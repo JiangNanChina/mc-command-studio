@@ -324,6 +324,37 @@ async function main() {
   }
   await page.screenshot({ path: join(ARTIFACTS, 'particle-form.png') })
 
+  // 世界控制：time / weather / difficulty
+  await page.locator('.command-item', { hasText: 'time' }).first().click()
+  await page.waitForSelector('#world-tab-time', { timeout: 10_000 })
+  await page.waitForTimeout(300)
+  const timeOutput = await page.locator('.output-code .cm-content').innerText()
+  if (!timeOutput.includes('time set day')) {
+    throw new Error(`time 输出不符合预期：${timeOutput}`)
+  }
+  await page.locator('#world-tab-weather').click()
+  await page.waitForTimeout(300)
+  const weatherOutput = await page.locator('.output-code .cm-content').innerText()
+  if (!weatherOutput.includes('weather clear')) {
+    throw new Error(`weather 输出不符合预期：${weatherOutput}`)
+  }
+  await page.getByLabel('指定持续时间').check()
+  await page.fill('#weather-seconds', '6000')
+  await page.waitForTimeout(300)
+  const weatherDuration = await page.locator('.output-code .cm-content').innerText()
+  if (!weatherDuration.includes('weather clear 6000')) {
+    throw new Error(`weather 持续时间输出不符合预期：${weatherDuration}`)
+  }
+  await page.screenshot({ path: join(ARTIFACTS, 'world-form.png') })
+  await page.locator('#world-tab-difficulty').click()
+  await page.waitForSelector('#difficulty-hard', { timeout: 10_000 })
+  await page.locator('#difficulty-hard').click()
+  await page.waitForTimeout(300)
+  const difficultyOutput = await page.locator('.output-code .cm-content').innerText()
+  if (!difficultyOutput.includes('difficulty hard')) {
+    throw new Error(`difficulty 输出不符合预期：${difficultyOutput}`)
+  }
+
   // scoreboard 可视化
   await page.locator('.command-item', { hasText: '记分板' }).first().click()
   await page.waitForSelector('#scoreboard-objective', { timeout: 10_000 })

@@ -45,6 +45,7 @@ export function StatusBar() {
     state.bossbar,
     state.scoreboard,
     state.particle,
+    state.world,
     state.generic,
     state.outputMode,
     state.commandBlock

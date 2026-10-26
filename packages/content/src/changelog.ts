@@ -22,6 +22,42 @@ const REPO = 'https://github.com/JiangNanChina/mc-command-studio'
  */
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: '0.1.15',
+    date: '2026-10-26',
+    title: '世界控制 time/weather/difficulty',
+    highlights: [
+      '时间、天气、难度合并为一个可视化页面，标签切换。',
+      '时间预设/自定义 tick、天气持续时间、难度机制说明。'
+    ],
+    sections: [
+      {
+        type: 'added',
+        items: [
+          'time：设置/推进/查询，6 种预设 + 自定义 tick。',
+          'weather：晴天/下雨/雷暴 + 可选持续时间。',
+          'difficulty：和平/简单/普通/困难。'
+        ]
+      },
+      {
+        type: 'improved',
+        items: [
+          '三个世界命令共用页面。',
+          '整数校验与机制提示。',
+          '单元测试 125 → 129；冒烟测试覆盖三项。'
+        ]
+      },
+      {
+        type: 'fixed',
+        items: ['无。']
+      },
+      {
+        type: 'known',
+        items: ['gamerule/worldborder 等世界命令仍在高级命令树。', '安装包尚未配置代码签名。']
+      }
+    ],
+    releaseUrl: `${REPO}/releases/tag/v0.1.15`
+  },
+  {
     version: '0.1.14',
     date: '2026-10-26',
     title: '可视化粒子 particle',

@@ -10,6 +10,9 @@ import {
   buildSetblockCommand,
   buildScoreboardCommand,
   buildParticleCommand,
+  buildTimeCommand,
+  buildWeatherCommand,
+  buildDifficultyCommand,
   buildSoundCommand,
   buildSummonCommand,
   buildTeleportCommand,
@@ -28,6 +31,7 @@ import {
   createDefaultGiveOptions,
   createDefaultScoreboardOptions,
   createDefaultParticleOptions,
+  createDefaultWorldOptions,
   createDefaultSetblockOptions,
   createDefaultSoundOptions,
   createDefaultSummonOptions,
@@ -59,6 +63,8 @@ import {
   type Selector,
   type ScoreboardOptions,
   type ParticleOptions,
+  type WorldOptions,
+  type TimeOptions,
   type SetblockMode,
   type SetblockOptions,
   type SoundOptions,
@@ -135,6 +141,7 @@ export interface ProjectPayload {
   bossbar: BossbarOptions
   scoreboard: ScoreboardOptions
   particle: ParticleOptions
+  world: WorldOptions
   datapack: DatapackDraft
   generic: GenericDraft
   commandBlock: CommandBlockOptions
@@ -176,6 +183,7 @@ interface AppStore {
   bossbar: BossbarOptions
   scoreboard: ScoreboardOptions
   particle: ParticleOptions
+  world: WorldOptions
   datapack: DatapackDraft
   generic: GenericDraft
   commandBlock: CommandBlockOptions
@@ -229,6 +237,9 @@ interface AppStore {
   updateBossbar: (patch: Partial<BossbarOptions>) => void
   updateScoreboard: (patch: Partial<ScoreboardOptions>) => void
   updateParticle: (patch: Partial<ParticleOptions>) => void
+  updateTime: (patch: Partial<TimeOptions>) => void
+  updateWeather: (patch: Partial<WorldOptions['weather']>) => void
+  updateDifficulty: (patch: Partial<WorldOptions['difficulty']>) => void
   openDatapack: () => void
   updateDatapackMeta: (patch: Partial<Pick<DatapackDraft, 'namespace' | 'description'>>) => void
   addDatapackFunction: () => void
@@ -788,6 +799,61 @@ function normalizeParticle(input: Partial<ParticleOptions> | undefined): Particl
   }
 }
 
+function normalizeWorld(input: Partial<WorldOptions> | undefined): WorldOptions {
+  const fallback = createDefaultWorldOptions()
+  if (!input) return fallback
+  const timeActions: TimeOptions['action'][] = ['set', 'add', 'query']
+  const presets: TimeOptions['preset'][] = [
+    'day',
+    'noon',
+    'night',
+    'midnight',
+    'sunrise',
+    'sunset',
+    'custom'
+  ]
+  const queries: TimeOptions['query'][] = ['day', 'daytime', 'gametime']
+  const weatherTypes: WorldOptions['weather']['type'][] = ['clear', 'rain', 'thunder']
+  const levels: WorldOptions['difficulty']['level'][] = [
+    'peaceful',
+    'easy',
+    'normal',
+    'hard'
+  ]
+  return {
+    time: {
+      action: timeActions.includes(input.time?.action as TimeOptions['action'])
+        ? (input.time?.action as TimeOptions['action'])
+        : 'set',
+      preset: presets.includes(input.time?.preset as TimeOptions['preset'])
+        ? (input.time?.preset as TimeOptions['preset'])
+        : 'day',
+      customTicks:
+        typeof input.time?.customTicks === 'string'
+          ? input.time.customTicks
+          : fallback.time.customTicks,
+      query: queries.includes(input.time?.query as TimeOptions['query'])
+        ? (input.time?.query as TimeOptions['query'])
+        : 'daytime'
+    },
+    weather: {
+      type: weatherTypes.includes(input.weather?.type as WorldOptions['weather']['type'])
+        ? (input.weather?.type as WorldOptions['weather']['type'])
+        : 'clear',
+      durationEnabled: Boolean(input.weather?.durationEnabled),
+      seconds:
+        typeof input.weather?.seconds === 'string'
+          ? input.weather.seconds
+          : fallback.weather.seconds
+    },
+    difficulty: {
+      level: levels.includes(input.difficulty?.level as WorldOptions['difficulty']['level'])
+        ? (input.difficulty?.level as WorldOptions['difficulty']['level'])
+        : 'normal'
+    }
+  }
+}
+
 function normalizeGive(input: Partial<GiveOptions> | undefined): GiveOptions {
   const fallback = createDefaultGiveOptions()
   if (!input) return fallback
@@ -828,6 +894,7 @@ function normalizePayload(input: unknown): ProjectPayload {
     bossbar: normalizeBossbar(data.bossbar),
     scoreboard: normalizeScoreboard(data.scoreboard),
     particle: normalizeParticle(data.particle),
+    world: normalizeWorld(data.world),
     datapack: normalizeDatapack(data.datapack),
     generic:
       data.generic && Array.isArray(data.generic.steps)
@@ -866,6 +933,7 @@ function documentSnapshot(state: AppStore): string {
     bossbar: state.bossbar,
     scoreboard: state.scoreboard,
     particle: state.particle,
+    world: state.world,
     datapack: state.datapack,
     generic: state.generic,
     commandBlock: state.commandBlock
@@ -918,6 +986,7 @@ export const useAppStore = create<AppStore>()(
     bossbar: createDefaultBossbarOptions(),
     scoreboard: createDefaultScoreboardOptions(),
     particle: createDefaultParticleOptions(),
+    world: createDefaultWorldOptions(),
     datapack: defaultDatapackDraft(),
     generic: emptyGeneric(),
     commandBlock: createDefaultCommandBlockOptions(),
@@ -1254,6 +1323,27 @@ export const useAppStore = create<AppStore>()(
       })
     },
 
+    updateTime: (patch) => {
+      set((state) => {
+        state.world.time = { ...state.world.time, ...patch }
+        state.dirty = true
+      })
+    },
+
+    updateWeather: (patch) => {
+      set((state) => {
+        state.world.weather = { ...state.world.weather, ...patch }
+        state.dirty = true
+      })
+    },
+
+    updateDifficulty: (patch) => {
+      set((state) => {
+        state.world.difficulty = { ...state.world.difficulty, ...patch }
+        state.dirty = true
+      })
+    },
+
     openDatapack: () => {
       set((state) => {
         state.activeCommandId = 'datapack'
@@ -1541,6 +1631,7 @@ export const useAppStore = create<AppStore>()(
         state.bossbar = createDefaultBossbarOptions()
         state.scoreboard = createDefaultScoreboardOptions()
         state.particle = createDefaultParticleOptions()
+        state.world = createDefaultWorldOptions()
         state.datapack = defaultDatapackDraft()
         state.generic = emptyGeneric()
         state.commandBlock = createDefaultCommandBlockOptions()
@@ -1583,6 +1674,7 @@ export const useAppStore = create<AppStore>()(
         bossbar: state.bossbar,
         scoreboard: state.scoreboard,
         particle: state.particle,
+        world: state.world,
         datapack: state.datapack,
         generic: state.generic,
         commandBlock: state.commandBlock,
@@ -1621,6 +1713,7 @@ export const useAppStore = create<AppStore>()(
         state.bossbar = payload.bossbar
         state.scoreboard = payload.scoreboard
         state.particle = payload.particle
+        state.world = payload.world
         state.datapack = payload.datapack
         state.generic = payload.generic
         state.commandBlock = payload.commandBlock
@@ -1896,4 +1989,18 @@ export function selectScoreboardOutput(scoreboard: ScoreboardOptions): BuildResu
 
 export function selectParticleOutput(particle: ParticleOptions): BuildResult {
   return buildParticleCommand(particle)
+}
+
+export function selectTimeOutput(time: TimeOptions): BuildResult {
+  return buildTimeCommand(time)
+}
+
+export function selectWeatherOutput(weather: WorldOptions['weather']): BuildResult {
+  return buildWeatherCommand(weather)
+}
+
+export function selectDifficultyOutput(
+  difficulty: WorldOptions['difficulty']
+): BuildResult {
+  return buildDifficultyCommand(difficulty)
 }

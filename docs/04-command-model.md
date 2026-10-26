@@ -336,7 +336,19 @@ interface ParticleOptions {
 
 26.3 使用 SNBT 参数：`particle minecraft:dust{color:[1,0,0],scale:1} ...`。按粒子类型自动推断 `block/dust/dust_transition/item/color/rgba/raw`；`trail`、`vibration`、`sculk_charge`、`shriek` 提供默认 SNBT，可继续原始编辑。
 
-### 1.19 通用构建器：所有 94 个根命令
+### 1.19 世界控制：`time` / `weather` / `difficulty`
+
+```ts
+interface WorldOptions {
+  time: { action: 'set' | 'add' | 'query'; preset: TimePreset; customTicks: string; query: TimeQuery }
+  weather: { type: 'clear' | 'rain' | 'thunder'; durationEnabled: boolean; seconds: string }
+  difficulty: { level: 'peaceful' | 'easy' | 'normal' | 'hard' }
+}
+```
+
+三个命令共用页面：`time set/add/query`、`weather <type> [seconds]`、`difficulty <level>`。自定义时间 tick 与天气秒数做整数校验。
+
+### 1.20 通用构建器：所有 94 个根命令
 
 ```ts
 interface GenericStep {
@@ -469,7 +481,7 @@ type Unit =
 
 ## 7. 测试
 
-`packages/core/src/*.test.ts` 与 `apps/desktop/src/shared/*.test.ts` 共 125 个用例，覆盖：
+`packages/core/src/*.test.ts` 与 `apps/desktop/src/shared/*.test.ts` 共 129 个用例，覆盖：
 
 - SNBT / 命令方块字符串转义。
 - 选择器排序、引号、范围、NBT 括号、分数。
@@ -491,6 +503,7 @@ type Unit =
 - `/bossbar` 创建序列、更新跳过 add、移除、ID/最大值/当前值校验。
 - `/scoreboard` 目标增删/显示位置、玩家分数、查询、运算、目标名/分数校验。
 - `/particle` 无参数/方块/红石尘/渐变/物品/RGBA/原始 SNBT、扩散/速度/数量/观察者。
+- `/time` 设置/推进/查询、自定义 tick；`/weather` 类型与持续时间；`/difficulty`。
 - 数据包文件树、load/tick 标签、多行函数、非法命名空间/函数名/空命令。
 - `/give` 文本导入：选择器、组件、数量、未知组件 raw。
 - 命令树遍历、通用路径、参数范围。

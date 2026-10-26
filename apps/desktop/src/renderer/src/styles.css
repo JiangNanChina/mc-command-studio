@@ -1854,6 +1854,93 @@ a {
   margin-top: 3px;
 }
 
+/* ---------- World control ---------- */
+.world-tabs {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 12px;
+  padding: 4px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--panel);
+  width: fit-content;
+}
+
+.world-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.world-tab:hover {
+  color: var(--text);
+}
+
+.world-tab.active {
+  background: var(--accent-soft);
+  border-color: color-mix(in srgb, var(--accent) 40%, var(--border));
+  color: var(--accent);
+}
+
+.world-option-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 8px;
+}
+
+.world-option {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  min-height: 52px;
+  padding: 10px;
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  background: var(--panel);
+  color: var(--text);
+  font-size: 13px;
+  transition: border-color 120ms ease, background 120ms ease;
+}
+
+.world-option:hover {
+  border-color: var(--border-strong);
+}
+
+.world-option.active {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+
+.world-option.tall {
+  min-height: 110px;
+  font-size: 18px;
+}
+
+.world-option.tall > span:first-child {
+  font-size: 13px;
+}
+
+.world-option-desc {
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.45;
+  text-align: center;
+}
+
+.world-option.active .world-option-desc {
+  color: color-mix(in srgb, var(--accent) 75%, var(--muted));
+}
+
 /* ---------- Datapack workspace ---------- */
 .workspace.no-output {
   grid-template-columns: 300px minmax(0, 1fr);
