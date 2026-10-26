@@ -1,0 +1,32 @@
+{
+  "name": "mc-command-studio",
+  "version": "0.1.0",
+  "private": true,
+  "description": "MC 指令工坊 - Windows 桌面版 Minecraft Java 命令编辑器",
+  "packageManager": "pnpm@11.28.5",
+  "scripts": {
+    "postinstall": "node tools/release/ensure-electron.mjs",
+    "setup:electron": "node tools/release/ensure-electron.mjs",
+    "dev": "pnpm --filter @mcstudio/desktop dev",
+    "build": "pnpm --filter @mcstudio/desktop build",
+    "build:win": "pnpm data:build && pnpm --filter @mcstudio/desktop build:win",
+    "typecheck": "pnpm -r --if-present typecheck",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "data:build": "node tools/pipeline/build-pack.mjs --version 26.3",
+    "data:verify": "node tools/pipeline/verify-pack.mjs",
+    "check:version": "node tools/release/verify-version.mjs",
+    "configure:github": "node tools/release/configure-github.mjs",
+    "release:patch": "node tools/release/bump.mjs patch",
+    "release:minor": "node tools/release/bump.mjs minor",
+    "update:serve": "node tools/release/mock-update-server.mjs",
+    "e2e": "node tools/e2e/smoke.mjs",
+    "e2e:update": "node tools/e2e/update-test.mjs"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "playwright": "^1.64.1",
+    "typescript": "^5.9.3",
+    "vitest": "^3.2.7"
+  }
+}

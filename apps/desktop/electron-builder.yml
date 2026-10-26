@@ -1,0 +1,49 @@
+appId: com.mcstudio.app
+productName: MC Command Studio
+copyright: Copyright © 2026 MC Command Studio
+directories:
+  buildResources: build
+  output: ../../release
+asar: true
+compression: normal
+files:
+  - out/**/*
+  - package.json
+extraResources:
+  - from: ../../packs
+    to: packs
+    filter:
+      - "**/*"
+win:
+  icon: build/icon.ico
+  target:
+    - target: nsis
+      arch:
+        - x64
+    - target: portable
+      arch:
+        - x64
+  artifactName: MC-Command-Studio-${version}-${arch}.${ext}
+nsis:
+  oneClick: false
+  perMachine: false
+  allowToChangeInstallationDirectory: true
+  createDesktopShortcut: true
+  createStartMenuShortcut: true
+  shortcutName: MC 指令工坊
+  uninstallDisplayName: MC 指令工坊
+  artifactName: MC-Command-Studio-Setup-${version}.${ext}
+  deleteAppDataOnUninstall: false
+  runAfterFinish: true
+portable:
+  artifactName: MC-Command-Studio-${version}-portable.${ext}
+fileAssociations:
+  - ext: mcstudio
+    name: MC Command Studio Project
+    description: MC 指令工坊项目
+    role: Editor
+publish:
+  - provider: github
+    owner: JiangNanChina
+    repo: mc-command-studio
+    releaseType: draft

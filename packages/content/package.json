@@ -1,0 +1,16 @@
+{
+  "name": "@mcstudio/content",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "命令中文名、分类、示例与物品组件定义",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit -p tsconfig.json"
+  },
+  "dependencies": {
+    "@mcstudio/core": "workspace:*"
+  }
+}

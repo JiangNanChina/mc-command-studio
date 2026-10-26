@@ -1,0 +1,16 @@
+{
+  "name": "@mcstudio/core",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "命令 AST、序列化、校验与版本包模型",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit -p tsconfig.json"
+  },
+  "dependencies": {
+    "zod": "^4.6.7"
+  }
+}

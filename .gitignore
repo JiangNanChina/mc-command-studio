@@ -1,0 +1,24 @@
+node_modules/
+out/
+dist/
+/release/
+.pnpm-store/
+*.log
+.DS_Store
+Thumbs.db
+
+# 数据包由 tools/pipeline 生成，不提交
+packs/*
+!packs/README.md
+!packs/.gitkeep
+
+# 本地更新源 / 测试产物
+.cache/
+artifacts/
+coverage/
+playwright-report/
+test-results/
+
+# 本地环境
+.env
+.env.local
