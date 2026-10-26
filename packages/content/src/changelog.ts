@@ -22,6 +22,27 @@ const REPO = 'https://github.com/JiangNanChina/mc-command-studio'
  */
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: '0.1.45',
+    date: '2026-10-27',
+    title: '启动性能：数据包编辑器按需加载',
+    highlights: ['数据包编辑器懒加载。', '主包体积下降约 68 kB。'],
+    sections: [
+      {
+        type: 'added',
+        items: ['加载占位 UI。']
+      },
+      {
+        type: 'improved',
+        items: ['DatapackWorkspace 独立 chunk。', '主包 2,555 → 2,487 kB。']
+      },
+      {
+        type: 'fixed',
+        items: ['无。']
+      }
+    ],
+    releaseUrl: `${REPO}/releases/tag/v0.1.45`
+  },
+  {
     version: '0.1.44',
     date: '2026-10-27',
     title: '服务器管理命令可视化',

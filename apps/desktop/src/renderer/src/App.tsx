@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { lazy, Suspense, useEffect } from 'react'
 import { AlertTriangle, Database, FolderOpen, Info, RefreshCw } from 'lucide-react'
 import { getApi } from './lib/api'
 import { getCurrentOutput } from './lib/commandOutput'
@@ -25,7 +25,11 @@ import { EffectForm } from './components/EffectForm'
 import { FillForm } from './components/FillForm'
 import { CloneForm } from './components/CloneForm'
 import { ChainBuilder } from './components/ChainBuilder'
-import { DatapackWorkspace } from './components/DatapackWorkspace'
+const DatapackWorkspace = lazy(() =>
+  import('./components/DatapackWorkspace').then((module) => ({
+    default: module.DatapackWorkspace
+  }))
+)
 import { EnchantForm } from './components/EnchantForm'
 import { XpForm } from './components/XpForm'
 import { TellrawForm } from './components/TellrawForm'
@@ -387,7 +391,9 @@ export default function App() {
           ) : showWelcome ? (
             <Welcome />
           ) : activeCommandId === 'datapack' ? (
-            <DatapackWorkspace />
+            <Suspense fallback={<div className="empty">数据包编辑器加载中…</div>}>
+              <DatapackWorkspace />
+            </Suspense>
           ) : activeCommandId === 'chain' ? (
             <ChainBuilder />
           ) : treeOnly && !supportsLegacyForm(activeCommandId ?? '') ? (
@@ -431,7 +437,9 @@ export default function App() {
           ) : activeCommandId === 'chain' ? (
             <ChainBuilder />
           ) : activeCommandId === 'datapack' ? (
-            <DatapackWorkspace />
+            <Suspense fallback={<div className="empty">数据包编辑器加载中…</div>}>
+              <DatapackWorkspace />
+            </Suspense>
           ) : activeCommandId === 'enchant' ? (
             <EnchantForm />
           ) : activeCommandId === 'xp' ? (
