@@ -22,6 +22,41 @@ const REPO = 'https://github.com/JiangNanChina/mc-command-studio'
  */
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: '0.1.6',
+    date: '2026-10-26',
+    title: '命令方块链工作区',
+    highlights: [
+      '新增命令方块链：按方向排布最多 64 个脉冲/连锁/循环方块。',
+      '整链预览与一键复制，坐标自动按方向偏移。'
+    ],
+    sections: [
+      {
+        type: 'added',
+        items: [
+          '命令方块链：起点、方向、每个方块的命令/类型/有条件/保持开启。',
+          '自动生成整链 setblock 命令，支持绝对与 ~ 相对坐标。',
+          '侧栏工具入口、整链预览、复制全部。'
+        ]
+      },
+      {
+        type: 'improved',
+        items: [
+          '命令方块链写入项目文件，撤销/重做覆盖链编辑。',
+          '单元测试 90 → 95；冒烟测试覆盖 2 格命令方块链。'
+        ]
+      },
+      {
+        type: 'fixed',
+        items: ['无。']
+      },
+      {
+        type: 'known',
+        items: ['暂不支持 ^ 局部坐标；单链最多 64 个方块。', '安装包尚未配置代码签名。']
+      }
+    ],
+    releaseUrl: `${REPO}/releases/tag/v0.1.6`
+  },
+  {
     version: '0.1.5',
     date: '2026-10-26',
     title: 'clone 表单与撤销重做',

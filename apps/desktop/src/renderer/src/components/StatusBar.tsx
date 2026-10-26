@@ -36,6 +36,7 @@ export function StatusBar() {
     state.effect,
     state.fill,
     state.clone,
+    state.chain,
     state.generic,
     state.outputMode,
     state.commandBlock

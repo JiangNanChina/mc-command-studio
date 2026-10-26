@@ -32,6 +32,7 @@
 
 - 26.3 数据包：94 根命令、1,197 字面量、59 参数类型、1,658 物品、1,286 方块。
 - 专用表单：`give`、`summon`、`setblock`、`execute`、`tp`、`effect`、`fill`、`clone`；`setblock` 支持方块状态与方块实体 NBT。
+- 命令方块链：最多 64 个脉冲/连锁/循环方块，按方向自动偏移坐标，生成整链 `/setblock`。
 - `execute` 执行链：as/at/positioned/align/anchored/facing/rotated/in/if/unless/store/raw + run，可排序。
 - 数据包导出：当前命令导出为 `.zip`，包含 `pack.mcmeta`、`.mcfunction` 与可选 load/tick 标签。
 - `tp`：坐标/实体目的地、可选朝向；`effect`：give/clear、时长、等级、隐藏粒子；`fill`/`clone`：区域、方块状态、模式、过滤。
@@ -44,7 +45,7 @@
 - 项目保存 / 打开 / 自动保存 / 崩溃恢复；最近项目。
 - 深色/浅色主题、设置、诊断导出、本地日志。
 - NSIS 安装包 + 便携版；electron-updater 自动更新与发布流水线。
-- 单元测试 90 个；Electron 冒烟测试覆盖公告、give/导入/summon/setblock/tp/effect/fill/clone/execute/数据包/撤销重做/命令方块。
+- 单元测试 95 个；Electron 冒烟测试覆盖公告、give/导入/summon/setblock/tp/effect/fill/clone/execute/命令方块链/数据包/撤销重做/命令方块。
 
 ### P1（现代版 MVP）
 
@@ -85,6 +86,7 @@
 | `give` / `summon` / `setblock` / `execute` / `tp` / `effect` / `fill` / `clone` 专用表单 | ✅ |
 | `give` 文本导入 | ✅ 组件无法解析时保留 raw |
 | 撤销 / 重做 | ✅ 全局 100 步 + 快捷键 |
+| 命令方块链 | ✅ 2–64 个方块、方向偏移、整链输出 |
 | 更新公告 / 版本历史 | ✅ 更新后首次启动横幅 + 顶栏铃铛 |
 | 数据包导出 | ✅ pack.mcmeta + mcfunction + load/tick |
 | 物品组件 | ✅ 13 类；复杂组件可用 raw |
@@ -92,7 +94,7 @@
 | 命令方块 setblock | ✅ 单块；链式布局未做 |
 | 项目保存 / 自动保存 | ✅ JSON 文件 |
 | 安装包 / 便携版 | ✅ 未签名（见 08） |
-| 自动更新 | ✅ 0.1.4 → 0.1.5 静默升级已实测；GitHub v0.1.5 Release 已发布 |
+| 自动更新 | ✅ 0.1.5 → 0.1.6 静默升级已实测；GitHub v0.1.6 Release 已发布 |
 | 1.12.2 / 1.13–1.20.4 | ❌ 仅设计 |
 | 数据包导出 / 单元 / execute 链 | ❌ P1 后续 |
 

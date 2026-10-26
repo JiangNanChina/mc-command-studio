@@ -212,6 +212,19 @@ async function main() {
   if (!redoneClone.includes(' force')) throw new Error(`重做后缺少 force：${redoneClone}`)
   await page.screenshot({ path: join(ARTIFACTS, 'clone-form.png') })
 
+  // 命令方块链
+  await page.locator('.command-item', { hasText: '命令方块链' }).first().click()
+  await page.waitForSelector('#chain-direction', { timeout: 10_000 })
+  await page.waitForTimeout(300)
+  const chainOutput = await page.locator('.output-code .cm-content').innerText()
+  if (!chainOutput.includes('setblock 0 64 0 minecraft:command_block')) {
+    throw new Error(`命令方块链输出不符合预期：${chainOutput}`)
+  }
+  if (!chainOutput.includes('setblock 1 64 0 minecraft:chain_command_block')) {
+    throw new Error(`命令方块链缺少连锁块：${chainOutput}`)
+  }
+  await page.screenshot({ path: join(ARTIFACTS, 'chain-form.png') })
+
   // execute 执行链
   await page.locator('.command-item', { hasText: '执行上下文' }).first().click()
   await page.waitForSelector('#execute-run', { timeout: 10_000 })

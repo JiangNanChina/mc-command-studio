@@ -2,6 +2,7 @@ import {
   buildCommandBlockSetblock,
   hasErrors,
   type BuildResult,
+  type ChainOptions,
   type CloneOptions,
   type CommandBlockOptions,
   type Diagnostic,
@@ -15,6 +16,7 @@ import {
   type VersionPack
 } from '@mcstudio/core'
 import {
+  selectChainOutput,
   selectCloneOutput,
   selectEffectOutput,
   selectExecuteOutput,
@@ -46,6 +48,7 @@ export function getCommandOutput(
   effect: EffectOptions,
   fill: FillOptions,
   clone: CloneOptions,
+  chain: ChainOptions,
   generic: GenericDraft
 ): BuildResult {
   if (!activeCommandId) return { text: '', diagnostics: [] }
@@ -57,6 +60,7 @@ export function getCommandOutput(
   if (activeCommandId === 'effect') return selectEffectOutput(effect)
   if (activeCommandId === 'fill') return selectFillOutput(fill)
   if (activeCommandId === 'clone') return selectCloneOutput(clone)
+  if (activeCommandId === 'chain') return selectChainOutput(chain)
   if (!pack) return { text: '', diagnostics: [] }
   return selectGenericOutput(pack, { ...generic, root: generic.root ?? activeCommandId })
 }
@@ -72,6 +76,7 @@ export function getCurrentOutput(
   effect: EffectOptions,
   fill: FillOptions,
   clone: CloneOptions,
+  chain: ChainOptions,
   generic: GenericDraft,
   outputMode: OutputMode,
   commandBlock: CommandBlockOptions
@@ -87,6 +92,7 @@ export function getCurrentOutput(
     effect,
     fill,
     clone,
+    chain,
     generic
   )
   if (outputMode === 'command') {

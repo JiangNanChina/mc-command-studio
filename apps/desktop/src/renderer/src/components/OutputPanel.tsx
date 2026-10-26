@@ -64,7 +64,6 @@ function CodeView({ text }: { text: string }) {
       extensions: [
         EditorState.readOnly.of(true),
         EditorView.editable.of(false),
-        EditorView.lineWrapping,
         outputTheme,
         EditorView.contentAttributes.of({ 'aria-label': '生成的命令' })
       ]
@@ -191,11 +190,13 @@ export function OutputPanel() {
     state.effect,
     state.fill,
     state.clone,
+    state.chain,
     state.generic,
     state.outputMode,
     state.commandBlock
   )
   const commandMode = state.outputMode === 'command'
+  const chainMode = state.activeCommandId === 'chain'
   const permission = state.activeCommandId
     ? permissionLabel(
         state.pack?.commands.children?.[state.activeCommandId] ??
@@ -207,7 +208,7 @@ export function OutputPanel() {
     if (!output.text) return
     try {
       await getApi().clipboard.write(output.text)
-      state.showToast(commandMode ? '命令已复制到剪贴板' : 'setblock 命令已复制', 'success')
+      state.showToast(chainMode ? '整链命令已复制' : commandMode ? '命令已复制到剪贴板' : 'setblock 命令已复制', 'success')
     } catch (error) {
       state.showToast(`复制失败：${error instanceof Error ? error.message : String(error)}`, 'error')
     }
@@ -235,6 +236,8 @@ export function OutputPanel() {
             role="tab"
             aria-selected={!commandMode}
             className={`tab${!commandMode ? ' active' : ''}`}
+            disabled={chainMode}
+            title={chainMode ? '命令方块链本身已经是多条 setblock 命令' : undefined}
             onClick={() => state.setOutputMode('command-block')}
           >
             命令方块
@@ -276,6 +279,7 @@ export function OutputPanel() {
             type="button"
             className="btn"
             title="把命令放进命令方块视图"
+            disabled={chainMode}
             onClick={() => state.setOutputMode(commandMode ? 'command-block' : 'command')}
           >
             <Boxes size={15} />
@@ -285,7 +289,7 @@ export function OutputPanel() {
         <button
           type="button"
           className="btn"
-          disabled={!output.command.text || !state.pack}
+          disabled={!output.command.text || !state.pack || chainMode}
           title="把当前命令导出为 Minecraft 数据包"
           onClick={() => setExportOpen(true)}
         >

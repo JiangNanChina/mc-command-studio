@@ -14,6 +14,7 @@ import { TeleportForm } from './components/TeleportForm'
 import { EffectForm } from './components/EffectForm'
 import { FillForm } from './components/FillForm'
 import { CloneForm } from './components/CloneForm'
+import { ChainBuilder } from './components/ChainBuilder'
 import { GenericBuilder } from './components/GenericBuilder'
 import { OutputPanel } from './components/OutputPanel'
 import { StatusBar } from './components/StatusBar'
@@ -104,6 +105,7 @@ export default function App() {
   const effect = state.effect
   const fill = state.fill
   const clone = state.clone
+  const chain = state.chain
   const generic = state.generic
   const commandBlock = state.commandBlock
   const outputMode = state.outputMode
@@ -211,6 +213,7 @@ export default function App() {
           store.effect,
           store.fill,
           store.clone,
+          store.chain,
           store.generic,
           store.outputMode,
           store.commandBlock
@@ -239,7 +242,7 @@ export default function App() {
       void useAppStore.getState().autosave()
     }, 4000)
     return () => clearTimeout(timer)
-  }, [dirty, give, summon, setblock, execute, teleport, effect, fill, clone, generic, commandBlock, outputMode, activeCommandId, projectName])
+  }, [dirty, give, summon, setblock, execute, teleport, effect, fill, clone, chain, generic, commandBlock, outputMode, activeCommandId, projectName])
 
   useEffect(() => {
     if (!toast) return
@@ -295,6 +298,8 @@ export default function App() {
             <FillForm />
           ) : activeCommandId === 'clone' ? (
             <CloneForm />
+          ) : activeCommandId === 'chain' ? (
+            <ChainBuilder />
           ) : (
             <GenericBuilder />
           )}

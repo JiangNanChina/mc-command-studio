@@ -147,7 +147,29 @@ interface CloneOptions {
 
 `buildCloneCommand` 生成 `clone <begin> <end> <destination> [mode] [filter] [move]`；`filtered` 必须提供过滤方块，`normal` 省略移动参数。
 
-### 1.10 通用构建器：所有 94 个根命令
+### 1.10 命令方块链
+
+```ts
+interface ChainOptions {
+  origin: { x: string; y: string; z: string }
+  direction: 'up' | 'down' | 'north' | 'south' | 'east' | 'west'
+  blocks: {
+    id: string
+    command: string
+    kind: 'impulse' | 'chain' | 'repeating'
+    conditional: boolean
+    auto: boolean
+  }[]
+}
+```
+
+`buildChainCommands` 沿方向逐格偏移起点，生成每行一个 `setblock`：
+- 方块 ID 按 kind 映射到 `command_block` / `chain_command_block` / `repeating_command_block`。
+- 方块状态带 `facing=<direction>`，有条件时追加 `conditional=true`。
+- NBT 使用 `commandBlockString` 转义命令，写入 `auto` / `conditionMet` / `powered` / `TrackOutput`。
+- 绝对坐标直接加偏移，`~` 坐标保留相对形式；`^` 局部坐标会报错。
+
+### 1.11 通用构建器：所有 94 个根命令
 
 ```ts
 interface GenericStep {
@@ -280,7 +302,7 @@ type Unit =
 
 ## 7. 测试
 
-`packages/core/src/*.test.ts` 与 `apps/desktop/src/shared/*.test.ts` 共 90 个用例，覆盖：
+`packages/core/src/*.test.ts` 与 `apps/desktop/src/shared/*.test.ts` 共 95 个用例，覆盖：
 
 - SNBT / 命令方块字符串转义。
 - 选择器排序、引号、范围、NBT 括号、分数。
@@ -293,6 +315,7 @@ type Unit =
 - `/effect` give/clear、时长/等级/隐藏粒子、非法数值。
 - `/fill` 模式、replace 过滤、非法方块与忽略过滤警告。
 - `/clone` 模式、filtered 过滤必填、force/move。
+- 命令方块链方向偏移、方块类型、条件/自动、引号转义、`^` 坐标报错。
 - 数据包文件树、load/tick 标签、非法命名空间/函数名/换行命令。
 - `/give` 文本导入：选择器、组件、数量、未知组件 raw。
 - 命令树遍历、通用路径、参数范围。

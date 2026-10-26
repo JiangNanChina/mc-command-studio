@@ -1,5 +1,5 @@
 import { useMemo } from 'react'
-import { Search, X, Boxes } from 'lucide-react'
+import { Search, X, Boxes, Link2 } from 'lucide-react'
 import {
   CATEGORY_ORDER,
   COMMAND_MAP,
@@ -82,6 +82,28 @@ export function Sidebar() {
       </div>
 
       <div className="command-list">
+        {category === ALL && !query ? (
+          <>
+            <div className="command-group-label">工具</div>
+            <button
+              type="button"
+              className={`command-item${state.activeCommandId === 'chain' ? ' active' : ''}`}
+              onClick={() => state.openChain()}
+            >
+              <span className="command-glyph">
+                <Link2 size={15} />
+              </span>
+              <span className="command-text">
+                <span className="command-name">
+                  命令方块链
+                  <span className="command-id">chain</span>
+                </span>
+                <span className="command-desc">排布多个命令方块，生成整链 setblock。</span>
+              </span>
+            </button>
+          </>
+        ) : null}
+
         {curated.length > 0 ? (
           <>
             <div className="command-group-label">精选命令</div>

@@ -1759,6 +1759,41 @@ a {
   margin-top: 3px;
 }
 
+/* ---------- Command block chain ---------- */
+.chain-block {
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg-elev);
+}
+
+.chain-block + .chain-block {
+  margin-top: 10px;
+}
+
+.chain-block-head {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.chain-preview {
+  max-height: 260px;
+  margin: 0;
+  padding: 12px;
+  overflow: auto;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg-elev);
+  color: var(--accent);
+  font-family: var(--mono);
+  font-size: 11.5px;
+  line-height: 1.7;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
 /* ---------- Datapack export ---------- */
 .datapack-files {
   display: flex;

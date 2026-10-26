@@ -1,4 +1,5 @@
 import {
+  buildChainCommands,
   buildCloneCommand,
   buildEffectCommand,
   buildExecuteCommand,
@@ -7,6 +8,8 @@ import {
   buildSetblockCommand,
   buildSummonCommand,
   buildTeleportCommand,
+  createChainBlock,
+  createDefaultChainOptions,
   createDefaultCloneOptions,
   createDefaultCommandBlockOptions,
   createDefaultEffectOptions,
@@ -21,6 +24,8 @@ import {
   serializeGeneric,
   type BlockStateValue,
   type BuildResult,
+  type ChainBlock,
+  type ChainOptions,
   type CloneOptions,
   type CommandBlockOptions,
   type CommandNodeData,
@@ -69,6 +74,7 @@ export interface ProjectPayload {
   effect: EffectOptions
   fill: FillOptions
   clone: CloneOptions
+  chain: ChainOptions
   generic: GenericDraft
   commandBlock: CommandBlockOptions
   outputMode: OutputMode
@@ -100,6 +106,7 @@ interface AppStore {
   effect: EffectOptions
   fill: FillOptions
   clone: CloneOptions
+  chain: ChainOptions
   generic: GenericDraft
   commandBlock: CommandBlockOptions
   outputMode: OutputMode
@@ -144,6 +151,12 @@ interface AppStore {
   updateEffect: (patch: Partial<EffectOptions>) => void
   updateFill: (patch: Partial<FillOptions>) => void
   updateClone: (patch: Partial<CloneOptions>) => void
+  openChain: () => void
+  updateChain: (patch: Partial<ChainOptions>) => void
+  addChainBlock: () => void
+  updateChainBlock: (id: string, patch: Partial<ChainBlock>) => void
+  removeChainBlock: (id: string) => void
+  moveChainBlock: (id: string, direction: -1 | 1) => void
   setGenericRoot: (root: string | null) => void
   pushGenericStep: (step: { name: string; value?: string }) => void
   popGenericStep: () => void
@@ -386,6 +399,40 @@ function normalizeClone(input: Partial<CloneOptions> | undefined): CloneOptions 
   }
 }
 
+function normalizeChain(input: Partial<ChainOptions> | undefined): ChainOptions {
+  const fallback = createDefaultChainOptions()
+  if (!input) return fallback
+  const directions: ChainOptions['direction'][] = [
+    'up',
+    'down',
+    'north',
+    'south',
+    'east',
+    'west'
+  ]
+  const kinds: ChainBlock['kind'][] = ['impulse', 'chain', 'repeating']
+  const blocks = Array.isArray(input.blocks)
+    ? input.blocks
+        .filter((block) => block && typeof block.id === 'string')
+        .map((block) => ({
+          id: block.id,
+          command: typeof block.command === 'string' ? block.command : '',
+          kind: kinds.includes(block.kind as ChainBlock['kind'])
+            ? (block.kind as ChainBlock['kind'])
+            : 'chain',
+          conditional: Boolean(block.conditional),
+          auto: Boolean(block.auto)
+        }))
+    : fallback.blocks
+  return {
+    origin: normalizePosition(input.origin),
+    direction: directions.includes(input.direction as ChainOptions['direction'])
+      ? (input.direction as ChainOptions['direction'])
+      : 'east',
+    blocks
+  }
+}
+
 function normalizeGive(input: Partial<GiveOptions> | undefined): GiveOptions {
   const fallback = createDefaultGiveOptions()
   if (!input) return fallback
@@ -417,6 +464,7 @@ function normalizePayload(input: unknown): ProjectPayload {
     effect: normalizeEffect(data.effect),
     fill: normalizeFill(data.fill),
     clone: normalizeClone(data.clone),
+    chain: normalizeChain(data.chain),
     generic:
       data.generic && Array.isArray(data.generic.steps)
         ? {
@@ -445,6 +493,7 @@ function documentSnapshot(state: AppStore): string {
     effect: state.effect,
     fill: state.fill,
     clone: state.clone,
+    chain: state.chain,
     generic: state.generic,
     commandBlock: state.commandBlock
   })
@@ -487,6 +536,7 @@ export const useAppStore = create<AppStore>()(
     effect: createDefaultEffectOptions(),
     fill: createDefaultFillOptions(),
     clone: createDefaultCloneOptions(),
+    chain: createDefaultChainOptions(),
     generic: emptyGeneric(),
     commandBlock: createDefaultCommandBlockOptions(),
     outputMode: 'command',
@@ -766,6 +816,54 @@ export const useAppStore = create<AppStore>()(
       })
     },
 
+    openChain: () => {
+      set((state) => {
+        state.activeCommandId = 'chain'
+        state.outputMode = 'command'
+      })
+    },
+
+    updateChain: (patch) => {
+      set((state) => {
+        state.chain = { ...state.chain, ...patch }
+        state.dirty = true
+      })
+    },
+
+    addChainBlock: () => {
+      set((state) => {
+        const index = state.chain.blocks.length
+        state.chain.blocks.push(createChainBlock(index, index === 0 ? 'impulse' : 'chain'))
+        state.dirty = true
+      })
+    },
+
+    updateChainBlock: (id, patch) => {
+      set((state) => {
+        const block = state.chain.blocks.find((item) => item.id === id)
+        if (block) Object.assign(block, patch)
+        state.dirty = true
+      })
+    },
+
+    removeChainBlock: (id) => {
+      set((state) => {
+        state.chain.blocks = state.chain.blocks.filter((block) => block.id !== id)
+        state.dirty = true
+      })
+    },
+
+    moveChainBlock: (id, direction) => {
+      set((state) => {
+        const index = state.chain.blocks.findIndex((block) => block.id === id)
+        const target = index + direction
+        if (index < 0 || target < 0 || target >= state.chain.blocks.length) return
+        const [block] = state.chain.blocks.splice(index, 1)
+        state.chain.blocks.splice(target, 0, block)
+        state.dirty = true
+      })
+    },
+
     setGenericRoot: (root) => {
       set((state) => {
         state.generic = { root, steps: [] }
@@ -914,6 +1012,7 @@ export const useAppStore = create<AppStore>()(
         state.effect = createDefaultEffectOptions()
         state.fill = createDefaultFillOptions()
         state.clone = createDefaultCloneOptions()
+        state.chain = createDefaultChainOptions()
         state.generic = emptyGeneric()
         state.commandBlock = createDefaultCommandBlockOptions()
         state.outputMode = 'command'
@@ -946,6 +1045,7 @@ export const useAppStore = create<AppStore>()(
         effect: state.effect,
         fill: state.fill,
         clone: state.clone,
+        chain: state.chain,
         generic: state.generic,
         commandBlock: state.commandBlock,
         outputMode: state.outputMode
@@ -974,6 +1074,7 @@ export const useAppStore = create<AppStore>()(
         state.effect = payload.effect
         state.fill = payload.fill
         state.clone = payload.clone
+        state.chain = payload.chain
         state.generic = payload.generic
         state.commandBlock = payload.commandBlock
         state.outputMode = payload.outputMode
@@ -1212,4 +1313,8 @@ export function selectFillOutput(fill: FillOptions): BuildResult {
 
 export function selectCloneOutput(clone: CloneOptions): BuildResult {
   return buildCloneCommand(clone)
+}
+
+export function selectChainOutput(chain: ChainOptions): BuildResult {
+  return buildChainCommands(chain)
 }
