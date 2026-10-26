@@ -7,6 +7,8 @@ import { Header } from './components/Header'
 import { Sidebar } from './components/Sidebar'
 import { Welcome } from './components/Welcome'
 import { GiveForm } from './components/GiveForm'
+import { SummonForm } from './components/SummonForm'
+import { SetblockForm } from './components/SetblockForm'
 import { GenericBuilder } from './components/GenericBuilder'
 import { OutputPanel } from './components/OutputPanel'
 import { StatusBar } from './components/StatusBar'
@@ -88,6 +90,8 @@ export default function App() {
   const pack = state.pack
   const dirty = state.dirty
   const give = state.give
+  const summon = state.summon
+  const setblock = state.setblock
   const generic = state.generic
   const commandBlock = state.commandBlock
   const outputMode = state.outputMode
@@ -159,6 +163,8 @@ export default function App() {
           store.pack,
           store.activeCommandId,
           store.give,
+          store.summon,
+          store.setblock,
           store.generic,
           store.outputMode,
           store.commandBlock
@@ -187,7 +193,7 @@ export default function App() {
       void useAppStore.getState().autosave()
     }, 4000)
     return () => clearTimeout(timer)
-  }, [dirty, give, generic, commandBlock, outputMode, activeCommandId, projectName])
+  }, [dirty, give, summon, setblock, generic, commandBlock, outputMode, activeCommandId, projectName])
 
   useEffect(() => {
     if (!toast) return
@@ -228,6 +234,10 @@ export default function App() {
             <Welcome />
           ) : activeCommandId === 'give' ? (
             <GiveForm />
+          ) : activeCommandId === 'summon' ? (
+            <SummonForm />
+          ) : activeCommandId === 'setblock' ? (
+            <SetblockForm />
           ) : (
             <GenericBuilder />
           )}

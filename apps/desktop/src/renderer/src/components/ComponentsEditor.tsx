@@ -1,5 +1,6 @@
 import { Plus, Trash2, X } from 'lucide-react'
 import {
+  RARITIES,
   TEXT_COLORS,
   itemComponentLabel,
   type EnchantmentEntry,
@@ -66,12 +67,12 @@ export function ComponentsEditor({ components, enchantments, onReplace, onRemove
       ) : null}
 
       {components.map((component, index) => {
-        if (component.kind === 'custom_name') {
+        if (component.kind === 'custom_name' || component.kind === 'item_name') {
           return (
-            <div className="component-card" key="custom_name">
+            <div className="component-card" key={component.kind}>
               <div className="component-head">
                 <span className="component-title">{itemComponentLabel(component.kind)}</span>
-                <span className="component-id">custom_name</span>
+                <span className="component-id">{component.kind}</span>
                 <span style={{ flex: 1 }} />
                 <button type="button" className="icon-btn" onClick={() => onRemove(index)} aria-label="移除组件">
                   <Trash2 size={14} />
@@ -79,11 +80,11 @@ export function ComponentsEditor({ components, enchantments, onReplace, onRemove
               </div>
               <div className="component-body">
                 <div className="field">
-                  <label className="field-label" htmlFor="custom-name-text">
+                  <label className="field-label" htmlFor={`component-${component.kind}-text`}>
                     名称
                   </label>
                   <input
-                    id="custom-name-text"
+                    id={`component-${component.kind}-text`}
                     className="input"
                     placeholder="例如 Excalibur"
                     value={component.text}
@@ -94,7 +95,7 @@ export function ComponentsEditor({ components, enchantments, onReplace, onRemove
                   <ColorSelect
                     value={component.color}
                     label="名称颜色"
-                    onChange={(color) => onReplace(index, { ...component, color: color as never })}
+                    onChange={(color) => onReplace(index, { ...component, color: color as TextLine['color'] })}
                   />
                   <label className="checkline">
                     <input
@@ -302,6 +303,170 @@ export function ComponentsEditor({ components, enchantments, onReplace, onRemove
                         value: Math.max(1, Math.min(99, Number(event.target.value) || 1))
                       })
                     }
+                  />
+                </div>
+              </div>
+            </div>
+          )
+        }
+
+        if (component.kind === 'max_damage' || component.kind === 'damage') {
+          const minimum = component.kind === 'max_damage' ? 1 : 0
+          return (
+            <div className="component-card" key={component.kind}>
+              <div className="component-head">
+                <span className="component-title">{itemComponentLabel(component.kind)}</span>
+                <span className="component-id">{component.kind}</span>
+                <span style={{ flex: 1 }} />
+                <button type="button" className="icon-btn" onClick={() => onRemove(index)} aria-label="移除组件">
+                  <Trash2 size={14} />
+                </button>
+              </div>
+              <div className="component-body">
+                <div className="field">
+                  <label className="field-label" htmlFor={`component-${component.kind}`}>
+                    {component.kind === 'max_damage' ? '最大耐久值' : '已消耗耐久值'}
+                  </label>
+                  <input
+                    id={`component-${component.kind}`}
+                    className="input"
+                    type="number"
+                    min={minimum}
+                    value={component.value}
+                    onChange={(event) =>
+                      onReplace(index, {
+                        ...component,
+                        value: Math.max(minimum, Math.floor(Number(event.target.value) || minimum))
+                      })
+                    }
+                  />
+                </div>
+              </div>
+            </div>
+          )
+        }
+
+        if (component.kind === 'rarity') {
+          return (
+            <div className="component-card" key="rarity">
+              <div className="component-head">
+                <span className="component-title">{itemComponentLabel(component.kind)}</span>
+                <span className="component-id">rarity</span>
+                <span style={{ flex: 1 }} />
+                <button type="button" className="icon-btn" onClick={() => onRemove(index)} aria-label="移除组件">
+                  <Trash2 size={14} />
+                </button>
+              </div>
+              <div className="component-body">
+                <div className="field">
+                  <label className="field-label" htmlFor="component-rarity">
+                    稀有度
+                  </label>
+                  <select
+                    id="component-rarity"
+                    className="select"
+                    value={component.value}
+                    onChange={(event) =>
+                      onReplace(index, { ...component, value: event.target.value as typeof component.value })
+                    }
+                  >
+                    {RARITIES.map((rarity) => (
+                      <option key={rarity} value={rarity}>
+                        {rarity}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+            </div>
+          )
+        }
+
+        if (component.kind === 'enchantment_glint_override') {
+          return (
+            <div className="component-card" key="enchantment_glint_override">
+              <div className="component-head">
+                <span className="component-title">{itemComponentLabel(component.kind)}</span>
+                <span className="component-id">enchantment_glint_override</span>
+                <span style={{ flex: 1 }} />
+                <button type="button" className="icon-btn" onClick={() => onRemove(index)} aria-label="移除组件">
+                  <Trash2 size={14} />
+                </button>
+              </div>
+              <div className="component-body">
+                <label className="checkline">
+                  <input
+                    type="checkbox"
+                    checked={component.value}
+                    onChange={(event) => onReplace(index, { ...component, value: event.target.checked })}
+                  />
+                  强制附魔光效
+                </label>
+              </div>
+            </div>
+          )
+        }
+
+        if (component.kind === 'custom_data') {
+          return (
+            <div className="component-card" key="custom_data">
+              <div className="component-head">
+                <span className="component-title">{itemComponentLabel(component.kind)}</span>
+                <span className="component-id">custom_data</span>
+                <span style={{ flex: 1 }} />
+                <button type="button" className="icon-btn" onClick={() => onRemove(index)} aria-label="移除组件">
+                  <Trash2 size={14} />
+                </button>
+              </div>
+              <div className="component-body">
+                <textarea
+                  className="textarea"
+                  placeholder="例如 {my_pack:{level:3}}"
+                  value={component.raw}
+                  onChange={(event) => onReplace(index, { ...component, raw: event.target.value })}
+                />
+                <div className="hint">必须是一个完整的 SNBT 复合标签 {'{…}'}。</div>
+              </div>
+            </div>
+          )
+        }
+
+        if (component.kind === 'raw') {
+          return (
+            <div className="component-card" key={`raw-${index}`}>
+              <div className="component-head">
+                <span className="component-title">{itemComponentLabel(component.kind)}</span>
+                <span className="component-id">{component.id || 'raw'}</span>
+                <span style={{ flex: 1 }} />
+                <button type="button" className="icon-btn" onClick={() => onRemove(index)} aria-label="移除组件">
+                  <Trash2 size={14} />
+                </button>
+              </div>
+              <div className="component-body">
+                <div className="grid-2">
+                  <div className="field">
+                    <label className="field-label" htmlFor={`raw-id-${index}`}>
+                      组件 ID
+                    </label>
+                    <input
+                      id={`raw-id-${index}`}
+                      className="input"
+                      placeholder="minecraft:tooltip_display"
+                      value={component.id}
+                      onChange={(event) => onReplace(index, { ...component, id: event.target.value })}
+                    />
+                  </div>
+                </div>
+                <div className="field" style={{ marginTop: 10 }}>
+                  <label className="field-label" htmlFor={`raw-value-${index}`}>
+                    SNBT 值
+                  </label>
+                  <textarea
+                    id={`raw-value-${index}`}
+                    className="textarea"
+                    placeholder='例如 {hidden_components:["minecraft:enchantments"]}'
+                    value={component.value}
+                    onChange={(event) => onReplace(index, { ...component, value: event.target.value })}
                   />
                 </div>
               </div>

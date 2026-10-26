@@ -63,7 +63,7 @@ export function buildCommandBlockNbt(
 }
 
 /** 生成把命令写入命令方块的 /setblock 命令。 */
-export function buildSetblockCommand(command: string, options: CommandBlockOptions): BuildResult {
+export function buildCommandBlockSetblock(command: string, options: CommandBlockOptions): BuildResult {
   const diagnostics: Diagnostic[] = []
   const trimmed = command.trim()
 

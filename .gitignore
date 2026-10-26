@@ -22,3 +22,6 @@ test-results/
 # æœ¬åœ°ç¯å¢ƒ
 .env
 .env.local
+
+# ²âÊÔÁÙÊ±Ä¿Â¼
+*.tmpdir/

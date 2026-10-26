@@ -1,7 +1,11 @@
 import { error, warn } from './diagnostics'
 import { containsControlCharacters, resourceId, snbtKey, snbtString } from './escape'
+import { isBalancedCompound } from './position'
 import { serializeSelector, warnIfEntityTarget, type Selector } from './selector'
 import type { BuildResult, Diagnostic } from './types'
+
+export const RARITIES = ['common', 'uncommon', 'rare', 'epic'] as const
+export type Rarity = (typeof RARITIES)[number]
 
 export const TEXT_COLORS = [
   'black',
@@ -37,11 +41,18 @@ export interface EnchantmentEntry {
 
 export type ItemComponent =
   | { kind: 'custom_name'; text: string; color?: TextColor | ''; italic: boolean }
+  | { kind: 'item_name'; text: string; color?: TextColor | ''; italic: boolean }
   | { kind: 'lore'; lines: TextLine[] }
   | { kind: 'enchantments'; entries: EnchantmentEntry[] }
   | { kind: 'unbreakable' }
   | { kind: 'max_stack_size'; value: number }
+  | { kind: 'max_damage'; value: number }
+  | { kind: 'damage'; value: number }
+  | { kind: 'rarity'; value: Rarity }
+  | { kind: 'enchantment_glint_override'; value: boolean }
   | { kind: 'custom_model_data'; raw: string }
+  | { kind: 'custom_data'; raw: string }
+  | { kind: 'raw'; id: string; value: string }
 
 export interface ItemStack {
   id: string
@@ -120,25 +131,27 @@ export function serializeItemStack(item: ItemStack): BuildResult {
   const parts: string[] = []
 
   for (const component of item.components) {
-    if (seen.has(component.kind)) {
+    const duplicateKey = component.kind === 'raw' ? `raw:${component.id}` : component.kind
+    if (seen.has(duplicateKey)) {
       diagnostics.push(
-        error('item.component.duplicate', `组件 ${component.kind} 重复，只保留第一个`, 'components')
+        error('item.component.duplicate', `组件 ${duplicateKey} 重复，只保留第一个`, 'components')
       )
       continue
     }
-    seen.add(component.kind)
+    seen.add(duplicateKey)
 
     switch (component.kind) {
-      case 'custom_name': {
+      case 'custom_name':
+      case 'item_name': {
         if (!component.text.trim()) {
-          diagnostics.push(error('item.custom_name', '自定义名称不能为空', 'custom_name'))
+          diagnostics.push(error(`item.${component.kind}`, '名称不能为空', component.kind))
           continue
         }
         const text = serializeTextComponent(
           { text: component.text, color: component.color, italic: component.italic },
           diagnostics
         )
-        parts.push(`custom_name=${text}`)
+        parts.push(`${component.kind}=${text}`)
         break
       }
       case 'lore': {
@@ -172,6 +185,61 @@ export function serializeItemStack(item: ItemStack): BuildResult {
           continue
         }
         parts.push(`max_stack_size=${component.value}`)
+        break
+      }
+      case 'max_damage': {
+        if (!Number.isInteger(component.value) || component.value < 1) {
+          diagnostics.push(error('item.max_damage', '最大耐久必须是大于 0 的整数', 'max_damage'))
+          continue
+        }
+        parts.push(`max_damage=${component.value}`)
+        break
+      }
+      case 'damage': {
+        if (!Number.isInteger(component.value) || component.value < 0) {
+          diagnostics.push(error('item.damage', '已消耗耐久必须是大于等于 0 的整数', 'damage'))
+          continue
+        }
+        parts.push(`damage=${component.value}`)
+        break
+      }
+      case 'rarity': {
+        if (!(RARITIES as readonly string[]).includes(component.value)) {
+          diagnostics.push(error('item.rarity', '稀有度必须是 common/uncommon/rare/epic', 'rarity'))
+          continue
+        }
+        parts.push(`rarity=${component.value}`)
+        break
+      }
+      case 'enchantment_glint_override': {
+        parts.push(`enchantment_glint_override=${component.value ? 'true' : 'false'}`)
+        break
+      }
+      case 'custom_data': {
+        const raw = component.raw.trim()
+        if (!raw) {
+          diagnostics.push(error('item.custom_data', 'custom_data 不能为空', 'custom_data'))
+          continue
+        }
+        if (!isBalancedCompound(raw)) {
+          diagnostics.push(error('item.custom_data', 'custom_data 必须是完整的 {…}', 'custom_data'))
+          continue
+        }
+        parts.push(`custom_data=${raw}`)
+        break
+      }
+      case 'raw': {
+        const id = resourceId(component.id.trim())
+        const value = component.value.trim()
+        if (!id || id === 'minecraft:') {
+          diagnostics.push(error('item.raw.id', '自定义组件 ID 不能为空', 'raw'))
+          continue
+        }
+        if (!value) {
+          diagnostics.push(error('item.raw.value', `组件 ${id} 的值不能为空`, 'raw'))
+          continue
+        }
+        parts.push(`${snbtKey(id)}=${value}`)
         break
       }
       case 'custom_model_data': {
@@ -237,6 +305,8 @@ export function itemComponentLabel(kind: ItemComponent['kind']): string {
   switch (kind) {
     case 'custom_name':
       return '自定义名称'
+    case 'item_name':
+      return '物品默认名称'
     case 'lore':
       return '描述文本'
     case 'enchantments':
@@ -245,7 +315,19 @@ export function itemComponentLabel(kind: ItemComponent['kind']): string {
       return '无法破坏'
     case 'max_stack_size':
       return '最大堆叠'
+    case 'max_damage':
+      return '最大耐久'
+    case 'damage':
+      return '已消耗耐久'
+    case 'rarity':
+      return '稀有度'
+    case 'enchantment_glint_override':
+      return '附魔光效'
     case 'custom_model_data':
       return '自定义模型数据'
+    case 'custom_data':
+      return '自定义数据'
+    case 'raw':
+      return '自定义组件'
   }
 }

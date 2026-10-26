@@ -93,4 +93,31 @@ describe('item stack', () => {
     })
     expect(result.diagnostics.filter((item) => item.severity === 'error').length).toBeGreaterThan(1)
   })
+
+  it('serializes extended components and raw components', () => {
+    const result = serializeItemStack({
+      id: 'minecraft:diamond_sword',
+      components: [
+        { kind: 'item_name', text: 'Sword', color: 'aqua', italic: false },
+        { kind: 'rarity', value: 'epic' },
+        { kind: 'max_damage', value: 2000 },
+        { kind: 'damage', value: 10 },
+        { kind: 'enchantment_glint_override', value: true },
+        { kind: 'custom_data', raw: '{foo:1b}' },
+        { kind: 'raw', id: 'my_pack:test', value: '1b' }
+      ]
+    })
+    expect(result.text).toBe(
+      'minecraft:diamond_sword[item_name={text:"Sword",color:"aqua",italic:false},rarity=epic,max_damage=2000,damage=10,enchantment_glint_override=true,custom_data={foo:1b},"my_pack:test"=1b]'
+    )
+    expect(result.diagnostics.filter((item) => item.severity === 'error')).toHaveLength(0)
+  })
+
+  it('rejects invalid custom_data', () => {
+    const result = serializeItemStack({
+      id: 'minecraft:stone',
+      components: [{ kind: 'custom_data', raw: 'foo' }]
+    })
+    expect(result.diagnostics.some((item) => item.code === 'item.custom_data')).toBe(true)
+  })
 })

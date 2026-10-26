@@ -1,13 +1,16 @@
-import { Gift, Package, Plus, Crosshair, Hash, Layers } from 'lucide-react'
+import { useState } from 'react'
+import { Gift, Package, Plus, Crosshair, Hash, Layers, ClipboardPaste } from 'lucide-react'
 import { COMMAND_MAP, ITEM_COMPONENTS } from '@mcstudio/content'
 import { SELECTOR_BASES, serializeSelector } from '@mcstudio/core'
 import { ComponentsEditor } from './ComponentsEditor'
+import { GiveImportDialog } from './GiveImportDialog'
 import { useAppStore } from '../store'
 
 const meta = COMMAND_MAP.get('give')
 
 export function GiveForm() {
   const state = useAppStore()
+  const [importOpen, setImportOpen] = useState(false)
   const selectorPreview = serializeSelector(state.give.target)
   const itemComponents = state.give.item.components
   const enchantments = state.pack?.registries.enchantment ?? []
@@ -35,6 +38,10 @@ export function GiveForm() {
             </div>
           </div>
         </div>
+        <button type="button" className="btn" onClick={() => setImportOpen(true)}>
+          <ClipboardPaste size={15} />
+          从命令导入
+        </button>
       </div>
 
       <div className="card">
@@ -195,6 +202,8 @@ export function GiveForm() {
         <Plus size={14} />
         如何复制？
       </button>
+
+      {importOpen ? <GiveImportDialog onClose={() => setImportOpen(false)} /> : null}
     </div>
   )
 }

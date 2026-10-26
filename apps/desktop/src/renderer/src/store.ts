@@ -1,18 +1,26 @@
 import {
   buildGiveCommand,
+  buildSetblockCommand,
+  buildSummonCommand,
   createDefaultCommandBlockOptions,
   createDefaultGiveOptions,
-  createDefaultSelector,
+  createDefaultSetblockOptions,
+  createDefaultSummonOptions,
   createProjectFile,
   parseProjectFile,
   serializeGeneric,
+  type BlockStateValue,
   type BuildResult,
   type CommandBlockOptions,
   type CommandNodeData,
   type GenericStep,
   type GiveOptions,
   type ItemComponent,
+  type Position,
   type Selector,
+  type SetblockMode,
+  type SetblockOptions,
+  type SummonOptions,
   type VersionPack
 } from '@mcstudio/core'
 import type { CommandCategory } from '@mcstudio/content'
@@ -37,6 +45,8 @@ export interface GenericDraft {
 export interface ProjectPayload {
   activeCommandId: string | null
   give: GiveOptions
+  summon: SummonOptions
+  setblock: SetblockOptions
   generic: GenericDraft
   commandBlock: CommandBlockOptions
   outputMode: OutputMode
@@ -61,6 +71,8 @@ interface AppStore {
   update: UpdateState
   activeCommandId: string | null
   give: GiveOptions
+  summon: SummonOptions
+  setblock: SetblockOptions
   generic: GenericDraft
   commandBlock: CommandBlockOptions
   outputMode: OutputMode
@@ -83,6 +95,15 @@ interface AppStore {
   addComponent: (kind: ItemComponent['kind']) => void
   replaceComponent: (index: number, component: ItemComponent) => void
   removeComponent: (index: number) => void
+  applyGiveImport: (options: GiveOptions) => void
+  updateSummon: (patch: Partial<SummonOptions>) => void
+  updateSummonPosition: (patch: Partial<Position>) => void
+  updateSetblock: (patch: Partial<SetblockOptions>) => void
+  updateSetblockPosition: (patch: Partial<Position>) => void
+  selectBlock: (block: BlockStateValue) => void
+  setBlockState: (key: string, value: string) => void
+  setBlockNbt: (nbt: string) => void
+  setBlockMode: (mode: SetblockMode) => void
   setGenericRoot: (root: string | null) => void
   pushGenericStep: (step: { name: string; value?: string }) => void
   popGenericStep: () => void
@@ -131,6 +152,7 @@ function emptyGeneric(): GenericDraft {
 function defaultComponent(kind: ItemComponent['kind']): ItemComponent {
   switch (kind) {
     case 'custom_name':
+    case 'item_name':
       return { kind, text: '', color: '', italic: false }
     case 'lore':
       return { kind, lines: [{ text: '', color: '', italic: false }] }
@@ -140,8 +162,66 @@ function defaultComponent(kind: ItemComponent['kind']): ItemComponent {
       return { kind }
     case 'max_stack_size':
       return { kind, value: 64 }
+    case 'max_damage':
+      return { kind, value: 1000 }
+    case 'damage':
+      return { kind, value: 0 }
+    case 'rarity':
+      return { kind, value: 'common' }
+    case 'enchantment_glint_override':
+      return { kind, value: true }
     case 'custom_model_data':
+    case 'custom_data':
       return { kind, raw: '' }
+    case 'raw':
+      return { kind, id: 'minecraft:tooltip_display', value: '{}' }
+  }
+}
+
+function normalizePosition(input: Partial<Position> | undefined): Position {
+  return {
+    x: typeof input?.x === 'string' ? input.x : '~',
+    y: typeof input?.y === 'string' ? input.y : '~',
+    z: typeof input?.z === 'string' ? input.z : '~'
+  }
+}
+
+function normalizeSummon(input: Partial<SummonOptions> | undefined): SummonOptions {
+  const fallback = createDefaultSummonOptions()
+  if (!input) return fallback
+  return {
+    entity: typeof input.entity === 'string' ? input.entity : fallback.entity,
+    usePosition: input.usePosition !== false,
+    position: normalizePosition(input.position),
+    nbt: typeof input.nbt === 'string' ? input.nbt : ''
+  }
+}
+
+function normalizeSetblock(input: Partial<SetblockOptions> | undefined): SetblockOptions {
+  const fallback = createDefaultSetblockOptions()
+  if (!input) return fallback
+  const block = input.block
+  return {
+    position: normalizePosition(input.position),
+    block:
+      block && typeof block.id === 'string'
+        ? {
+            id: block.id,
+            states:
+              block.states && typeof block.states === 'object'
+                ? Object.fromEntries(
+                    Object.entries(block.states).filter(
+                      ([key, value]) => typeof key === 'string' && typeof value === 'string'
+                    )
+                  )
+                : {},
+            nbt: typeof block.nbt === 'string' ? block.nbt : ''
+          }
+        : fallback.block,
+    mode:
+      input.mode === 'destroy' || input.mode === 'keep' || input.mode === 'strict'
+        ? input.mode
+        : 'replace'
   }
 }
 
@@ -169,6 +249,8 @@ function normalizePayload(input: unknown): ProjectPayload {
   return {
     activeCommandId: typeof data.activeCommandId === 'string' ? data.activeCommandId : null,
     give: normalizeGive(data.give),
+    summon: normalizeSummon(data.summon),
+    setblock: normalizeSetblock(data.setblock),
     generic:
       data.generic && Array.isArray(data.generic.steps)
         ? {
@@ -198,6 +280,8 @@ export const useAppStore = create<AppStore>()(
     update: { status: 'idle' },
     activeCommandId: null,
     give: createDefaultGiveOptions(),
+    summon: createDefaultSummonOptions(),
+    setblock: createDefaultSetblockOptions(),
     generic: emptyGeneric(),
     commandBlock: createDefaultCommandBlockOptions(),
     outputMode: 'command',
@@ -314,7 +398,7 @@ export const useAppStore = create<AppStore>()(
 
     addComponent: (kind) => {
       set((state) => {
-        if (state.give.item.components.some((item) => item.kind === kind)) return
+        if (kind !== 'raw' && state.give.item.components.some((item) => item.kind === kind)) return
         state.give.item.components.push(defaultComponent(kind))
         state.dirty = true
       })
@@ -331,6 +415,70 @@ export const useAppStore = create<AppStore>()(
     removeComponent: (index) => {
       set((state) => {
         state.give.item.components.splice(index, 1)
+        state.dirty = true
+      })
+    },
+
+    applyGiveImport: (options) => {
+      set((state) => {
+        state.activeCommandId = 'give'
+        state.give = options
+        state.dirty = true
+      })
+    },
+
+    updateSummon: (patch) => {
+      set((state) => {
+        Object.assign(state.summon, patch)
+        state.dirty = true
+      })
+    },
+
+    updateSummonPosition: (patch) => {
+      set((state) => {
+        Object.assign(state.summon.position, patch)
+        state.dirty = true
+      })
+    },
+
+    updateSetblock: (patch) => {
+      set((state) => {
+        Object.assign(state.setblock, patch)
+        state.dirty = true
+      })
+    },
+
+    updateSetblockPosition: (patch) => {
+      set((state) => {
+        Object.assign(state.setblock.position, patch)
+        state.dirty = true
+      })
+    },
+
+    selectBlock: (block) => {
+      set((state) => {
+        state.setblock.block = block
+        state.dirty = true
+      })
+    },
+
+    setBlockState: (key, value) => {
+      set((state) => {
+        state.setblock.block.states[key] = value
+        state.dirty = true
+      })
+    },
+
+    setBlockNbt: (nbt) => {
+      set((state) => {
+        state.setblock.block.nbt = nbt
+        state.dirty = true
+      })
+    },
+
+    setBlockMode: (mode) => {
+      set((state) => {
+        state.setblock.mode = mode
         state.dirty = true
       })
     },
@@ -476,6 +624,8 @@ export const useAppStore = create<AppStore>()(
       set((state) => {
         state.activeCommandId = null
         state.give = createDefaultGiveOptions()
+        state.summon = createDefaultSummonOptions()
+        state.setblock = createDefaultSetblockOptions()
         state.generic = emptyGeneric()
         state.commandBlock = createDefaultCommandBlockOptions()
         state.outputMode = 'command'
@@ -500,6 +650,8 @@ export const useAppStore = create<AppStore>()(
       const payload: ProjectPayload = {
         activeCommandId: state.activeCommandId,
         give: state.give,
+        summon: state.summon,
+        setblock: state.setblock,
         generic: state.generic,
         commandBlock: state.commandBlock,
         outputMode: state.outputMode
@@ -521,6 +673,8 @@ export const useAppStore = create<AppStore>()(
       set((state) => {
         state.activeCommandId = payload.activeCommandId
         state.give = payload.give
+        state.summon = payload.summon
+        state.setblock = payload.setblock
         state.generic = payload.generic
         state.commandBlock = payload.commandBlock
         state.outputMode = payload.outputMode
@@ -670,4 +824,12 @@ export function selectGenericOutput(pack: VersionPack | null, draft: GenericDraf
 
 export function selectGiveOutput(give: GiveOptions): BuildResult {
   return buildGiveCommand(give)
+}
+
+export function selectSummonOutput(summon: SummonOptions): BuildResult {
+  return buildSummonCommand(summon)
+}
+
+export function selectSetblockOutput(setblock: SetblockOptions): BuildResult {
+  return buildSetblockCommand(setblock)
 }

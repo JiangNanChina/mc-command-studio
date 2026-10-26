@@ -65,7 +65,7 @@ async function main() {
 
   // 添加自定义名称组件
   await page.locator('select[aria-label="添加组件"]').selectOption('custom_name')
-  await page.locator('#custom-name-text').fill('Excalibur')
+  await page.locator('#component-custom_name-text').fill('Excalibur')
 
   await page.waitForTimeout(600)
   const commandText = await page.locator('.output-code .cm-content').innerText()
@@ -79,7 +79,53 @@ async function main() {
   await page.waitForTimeout(150)
   await page.screenshot({ path: join(ARTIFACTS, 'give-form.png') })
 
-  // 切换命令方块
+  // 文本导入：从命令还原 give 表单
+  await page.getByRole('button', { name: '从命令导入' }).click()
+  await page.waitForSelector('#give-import-text', { timeout: 10_000 })
+  await page
+    .locator('#give-import-text')
+    .fill('/give @s minecraft:diamond_sword[custom_name={text:"Imported",color:"aqua",italic:false}] 1')
+  await page.getByRole('button', { name: '解析' }).click()
+  await page.getByRole('button', { name: '应用到表单' }).click()
+  await page.waitForSelector('#component-custom_name-text', { timeout: 10_000 })
+  if ((await page.locator('#component-custom_name-text').inputValue()) !== 'Imported') {
+    throw new Error('文本导入没有还原 custom_name')
+  }
+  if ((await page.locator('.toast-close').count()) > 0) {
+    await page.locator('.toast-close').first().click()
+  }
+
+  // summon 专用表单
+  await page.locator('.command-item', { hasText: '召唤实体' }).first().click()
+  await page.waitForSelector('#summon-entity', { timeout: 10_000 })
+  await page.locator('#summon-entity').fill('minecraft:armor_stand')
+  await page.waitForTimeout(400)
+  const summonText = await page.locator('.output-code .cm-content').innerText()
+  if (!summonText.includes('summon minecraft:armor_stand ~ ~ ~')) {
+    throw new Error(`summon 输出不符合预期：${summonText}`)
+  }
+  await page.screenshot({ path: join(ARTIFACTS, 'summon-form.png') })
+
+  // setblock 专用表单 + 方块状态
+  await page.locator('.command-item', { hasText: '放置方块' }).first().click()
+  await page.waitForSelector('#setblock-x', { timeout: 10_000 })
+  await page.getByRole('button', { name: '选择方块' }).click()
+  await page.waitForSelector('.modal', { timeout: 10_000 })
+  await page.locator('.modal input[placeholder*="搜索方块"]').fill('chest')
+  await page.locator('.item-row', { hasText: 'minecraft:chest' }).first().click()
+  await page.waitForTimeout(400)
+  const blockText = await page.locator('.output-code .cm-content').innerText()
+  if (!blockText.includes('setblock ~ ~ ~ minecraft:chest[')) {
+    throw new Error(`setblock 输出不符合预期：${blockText}`)
+  }
+  await page.locator('.main').evaluate((element) => {
+    element.scrollTop = 0
+  })
+  await page.screenshot({ path: join(ARTIFACTS, 'setblock-form.png') })
+
+  // 回到 give，切换命令方块
+  await page.locator('.command-item', { hasText: '给予物品' }).first().click()
+  await page.waitForSelector('#give-count', { timeout: 10_000 })
   await page.locator('.tab', { hasText: '命令方块' }).click()
   await page.waitForTimeout(400)
   const setblockText = await page.locator('.output-code .cm-content').innerText()

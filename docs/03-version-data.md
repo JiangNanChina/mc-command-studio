@@ -85,10 +85,10 @@ pnpm data:verify       # 校验文件、哈希、统计
 官方没有公开组件字段 schema，采用三层策略：
 
 1. **默认值统计**：汇总 1,658 个物品的组件键与默认值，推导基础类型（数字/字符串/布尔/对象/数组）与常见枚举。
-2. **手工 schema（当前 6 个）**：`custom_name`、`lore`、`enchantments`、`unbreakable`、`max_stack_size`、`custom_model_data`。这 6 个覆盖首版主要场景。
+2. **手工 schema（当前 13 个）**：`custom_name`、`item_name`、`lore`、`enchantments`、`unbreakable`、`max_stack_size`、`max_damage`、`damage`、`rarity`、`enchantment_glint_override`、`custom_model_data`、`custom_data`、`raw`。
 3. **原始 SNBT 兜底**：任何组件都可以直接写 SNBT；解析失败只提示，不丢弃文本。
 
-后续优先补齐：`item_name`、`rarity`、`attribute_modifiers`、`container`、`potion_contents`、`food`、`tool`、`charged_projectiles`、`bundle_contents`、`written_book_content`。
+后续优先补齐：`attribute_modifiers`、`container`、`potion_contents`、`food`、`tool`、`charged_projectiles`、`bundle_contents`、`written_book_content`。
 
 ## 5. 命令数据如何使用
 

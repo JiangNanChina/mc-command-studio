@@ -1,8 +1,8 @@
 # 04 · 命令模型
 
-## 1. 当前实现的两条路径
+## 1. 当前实现的四条路径
 
-首版没有强行抽象“所有命令的 AST”，而是分成两条可靠路径：
+当前没有强行抽象“所有命令的 AST”，而是用四个可靠路径覆盖高频命令：
 
 ### 1.1 专用表单：`give`
 
@@ -13,23 +13,46 @@ interface GiveOptions {
   count: number
 }
 
-interface ItemStack {
-  id: string
-  components: ItemComponent[]
-}
-
 type ItemComponent =
-  | { kind: 'custom_name'; text: string; color?: string; italic: boolean }
+  | { kind: 'custom_name' | 'item_name'; text: string; color?: string; italic: boolean }
   | { kind: 'lore'; lines: TextLine[] }
   | { kind: 'enchantments'; entries: { id: string; level: number }[] }
   | { kind: 'unbreakable' }
-  | { kind: 'max_stack_size'; value: number }
-  | { kind: 'custom_model_data'; raw: string }
+  | { kind: 'max_stack_size' | 'max_damage' | 'damage'; value: number }
+  | { kind: 'rarity'; value: 'common' | 'uncommon' | 'rare' | 'epic' }
+  | { kind: 'enchantment_glint_override'; value: boolean }
+  | { kind: 'custom_model_data' | 'custom_data'; raw: string }
+  | { kind: 'raw'; id: string; value: string }
 ```
 
 `buildGiveCommand(options)` 输出 `{ text, diagnostics }`。
 
-### 1.2 通用构建器：所有 94 个根命令
+### 1.2 专用表单：`summon`
+
+```ts
+interface SummonOptions {
+  entity: string
+  usePosition: boolean
+  position: Position
+  nbt: string
+}
+```
+
+`buildSummonCommand(options)` 生成 `summon <entity> [pos] [nbt]`。NBT 依赖坐标参数，未启用坐标时忽略并警告。
+
+### 1.3 专用表单：`setblock`
+
+```ts
+interface SetblockOptions {
+  position: Position
+  block: { id: string; states: Record<string, string>; nbt: string }
+  mode: 'replace' | 'destroy' | 'keep' | 'strict'
+}
+```
+
+`buildSetblockCommand(options)` 生成 `setblock <pos> <block[states]>{nbt} [mode]`。方块状态来自 `blocks.json`，属性按键名排序，NBT 紧贴方块状态（不留空格）。
+
+### 1.4 通用构建器：所有 94 个根命令
 
 ```ts
 interface GenericStep {
@@ -41,7 +64,7 @@ interface GenericStep {
 
 `serializeGeneric(root, steps)` 把命令名、字面量、参数原文用空格拼接，并对常见参数类型做基础校验。
 
-> P1 会把两条路径统一为 `CommandDraft` AST，让文本导入、撤销/重做与单元引用共享同一结构。当前先保证端到端可用。
+> P1 后续会把四条路径统一为 `CommandDraft` AST，让撤销/重做、单元引用和更多文本导入共享同一结构。
 
 ## 2. 序列化规则
 
@@ -64,12 +87,17 @@ snbtString('C:\\temp') // "C:\\temp"
 
 | 组件 | 输出示例 |
 |---|---|
-| `custom_name` | `custom_name={text:"Excalibur",color:"gold",italic:false}` |
+| `custom_name` / `item_name` | `custom_name={text:"Excalibur",color:"gold",italic:false}` |
 | `lore` | `lore=[{text:"第一行",color:"gray",italic:false}]` |
 | `enchantments` | `enchantments={sharpness:5,knockback:2}`（1.21+ 扁平映射） |
 | `unbreakable` | `unbreakable={}` |
 | `max_stack_size` | `max_stack_size=16` |
+| `max_damage` / `damage` | `max_damage=2000`、`damage=10` |
+| `rarity` | `rarity=epic` |
+| `enchantment_glint_override` | `enchantment_glint_override=true` |
 | `custom_model_data` | `custom_model_data={strings:["my_pack:model"]}` |
+| `custom_data` | `custom_data={my_pack:{level:3}}` |
+| `raw` | `"my_pack:component"=1b`（任意组件 id=SNBT） |
 
 `minecraft:` 前缀在组件键里省略，非原版命名空间加引号（`"mypack:custom":1`）。
 
@@ -93,6 +121,18 @@ setblock 0 64 0 minecraft:command_block[facing=up]{Command:"give @s minecraft:st
 - 坐标支持绝对、`~` 相对与 `^` 局部。
 - 命令内换行直接判错（命令方块不支持多行）。
 - 超过 32,500 字符判错。
+
+### 2.6 实体与方块
+
+```text
+summon minecraft:zombie ~ ~ ~ {NoAI:1b}
+setblock 0 64 0 minecraft:chest[facing=east,type=single]{Items:[]} keep
+```
+
+- `summon` 的 NBT 与坐标之间用空格分隔。
+- `setblock` 的方块状态与 NBT 之间**不加空格**，否则游戏按两个参数解析。
+- `setblock` 的 `replace` 模式省略；`destroy` / `keep` / `strict` 追加在末尾。
+- 方块属性来自 `blocks.json` 的默认值与候选值，UI 自动生成下拉。
 
 ## 3. 参数解析器
 
@@ -131,24 +171,29 @@ type Unit =
 
 命令里保存 `{ kind: 'ref', unitId }`，序列化时内联；项目文件同时保存单元表。这样修改一个“传说剑”单元，所有引用它的命令一起更新。
 
-## 6. 文本 → 表单（P1）
+## 6. 文本 → 表单（已实现 `give`）
 
-不实现完整 Brigadier 解析器，而是：
+已实现 `/give` 的结构化导入（`parseGive.ts`），不依赖完整 Brigadier：
 
-1. 用命令树做最长字面量匹配，定位根命令与子命令路径。
-2. 对 `give` / 选择器 / 物品先做结构化解析；失败时保留原文。
-3. 其余参数保留为 raw，表单仍可编辑可复制。
-4. 目标覆盖率：粘贴一条命令后，至少能识别出正确的根命令与修改入口。
+1. 去除前导 `/`，用括号/引号感知的 tokenizer 切出 `give、目标、物品、数量`。
+2. 目标：解析 `@x[...]`，还原 name/type/tag/distance/level/gamemode/limit/sort/坐标/scores/nbt。
+3. 物品：解析 `id[组件]`，已知组件映射到类型化模型；未知组件保留为 `raw`。
+4. 文本组件、lore、附魔映射、数值/布尔组件逐项解析；失败也回退 raw，不丢数据。
+5. 无法识别的选择器参数给 warning，仍保留其余部分。
+
+后续导入扩展：`summon` / `setblock` / `execute`。
 
 ## 7. 测试
 
-`packages/core/src/*.test.ts` 共 50 个用例，覆盖：
+`packages/core/src/*.test.ts` 共 65 个用例，覆盖：
 
 - SNBT / 命令方块字符串转义。
 - 选择器排序、引号、范围、NBT 括号、分数。
-- 物品 6 类组件、重复组件、非法等级。
+- 物品 13 类组件、raw 组件、重复组件、非法等级/耐久/数据。
 - `/give` 数量、选择器警告。
-- `/setblock` 朝向、条件、换行、坐标。
+- `/summon` 坐标开关、NBT、未启用坐标的警告。
+- `/setblock` 方块状态、NBT 紧贴、模式、坐标/属性校验。
+- `/give` 文本导入：选择器、组件、数量、未知组件 raw。
 - 命令树遍历、通用路径、参数范围。
 - 数据包 manifest、注册表选择。
 - SemVer 比较、项目文件 schema。

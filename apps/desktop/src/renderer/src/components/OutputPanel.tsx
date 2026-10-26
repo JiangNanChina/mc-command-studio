@@ -181,6 +181,8 @@ export function OutputPanel() {
     state.pack,
     state.activeCommandId,
     state.give,
+    state.summon,
+    state.setblock,
     state.generic,
     state.outputMode,
     state.commandBlock

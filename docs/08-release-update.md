@@ -17,9 +17,9 @@
 
 | 文件 | 大小 |
 |---|---:|
-| `MC-Command-Studio-Setup-0.1.0.exe` | 125,302,228 B ≈ 119.5 MiB |
-| `MC-Command-Studio-0.1.0-portable.exe` | 113,078,841 B ≈ 107.8 MiB |
-| `MC-Command-Studio-Setup-0.1.0.exe.blockmap` | 132,736 B |
+| `MC-Command-Studio-Setup-0.1.1.exe` | 125,314,900 B ≈ 119.5 MiB |
+| `MC-Command-Studio-0.1.1-portable.exe` | 113,088,178 B ≈ 107.8 MiB |
+| `MC-Command-Studio-Setup-0.1.1.exe.blockmap` | 132,962 B |
 | `latest.yml` | 363 B |
 
 安装目录为 `%LOCALAPPDATA%\Programs\MC Command Studio`（per-user），卸载器保留用户项目与设置，可选择手动删除。
@@ -211,7 +211,9 @@ $env:MCSTUDIO_UPDATE_URL = "http://127.0.0.1:8123/updates/"
 - [ ] “跳过此版本”（代码已实现，未单独 e2e）
 - [x] 便携版提示手动更新（`PORTABLE_EXECUTABLE_DIR` 模式实测）
 
-**实测结果（2026-10-26）**：在 `artifacts/update-run` 安装最终 0.1.0，设置 `MCSTUDIO_UPDATE_URL=http://127.0.0.1:8123/updates/`，点击检查更新 → 下载 → 重启安装，安装目录中的 exe 产品版本变为 **0.1.1.0**，用户数据目录保留。
+**实测结果（2026-10-26）**：使用与 0.1.1 相同 updater 代码的 0.1.0 测试构建，在 `artifacts/update-run` 安装，设置 `MCSTUDIO_UPDATE_URL=http://127.0.0.1:8123/updates/`，点击检查更新 → 下载 → 重启安装，安装目录中的 exe 产品版本变为 **0.1.1.0**，用户数据目录保留。
+
+> 已发布的 v0.1.0 使用旧 updater 代码，点击“重启并安装”会显示 NSIS 安装向导；从 v0.1.1 起改为静默安装（`quitAndInstall(true, true)`）。
 
 GitHub Actions 的 Release 工作流已在本仓库成功执行（run 40275025582），创建并发布了 [v0.1.0 Release](https://github.com/JiangNanChina/mc-command-studio/releases/tag/v0.1.0)；公开的 `releases/latest/download/latest.yml` 返回 200，内容指向 `MC-Command-Studio-Setup-0.1.0.exe`，大小 125,302,228 字节，与 Release 资产一致。
 

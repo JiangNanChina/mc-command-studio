@@ -12,11 +12,14 @@
 
 ![give 表单](docs/assets/give-form.png)
 
-## 功能（0.1.0 骨架）
+## 功能（0.1.1）
 
 - **26.3 数据包**：94 个根命令、1,197 个字面量、59 种参数类型、1,658 个物品、1,286 个方块。
-- **give 端到端**：目标选择器、物品搜索、数量、6 类物品组件（自定义名称、描述、附魔、无法破坏、最大堆叠、自定义模型数据）。
-- **通用构建器**：所有 94 个根命令都能按官方命令树逐层拼接；没有专用编辑器的参数以原始文本 + 基础校验兜底。
+- **专用表单**：`give`、`summon`、`setblock` 已从通用构建器升级为专用界面。
+- **give**：目标选择器、物品搜索、数量、13 类物品组件（名称、描述、附魔、耐久、稀有度、自定义数据等）。
+- **give 文本导入**：粘贴 `/give` 命令，还原成可编辑表单；未知组件保留为 raw。
+- **setblock**：方块搜索、方块状态属性、方块实体 NBT、4 种放置模式。
+- **通用构建器**：其余根命令按官方命令树逐层拼接；未覆盖参数用原始文本 + 基础校验兜底。
 - **命令方块**：一键生成 `/setblock … command_block[facing=up]{Command:"…"}`，处理引号/反斜杠转义。
 - **本地项目**：`.mcstudio` JSON、最近打开、4 秒防抖自动保存、异常退出恢复。
 - **桌面体验**：深色/浅色主题、中文界面、原生菜单、文件关联、单实例、高 DPI。
@@ -50,8 +53,8 @@ pnpm build:win          # 安装包 + 便携版 + latest.yml
 
 产物在 `release/`：
 
-- `MC-Command-Studio-Setup-0.1.0.exe`
-- `MC-Command-Studio-0.1.0-portable.exe`
+- `MC-Command-Studio-Setup-0.1.1.exe`
+- `MC-Command-Studio-0.1.1-portable.exe`
 - `latest.yml`、`.blockmap`
 
 如果 `pnpm install` 后没有 Electron 二进制，运行 `pnpm setup:electron`；国内网络可设置：
@@ -75,8 +78,8 @@ pnpm data:verify
 ## 测试
 
 ```bash
-pnpm test        # 50 个核心逻辑用例
-pnpm e2e         # Playwright 启动 Electron，操作 give 表单并截图
+pnpm test        # 65 个核心逻辑用例
+pnpm e2e         # Playwright 启动 Electron，覆盖 give/导入/summon/setblock/命令方块
 ```
 
 `pnpm e2e` 需要先 `pnpm build`，并且需要可用的 Windows 桌面会话。截图输出到 `artifacts/`。

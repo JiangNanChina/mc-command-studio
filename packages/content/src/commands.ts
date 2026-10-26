@@ -103,9 +103,16 @@ export interface ComponentMeta {
 
 export const ITEM_COMPONENTS: ComponentMeta[] = [
   { kind: 'custom_name', name: '自定义名称', description: '物品在快捷栏和提示框中的名字，支持颜色与斜体。', example: 'custom_name={text:"Excalibur",color:"gold",italic:false}' },
+  { kind: 'item_name', name: '默认名称', description: '覆盖物品的默认名称（区别于铁砧修改的 custom_name）。', example: 'item_name={text:"Magic Sword",color:"light_purple",italic:false}' },
   { kind: 'lore', name: '描述文本', description: '物品提示框中的多行描述。', example: 'lore=[{text:"第一行",color:"gray",italic:false}]' },
   { kind: 'enchantments', name: '附魔', description: '添加生效中的附魔及等级。', example: 'enchantments={sharpness:5,knockback:2}' },
   { kind: 'unbreakable', name: '无法破坏', description: '隐藏耐久条，物品不会因使用而损坏。', example: 'unbreakable={}' },
   { kind: 'max_stack_size', name: '最大堆叠', description: '覆盖物品的最大堆叠数量（1–99）。', example: 'max_stack_size=16' },
-  { kind: 'custom_model_data', name: '自定义模型数据', description: '供资源包判断模型/贴图用的数据，直接填写 SNBT。', example: 'custom_model_data={strings:["my_pack:model"]}' }
+  { kind: 'max_damage', name: '最大耐久', description: '覆盖物品的最大耐久值。', example: 'max_damage=2000' },
+  { kind: 'damage', name: '已消耗耐久', description: '设置物品当前已消耗的耐久值。', example: 'damage=10' },
+  { kind: 'rarity', name: '稀有度', description: '物品名称颜色与稀有度标签。', example: 'rarity=epic' },
+  { kind: 'enchantment_glint_override', name: '附魔光效', description: '强制打开或关闭附魔光效。', example: 'enchantment_glint_override=true' },
+  { kind: 'custom_model_data', name: '自定义模型数据', description: '供资源包判断模型/贴图用的数据，直接填写 SNBT。', example: 'custom_model_data={strings:["my_pack:model"]}' },
+  { kind: 'custom_data', name: '自定义数据', description: '写入物品的 custom_data 复合标签，供数据包/模组读取。', example: 'custom_data={my_pack:{level:3}}' },
+  { kind: 'raw', name: '自定义组件（raw）', description: '直接写入任意组件 id=SNBT，用于尚未收录的组件。', example: 'tooltip_display={hidden_components:["minecraft:enchantments"]}' }
 ]
