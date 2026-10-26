@@ -1,0 +1,41 @@
+/**
+ * 1.20.4（NBT 引擎）下可以安全复用的可视化表单。
+ * 其余命令继续走命令树，避免生成 26.3 专有语法。
+ */
+export const LEGACY_SAFE_FORMS = new Set([
+  'give',
+  'summon',
+  'tp',
+  'effect',
+  'fill',
+  'clone',
+  'setblock',
+  'execute',
+  'tellraw',
+  'title',
+  'playsound',
+  'stopsound',
+  'bossbar',
+  'scoreboard',
+  'time',
+  'weather',
+  'difficulty',
+  'tag',
+  'clear',
+  'worldborder',
+  'team',
+  'spawnpoint',
+  'setworldspawn',
+  'forceload',
+  'item',
+  'data',
+  'advancement',
+  'function',
+  'schedule',
+  'enchant',
+  'xp'
+])
+
+export function supportsLegacyForm(commandId: string): boolean {
+  return LEGACY_SAFE_FORMS.has(commandId)
+}

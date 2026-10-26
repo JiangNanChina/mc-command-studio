@@ -968,6 +968,16 @@ async function main() {
   if ((await page.locator('#give-count').count()) !== 0) {
     throw new Error('1.20.4 不应显示 26.3 give 表单')
   }
+  await page.locator('.command-item', { hasText: '召唤实体' }).first().click()
+  await page.waitForSelector('#summon-x', { timeout: 10_000 })
+  await page.fill('#summon-x', '0')
+  await page.fill('#summon-y', '64')
+  await page.fill('#summon-z', '0')
+  await page.waitForTimeout(300)
+  const summonNbtOutput = await page.locator('.output-code .cm-content').innerText()
+  if (!/summon minecraft:[a-z0-9_]+ 0 64 0/.test(summonNbtOutput)) {
+    throw new Error(`1.20.4 summon 输出不符合预期：${summonNbtOutput}`)
+  }
   await page.screenshot({ path: join(ARTIFACTS, 'pack-1.20.4.png') })
   await page.selectOption('#pack-select', '26.3')
   await page.waitForSelector('.version-notice', { state: 'detached', timeout: 15_000 })

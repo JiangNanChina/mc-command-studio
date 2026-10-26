@@ -22,6 +22,36 @@ const REPO = 'https://github.com/JiangNanChina/mc-command-studio'
  */
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: '0.1.36',
+    date: '2026-10-27',
+    title: '1.20.4 兼容表单扩展',
+    highlights: [
+      '1.20.4 启用 31 个兼容表单。',
+      '版本敏感命令继续使用命令树。'
+    ],
+    sections: [
+      {
+        type: 'added',
+        items: [
+          'summon/tp/effect/fill/clone/setblock/execute 等 31 个表单。',
+          'give 使用 NBT 表单。'
+        ]
+      },
+      {
+        type: 'improved',
+        items: [
+          'packCompat 白名单与单元测试。',
+          '单元测试 200 → 202；冒烟覆盖 1.20.4 summon。'
+        ]
+      },
+      {
+        type: 'fixed',
+        items: ['无。']
+      }
+    ],
+    releaseUrl: `${REPO}/releases/tag/v0.1.36`
+  },
+  {
     version: '0.1.35',
     date: '2026-10-27',
     title: '1.20.4 NBT 物品编辑器',

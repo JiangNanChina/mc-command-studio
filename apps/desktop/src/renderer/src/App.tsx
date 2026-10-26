@@ -2,6 +2,7 @@ import { useEffect } from 'react'
 import { AlertTriangle, Database, FolderOpen, Info, RefreshCw } from 'lucide-react'
 import { getApi } from './lib/api'
 import { getCurrentOutput } from './lib/commandOutput'
+import { supportsLegacyForm } from './lib/packCompat'
 import { useAppStore, type DialogName } from './store'
 import { Header } from './components/Header'
 import { Sidebar } from './components/Sidebar'
@@ -343,7 +344,7 @@ export default function App() {
         <div className="version-notice">
           <Info size={14} />
           {treeOnly
-            ? `当前使用 ${pack.manifest.gameVersion}（NBT 引擎）：give 使用 NBT 可视化，其余命令使用命令树/通用构建器。`
+            ? `当前使用 ${pack.manifest.gameVersion}（NBT 引擎）：give 使用 NBT 表单，召唤/方块/execute 等兼容表单已启用，其余命令使用命令树。`
             : `当前使用 ${pack.manifest.gameVersion} 数据包：命令树与通用构建器来自该版本；可视化表单按 26.3 语法生成，跨版本使用前请核对。`}
         </div>
       ) : null}
@@ -365,7 +366,7 @@ export default function App() {
             <DatapackWorkspace />
           ) : activeCommandId === 'chain' ? (
             <ChainBuilder />
-          ) : treeOnly && activeCommandId !== 'give' ? (
+          ) : treeOnly && !supportsLegacyForm(activeCommandId ?? '') ? (
             <GenericBuilder />
           ) : activeCommandId === 'give' ? (
             pack?.manifest.engine === 'nbt' ? (

@@ -2,6 +2,21 @@
 
 所有版本变更记录在此。版本号遵循 SemVer。
 
+## [0.1.36] - 2026-10-27
+
+1.20.4 兼容表单扩展。
+
+### 新增
+
+- 1.20.4 下自动启用 31 个兼容可视化表单：summon、tp、effect、fill、clone、setblock、execute、tellraw、title、sound、bossbar、scoreboard、team、data 等。
+- give 继续使用 NBT 表单；loot/gamerule/particle/attribute 等版本敏感命令保持命令树。
+
+### 改进
+
+- 新增 `packCompat` 兼容白名单与单元测试。
+- 1.20.4 版本提示改为“兼容表单已启用”。
+- 单元测试 200 → 202；冒烟测试覆盖 1.20.4 summon。
+
 ## [0.1.35] - 2026-10-27
 
 1.20.4 NBT 物品编辑器。
