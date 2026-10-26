@@ -22,6 +22,37 @@ const REPO = 'https://github.com/JiangNanChina/mc-command-studio'
  */
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: '0.1.32',
+    date: '2026-10-27',
+    title: '多版本数据包：1.21.1 试验支持',
+    highlights: [
+      '顶栏切换 26.3 / 1.21.1。',
+      '1.21.1 命令树与通用构建器可用。'
+    ],
+    sections: [
+      {
+        type: 'added',
+        items: [
+          '1.21.1 数据包：83 根命令、1,333 物品、1,060 方块。',
+          '版本切换器与跨版本提示。',
+          '构建流程同时生成 26.3 与 1.21.1。'
+        ]
+      },
+      {
+        type: 'improved',
+        items: [
+          'data:build/data:verify 覆盖双版本。',
+          '冒烟测试覆盖版本切换。'
+        ]
+      },
+      {
+        type: 'fixed',
+        items: ['无。']
+      }
+    ],
+    releaseUrl: `${REPO}/releases/tag/v0.1.32`
+  },
+  {
     version: '0.1.31',
     date: '2026-10-27',
     title: 'BOSS 栏查询与计分目标修改',

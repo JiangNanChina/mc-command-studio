@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import { AlertTriangle, Database, FolderOpen, RefreshCw } from 'lucide-react'
+import { AlertTriangle, Database, FolderOpen, Info, RefreshCw } from 'lucide-react'
 import { getApi } from './lib/api'
 import { getCurrentOutput } from './lib/commandOutput'
 import { useAppStore, type DialogName } from './store'
@@ -335,6 +335,13 @@ export default function App() {
       <AnnouncementBanner />
       <UpdateBanner />
       <AutosaveBanner />
+      {pack && pack.manifest.id !== '26.3' ? (
+        <div className="version-notice">
+          <Info size={14} />
+          当前使用 {pack.manifest.gameVersion} 数据包：命令树与通用构建器来自该版本；
+          可视化表单按 26.3 语法生成，跨版本使用前请核对。
+        </div>
+      ) : null}
       <div className={`workspace${activeCommandId === 'datapack' ? ' no-output' : ''}`}>
         <Sidebar />
         <main className="main">

@@ -915,6 +915,25 @@ async function main() {
   await page.waitForTimeout(150)
   await page.screenshot({ path: join(ARTIFACTS, 'command-block.png') })
 
+  // 多版本数据包切换
+  const packOptions = await page.locator('#pack-select option').allTextContents()
+  if (!packOptions.includes('1.21.1') || !packOptions.includes('26.3')) {
+    throw new Error(`版本选项不符合预期：${packOptions.join(', ')}`)
+  }
+  await page.selectOption('#pack-select', '1.21.1')
+  await page.waitForSelector('.version-notice', { timeout: 15_000 })
+  const pack121 = await page.locator('.pack-count').innerText()
+  if (!pack121.includes('83')) {
+    throw new Error(`1.21.1 命令数量不符合预期：${pack121}`)
+  }
+  await page.screenshot({ path: join(ARTIFACTS, 'pack-1.21.1.png') })
+  await page.selectOption('#pack-select', '26.3')
+  await page.waitForSelector('.version-notice', { state: 'detached', timeout: 15_000 })
+  const pack26 = await page.locator('.pack-count').innerText()
+  if (!pack26.includes('94')) {
+    throw new Error(`26.3 命令数量不符合预期：${pack26}`)
+  }
+
   // 设置弹窗
   await page.locator('button[title="设置 (Ctrl+,)"]').click()
   await page.waitForSelector('.modal', { timeout: 10_000 })

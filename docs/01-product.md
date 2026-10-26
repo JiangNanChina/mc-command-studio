@@ -31,6 +31,7 @@
 ### P0（首个可发布版，已实现骨架）
 
 - 26.3 数据包：94 根命令、1,197 字面量、59 参数类型、1,658 物品、1,286 方块。
+- 1.21.1 试验数据包：83 根命令、1,333 物品、1,060 方块，可在顶栏切换。
 - 数据包工作区：独立于命令编辑，多函数管理、load/tick 标签、文件预览与 zip 导出。
 - 专用表单：`give`、`summon`、`setblock`、`execute`、`tp`、`effect`、`fill`、`clone`、`enchant`、`xp`、`tellraw`、`title`、`playsound`、`stopsound`、`bossbar`、`scoreboard`、`particle`、`time`、`weather`、`difficulty`、`tag`、`clear`、`gamerule`、`worldborder`、`team`、`spawnpoint`、`setworldspawn`、`forceload`、`attribute`、`advancement`、`function`、`schedule`、`item`、`data`、`loot`；`setblock` 支持方块状态与方块实体 NBT。
 - 可视化资源库：26.3 官方中文名称与图标，物品/方块/效果/附魔/实体/声音统一为图标网格选择，支持中文名搜索。
@@ -119,7 +120,7 @@
 | 命令方块 setblock | ✅ 单块 + 命令方块链 |
 | 项目保存 / 自动保存 | ✅ JSON 文件 |
 | 安装包 / 便携版 | ✅ 未签名（见 08） |
-| 自动更新 | ✅ 0.1.30 → 0.1.31 静默升级已实测；GitHub v0.1.31 Release 已发布 |
+| 自动更新 | ✅ 0.1.31 → 0.1.32 静默升级已实测；GitHub v0.1.32 Release 已发布 |
 | 1.12.2 / 1.13–1.20.4 | ❌ 仅设计 |
 | 单元体系 | ❌ P1 后续 |
 
@@ -127,5 +128,6 @@
 
 - 暂无 Mojang 官方组件 schema：复杂组件通过原始 SNBT 兜底。
 - 未接入游戏内验证：语义错误（例如选择器在特定维度无匹配）只能进游戏确认。
-- 当前版本只打包 26.3；切换到其他版本需要额外数据包。
+- 1.21.1 为试验支持：命令树与通用构建器来自 1.21.1，可视化表单仍按 26.3 语法生成。
+- 1.13–1.20.4 尚未接入。
 - 便携版不支持自动更新（electron-updater 限制），只提示手动下载。

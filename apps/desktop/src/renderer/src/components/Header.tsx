@@ -45,9 +45,25 @@ export function Header() {
       </div>
 
       <div className="header-actions">
-        <div className="pack-pill" title="当前数据包">
+        <div className="pack-pill" title="切换 Minecraft 版本">
           <span className="dot" />
-          {state.pack ? `${state.pack.manifest.gameVersion} · ${state.pack.manifest.counts.roots} 命令` : '数据包加载中'}
+          <select
+            id="pack-select"
+            className="pack-select"
+            aria-label="Minecraft 版本"
+            value={state.activePackId}
+            disabled={loading || state.packs.length <= 1}
+            onChange={(event) => void state.loadPack(event.target.value)}
+          >
+            {state.packs.map((pack) => (
+              <option key={pack.id} value={pack.id}>
+                {pack.gameVersion}
+              </option>
+            ))}
+          </select>
+          {state.pack ? (
+            <span className="pack-count">{state.pack.manifest.counts.roots} 命令</span>
+          ) : null}
         </div>
         <button type="button" className="btn btn-ghost" onClick={() => state.newProject()} disabled={loading}>
           <FilePlus2 size={15} />
