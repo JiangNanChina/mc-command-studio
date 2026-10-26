@@ -968,7 +968,28 @@ async function main() {
   if (!tickOutput.includes('tick rate 20')) {
     throw new Error(`tick 输出不符合预期：${tickOutput}`)
   }
-  await page.screenshot({ path: join(ARTIFACTS, 'misc-commands.png') })
+  await page.locator('.command-item', { hasText: '广播消息' }).first().click()
+  await page.waitForSelector('#social-message', { timeout: 10_000 })
+  await page.fill('#social-message', '欢迎来到服务器')
+  await page.waitForTimeout(300)
+  const sayOutput = await page.locator('.output-code .cm-content').innerText()
+  if (!sayOutput.includes('say 欢迎来到服务器')) {
+    throw new Error(`say 输出不符合预期：${sayOutput}`)
+  }
+  await page.locator('.command-item', { hasText: '玩家列表' }).first().click()
+  await page.getByLabel('同时显示玩家 UUID（list uuids）').check()
+  await page.waitForTimeout(300)
+  const listOutput = await page.locator('.output-code .cm-content').innerText()
+  if (!listOutput.includes('list uuids')) {
+    throw new Error(`list 输出不符合预期：${listOutput}`)
+  }
+  await page.locator('.command-item', { hasText: '查看种子' }).first().click()
+  await page.waitForTimeout(300)
+  const seedOutput = await page.locator('.output-code .cm-content').innerText()
+  if (!seedOutput.trim().endsWith('seed')) {
+    throw new Error(`seed 输出不符合预期：${seedOutput}`)
+  }
+  await page.screenshot({ path: join(ARTIFACTS, 'social-commands.png') })
 
   // 模板库
   await page.getByRole('button', { name: '模板', exact: true }).click()

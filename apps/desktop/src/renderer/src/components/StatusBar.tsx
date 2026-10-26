@@ -37,6 +37,7 @@ export function StatusBar() {
     state.ride,
     state.random,
     state.tick,
+    state.social,
     state.summon,
     state.setblock,
     state.execute,

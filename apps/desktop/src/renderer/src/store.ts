@@ -35,6 +35,11 @@ import {
   buildRideCommand,
   buildRandomCommand,
   buildTickCommand,
+  buildSayCommand,
+  buildMsgCommand,
+  buildKillCommand,
+  buildListCommand,
+  buildSeedCommand,
   createDefaultNbtGiveOptions,
   createDefaultGamemodeOptions,
   createDefaultDamageOptions,
@@ -43,6 +48,7 @@ import {
   createDefaultRideOptions,
   createDefaultRandomOptions,
   createDefaultTickOptions,
+  createDefaultSocialOptions,
   buildLootCommand,
   buildSoundCommand,
   buildSummonCommand,
@@ -131,6 +137,7 @@ import {
   type RideOptions,
   type RandomOptions,
   type TickOptions,
+  type SocialOptions,
   type DataOptions,
   type LootOptions,
   type TimeOptions,
@@ -269,6 +276,7 @@ export interface ProjectPayload {
   ride: RideOptions
   random: RandomOptions
   tick: TickOptions
+  social: SocialOptions
   summon: SummonOptions
   setblock: SetblockOptions
   execute: ExecuteOptions
@@ -332,6 +340,7 @@ interface AppStore {
   ride: RideOptions
   random: RandomOptions
   tick: TickOptions
+  social: SocialOptions
   summon: SummonOptions
   setblock: SetblockOptions
   execute: ExecuteOptions
@@ -413,6 +422,7 @@ interface AppStore {
   updateRide: (patch: Partial<RideOptions>) => void
   updateRandom: (patch: Partial<RandomOptions>) => void
   updateTick: (patch: Partial<TickOptions>) => void
+  updateSocial: (patch: Partial<SocialOptions>) => void
   updateFill: (patch: Partial<FillOptions>) => void
   updateClone: (patch: Partial<CloneOptions>) => void
   updateEnchant: (patch: Partial<EnchantOptions>) => void
@@ -1547,6 +1557,16 @@ function normalizeTick(input: Partial<TickOptions> | undefined): TickOptions {
   }
 }
 
+function normalizeSocial(input: Partial<SocialOptions> | undefined): SocialOptions {
+  const fallback = createDefaultSocialOptions()
+  if (!input) return fallback
+  return {
+    message: typeof input.message === 'string' ? input.message : fallback.message,
+    target: input.target?.base ? input.target : fallback.target,
+    uuids: Boolean(input.uuids)
+  }
+}
+
 function normalizeNbtGive(input: Partial<NbtGiveOptions> | undefined): NbtGiveOptions {
   const fallback = createDefaultNbtGiveOptions()
   if (!input) return fallback
@@ -1600,6 +1620,7 @@ function normalizePayload(input: unknown): ProjectPayload {
     ride: normalizeRide(data.ride),
     random: normalizeRandom(data.random),
     tick: normalizeTick(data.tick),
+    social: normalizeSocial(data.social),
     summon: normalizeSummon(data.summon),
     setblock: normalizeSetblock(data.setblock),
     execute: normalizeExecute(data.execute),
@@ -1660,6 +1681,7 @@ function documentSnapshot(state: AppStore): string {
     ride: state.ride,
     random: state.random,
     tick: state.tick,
+    social: state.social,
     summon: state.summon,
     setblock: state.setblock,
     execute: state.execute,
@@ -1734,6 +1756,7 @@ export const useAppStore = create<AppStore>()(
     ride: createDefaultRideOptions(),
     random: createDefaultRandomOptions(),
     tick: createDefaultTickOptions(),
+    social: createDefaultSocialOptions(),
     summon: createDefaultSummonOptions(),
     setblock: createDefaultSetblockOptions(),
     execute: createDefaultExecuteOptions(),
@@ -2086,6 +2109,13 @@ export const useAppStore = create<AppStore>()(
     updateTick: (patch) => {
       set((state) => {
         state.tick = { ...state.tick, ...patch }
+        state.dirty = true
+      })
+    },
+
+    updateSocial: (patch) => {
+      set((state) => {
+        state.social = { ...state.social, ...patch }
         state.dirty = true
       })
     },
@@ -2616,6 +2646,7 @@ export const useAppStore = create<AppStore>()(
         state.ride = createDefaultRideOptions()
         state.random = createDefaultRandomOptions()
         state.tick = createDefaultTickOptions()
+        state.social = createDefaultSocialOptions()
         state.summon = createDefaultSummonOptions()
         state.setblock = createDefaultSetblockOptions()
         state.execute = createDefaultExecuteOptions()
@@ -2684,6 +2715,7 @@ export const useAppStore = create<AppStore>()(
         ride: state.ride,
         random: state.random,
         tick: state.tick,
+        social: state.social,
         summon: state.summon,
         setblock: state.setblock,
         execute: state.execute,
@@ -2744,6 +2776,7 @@ export const useAppStore = create<AppStore>()(
         state.ride = payload.ride
         state.random = payload.random
         state.tick = payload.tick
+        state.social = payload.social
         state.summon = payload.summon
         state.setblock = payload.setblock
         state.execute = payload.execute
@@ -3017,6 +3050,14 @@ export function selectRandomOutput(random: RandomOptions): BuildResult {
 
 export function selectTickOutput(tick: TickOptions): BuildResult {
   return buildTickCommand(tick)
+}
+
+export function selectSocialOutput(social: SocialOptions, id: string): BuildResult {
+  if (id === 'msg') return buildMsgCommand(social.target, social.message)
+  if (id === 'kill') return buildKillCommand(social.target)
+  if (id === 'list') return buildListCommand(social.uuids)
+  if (id === 'seed') return buildSeedCommand()
+  return buildSayCommand(social.message)
 }
 
 export function selectSummonOutput(summon: SummonOptions): BuildResult {

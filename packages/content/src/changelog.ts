@@ -22,6 +22,27 @@ const REPO = 'https://github.com/JiangNanChina/mc-command-studio'
  */
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: '0.1.42',
+    date: '2026-10-27',
+    title: '服务器/社交命令可视化',
+    highlights: ['say/msg/kill/list/seed 表单。', '1.20.4 同步可用。'],
+    sections: [
+      {
+        type: 'added',
+        items: ['广播、私聊、清除实体、玩家列表、查看种子。']
+      },
+      {
+        type: 'improved',
+        items: ['可视化根命令 42 → 47。', '单元测试 224 → 229。']
+      },
+      {
+        type: 'fixed',
+        items: ['无。']
+      }
+    ],
+    releaseUrl: `${REPO}/releases/tag/v0.1.42`
+  },
+  {
     version: '0.1.41',
     date: '2026-10-27',
     title: 'random / tick 可视化',

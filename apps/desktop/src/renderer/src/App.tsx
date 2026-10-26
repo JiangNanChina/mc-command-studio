@@ -16,6 +16,7 @@ import { SpreadplayersForm } from './components/SpreadplayersForm'
 import { RideForm } from './components/RideForm'
 import { RandomForm } from './components/RandomForm'
 import { TickForm } from './components/TickForm'
+import { SocialForm } from './components/SocialForm'
 import { SummonForm } from './components/SummonForm'
 import { SetblockForm } from './components/SetblockForm'
 import { ExecuteForm } from './components/ExecuteForm'
@@ -138,6 +139,7 @@ export default function App() {
   const ride = state.ride
   const random = state.random
   const tick = state.tick
+  const social = state.social
   const summon = state.summon
   const setblock = state.setblock
   const execute = state.execute
@@ -277,6 +279,7 @@ export default function App() {
           store.ride,
           store.random,
           store.tick,
+          store.social,
           store.summon,
           store.setblock,
           store.execute,
@@ -335,7 +338,7 @@ export default function App() {
       void useAppStore.getState().autosave()
     }, 4000)
     return () => clearTimeout(timer)
-  }, [dirty, give, nbtGive, gamemode, damage, rotate, spreadplayers, ride, random, tick, summon, setblock, execute, teleport, effect, fill, clone, chain, enchant, xp, tellraw, title, sound, bossbar, scoreboard, particle, world, tag, clear, gamerule, worldborder, team, spawnpoint, worldSpawn, forceload, attribute, automation, itemCommand, dataCommand, loot, generic, commandBlock, outputMode, activeCommandId, projectName])
+  }, [dirty, give, nbtGive, gamemode, damage, rotate, spreadplayers, ride, random, tick, social, summon, setblock, execute, teleport, effect, fill, clone, chain, enchant, xp, tellraw, title, sound, bossbar, scoreboard, particle, world, tag, clear, gamerule, worldborder, team, spawnpoint, worldSpawn, forceload, attribute, automation, itemCommand, dataCommand, loot, generic, commandBlock, outputMode, activeCommandId, projectName])
 
   useEffect(() => {
     if (!toast) return
@@ -409,6 +412,8 @@ export default function App() {
             <RandomForm />
           ) : activeCommandId === 'tick' ? (
             <TickForm />
+          ) : ['say', 'msg', 'kill', 'list', 'seed'].includes(activeCommandId ?? '') ? (
+            <SocialForm />
           ) : activeCommandId === 'summon' ? (
             <SummonForm />
           ) : activeCommandId === 'setblock' ? (

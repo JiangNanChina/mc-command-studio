@@ -20,6 +20,7 @@ import {
   type RideOptions,
   type RandomOptions,
   type TickOptions,
+  type SocialOptions,
   type SetblockOptions,
   type ScoreboardOptions,
   type ParticleOptions,
@@ -54,6 +55,7 @@ import {
   selectRideOutput,
   selectRandomOutput,
   selectTickOutput,
+  selectSocialOutput,
   selectChainOutput,
   selectCloneOutput,
   selectBossbarOutput,
@@ -113,6 +115,7 @@ export function getCommandOutput(
   ride: RideOptions,
   random: RandomOptions,
   tick: TickOptions,
+  social: SocialOptions,
   summon: SummonOptions,
   setblock: SetblockOptions,
   execute: ExecuteOptions,
@@ -158,6 +161,15 @@ export function getCommandOutput(
   if (activeCommandId === 'ride') return selectRideOutput(ride)
   if (activeCommandId === 'random') return selectRandomOutput(random)
   if (activeCommandId === 'tick') return selectTickOutput(tick)
+  if (
+    activeCommandId === 'say' ||
+    activeCommandId === 'msg' ||
+    activeCommandId === 'kill' ||
+    activeCommandId === 'list' ||
+    activeCommandId === 'seed'
+  ) {
+    return selectSocialOutput(social, activeCommandId)
+  }
   if (activeCommandId === 'summon') return selectSummonOutput(summon)
   if (activeCommandId === 'setblock') return selectSetblockOutput(setblock)
   if (activeCommandId === 'execute') return selectExecuteOutput(execute)
@@ -214,6 +226,7 @@ export function getCurrentOutput(
   ride: RideOptions,
   random: RandomOptions,
   tick: TickOptions,
+  social: SocialOptions,
   summon: SummonOptions,
   setblock: SetblockOptions,
   execute: ExecuteOptions,
@@ -260,6 +273,7 @@ export function getCurrentOutput(
     ride,
     random,
     tick,
+    social,
     summon,
     setblock,
     execute,
