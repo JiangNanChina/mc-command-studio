@@ -10,6 +10,7 @@ import {
   type TeamVisibility
 } from '@mcstudio/core'
 import { SelectorField } from './SelectorField'
+import { TextPreview, TextSegmentsEditor } from './TextSegmentsEditor'
 import { useAppStore } from '../store'
 
 const meta = COMMAND_MAP.get('team')
@@ -213,6 +214,45 @@ export function TeamForm() {
           </div>
         </div>
       </div>
+
+      {showOptions ? (
+        <div className="card">
+          <div className="card-head">
+            <div className="card-title">
+              <Flag size={15} />
+              队伍前缀与后缀
+            </div>
+          </div>
+          <div className="card-body">
+            <div className="field">
+              <span className="field-label">名字前缀</span>
+              <TextSegmentsEditor
+                segments={team.prefix}
+                onChange={(prefix) => state.updateTeam({ prefix })}
+                interactive={false}
+              />
+              {team.prefix.length ? (
+                <TextPreview segments={team.prefix} />
+              ) : (
+                <div className="hint">未设置前缀；点击“添加文本”即可编辑。</div>
+              )}
+            </div>
+            <div className="field" style={{ marginTop: 16 }}>
+              <span className="field-label">名字后缀</span>
+              <TextSegmentsEditor
+                segments={team.suffix}
+                onChange={(suffix) => state.updateTeam({ suffix })}
+                interactive={false}
+              />
+              {team.suffix.length ? (
+                <TextPreview segments={team.suffix} />
+              ) : (
+                <div className="hint">未设置后缀；点击“添加文本”即可编辑。</div>
+              )}
+            </div>
+          </div>
+        </div>
+      ) : null}
     </div>
   )
 }

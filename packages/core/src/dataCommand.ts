@@ -4,8 +4,9 @@ import { serializePosition, type Position } from './position'
 import { serializeSelector, type Selector } from './selector'
 import type { BuildResult, Diagnostic } from './types'
 
-export type DataAction = 'get' | 'merge' | 'remove'
+export type DataAction = 'get' | 'merge' | 'remove' | 'modify'
 export type DataTargetType = 'entity' | 'block' | 'storage'
+export type DataModifyOperation = 'set' | 'merge' | 'append' | 'prepend' | 'insert' | 'remove'
 
 export interface DataOptions {
   action: DataAction
@@ -17,6 +18,8 @@ export interface DataOptions {
   scaleEnabled: boolean
   scale: string
   nbt: string
+  modifyOperation: DataModifyOperation
+  index: string
 }
 
 export function createDefaultDataOptions(): DataOptions {
@@ -29,7 +32,9 @@ export function createDefaultDataOptions(): DataOptions {
     path: 'Health',
     scaleEnabled: false,
     scale: '1',
-    nbt: '{}'
+    nbt: '{}',
+    modifyOperation: 'set',
+    index: '0'
   }
 }
 
@@ -70,6 +75,31 @@ export function buildDataCommand(options: DataOptions): BuildResult {
     diagnostics.push(error('data.path', 'NBT 路径不能为空', 'path'))
   }
   parts.push(path)
+
+  if (options.action === 'modify') {
+    const operation = options.modifyOperation
+    if (operation === 'insert' || operation === 'remove') {
+      if (!/^\d+$/.test(options.index.trim())) {
+        diagnostics.push(error('data.index', '列表索引必须是非负整数', 'index'))
+      }
+      if (operation === 'insert') {
+        const nbt = options.nbt.trim()
+        if (!nbt.startsWith('{') || !nbt.endsWith('}')) {
+          diagnostics.push(error('data.nbt', '插入内容必须是 { ... } 形式的 SNBT', 'nbt'))
+        }
+        parts.push('insert', options.index.trim(), 'value', nbt)
+      } else {
+        parts.push('remove', options.index.trim())
+      }
+    } else {
+      const nbt = options.nbt.trim()
+      if (!nbt.startsWith('{') || !nbt.endsWith('}')) {
+        diagnostics.push(error('data.nbt', '修改内容必须是 { ... } 形式的 SNBT', 'nbt'))
+      }
+      parts.push(operation, 'value', nbt)
+    }
+    return { text: parts.join(' '), diagnostics }
+  }
 
   if (options.action === 'get' && options.scaleEnabled) {
     if (!isNumber(options.scale)) {

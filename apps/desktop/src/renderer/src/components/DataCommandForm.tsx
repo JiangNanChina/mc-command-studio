@@ -1,6 +1,7 @@
 import { Braces, Database } from 'lucide-react'
 import {
   type DataAction,
+  type DataModifyOperation,
   type DataTargetType
 } from '@mcstudio/core'
 import { COMMAND_MAP } from '@mcstudio/content'
@@ -12,8 +13,18 @@ const meta = COMMAND_MAP.get('data')
 
 const ACTIONS: { value: DataAction; label: string }[] = [
   { value: 'get', label: '查询' },
+  { value: 'modify', label: '修改路径' },
   { value: 'merge', label: '合并' },
   { value: 'remove', label: '删除路径' }
+]
+
+const MODIFY_OPERATIONS: { value: DataModifyOperation; label: string }[] = [
+  { value: 'set', label: '设置 set' },
+  { value: 'merge', label: '合并 merge' },
+  { value: 'append', label: '追加 append' },
+  { value: 'prepend', label: '前置 prepend' },
+  { value: 'insert', label: '插入 insert' },
+  { value: 'remove', label: '移除 remove' }
 ]
 
 const TARGETS: { value: DataTargetType; label: string }[] = [
@@ -153,8 +164,69 @@ export function DataCommandForm() {
                     state.updateDataCommand({ path: event.target.value })
                   }
                 />
-                <div className="hint">查询可留空以读取整个 NBT；删除路径不能为空。</div>
+                <div className="hint">查询可留空以读取整个 NBT；删除/修改路径不能为空。</div>
               </div>
+
+              {options.action === 'modify' ? (
+                <>
+                  <div className="grid-2" style={{ marginTop: 12 }}>
+                    <div className="field">
+                      <label className="field-label" htmlFor="data-modify-operation">
+                        操作
+                      </label>
+                      <select
+                        id="data-modify-operation"
+                        className="select"
+                        value={options.modifyOperation}
+                        onChange={(event) =>
+                          state.updateDataCommand({
+                            modifyOperation: event.target.value as DataModifyOperation
+                          })
+                        }
+                      >
+                        {MODIFY_OPERATIONS.map((operation) => (
+                          <option key={operation.value} value={operation.value}>
+                            {operation.label}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                    {options.modifyOperation === 'insert' ||
+                    options.modifyOperation === 'remove' ? (
+                      <div className="field">
+                        <label className="field-label" htmlFor="data-index">
+                          列表索引
+                        </label>
+                        <input
+                          id="data-index"
+                          className="input"
+                          value={options.index}
+                          onChange={(event) =>
+                            state.updateDataCommand({ index: event.target.value })
+                          }
+                        />
+                      </div>
+                    ) : null}
+                  </div>
+                  {options.modifyOperation !== 'remove' ? (
+                    <div className="field" style={{ marginTop: 10 }}>
+                      <label className="field-label" htmlFor="data-nbt">
+                        SNBT 值
+                      </label>
+                      <textarea
+                        id="data-nbt"
+                        className="textarea particle-raw"
+                        value={options.nbt}
+                        spellCheck={false}
+                        onChange={(event) =>
+                          state.updateDataCommand({ nbt: event.target.value })
+                        }
+                      />
+                    </div>
+                  ) : null}
+                </>
+              ) : null}
+
               {options.action === 'get' ? (
                 <>
                   <label className="checkline" style={{ marginTop: 12 }}>

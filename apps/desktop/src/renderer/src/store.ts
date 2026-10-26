@@ -1150,7 +1150,13 @@ function normalizeTeam(input: Partial<TeamOptions> | undefined): TeamOptions {
     collisionRule: collisions.includes(input.collisionRule as TeamOptions['collisionRule'])
       ? (input.collisionRule as TeamOptions['collisionRule'])
       : 'always',
-    target: input.target?.base ? input.target : fallback.target
+    target: input.target?.base ? input.target : fallback.target,
+    prefix: Array.isArray(input.prefix)
+      ? input.prefix.map(normalizeTextSegment)
+      : [],
+    suffix: Array.isArray(input.suffix)
+      ? input.suffix.map(normalizeTextSegment)
+      : []
   }
 }
 
@@ -1302,9 +1308,19 @@ function normalizeItemCommand(input: Partial<ItemOptions> | undefined): ItemOpti
 function normalizeDataCommand(input: Partial<DataOptions> | undefined): DataOptions {
   const fallback = createDefaultDataOptions()
   if (!input) return fallback
+  const operations: DataOptions['modifyOperation'][] = [
+    'set',
+    'merge',
+    'append',
+    'prepend',
+    'insert',
+    'remove'
+  ]
   return {
     action:
-      input.action === 'merge' || input.action === 'remove' ? input.action : 'get',
+      input.action === 'merge' || input.action === 'remove' || input.action === 'modify'
+        ? input.action
+        : 'get',
     targetType:
       input.targetType === 'block' || input.targetType === 'storage'
         ? input.targetType
@@ -1315,7 +1331,11 @@ function normalizeDataCommand(input: Partial<DataOptions> | undefined): DataOpti
     path: typeof input.path === 'string' ? input.path : fallback.path,
     scaleEnabled: Boolean(input.scaleEnabled),
     scale: typeof input.scale === 'string' ? input.scale : fallback.scale,
-    nbt: typeof input.nbt === 'string' ? input.nbt : fallback.nbt
+    nbt: typeof input.nbt === 'string' ? input.nbt : fallback.nbt,
+    modifyOperation: operations.includes(input.modifyOperation as DataOptions['modifyOperation'])
+      ? (input.modifyOperation as DataOptions['modifyOperation'])
+      : 'set',
+    index: typeof input.index === 'string' ? input.index : fallback.index
   }
 }
 

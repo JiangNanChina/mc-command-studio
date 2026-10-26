@@ -478,6 +478,14 @@ async function main() {
   if (!teamCreate.includes('team modify red_team friendlyFire false')) {
     throw new Error(`team 选项输出不符合预期：${teamCreate}`)
   }
+  const teamTextCard = page.locator('.card').filter({ hasText: '队伍前缀与后缀' })
+  await teamTextCard.getByRole('button', { name: /添加文本片段/ }).first().click()
+  await teamTextCard.locator('.text-segment input.input').first().fill('[RED]')
+  await page.waitForTimeout(300)
+  const teamPrefix = await page.locator('.output-code .cm-content').innerText()
+  if (!teamPrefix.includes('team modify red_team prefix {"text":"[RED]"}')) {
+    throw new Error(`team 前缀输出不符合预期：${teamPrefix}`)
+  }
   await page.screenshot({ path: join(ARTIFACTS, 'team-form.png') })
   await page.getByRole('button', { name: '加入队伍', exact: true }).click()
   await page.waitForTimeout(300)
@@ -686,6 +694,15 @@ async function main() {
   const dataRemove = await page.locator('.output-code .cm-content').innerText()
   if (!dataRemove.includes('data remove entity @s Health')) {
     throw new Error(`data 删除输出不符合预期：${dataRemove}`)
+  }
+  await page.getByRole('button', { name: '修改路径', exact: true }).click()
+  await page.waitForSelector('#data-modify-operation', { timeout: 10_000 })
+  await page.selectOption('#data-modify-operation', 'set')
+  await page.fill('#data-nbt', '{id:"minecraft:stone"}')
+  await page.waitForTimeout(300)
+  const dataModify = await page.locator('.output-code .cm-content').innerText()
+  if (!dataModify.includes('data modify entity @s Health set value {id:"minecraft:stone"}')) {
+    throw new Error(`data 修改输出不符合预期：${dataModify}`)
   }
   await page.screenshot({ path: join(ARTIFACTS, 'data-form.png') })
 

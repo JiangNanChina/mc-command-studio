@@ -321,8 +321,9 @@
 
 ![data 表单](assets/data-form.png)
 
-- data：实体/方块实体/命令存储，查询、合并 SNBT、删除路径；查询支持 scale。
+- data：实体/方块实体/命令存储，查询、修改（set/merge/append/prepend/insert/remove）、合并 SNBT、删除路径；查询支持 scale。
 - loot：给予玩家、生成掉落物、插入容器；战利品表支持数据包 loot_table 建议。
+- team：名字前缀/后缀使用文本片段编辑，支持颜色/加粗等样式与预览。
 - 两个表单分别从侧栏“NBT 数据”“战利品”打开。
 
 ## 4. 通用构建器

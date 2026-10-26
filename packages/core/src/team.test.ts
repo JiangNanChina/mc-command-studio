@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { buildTeamCommands, createDefaultTeamOptions } from './team'
+import { createTextSegment } from './text'
 
 describe('team', () => {
   it('creates a team with all options', () => {
@@ -40,6 +41,19 @@ describe('team', () => {
     expect(buildTeamCommands({ ...createDefaultTeamOptions(), action: 'list' }).text).toBe(
       'team list red_team'
     )
+  })
+
+  it('adds prefix and suffix text components', () => {
+    const prefix = { ...createTextSegment(), text: '[RED]' }
+    const suffix = { ...createTextSegment(), text: '<>' }
+    const lines = buildTeamCommands({
+      ...createDefaultTeamOptions(),
+      action: 'modify',
+      prefix: [prefix],
+      suffix: [suffix]
+    }).text.split('\n')
+    expect(lines).toContain('team modify red_team prefix {"text":"[RED]"}')
+    expect(lines).toContain('team modify red_team suffix {"text":"<>"}')
   })
 
   it('validates team names', () => {

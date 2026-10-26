@@ -22,6 +22,37 @@ const REPO = 'https://github.com/JiangNanChina/mc-command-studio'
  */
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: '0.1.26',
+    date: '2026-10-26',
+    title: 'data modify 与队伍前缀后缀',
+    highlights: [
+      'data modify 六种操作。',
+      'team 前缀/后缀文本组件编辑。'
+    ],
+    sections: [
+      {
+        type: 'added',
+        items: [
+          'data modify：set/merge/append/prepend/insert/remove。',
+          '列表索引与 SNBT 值编辑。',
+          'team prefix/suffix 文本片段编辑与预览。'
+        ]
+      },
+      {
+        type: 'improved',
+        items: [
+          '前缀/后缀换行校验。',
+          '单元测试 178 → 180；冒烟测试覆盖新功能。'
+        ]
+      },
+      {
+        type: 'fixed',
+        items: ['无。']
+      }
+    ],
+    releaseUrl: `${REPO}/releases/tag/v0.1.26`
+  },
+  {
     version: '0.1.25',
     date: '2026-10-26',
     title: '可视化 NBT 与战利品表',

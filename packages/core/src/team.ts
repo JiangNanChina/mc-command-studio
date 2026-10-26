@@ -1,6 +1,7 @@
 import { error } from './diagnostics'
 import { snbtString } from './escape'
 import { serializeSelector, type Selector } from './selector'
+import { textComponentJson, type TextSegment } from './text'
 import type { BuildResult, Diagnostic } from './types'
 
 export type TeamAction = 'create' | 'modify' | 'join' | 'leave' | 'remove' | 'list'
@@ -34,6 +35,8 @@ export interface TeamOptions {
   nametagVisibility: TeamVisibility
   collisionRule: TeamCollision
   target: Selector
+  prefix: TextSegment[]
+  suffix: TextSegment[]
 }
 
 export const TEAM_COLORS: { value: TeamColor; label: string; hex: string }[] = [
@@ -79,7 +82,9 @@ export function createDefaultTeamOptions(): TeamOptions {
     seeFriendlyInvisibles: true,
     nametagVisibility: 'always',
     collisionRule: 'always',
-    target: { base: '@a' }
+    target: { base: '@a' },
+    prefix: [],
+    suffix: []
   }
 }
 
@@ -94,6 +99,15 @@ export function buildTeamCommands(options: TeamOptions): BuildResult {
     diagnostics.push(error('team.name', '队伍名只能是 1–16 位字母/数字/下划线/点/连字符', 'name'))
   }
 
+  for (const [kind, segments] of [
+    ['prefix', options.prefix],
+    ['suffix', options.suffix]
+  ] as const) {
+    if (segments.some((segment) => /[\r\n]/.test(segment.text))) {
+      diagnostics.push(error(`team.${kind}`, '队伍前缀/后缀不能包含换行', kind))
+    }
+  }
+
   const modifyLines = (): string[] => {
     const display = options.displayName.trim()
     return [
@@ -102,7 +116,13 @@ export function buildTeamCommands(options: TeamOptions): BuildResult {
       `team modify ${name} friendlyFire ${options.friendlyFire ? 'true' : 'false'}`,
       `team modify ${name} seeFriendlyInvisibles ${options.seeFriendlyInvisibles ? 'true' : 'false'}`,
       `team modify ${name} nametagVisibility ${options.nametagVisibility}`,
-      `team modify ${name} collisionRule ${options.collisionRule}`
+      `team modify ${name} collisionRule ${options.collisionRule}`,
+      ...(options.prefix.length
+        ? [`team modify ${name} prefix ${textComponentJson(options.prefix)}`]
+        : []),
+      ...(options.suffix.length
+        ? [`team modify ${name} suffix ${textComponentJson(options.suffix)}`]
+        : [])
     ]
   }
 

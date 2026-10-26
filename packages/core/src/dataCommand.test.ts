@@ -46,6 +46,30 @@ describe('data', () => {
     ).toBe('data remove entity @s Inventory[0]')
   })
 
+  it('modifies paths with set/merge/append/insert/remove', () => {
+    const base = {
+      ...createDefaultDataOptions(),
+      action: 'modify' as const,
+      path: 'Inventory'
+    }
+    expect(buildDataCommand({ ...base, modifyOperation: 'set', nbt: '{id:"minecraft:stone"}' }).text).toBe(
+      'data modify entity @s Inventory set value {id:"minecraft:stone"}'
+    )
+    expect(buildDataCommand({ ...base, modifyOperation: 'append', nbt: '{id:"minecraft:stone"}' }).text).toBe(
+      'data modify entity @s Inventory append value {id:"minecraft:stone"}'
+    )
+    expect(
+      buildDataCommand({ ...base, modifyOperation: 'insert', index: '2', nbt: '{id:"minecraft:stone"}' })
+        .text
+    ).toBe('data modify entity @s Inventory insert 2 value {id:"minecraft:stone"}')
+    expect(buildDataCommand({ ...base, modifyOperation: 'remove', index: '1' }).text).toBe(
+      'data modify entity @s Inventory remove 1'
+    )
+    const bad = buildDataCommand({ ...base, modifyOperation: 'insert', index: 'x', nbt: 'bad' })
+    expect(bad.diagnostics.some((item) => item.code === 'data.index')).toBe(true)
+    expect(bad.diagnostics.some((item) => item.code === 'data.nbt')).toBe(true)
+  })
+
   it('validates path, nbt and scale', () => {
     const result = buildDataCommand({
       ...createDefaultDataOptions(),
