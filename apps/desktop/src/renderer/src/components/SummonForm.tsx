@@ -154,6 +154,29 @@ export function SummonForm() {
           <div className="hint" style={{ marginTop: 6 }}>
             实体 NBT 仍使用 SNBT；如果未开启“指定坐标”，该内容不会写入命令。
           </div>
+          <div className="row" style={{ marginTop: 10, flexWrap: 'wrap' }}>
+            {[
+              {
+                label: '无声展示',
+                nbt: '{NoAI:1b,Silent:1b,Invulnerable:1b,PersistenceRequired:1b}'
+              },
+              { label: '发光标记', nbt: '{Glowing:1b,Invulnerable:1b}' },
+              { label: '生命 100', nbt: '{Health:100f}' },
+              { label: '命名实体', nbt: '{CustomName:\'{"text":"测试实体"}\'}' },
+              { label: '清除', nbt: '' }
+            ].map((preset) => (
+              <button
+                key={preset.label}
+                type="button"
+                className={`btn btn-sm${summon.nbt === preset.nbt ? ' btn-primary' : ''}`}
+                onClick={() =>
+                  state.updateSummon({ nbt: preset.nbt, usePosition: true })
+                }
+              >
+                {preset.label}
+              </button>
+            ))}
+          </div>
           <div className="divider" />
           <div className="hint">
             示例：

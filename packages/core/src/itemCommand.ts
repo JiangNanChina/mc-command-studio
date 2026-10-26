@@ -1,6 +1,6 @@
 import { error } from './diagnostics'
 import { resourceId } from './escape'
-import { serializePosition, type Position } from './position'
+import { isBalancedCompound, serializePosition, type Position } from './position'
 import { serializeSelector, type Selector } from './selector'
 import { isValidResourceLocation, isValidSlot, parseNumberUnit } from './units'
 import type { BuildResult, Diagnostic } from './types'
@@ -17,6 +17,8 @@ export interface ItemOptions {
   item: string
   count: string
   modifier: string
+  nbtEnabled: boolean
+  nbt: string
 }
 
 export const ITEM_SLOTS = [
@@ -45,7 +47,9 @@ export function createDefaultItemOptions(): ItemOptions {
     slot: 'weapon.mainhand',
     item: 'minecraft:diamond_sword',
     count: '1',
-    modifier: 'mcstudio:bonus'
+    modifier: 'mcstudio:bonus',
+    nbtEnabled: false,
+    nbt: '{}'
   }
 }
 
@@ -53,7 +57,10 @@ function validSlot(slot: string): boolean {
   return isValidSlot(slot)
 }
 
-export function buildItemCommand(options: ItemOptions): BuildResult {
+export function buildItemCommand(
+  options: ItemOptions,
+  engine: 'components' | 'nbt' | 'legacy' = 'components'
+): BuildResult {
   const diagnostics: Diagnostic[] = []
   const slot = options.slot.trim()
   if (!validSlot(slot)) {
@@ -82,7 +89,16 @@ export function buildItemCommand(options: ItemOptions): BuildResult {
     if (!parseNumberUnit(options.count, { min: 1, max: 99, integer: true })) {
       diagnostics.push(error('item.count', '数量必须是 1–99 的整数', 'count'))
     }
-    parts.push('with', item, options.count.trim())
+    let stack = item
+    if (engine === 'nbt' && options.nbtEnabled) {
+      const nbt = options.nbt.trim()
+      if (!isBalancedCompound(nbt)) {
+        diagnostics.push(error('item.nbt', 'NBT 必须是完整的 {…} 复合标签', 'nbt'))
+      } else {
+        stack += nbt
+      }
+    }
+    parts.push('with', stack, options.count.trim())
   } else {
     const modifier = resourceId(options.modifier.trim())
     if (!isValidResourceLocation(options.modifier)) {

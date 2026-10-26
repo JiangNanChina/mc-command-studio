@@ -19,6 +19,7 @@ export function ItemCommandForm() {
   const state = useAppStore()
   const options = state.itemCommand
   const [itemOpen, setItemOpen] = useState(false)
+  const nbtEngine = state.pack?.manifest.engine === 'nbt'
 
   return (
     <div className="content">
@@ -143,6 +144,39 @@ export function ItemCommandForm() {
                 onChange={(event) => state.updateItemCommand({ count: event.target.value })}
               />
             </div>
+            {nbtEngine ? (
+              <>
+                <label className="checkline" style={{ marginTop: 12 }}>
+                  <input
+                    type="checkbox"
+                    checked={options.nbtEnabled}
+                    onChange={(event) =>
+                      state.updateItemCommand({ nbtEnabled: event.target.checked })
+                    }
+                  />
+                  追加 NBT（1.20.4）
+                </label>
+                {options.nbtEnabled ? (
+                  <div className="field" style={{ marginTop: 10 }}>
+                    <label className="field-label" htmlFor="item-nbt">
+                      物品 NBT
+                    </label>
+                    <textarea
+                      id="item-nbt"
+                      className="textarea particle-raw"
+                      value={options.nbt}
+                      spellCheck={false}
+                      onChange={(event) =>
+                        state.updateItemCommand({ nbt: event.target.value })
+                      }
+                    />
+                    <div className="hint">
+                      例如 {`{display:{Name:'{"text":"剑"}'}}`}。
+                    </div>
+                  </div>
+                ) : null}
+              </>
+            ) : null}
           </div>
         </div>
       ) : (

@@ -102,7 +102,7 @@
 - 命令编辑器的输出面板不再提供数据包导出按钮。
 - BOSS 栏支持查询字段与列出全部；计分目标支持修改显示名/自动更新/数字格式/渲染类型。
 - 顶栏版本切换器可在 26.3 / 1.21.1 / 1.20.4 间切换；非 26.3 显示跨版本提示。
-- 1.20.4 自动进入 NBT 模式：give 使用 NBT 表单，summon/tp/effect/fill/clone/setblock/execute 等 31 个兼容表单启用；loot/gamerule/particle/attribute 等使用命令树。
+- 1.20.4 自动进入 NBT 模式：give 使用 NBT 表单，item 支持追加 NBT，summon 提供无声/发光/生命/命名预设；31 个兼容表单启用。
 
 ## 3.5 tp 传送表单
 

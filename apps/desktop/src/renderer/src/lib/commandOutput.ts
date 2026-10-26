@@ -160,7 +160,9 @@ export function getCommandOutput(
   if (activeCommandId === 'advancement') return selectAdvancementOutput(automation.advancement)
   if (activeCommandId === 'function') return selectFunctionOutput(automation.function)
   if (activeCommandId === 'schedule') return selectScheduleOutput(automation.schedule)
-  if (activeCommandId === 'item') return selectItemCommandOutput(itemCommand)
+  if (activeCommandId === 'item') {
+    return selectItemCommandOutput(itemCommand, pack?.manifest.engine ?? 'components')
+  }
   if (activeCommandId === 'data') return selectDataCommandOutput(dataCommand)
   if (activeCommandId === 'loot') return selectLootOutput(loot)
   if (activeCommandId === 'playsound' || activeCommandId === 'stopsound') {

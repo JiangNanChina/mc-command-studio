@@ -978,6 +978,22 @@ async function main() {
   if (!/summon minecraft:[a-z0-9_]+ 0 64 0/.test(summonNbtOutput)) {
     throw new Error(`1.20.4 summon 输出不符合预期：${summonNbtOutput}`)
   }
+  await page.getByRole('button', { name: '无声展示', exact: true }).click()
+  await page.waitForTimeout(300)
+  const summonPreset = await page.locator('.output-code .cm-content').innerText()
+  if (!summonPreset.includes('NoAI:1b') || !summonPreset.includes('Silent:1b')) {
+    throw new Error(`1.20.4 summon 预设不符合预期：${summonPreset}`)
+  }
+  await page.locator('.command-item', { hasText: '物品操作' }).first().click()
+  await page.waitForSelector('#item-slot', { timeout: 10_000 })
+  await page.getByRole('button', { name: '替换物品', exact: true }).click()
+  await page.getByLabel('追加 NBT（1.20.4）').check()
+  await page.fill('#item-nbt', '{display:{Name:\'{"text":"旧剑"}\'}}')
+  await page.waitForTimeout(300)
+  const itemNbtOutput = await page.locator('.output-code .cm-content').innerText()
+  if (!/item replace (entity|block).* with minecraft:[a-z0-9_]+{display:{Name:/.test(itemNbtOutput)) {
+    throw new Error(`1.20.4 item NBT 输出不符合预期：${itemNbtOutput}`)
+  }
   await page.screenshot({ path: join(ARTIFACTS, 'pack-1.20.4.png') })
   await page.selectOption('#pack-select', '26.3')
   await page.waitForSelector('.version-notice', { state: 'detached', timeout: 15_000 })

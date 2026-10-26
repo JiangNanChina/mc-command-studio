@@ -31,6 +31,26 @@ describe('item command', () => {
     ).toBe('item modify entity @s weapon.mainhand mcstudio:bonus')
   })
 
+  it('appends NBT in the 1.20.4 engine', () => {
+    const result = buildItemCommand(
+      {
+        ...createDefaultItemOptions(),
+        nbtEnabled: true,
+        nbt: '{display:{Name:\'{"text":"剑"}\'}}'
+      },
+      'nbt'
+    )
+    expect(result.text).toContain(
+      'with minecraft:diamond_sword{display:{Name:\'{"text":"剑"}\'}} 1'
+    )
+    const invalid = buildItemCommand(
+      { ...createDefaultItemOptions(), nbtEnabled: true, nbt: 'bad' },
+      'nbt'
+    )
+    expect(invalid.diagnostics.some((item) => item.code === 'item.nbt')).toBe(true)
+    expect(buildItemCommand(createDefaultItemOptions(), 'components').text).not.toContain('{')
+  })
+
   it('validates slot, count and modifier', () => {
     const replace = buildItemCommand({
       ...createDefaultItemOptions(),

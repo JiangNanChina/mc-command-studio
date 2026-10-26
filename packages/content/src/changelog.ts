@@ -22,6 +22,36 @@ const REPO = 'https://github.com/JiangNanChina/mc-command-studio'
  */
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: '0.1.37',
+    date: '2026-10-27',
+    title: '1.20.4 NBT 槽位物品与召唤预设',
+    highlights: [
+      'item 支持 1.20.4 NBT 后缀。',
+      'summon 内置常用 NBT 预设。'
+    ],
+    sections: [
+      {
+        type: 'added',
+        items: [
+          '1.20.4 item replace 追加 NBT。',
+          'summon 无声/发光/生命/命名/清除预设。'
+        ]
+      },
+      {
+        type: 'improved',
+        items: [
+          'NBT 复合标签校验。',
+          '单元测试 202 → 203；冒烟覆盖 item NBT 与 summon 预设。'
+        ]
+      },
+      {
+        type: 'fixed',
+        items: ['无。']
+      }
+    ],
+    releaseUrl: `${REPO}/releases/tag/v0.1.37`
+  },
+  {
     version: '0.1.36',
     date: '2026-10-27',
     title: '1.20.4 兼容表单扩展',

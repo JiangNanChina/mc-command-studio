@@ -1339,7 +1339,9 @@ function normalizeItemCommand(input: Partial<ItemOptions> | undefined): ItemOpti
     slot: typeof input.slot === 'string' ? input.slot : fallback.slot,
     item: typeof input.item === 'string' ? input.item : fallback.item,
     count: typeof input.count === 'string' ? input.count : fallback.count,
-    modifier: typeof input.modifier === 'string' ? input.modifier : fallback.modifier
+    modifier: typeof input.modifier === 'string' ? input.modifier : fallback.modifier,
+    nbtEnabled: Boolean(input.nbtEnabled),
+    nbt: typeof input.nbt === 'string' ? input.nbt : fallback.nbt
   }
 }
 
@@ -2879,8 +2881,11 @@ export function selectScheduleOutput(schedule: ScheduleOptions): BuildResult {
   return buildScheduleCommand(schedule)
 }
 
-export function selectItemCommandOutput(itemCommand: ItemOptions): BuildResult {
-  return buildItemCommand(itemCommand)
+export function selectItemCommandOutput(
+  itemCommand: ItemOptions,
+  engine: 'components' | 'nbt' | 'legacy' = 'components'
+): BuildResult {
+  return buildItemCommand(itemCommand, engine)
 }
 
 export function selectDataCommandOutput(dataCommand: DataOptions): BuildResult {
