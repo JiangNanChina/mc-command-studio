@@ -310,6 +310,20 @@ async function main() {
   if (!bossbarRemove.includes('bossbar remove mcstudio:boss')) {
     throw new Error(`bossbar 移除输出不符合预期：${bossbarRemove}`)
   }
+  await page.getByRole('button', { name: '查询字段', exact: true }).click()
+  await page.waitForSelector('#bossbar-field', { timeout: 10_000 })
+  await page.selectOption('#bossbar-field', 'players')
+  await page.waitForTimeout(300)
+  const bossbarGet = await page.locator('.output-code .cm-content').innerText()
+  if (!bossbarGet.includes('bossbar get mcstudio:boss players')) {
+    throw new Error(`bossbar 查询输出不符合预期：${bossbarGet}`)
+  }
+  await page.getByRole('button', { name: '列出全部', exact: true }).click()
+  await page.waitForTimeout(300)
+  const bossbarList = await page.locator('.output-code .cm-content').innerText()
+  if (!bossbarList.includes('bossbar list')) {
+    throw new Error(`bossbar 列表输出不符合预期：${bossbarList}`)
+  }
   await page.getByRole('button', { name: '创建并配置' }).click()
 
   // particle 可视化（dust SNBT 参数）
@@ -756,6 +770,15 @@ async function main() {
     throw new Error(`scoreboard 输出不符合预期：${scoreboardOutput}`)
   }
   await page.screenshot({ path: join(ARTIFACTS, 'scoreboard-form.png') })
+  await page.getByRole('button', { name: '修改目标' }).click()
+  await page.waitForSelector('#scoreboard-modify-field', { timeout: 10_000 })
+  await page.selectOption('#scoreboard-modify-field', 'displayname')
+  await page.fill('#scoreboard-modify-name', '击杀数')
+  await page.waitForTimeout(300)
+  const scoreboardModify = await page.locator('.output-code .cm-content').innerText()
+  if (!scoreboardModify.includes('scoreboard objectives modify kills displayname "击杀数"')) {
+    throw new Error(`scoreboard 修改输出不符合预期：${scoreboardModify}`)
+  }
   await page.getByRole('button', { name: '设置分数' }).click()
   await page.waitForSelector('#scoreboard-score', { timeout: 10_000 })
   await page.waitForTimeout(300)

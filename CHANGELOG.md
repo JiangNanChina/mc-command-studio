@@ -2,6 +2,19 @@
 
 所有版本变更记录在此。版本号遵循 SemVer。
 
+## [0.1.31] - 2026-10-27
+
+BOSS 栏查询与计分目标修改。
+
+### 新增
+
+- `bossbar get`：查询 max/value/visible/players；`bossbar list` 列出全部。
+- `scoreboard objectives modify`：显示名、自动更新、数字格式（blank/fixed/styled）、渲染类型（integer/hearts）。
+
+### 改进
+
+- 单元测试 194 → 196；冒烟测试覆盖 bossbar 查询/列表与 scoreboard 修改。
+
 ## [0.1.30] - 2026-10-27
 
 谓词结构化编辑器。

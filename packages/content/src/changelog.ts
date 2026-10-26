@@ -22,6 +22,36 @@ const REPO = 'https://github.com/JiangNanChina/mc-command-studio'
  */
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: '0.1.31',
+    date: '2026-10-27',
+    title: 'BOSS 栏查询与计分目标修改',
+    highlights: [
+      'bossbar get/list。',
+      'scoreboard objectives modify 全字段。'
+    ],
+    sections: [
+      {
+        type: 'added',
+        items: [
+          'bossbar get max/value/visible/players 与 list。',
+          '计分目标显示名、自动更新、数字格式、渲染类型。'
+        ]
+      },
+      {
+        type: 'improved',
+        items: [
+          '数字格式 blank/fixed/styled 可视化。',
+          '单元测试 194 → 196；冒烟测试覆盖新功能。'
+        ]
+      },
+      {
+        type: 'fixed',
+        items: ['无。']
+      }
+    ],
+    releaseUrl: `${REPO}/releases/tag/v0.1.31`
+  },
+  {
     version: '0.1.30',
     date: '2026-10-27',
     title: '谓词结构化编辑器',

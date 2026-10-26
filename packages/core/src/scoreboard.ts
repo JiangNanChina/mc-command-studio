@@ -7,6 +7,7 @@ export type ScoreboardAction =
   | 'objective-add'
   | 'objective-remove'
   | 'objective-display'
+  | 'objective-modify'
   | 'players-set'
   | 'players-add'
   | 'players-remove'
@@ -15,6 +16,13 @@ export type ScoreboardAction =
   | 'players-operation'
 
 export type ScoreOperation = '=' | '+=' | '-=' | '*=' | '/=' | '%=' | '<' | '>' | '><'
+export type ScoreboardModifyField =
+  | 'displayname'
+  | 'displayautoupdate'
+  | 'numberformat'
+  | 'rendertype'
+export type ScoreboardNumberFormat = 'blank' | 'fixed' | 'styled'
+export type ScoreboardRenderType = 'hearts' | 'integer'
 
 export interface ScoreboardOptions {
   action: ScoreboardAction
@@ -27,6 +35,11 @@ export interface ScoreboardOptions {
   operation: ScoreOperation
   source: Selector
   sourceObjective: string
+  modifyField: ScoreboardModifyField
+  autoUpdate: boolean
+  numberFormat: ScoreboardNumberFormat
+  numberFormatValue: string
+  renderType: ScoreboardRenderType
 }
 
 export const SCORE_CRITERIA = [
@@ -62,6 +75,7 @@ export const SCOREBOARD_ACTION_LABELS: Record<ScoreboardAction, string> = {
   'objective-add': '创建目标',
   'objective-remove': '删除目标',
   'objective-display': '设置显示位置',
+  'objective-modify': '修改目标',
   'players-set': '设置分数',
   'players-add': '增加分数',
   'players-remove': '减少分数',
@@ -81,7 +95,12 @@ export function createDefaultScoreboardOptions(): ScoreboardOptions {
     score: '0',
     operation: '=',
     source: { base: '@s' },
-    sourceObjective: 'kills'
+    sourceObjective: 'kills',
+    modifyField: 'displayname',
+    autoUpdate: true,
+    numberFormat: 'blank',
+    numberFormatValue: '{"text":"#","color":"gold"}',
+    renderType: 'integer'
   }
 }
 
@@ -121,6 +140,41 @@ export function buildScoreboardCommand(options: ScoreboardOptions): BuildResult 
       const slot = options.slot.trim()
       if (!slot) diagnostics.push(error('scoreboard.slot', '显示位置不能为空', 'slot'))
       text = `scoreboard objectives setdisplay ${slot}${objective ? ` ${objective}` : ''}`
+      break
+    }
+    case 'objective-modify': {
+      switch (options.modifyField) {
+        case 'displayname': {
+          const name = options.displayName.trim()
+          if (!name) diagnostics.push(error('scoreboard.displayName', '显示名称不能为空', 'displayName'))
+          text = `scoreboard objectives modify ${objective} displayname ${snbtString(name)}`
+          break
+        }
+        case 'displayautoupdate':
+          text = `scoreboard objectives modify ${objective} displayautoupdate ${options.autoUpdate}`
+          break
+        case 'numberformat': {
+          if (options.numberFormat === 'blank') {
+            text = `scoreboard objectives modify ${objective} numberformat blank`
+          } else if (options.numberFormat === 'fixed') {
+            const value = options.numberFormatValue.trim()
+            if (!value) {
+              diagnostics.push(error('scoreboard.numberFormat', '固定格式内容不能为空', 'numberFormatValue'))
+            }
+            text = `scoreboard objectives modify ${objective} numberformat fixed ${snbtString(value)}`
+          } else {
+            const value = options.numberFormatValue.trim()
+            if (!value) {
+              diagnostics.push(error('scoreboard.numberFormat', '样式 JSON 不能为空', 'numberFormatValue'))
+            }
+            text = `scoreboard objectives modify ${objective} numberformat styled ${value}`
+          }
+          break
+        }
+        default:
+          text = `scoreboard objectives modify ${objective} rendertype ${options.renderType}`
+          break
+      }
       break
     }
     case 'players-set':

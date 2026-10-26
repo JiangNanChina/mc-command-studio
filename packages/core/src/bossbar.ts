@@ -3,7 +3,8 @@ import { error, warn } from './diagnostics'
 import { serializeSelector, type Selector } from './selector'
 import type { BuildResult, Diagnostic } from './types'
 
-export type BossbarAction = 'create' | 'update' | 'remove'
+export type BossbarAction = 'create' | 'update' | 'remove' | 'get' | 'list'
+export type BossbarField = 'max' | 'players' | 'value' | 'visible'
 export type BossbarColor =
   | 'blue'
   | 'green'
@@ -30,6 +31,7 @@ export interface BossbarOptions {
   visible: boolean
   playersEnabled: boolean
   players: Selector
+  field: BossbarField
 }
 
 export const BOSSBAR_COLORS: { value: BossbarColor; label: string; hex: string }[] = [
@@ -61,7 +63,8 @@ export function createDefaultBossbarOptions(): BossbarOptions {
     value: '100',
     visible: true,
     playersEnabled: true,
-    players: { base: '@a' }
+    players: { base: '@a' },
+    field: 'max'
   }
 }
 
@@ -69,11 +72,17 @@ export function buildBossbarCommands(options: BossbarOptions): BuildResult {
   const diagnostics: Diagnostic[] = []
   const id = resourceId(options.id.trim())
 
+  if (options.action === 'list') {
+    return { text: 'bossbar list', diagnostics }
+  }
   if (!/^[a-z0-9_.-]+:[a-z0-9_./-]+$/.test(id)) {
     diagnostics.push(error('bossbar.id', 'BOSS 栏 ID 必须是 namespace:path 格式', 'id'))
   }
   if (options.action === 'remove') {
     return finish([`bossbar remove ${id}`], diagnostics)
+  }
+  if (options.action === 'get') {
+    return { text: `bossbar get ${id} ${options.field}`, diagnostics }
   }
 
   const name = options.name.trim()

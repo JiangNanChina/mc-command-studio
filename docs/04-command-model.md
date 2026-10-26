@@ -641,7 +641,7 @@ type Unit =
 
 ## 7. 测试
 
-`packages/core/src/*.test.ts` 与 `apps/desktop/src/shared/*.test.ts` 共 194 个用例，覆盖：
+`packages/core/src/*.test.ts` 与 `apps/desktop/src/shared/*.test.ts` 共 196 个用例，覆盖：
 
 - SNBT / 命令方块字符串转义。
 - 选择器排序、引号、范围、NBT 括号、分数。
@@ -675,6 +675,8 @@ type Unit =
 - 数据包高级文件：谓词/进度/战利品表、JSON 校验、重复路径、三者结构化模型。
 - 单元体系：资源 ID、数值、物品栈、槽位。
 - `/data` 实体/方块/存储的 get/merge/remove/modify、路径/scale；`/loot` give/spawn/insert。
+- `/bossbar` get/list 与创建/更新/移除。
+- `/scoreboard objectives modify` 显示名/自动更新/数字格式/渲染类型。
 - `/team` 前缀/后缀/高级显示名文本组件。
 - `/data` 的 modify from 来源。
 - 数据包文件树、load/tick 标签、多行函数、非法命名空间/函数名/空命令。

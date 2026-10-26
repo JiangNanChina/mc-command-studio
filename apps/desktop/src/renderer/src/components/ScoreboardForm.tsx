@@ -5,6 +5,9 @@ import {
   SCORE_OPERATIONS,
   SCORE_SLOTS,
   type ScoreboardAction,
+  type ScoreboardModifyField,
+  type ScoreboardNumberFormat,
+  type ScoreboardRenderType,
   type ScoreOperation
 } from '@mcstudio/core'
 import { COMMAND_MAP } from '@mcstudio/content'
@@ -16,7 +19,8 @@ const meta = COMMAND_MAP.get('scoreboard')
 const OBJECTIVE_ACTIONS: ScoreboardAction[] = [
   'objective-add',
   'objective-remove',
-  'objective-display'
+  'objective-display',
+  'objective-modify'
 ]
 const PLAYER_ACTIONS: ScoreboardAction[] = [
   'players-set',
@@ -187,6 +191,126 @@ export function ScoreboardForm() {
                 </datalist>
                 <div className="hint">常用：sidebar、list、belowName；也支持 sidebar.team.red 等队伍位置。</div>
               </div>
+            ) : null}
+
+            {scoreboard.action === 'objective-modify' ? (
+              <>
+                <div className="field" style={{ marginTop: 12 }}>
+                  <label className="field-label" htmlFor="scoreboard-modify-field">
+                    修改项
+                  </label>
+                  <select
+                    id="scoreboard-modify-field"
+                    className="select"
+                    value={scoreboard.modifyField}
+                    onChange={(event) =>
+                      state.updateScoreboard({
+                        modifyField: event.target.value as ScoreboardModifyField
+                      })
+                    }
+                  >
+                    <option value="displayname">显示名称</option>
+                    <option value="displayautoupdate">自动更新显示</option>
+                    <option value="numberformat">数字格式</option>
+                    <option value="rendertype">渲染类型</option>
+                  </select>
+                </div>
+
+                {scoreboard.modifyField === 'displayname' ? (
+                  <div className="field" style={{ marginTop: 12 }}>
+                    <label className="field-label" htmlFor="scoreboard-modify-name">
+                      显示名称
+                    </label>
+                    <input
+                      id="scoreboard-modify-name"
+                      className="input"
+                      value={scoreboard.displayName}
+                      onChange={(event) =>
+                        state.updateScoreboard({ displayName: event.target.value })
+                      }
+                    />
+                  </div>
+                ) : null}
+
+                {scoreboard.modifyField === 'displayautoupdate' ? (
+                  <label className="checkline" style={{ marginTop: 12 }}>
+                    <input
+                      type="checkbox"
+                      checked={scoreboard.autoUpdate}
+                      onChange={(event) =>
+                        state.updateScoreboard({ autoUpdate: event.target.checked })
+                      }
+                    />
+                    自动更新显示名称
+                  </label>
+                ) : null}
+
+                {scoreboard.modifyField === 'numberformat' ? (
+                  <>
+                    <div className="field" style={{ marginTop: 12 }}>
+                      <label className="field-label" htmlFor="scoreboard-number-format">
+                        数字格式
+                      </label>
+                      <select
+                        id="scoreboard-number-format"
+                        className="select"
+                        value={scoreboard.numberFormat}
+                        onChange={(event) =>
+                          state.updateScoreboard({
+                            numberFormat: event.target.value as ScoreboardNumberFormat
+                          })
+                        }
+                      >
+                        <option value="blank">不显示数字 blank</option>
+                        <option value="fixed">固定文本 fixed</option>
+                        <option value="styled">样式 styled</option>
+                      </select>
+                    </div>
+                    {scoreboard.numberFormat !== 'blank' ? (
+                      <div className="field" style={{ marginTop: 10 }}>
+                        <label className="field-label" htmlFor="scoreboard-number-value">
+                          {scoreboard.numberFormat === 'fixed' ? '固定文本' : '样式 JSON'}
+                        </label>
+                        <input
+                          id="scoreboard-number-value"
+                          className="input"
+                          value={scoreboard.numberFormatValue}
+                          spellCheck={false}
+                          onChange={(event) =>
+                            state.updateScoreboard({ numberFormatValue: event.target.value })
+                          }
+                        />
+                        <div className="hint">
+                          {scoreboard.numberFormat === 'fixed'
+                            ? '例如：分'
+                            : '例如：{"color":"gold","bold":true}'}
+                        </div>
+                      </div>
+                    ) : null}
+                  </>
+                ) : null}
+
+                {scoreboard.modifyField === 'rendertype' ? (
+                  <div className="field" style={{ marginTop: 12 }}>
+                    <label className="field-label" htmlFor="scoreboard-render-type">
+                      渲染类型
+                    </label>
+                    <select
+                      id="scoreboard-render-type"
+                      className="select"
+                      value={scoreboard.renderType}
+                      onChange={(event) =>
+                        state.updateScoreboard({
+                          renderType: event.target.value as ScoreboardRenderType
+                        })
+                      }
+                    >
+                      <option value="integer">整数 integer</option>
+                      <option value="hearts">心形 hearts</option>
+                    </select>
+                  </div>
+                ) : null}
+              </>
             ) : null}
           </div>
         </div>

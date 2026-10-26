@@ -814,7 +814,12 @@ function normalizeBossbar(input: Partial<BossbarOptions> | undefined): BossbarOp
   ]
   return {
     action:
-      input.action === 'update' || input.action === 'remove' ? input.action : 'create',
+      input.action === 'update' ||
+      input.action === 'remove' ||
+      input.action === 'get' ||
+      input.action === 'list'
+        ? input.action
+        : 'create',
     id: typeof input.id === 'string' ? input.id : fallback.id,
     name: typeof input.name === 'string' ? input.name : fallback.name,
     color: colors.includes(input.color as BossbarOptions['color'])
@@ -827,7 +832,13 @@ function normalizeBossbar(input: Partial<BossbarOptions> | undefined): BossbarOp
     value: typeof input.value === 'string' ? input.value : fallback.value,
     visible: Boolean(input.visible),
     playersEnabled: Boolean(input.playersEnabled),
-    players: input.players?.base ? input.players : fallback.players
+    players: input.players?.base ? input.players : fallback.players,
+    field:
+      input.field === 'players' ||
+      input.field === 'value' ||
+      input.field === 'visible'
+        ? input.field
+        : 'max'
   }
 }
 
@@ -889,6 +900,7 @@ function normalizeScoreboard(input: Partial<ScoreboardOptions> | undefined): Sco
     'objective-add',
     'objective-remove',
     'objective-display',
+    'objective-modify',
     'players-set',
     'players-add',
     'players-remove',
@@ -925,7 +937,23 @@ function normalizeScoreboard(input: Partial<ScoreboardOptions> | undefined): Sco
     sourceObjective:
       typeof input.sourceObjective === 'string'
         ? input.sourceObjective
-        : fallback.sourceObjective
+        : fallback.sourceObjective,
+    modifyField:
+      input.modifyField === 'displayautoupdate' ||
+      input.modifyField === 'numberformat' ||
+      input.modifyField === 'rendertype'
+        ? input.modifyField
+        : 'displayname',
+    autoUpdate: input.autoUpdate !== false,
+    numberFormat:
+      input.numberFormat === 'fixed' || input.numberFormat === 'styled'
+        ? input.numberFormat
+        : 'blank',
+    numberFormatValue:
+      typeof input.numberFormatValue === 'string'
+        ? input.numberFormatValue
+        : fallback.numberFormatValue,
+    renderType: input.renderType === 'hearts' ? 'hearts' : 'integer'
   }
 }
 

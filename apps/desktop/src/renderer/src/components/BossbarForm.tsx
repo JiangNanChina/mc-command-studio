@@ -4,6 +4,7 @@ import {
   BOSSBAR_COLORS,
   BOSSBAR_STYLES,
   type BossbarColor,
+  type BossbarField,
   type BossbarStyle
 } from '@mcstudio/core'
 import { SelectorField } from './SelectorField'
@@ -71,27 +72,75 @@ export function BossbarForm() {
               <Trash2 size={13} />
               移除
             </button>
+            <button
+              type="button"
+              className={`btn btn-sm${bossbar.action === 'get' ? ' btn-primary' : ''}`}
+              onClick={() => state.updateBossbar({ action: 'get' })}
+            >
+              查询字段
+            </button>
+            <button
+              type="button"
+              className={`btn btn-sm${bossbar.action === 'list' ? ' btn-primary' : ''}`}
+              onClick={() => state.updateBossbar({ action: 'list' })}
+            >
+              列出全部
+            </button>
           </div>
         </div>
         <div className="card-body">
-          <div className="field">
-            <label className="field-label" htmlFor="bossbar-id">
-              BOSS 栏 ID
-            </label>
-            <input
-              id="bossbar-id"
-              className="input"
-              value={bossbar.id}
-              spellCheck={false}
-              placeholder="mcstudio:boss"
-              onChange={(event) => state.updateBossbar({ id: event.target.value })}
-            />
-            <div className="hint">格式 namespace:path；“创建”要求 ID 尚不存在。</div>
-          </div>
+          {bossbar.action === 'list' ? (
+            <div className="hint">列出当前世界中所有已加载的 BOSS 栏 ID。</div>
+          ) : (
+            <div className="field">
+              <label className="field-label" htmlFor="bossbar-id">
+                BOSS 栏 ID
+              </label>
+              <input
+                id="bossbar-id"
+                className="input"
+                value={bossbar.id}
+                spellCheck={false}
+                placeholder="mcstudio:boss"
+                onChange={(event) => state.updateBossbar({ id: event.target.value })}
+              />
+              <div className="hint">
+                格式 namespace:path；创建要求 ID 尚不存在，查询/更新要求已存在。
+              </div>
+            </div>
+          )}
         </div>
       </div>
 
-      {bossbar.action !== 'remove' ? (
+      {bossbar.action === 'get' ? (
+        <div className="card">
+          <div className="card-head">
+            <div className="card-title">查询字段</div>
+          </div>
+          <div className="card-body">
+            <div className="field">
+              <label className="field-label" htmlFor="bossbar-field">
+                字段
+              </label>
+              <select
+                id="bossbar-field"
+                className="select"
+                value={bossbar.field}
+                onChange={(event) =>
+                  state.updateBossbar({ field: event.target.value as BossbarField })
+                }
+              >
+                <option value="max">最大值 max</option>
+                <option value="value">当前值 value</option>
+                <option value="visible">可见性 visible</option>
+                <option value="players">玩家列表 players</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      ) : null}
+
+      {bossbar.action === 'create' || bossbar.action === 'update' ? (
         <>
           <div className="card">
             <div className="card-head">
@@ -243,7 +292,7 @@ export function BossbarForm() {
             </div>
           </div>
         </>
-      ) : (
+      ) : bossbar.action === 'remove' ? (
         <div className="card">
           <div className="card-head">
             <div className="card-title">
@@ -258,7 +307,7 @@ export function BossbarForm() {
             </div>
           </div>
         </div>
-      )}
+      ) : null}
     </div>
   )
 }

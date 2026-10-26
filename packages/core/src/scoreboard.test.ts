@@ -77,6 +77,33 @@ describe('scoreboard', () => {
     ).toBe('scoreboard players operation @s kills += @p deaths')
   })
 
+  it('modifies objective display settings', () => {
+    const base = {
+      ...createDefaultScoreboardOptions(),
+      action: 'objective-modify' as const
+    }
+    expect(buildScoreboardCommand({ ...base, modifyField: 'displayname', displayName: '击杀' }).text).toBe(
+      'scoreboard objectives modify kills displayname "击杀"'
+    )
+    expect(buildScoreboardCommand({ ...base, modifyField: 'displayautoupdate', autoUpdate: false }).text).toBe(
+      'scoreboard objectives modify kills displayautoupdate false'
+    )
+    expect(buildScoreboardCommand({ ...base, modifyField: 'numberformat', numberFormat: 'blank' }).text).toBe(
+      'scoreboard objectives modify kills numberformat blank'
+    )
+    expect(
+      buildScoreboardCommand({
+        ...base,
+        modifyField: 'numberformat',
+        numberFormat: 'fixed',
+        numberFormatValue: '积分'
+      }).text
+    ).toBe('scoreboard objectives modify kills numberformat fixed "积分"')
+    expect(buildScoreboardCommand({ ...base, modifyField: 'rendertype', renderType: 'hearts' }).text).toBe(
+      'scoreboard objectives modify kills rendertype hearts'
+    )
+  })
+
   it('validates objective names and scores', () => {
     const result = buildScoreboardCommand({
       ...createDefaultScoreboardOptions(),

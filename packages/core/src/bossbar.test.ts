@@ -36,6 +36,19 @@ describe('bossbar', () => {
     ).toBe('bossbar remove mcstudio:boss')
   })
 
+  it('builds get and list', () => {
+    expect(
+      buildBossbarCommands({
+        ...createDefaultBossbarOptions(),
+        action: 'get',
+        field: 'players'
+      }).text
+    ).toBe('bossbar get mcstudio:boss players')
+    expect(
+      buildBossbarCommands({ ...createDefaultBossbarOptions(), action: 'list' }).text
+    ).toBe('bossbar list')
+  })
+
   it('validates id, max and value', () => {
     const result = buildBossbarCommands({
       ...createDefaultBossbarOptions(),
