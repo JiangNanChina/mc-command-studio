@@ -97,6 +97,9 @@ function createWindow(): BrowserWindow {
   const window = new BrowserWindow({
     width: 1380,
     height: 880,
+    icon: app.isPackaged
+      ? join(process.resourcesPath, 'icon.png')
+      : join(__dirname, '../../build/icon.png'),
     minWidth: 1080,
     minHeight: 680,
     show: false,

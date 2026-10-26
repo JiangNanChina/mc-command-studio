@@ -145,12 +145,19 @@ a {
 .brand-mark {
   display: grid;
   place-items: center;
-  width: 34px;
-  height: 34px;
+  width: 36px;
+  height: 36px;
+  overflow: hidden;
   border-radius: 10px;
-  background: linear-gradient(135deg, var(--accent), #1f8f6a);
-  color: #04110c;
-  font-family: var(--mono);
+  background: #1a120c;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.08);
+}
+
+.brand-mark img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
   font-size: 15px;
   font-weight: 800;
   letter-spacing: -1px;
@@ -1271,13 +1278,20 @@ a {
   place-items: center;
   width: 54px;
   height: 54px;
+  overflow: hidden;
   border-radius: 16px;
-  background: linear-gradient(135deg, var(--accent), #1f8f6a);
+  background: #1a120c;
   color: #04110c;
   font-family: var(--mono);
   font-size: 22px;
   font-weight: 800;
-  box-shadow: 0 12px 30px rgba(61, 220, 151, 0.24);
+  box-shadow: 0 12px 30px rgba(220, 138, 61, 0.28);
+}
+
+.welcome-mark img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .welcome h1 {

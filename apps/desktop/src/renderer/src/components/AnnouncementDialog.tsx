@@ -1,6 +1,4 @@
-import { useState } from 'react'
 import {
-  AlertTriangle,
   Bell,
   Calendar,
   ExternalLink,
@@ -9,9 +7,9 @@ import {
   Wrench
 } from 'lucide-react'
 import {
-  CHANGELOG,
   CHANGE_TYPE_LABELS,
   getChangelogEntry,
+  latestChangelog,
   type ChangeType,
   type ChangelogEntry
 } from '@mcstudio/content'
@@ -19,25 +17,26 @@ import { getApi } from '../lib/api'
 import { Modal } from './Modal'
 import { useAppStore } from '../store'
 
-const SECTION_ICONS: Record<ChangeType, typeof Plus> = {
+const RELEASES_URL = 'https://github.com/JiangNanChina/mc-command-studio/releases'
+
+const SECTION_ICONS: Record<Exclude<ChangeType, 'known'>, typeof Plus> = {
   added: Plus,
   improved: Sparkles,
-  fixed: Wrench,
-  known: AlertTriangle
+  fixed: Wrench
 }
 
 function sectionClass(type: ChangeType): string {
   return `changelog-section ${type}`
 }
 
-function EntryView({ entry, current }: { entry: ChangelogEntry; current: string }) {
+function EntryView({ entry }: { entry: ChangelogEntry }) {
   return (
     <div>
       <div className="row" style={{ justifyContent: 'space-between', alignItems: 'flex-start' }}>
         <div>
           <div className="row" style={{ gap: 8 }}>
             <span className="badge accent">v{entry.version}</span>
-            {entry.version === current ? <span className="badge">当前安装</span> : null}
+            <span className="badge">当前安装</span>
           </div>
           <h2 style={{ margin: '8px 0 2px', fontSize: 20 }}>{entry.title}</h2>
           <div className="hint row" style={{ gap: 6 }}>
@@ -66,63 +65,58 @@ function EntryView({ entry, current }: { entry: ChangelogEntry; current: string 
         ))}
       </div>
 
-      {entry.sections.map((section) => {
-        const Icon = SECTION_ICONS[section.type]
-        return (
-          <div key={section.type} className={sectionClass(section.type)}>
-            <div className="changelog-section-head">
-              <Icon size={15} />
-              {CHANGE_TYPE_LABELS[section.type]}
+      {entry.sections
+        .filter((section) => section.type !== 'known')
+        .map((section) => {
+          const Icon = SECTION_ICONS[section.type as Exclude<ChangeType, 'known'>] ?? Plus
+          return (
+            <div key={section.type} className={sectionClass(section.type)}>
+              <div className="changelog-section-head">
+                <Icon size={15} />
+                {CHANGE_TYPE_LABELS[section.type]}
+              </div>
+              <ul className="changelog-list">
+                {section.items.map((item) => (
+                  <li key={item}>{item}</li>
+                ))}
+              </ul>
             </div>
-            <ul className="changelog-list">
-              {section.items.map((item) => (
-                <li key={item}>{item}</li>
-              ))}
-            </ul>
-          </div>
-        )
-      })}
+          )
+        })}
     </div>
   )
 }
 
 export function AnnouncementDialog() {
   const state = useAppStore()
-  const current = state.appInfo?.version ?? CHANGELOG[0].version
-  const initial = getChangelogEntry(current) ? current : CHANGELOG[0].version
-  const [selected, setSelected] = useState(initial)
-  const entry = getChangelogEntry(selected) ?? CHANGELOG[0]
+  const current = state.appInfo?.version ?? latestChangelog().version
+  const entry = getChangelogEntry(current) ?? latestChangelog()
 
   return (
     <Modal
       title="更新公告"
-      subtitle="每次版本更新都会在这里记录新增、改进、修复与已知问题。"
+      subtitle="这里只展示当前版本的更新内容；历史版本请前往 GitHub Releases 查看。"
       icon={<Bell size={17} />}
       onClose={() => void state.closeAnnouncement()}
       wide
       footer={
         <>
           <div className="left">当前安装：v{current}</div>
-          <button type="button" className="btn" onClick={() => void state.closeAnnouncement()}>
+          <button
+            type="button"
+            className="btn"
+            onClick={() => void getApi().app.openExternal(RELEASES_URL)}
+          >
+            查看历史版本
+            <ExternalLink size={12} />
+          </button>
+          <button type="button" className="btn btn-primary" onClick={() => void state.closeAnnouncement()}>
             知道了
           </button>
         </>
       }
     >
-      <div className="changelog-versions">
-        {CHANGELOG.map((item) => (
-          <button
-            key={item.version}
-            type="button"
-            className={`chip${item.version === selected ? ' active' : ''}`}
-            onClick={() => setSelected(item.version)}
-          >
-            v{item.version}
-          </button>
-        ))}
-      </div>
-      <div className="divider" />
-      <EntryView entry={entry} current={current} />
+      <EntryView entry={entry} />
     </Modal>
   )
 }

@@ -1,5 +1,6 @@
 import { ArrowRight, FolderOpen, Sparkles, Terminal, Wand2 } from 'lucide-react'
 import { COMMANDS } from '@mcstudio/content'
+import icon from '../assets/icon.png'
 import { useAppStore } from '../store'
 
 const QUICK_IDS = ['give', 'summon', 'setblock', 'execute', 'effect', 'tellraw']
@@ -11,7 +12,9 @@ export function Welcome() {
 
   return (
     <div className="welcome">
-      <div className="welcome-mark">&gt;_</div>
+      <div className="welcome-mark">
+        <img src={icon} alt="MC 指令工坊" />
+      </div>
       <h1>把命令拼出来，而不是背语法。</h1>
       <p>
         选择命令、填写参数、实时得到可复制的 Java 版命令。当前内置 Minecraft{' '}

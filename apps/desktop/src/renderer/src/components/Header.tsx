@@ -12,6 +12,7 @@ import {
   Sparkles
 } from 'lucide-react'
 import { useAppStore } from '../store'
+import icon from '../assets/icon.png'
 
 export function Header() {
   const state = useAppStore()
@@ -23,7 +24,9 @@ export function Header() {
   return (
     <header className="header">
       <div className="brand">
-        <div className="brand-mark">&gt;_</div>
+        <div className="brand-mark">
+          <img src={icon} alt="MC 指令工坊" />
+        </div>
         <div>
           <div className="brand-name">MC 指令工坊</div>
           <div className="brand-sub">Minecraft Java 命令编辑器</div>

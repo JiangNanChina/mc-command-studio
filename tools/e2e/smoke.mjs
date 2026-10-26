@@ -78,8 +78,18 @@ async function main() {
   if ((await modal.getByRole('button', { name: '知道了' }).count()) === 0) {
     throw new Error('公告弹窗缺少“知道了”按钮')
   }
+  if ((await modal.getByRole('button', { name: '查看历史版本' }).count()) === 0) {
+    throw new Error('公告弹窗缺少“查看历史版本”按钮')
+  }
+  if ((await modal.locator('.changelog-versions').count()) > 0) {
+    throw new Error('公告弹窗不应显示所有版本列表')
+  }
+  if ((await modal.locator('.changelog-section.known').count()) > 0) {
+    throw new Error('公告弹窗不应显示已知问题栏目')
+  }
   await modal.getByRole('button', { name: '知道了' }).click()
   await page.waitForSelector('.banner.announcement', { state: 'detached', timeout: 10_000 })
+  await page.waitForSelector('.brand-mark img', { timeout: 10_000 })
 
   await page.screenshot({ path: join(ARTIFACTS, 'welcome.png') })
 

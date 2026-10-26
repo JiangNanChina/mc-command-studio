@@ -1,5 +1,6 @@
 import { Code2, ExternalLink, ShieldCheck, Sparkles } from 'lucide-react'
 import { getApi } from '../lib/api'
+import icon from '../assets/icon.png'
 import { Modal } from './Modal'
 import { useAppStore } from '../store'
 
@@ -27,8 +28,8 @@ export function AboutDialog() {
       }
     >
       <div className="row" style={{ gap: 14, alignItems: 'flex-start' }}>
-        <div className="welcome-mark" style={{ width: 46, height: 46, borderRadius: 13, fontSize: 18 }}>
-          &gt;_
+        <div className="welcome-mark" style={{ width: 46, height: 46, borderRadius: 13 }}>
+          <img src={icon} alt="MC 指令工坊" />
         </div>
         <div>
           <div style={{ fontWeight: 700, fontSize: 15 }}>MC 指令工坊</div>

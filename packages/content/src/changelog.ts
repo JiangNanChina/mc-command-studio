@@ -22,6 +22,36 @@ const REPO = 'https://github.com/JiangNanChina/mc-command-studio'
  */
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: '0.1.21',
+    date: '2026-10-26',
+    title: '全新图标与更简洁的更新公告',
+    highlights: [
+      '命令方块品牌图成为应用图标与界面 Logo。',
+      '更新公告只展示当前版本，历史版本跳转 GitHub。'
+    ],
+    sections: [
+      {
+        type: 'added',
+        items: [
+          '全新应用图标、安装包图标、顶栏/欢迎页/关于页 Logo。',
+          '更新公告“查看历史版本”入口。'
+        ]
+      },
+      {
+        type: 'improved',
+        items: [
+          '公告只展示当前版本更新内容，不再显示所有版本列表。',
+          '公告只保留“新增 / 改进 / 修复”三个栏目。'
+        ]
+      },
+      {
+        type: 'fixed',
+        items: ['无。']
+      }
+    ],
+    releaseUrl: `${REPO}/releases/tag/v0.1.21`
+  },
+  {
     version: '0.1.20',
     date: '2026-10-26',
     title: '出生点与区块加载',

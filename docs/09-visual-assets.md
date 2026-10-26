@@ -40,6 +40,22 @@ python tools/assets/build_mc_assets.py `
 
 脚本只读取本地 jar、注册表和语言文件，不联网。图标图集约 2.0 MB，随应用打包。
 
+## 品牌图标与 Logo
+
+- 源图：`tools/assets/brand-source.jpg`（项目品牌图，命令方块 + 工作台）。
+- 应用图标：`apps/desktop/build/icon.ico`（16/24/32/48/64/128/256 多尺寸）与 `icon.png`。
+- 界面 Logo：`apps/desktop/src/renderer/src/assets/icon.png`（256px 方形）与 `logo.png`（完整品牌图）。
+- 文档预览：`docs/assets/app-icon.png`、`docs/assets/brand-logo.png`。
+- 安装包、窗口图标、顶栏、欢迎页、关于页统一使用该品牌图。
+
+重新生成：
+
+```powershell
+python tools/assets/build_brand_assets.py
+```
+
+图标从品牌图中央命令方块裁切并做圆角，避免小尺寸下文字不可读；完整品牌图保留在 `logo.png`。
+
 ## 后续改进
 
 - 用方块模型渲染真正的等距方块图标，而不是平面材质。
