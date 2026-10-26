@@ -33,10 +33,21 @@ describe('datapack export', () => {
     expect(result.files.some((file) => file.path.endsWith('lib/main.mcfunction'))).toBe(true)
   })
 
-  it('rejects invalid names and commands', () => {
+  it('supports multiple commands from a chain', () => {
+    const result = buildDatapackFiles({
+      ...base,
+      command: 'setblock 0 64 0 minecraft:command_block\nsetblock 1 64 0 minecraft:chain_command_block'
+    })
+    const functionFile = result.files[1]
+    expect(functionFile.content).toBe(
+      'setblock 0 64 0 minecraft:command_block\nsetblock 1 64 0 minecraft:chain_command_block\n'
+    )
+  })
+
+  it('rejects invalid names and empty commands', () => {
     expect(() => buildDatapackFiles({ ...base, namespace: 'Bad Namespace' })).toThrow()
     expect(() => buildDatapackFiles({ ...base, functionName: 'a//b' })).toThrow()
     expect(() => buildDatapackFiles({ ...base, command: '  ' })).toThrow()
-    expect(() => buildDatapackFiles({ ...base, command: 'say a\nsay b' })).toThrow()
+    expect(() => buildDatapackFiles({ ...base, command: '\n\n' })).toThrow()
   })
 })

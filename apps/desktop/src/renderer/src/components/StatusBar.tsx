@@ -37,6 +37,8 @@ export function StatusBar() {
     state.fill,
     state.clone,
     state.chain,
+    state.enchant,
+    state.xp,
     state.generic,
     state.outputMode,
     state.commandBlock

@@ -25,7 +25,12 @@ export function buildDatapackFiles(options: DatapackExportOptions): DatapackBuil
   const namespace = options.namespace.trim()
   const functionName = options.functionName.trim().replace(/\.mcfunction$/i, '')
   const description = options.description.trim() || 'MC 指令工坊导出'
-  const command = options.command.trim().replace(/^\//, '')
+  const commands = options.command
+    .replace(/\r\n?/g, '\n')
+    .split('\n')
+    .map((line) => line.trim().replace(/^\/+/, ''))
+    .filter((line) => line.length > 0)
+  const command = commands.join('\n')
 
   if (!NAMESPACE.test(namespace)) {
     throw new Error('命名空间只能包含小写字母、数字、下划线、点和连字符')
@@ -35,9 +40,6 @@ export function buildDatapackFiles(options: DatapackExportOptions): DatapackBuil
   }
   if (!command) {
     throw new Error('当前没有可导出的命令')
-  }
-  if (/[\r\n]/.test(command)) {
-    throw new Error('命令中不能包含换行符')
   }
   if (!Number.isInteger(options.packFormat) || options.packFormat <= 0) {
     throw new Error('数据包格式版本不合法')

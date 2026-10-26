@@ -191,6 +191,8 @@ export function OutputPanel() {
     state.fill,
     state.clone,
     state.chain,
+    state.enchant,
+    state.xp,
     state.generic,
     state.outputMode,
     state.commandBlock
@@ -289,7 +291,7 @@ export function OutputPanel() {
         <button
           type="button"
           className="btn"
-          disabled={!output.command.text || !state.pack || chainMode}
+          disabled={!output.command.text || !state.pack}
           title="把当前命令导出为 Minecraft 数据包"
           onClick={() => setExportOpen(true)}
         >

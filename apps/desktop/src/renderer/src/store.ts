@@ -2,23 +2,27 @@ import {
   buildChainCommands,
   buildCloneCommand,
   buildEffectCommand,
+  buildEnchantCommand,
   buildExecuteCommand,
   buildFillCommand,
   buildGiveCommand,
   buildSetblockCommand,
   buildSummonCommand,
   buildTeleportCommand,
+  buildXpCommand,
   createChainBlock,
   createDefaultChainOptions,
   createDefaultCloneOptions,
   createDefaultCommandBlockOptions,
   createDefaultEffectOptions,
+  createDefaultEnchantOptions,
   createDefaultExecuteOptions,
   createDefaultFillOptions,
   createDefaultGiveOptions,
   createDefaultSetblockOptions,
   createDefaultSummonOptions,
   createDefaultTeleportOptions,
+  createDefaultXpOptions,
   createProjectFile,
   parseProjectFile,
   serializeGeneric,
@@ -30,6 +34,7 @@ import {
   type CommandBlockOptions,
   type CommandNodeData,
   type EffectOptions,
+  type EnchantOptions,
   type ExecuteClause,
   type ExecuteOptions,
   type FillOptions,
@@ -43,7 +48,8 @@ import {
   type SummonOptions,
   type TeleportDestination,
   type TeleportOptions,
-  type VersionPack
+  type VersionPack,
+  type XpOptions
 } from '@mcstudio/core'
 import type { CommandCategory } from '@mcstudio/content'
 import type {
@@ -75,6 +81,8 @@ export interface ProjectPayload {
   fill: FillOptions
   clone: CloneOptions
   chain: ChainOptions
+  enchant: EnchantOptions
+  xp: XpOptions
   generic: GenericDraft
   commandBlock: CommandBlockOptions
   outputMode: OutputMode
@@ -107,6 +115,8 @@ interface AppStore {
   fill: FillOptions
   clone: CloneOptions
   chain: ChainOptions
+  enchant: EnchantOptions
+  xp: XpOptions
   generic: GenericDraft
   commandBlock: CommandBlockOptions
   outputMode: OutputMode
@@ -151,6 +161,8 @@ interface AppStore {
   updateEffect: (patch: Partial<EffectOptions>) => void
   updateFill: (patch: Partial<FillOptions>) => void
   updateClone: (patch: Partial<CloneOptions>) => void
+  updateEnchant: (patch: Partial<EnchantOptions>) => void
+  updateXp: (patch: Partial<XpOptions>) => void
   openChain: () => void
   updateChain: (patch: Partial<ChainOptions>) => void
   addChainBlock: () => void
@@ -433,6 +445,28 @@ function normalizeChain(input: Partial<ChainOptions> | undefined): ChainOptions 
   }
 }
 
+function normalizeEnchant(input: Partial<EnchantOptions> | undefined): EnchantOptions {
+  const fallback = createDefaultEnchantOptions()
+  if (!input) return fallback
+  return {
+    target: input.target?.base ? input.target : fallback.target,
+    enchantment: typeof input.enchantment === 'string' ? input.enchantment : fallback.enchantment,
+    level: typeof input.level === 'string' ? input.level : fallback.level
+  }
+}
+
+function normalizeXp(input: Partial<XpOptions> | undefined): XpOptions {
+  const fallback = createDefaultXpOptions()
+  if (!input) return fallback
+  return {
+    action:
+      input.action === 'set' || input.action === 'query' ? input.action : 'add',
+    target: input.target?.base ? input.target : fallback.target,
+    amount: typeof input.amount === 'string' ? input.amount : fallback.amount,
+    unit: input.unit === 'levels' ? 'levels' : 'points'
+  }
+}
+
 function normalizeGive(input: Partial<GiveOptions> | undefined): GiveOptions {
   const fallback = createDefaultGiveOptions()
   if (!input) return fallback
@@ -465,6 +499,8 @@ function normalizePayload(input: unknown): ProjectPayload {
     fill: normalizeFill(data.fill),
     clone: normalizeClone(data.clone),
     chain: normalizeChain(data.chain),
+    enchant: normalizeEnchant(data.enchant),
+    xp: normalizeXp(data.xp),
     generic:
       data.generic && Array.isArray(data.generic.steps)
         ? {
@@ -494,6 +530,8 @@ function documentSnapshot(state: AppStore): string {
     fill: state.fill,
     clone: state.clone,
     chain: state.chain,
+    enchant: state.enchant,
+    xp: state.xp,
     generic: state.generic,
     commandBlock: state.commandBlock
   })
@@ -537,6 +575,8 @@ export const useAppStore = create<AppStore>()(
     fill: createDefaultFillOptions(),
     clone: createDefaultCloneOptions(),
     chain: createDefaultChainOptions(),
+    enchant: createDefaultEnchantOptions(),
+    xp: createDefaultXpOptions(),
     generic: emptyGeneric(),
     commandBlock: createDefaultCommandBlockOptions(),
     outputMode: 'command',
@@ -816,6 +856,20 @@ export const useAppStore = create<AppStore>()(
       })
     },
 
+    updateEnchant: (patch) => {
+      set((state) => {
+        state.enchant = { ...state.enchant, ...patch }
+        state.dirty = true
+      })
+    },
+
+    updateXp: (patch) => {
+      set((state) => {
+        state.xp = { ...state.xp, ...patch }
+        state.dirty = true
+      })
+    },
+
     openChain: () => {
       set((state) => {
         state.activeCommandId = 'chain'
@@ -1013,6 +1067,8 @@ export const useAppStore = create<AppStore>()(
         state.fill = createDefaultFillOptions()
         state.clone = createDefaultCloneOptions()
         state.chain = createDefaultChainOptions()
+        state.enchant = createDefaultEnchantOptions()
+        state.xp = createDefaultXpOptions()
         state.generic = emptyGeneric()
         state.commandBlock = createDefaultCommandBlockOptions()
         state.outputMode = 'command'
@@ -1046,6 +1102,8 @@ export const useAppStore = create<AppStore>()(
         fill: state.fill,
         clone: state.clone,
         chain: state.chain,
+        enchant: state.enchant,
+        xp: state.xp,
         generic: state.generic,
         commandBlock: state.commandBlock,
         outputMode: state.outputMode
@@ -1075,6 +1133,8 @@ export const useAppStore = create<AppStore>()(
         state.fill = payload.fill
         state.clone = payload.clone
         state.chain = payload.chain
+        state.enchant = payload.enchant
+        state.xp = payload.xp
         state.generic = payload.generic
         state.commandBlock = payload.commandBlock
         state.outputMode = payload.outputMode
@@ -1317,4 +1377,12 @@ export function selectCloneOutput(clone: CloneOptions): BuildResult {
 
 export function selectChainOutput(chain: ChainOptions): BuildResult {
   return buildChainCommands(chain)
+}
+
+export function selectEnchantOutput(enchant: EnchantOptions): BuildResult {
+  return buildEnchantCommand(enchant)
+}
+
+export function selectXpOutput(xp: XpOptions): BuildResult {
+  return buildXpCommand(xp)
 }

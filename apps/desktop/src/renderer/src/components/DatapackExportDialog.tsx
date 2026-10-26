@@ -150,8 +150,13 @@ export function DatapackExportDialog({ command, packFormat, onClose }: DatapackE
       </div>
 
       <div className="field" style={{ marginTop: 14 }}>
-        <label className="field-label">函数内容</label>
-        <pre className="datapack-command">{command.replace(/^\//, '')}</pre>
+        <label className="field-label">函数内容（每行一条命令）</label>
+        <pre className="datapack-command">
+          {command
+            .split('\n')
+            .map((line) => line.replace(/^\/+/, ''))
+            .join('\n')}
+        </pre>
       </div>
 
       <div className="hint" style={{ marginTop: 10 }}>

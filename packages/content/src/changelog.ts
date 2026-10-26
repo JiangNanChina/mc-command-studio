@@ -22,6 +22,41 @@ const REPO = 'https://github.com/JiangNanChina/mc-command-studio'
  */
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: '0.1.7',
+    date: '2026-10-26',
+    title: '附魔 / 经验与多行导出',
+    highlights: [
+      '新增 enchant、xp 专用表单。',
+      '数据包导出支持多行命令，命令方块链可直接导出为函数。'
+    ],
+    sections: [
+      {
+        type: 'added',
+        items: [
+          'enchant：目标、附魔补全、快捷附魔、等级 1–255。',
+          'xp：增加/设置/查询，经验点或等级。',
+          '多行数据包导出：每行一条命令写入 .mcfunction。'
+        ]
+      },
+      {
+        type: 'improved',
+        items: [
+          '导出对话框标注“每行一条命令”，命令方块链导出不再被禁用。',
+          '单元测试 95 → 102；冒烟测试覆盖 enchant、xp 与链导出。'
+        ]
+      },
+      {
+        type: 'fixed',
+        items: ['无。']
+      },
+      {
+        type: 'known',
+        items: ['多行导出不会校验每行命令语法；安装包尚未配置代码签名。']
+      }
+    ],
+    releaseUrl: `${REPO}/releases/tag/v0.1.7`
+  },
+  {
     version: '0.1.6',
     date: '2026-10-26',
     title: '命令方块链工作区',

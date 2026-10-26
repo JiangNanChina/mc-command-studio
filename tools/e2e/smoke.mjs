@@ -189,6 +189,25 @@ async function main() {
   }
   await page.screenshot({ path: join(ARTIFACTS, 'fill-form.png') })
 
+  // enchant / xp 专用表单
+  await page.locator('.command-item', { hasText: 'enchant' }).first().click()
+  await page.waitForSelector('#enchant-id', { timeout: 10_000 })
+  await page.waitForTimeout(300)
+  const enchantOutput = await page.locator('.output-code .cm-content').innerText()
+  if (!enchantOutput.includes('enchant @s minecraft:sharpness 1')) {
+    throw new Error(`enchant 输出不符合预期：${enchantOutput}`)
+  }
+  await page.screenshot({ path: join(ARTIFACTS, 'enchant-form.png') })
+
+  await page.locator('.command-item', { hasText: '经验' }).first().click()
+  await page.waitForSelector('#xp-amount', { timeout: 10_000 })
+  await page.waitForTimeout(300)
+  const xpOutput = await page.locator('.output-code .cm-content').innerText()
+  if (!xpOutput.includes('xp add @s 100')) {
+    throw new Error(`xp 输出不符合预期：${xpOutput}`)
+  }
+  await page.screenshot({ path: join(ARTIFACTS, 'xp-form.png') })
+
   // clone 专用表单 + 撤销/重做
   await page.locator('.command-item', { hasText: '复制区域' }).first().click()
   await page.waitForSelector('#clone-mode', { timeout: 10_000 })
@@ -224,6 +243,16 @@ async function main() {
     throw new Error(`命令方块链缺少连锁块：${chainOutput}`)
   }
   await page.screenshot({ path: join(ARTIFACTS, 'chain-form.png') })
+
+  // 多行命令导出数据包
+  await page.getByRole('button', { name: '导出数据包' }).click()
+  await page.waitForSelector('#datapack-namespace', { timeout: 10_000 })
+  await page.fill('#datapack-function', 'chain_main')
+  await page.getByRole('button', { name: '导出 .zip' }).click()
+  await page.waitForSelector('text=数据包已导出', { timeout: 20_000 })
+  if (!existsSync(join(DATAPACK_DIR, 'mcstudio-chain_main.zip'))) {
+    throw new Error('多行数据包 zip 未生成')
+  }
 
   // execute 执行链
   await page.locator('.command-item', { hasText: '执行上下文' }).first().click()

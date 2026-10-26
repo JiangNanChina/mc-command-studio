@@ -15,6 +15,8 @@ import { EffectForm } from './components/EffectForm'
 import { FillForm } from './components/FillForm'
 import { CloneForm } from './components/CloneForm'
 import { ChainBuilder } from './components/ChainBuilder'
+import { EnchantForm } from './components/EnchantForm'
+import { XpForm } from './components/XpForm'
 import { GenericBuilder } from './components/GenericBuilder'
 import { OutputPanel } from './components/OutputPanel'
 import { StatusBar } from './components/StatusBar'
@@ -106,6 +108,8 @@ export default function App() {
   const fill = state.fill
   const clone = state.clone
   const chain = state.chain
+  const enchant = state.enchant
+  const xp = state.xp
   const generic = state.generic
   const commandBlock = state.commandBlock
   const outputMode = state.outputMode
@@ -214,6 +218,8 @@ export default function App() {
           store.fill,
           store.clone,
           store.chain,
+          store.enchant,
+          store.xp,
           store.generic,
           store.outputMode,
           store.commandBlock
@@ -242,7 +248,7 @@ export default function App() {
       void useAppStore.getState().autosave()
     }, 4000)
     return () => clearTimeout(timer)
-  }, [dirty, give, summon, setblock, execute, teleport, effect, fill, clone, chain, generic, commandBlock, outputMode, activeCommandId, projectName])
+  }, [dirty, give, summon, setblock, execute, teleport, effect, fill, clone, chain, enchant, xp, generic, commandBlock, outputMode, activeCommandId, projectName])
 
   useEffect(() => {
     if (!toast) return
@@ -300,6 +306,10 @@ export default function App() {
             <CloneForm />
           ) : activeCommandId === 'chain' ? (
             <ChainBuilder />
+          ) : activeCommandId === 'enchant' ? (
+            <EnchantForm />
+          ) : activeCommandId === 'xp' ? (
+            <XpForm />
           ) : (
             <GenericBuilder />
           )}

@@ -79,6 +79,7 @@
 - 输出面板底部“导出数据包”打开弹窗。
 - 可配置命名空间、函数名（支持 `lib/main` 子目录）、描述、load/tick 标签。
 - 文件预览：`pack.mcmeta`、`data/<ns>/function/<name>.mcfunction`、可选 `tags/function/load.json` / `tick.json`。
+- 支持单命令或多行命令（命令方块链），每行写入一条命令。
 - 用当前 26.3 数据包的 `pack_format=121`；导出为 `.zip`，可直接放进世界 `datapacks/`。
 - 弹窗底部提示 `/reload` 与 `/function <ns>:<name>` 的用法。
 
@@ -128,6 +129,22 @@
 - 支持上移/下移/删除，最多 64 个方块。
 - 整链预览 + “复制全部”；输出面板同步显示多行 `/setblock`。
 - 链模式下禁用“命令方块”输出切换和数据包导出。
+
+## 3.10 enchant 附魔
+
+![enchant 表单](assets/enchant-form.png)
+
+- 目标选择器；43 个附魔补全 + 6 个快捷附魔。
+- 等级 1–255，超过原版上限仍可写入。
+- 作用于目标主手物品。
+
+## 3.11 xp 经验
+
+![xp 表单](assets/xp-form.png)
+
+- 增加 / 设置 / 查询三种模式。
+- 目标选择器；数量 + points/levels。
+- 查询模式隐藏数量，只保留查询单位。
 
 ## 4. 通用构建器
 

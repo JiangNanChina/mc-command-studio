@@ -7,18 +7,21 @@ import {
   type CommandBlockOptions,
   type Diagnostic,
   type EffectOptions,
+  type EnchantOptions,
   type ExecuteOptions,
   type FillOptions,
   type GiveOptions,
   type SetblockOptions,
   type SummonOptions,
   type TeleportOptions,
-  type VersionPack
+  type VersionPack,
+  type XpOptions
 } from '@mcstudio/core'
 import {
   selectChainOutput,
   selectCloneOutput,
   selectEffectOutput,
+  selectEnchantOutput,
   selectExecuteOutput,
   selectFillOutput,
   selectGenericOutput,
@@ -26,6 +29,7 @@ import {
   selectSetblockOutput,
   selectSummonOutput,
   selectTeleportOutput,
+  selectXpOutput,
   type GenericDraft,
   type OutputMode
 } from '../store'
@@ -49,6 +53,8 @@ export function getCommandOutput(
   fill: FillOptions,
   clone: CloneOptions,
   chain: ChainOptions,
+  enchant: EnchantOptions,
+  xp: XpOptions,
   generic: GenericDraft
 ): BuildResult {
   if (!activeCommandId) return { text: '', diagnostics: [] }
@@ -61,6 +67,8 @@ export function getCommandOutput(
   if (activeCommandId === 'fill') return selectFillOutput(fill)
   if (activeCommandId === 'clone') return selectCloneOutput(clone)
   if (activeCommandId === 'chain') return selectChainOutput(chain)
+  if (activeCommandId === 'enchant') return selectEnchantOutput(enchant)
+  if (activeCommandId === 'xp') return selectXpOutput(xp)
   if (!pack) return { text: '', diagnostics: [] }
   return selectGenericOutput(pack, { ...generic, root: generic.root ?? activeCommandId })
 }
@@ -77,6 +85,8 @@ export function getCurrentOutput(
   fill: FillOptions,
   clone: CloneOptions,
   chain: ChainOptions,
+  enchant: EnchantOptions,
+  xp: XpOptions,
   generic: GenericDraft,
   outputMode: OutputMode,
   commandBlock: CommandBlockOptions
@@ -93,6 +103,8 @@ export function getCurrentOutput(
     fill,
     clone,
     chain,
+    enchant,
+    xp,
     generic
   )
   if (outputMode === 'command') {
