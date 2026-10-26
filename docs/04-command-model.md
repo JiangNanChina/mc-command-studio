@@ -376,7 +376,24 @@ interface GameruleOptions {
 
 59 条规则从 26.3 命令树提取，名称/说明来自官方 `zh_cn`；布尔规则 true/false，整数规则做整数校验。`action=query` 生成 `gamerule <rule>`。
 
-### 1.22 通用构建器：所有 94 个根命令
+### 1.22 世界边界：`worldborder`
+
+```ts
+interface WorldborderOptions {
+  action: 'set' | 'add' | 'center' | 'damage-amount' | 'damage-buffer'
+    | 'warning-distance' | 'warning-time' | 'get'
+  distance: string
+  timeEnabled: boolean
+  time: string
+  x: string
+  z: string
+  value: string
+}
+```
+
+尺寸支持可选过渡时间（`10s`/`10t`/`10d`）；中心 X/Z、伤害/缓冲、警告距离/时间分别校验。`get` 生成查询命令。
+
+### 1.23 通用构建器：所有 94 个根命令
 
 ```ts
 interface GenericStep {
@@ -509,7 +526,7 @@ type Unit =
 
 ## 7. 测试
 
-`packages/core/src/*.test.ts` 与 `apps/desktop/src/shared/*.test.ts` 共 137 个用例，覆盖：
+`packages/core/src/*.test.ts` 与 `apps/desktop/src/shared/*.test.ts` 共 141 个用例，覆盖：
 
 - SNBT / 命令方块字符串转义。
 - 选择器排序、引号、范围、NBT 括号、分数。
@@ -534,6 +551,7 @@ type Unit =
 - `/time` 设置/推进/查询、自定义 tick；`/weather` 类型与持续时间；`/difficulty`。
 - `/tag` 添加/移除/查询、标签名校验；`/clear` 全部/指定物品/数量/0 统计。
 - `/gamerule` 布尔/整数设置与查询、规则名和值类型校验。
+- `/worldborder` 尺寸/过渡/中心/伤害/警告/查询、数值与时间校验。
 - 数据包文件树、load/tick 标签、多行函数、非法命名空间/函数名/空命令。
 - `/give` 文本导入：选择器、组件、数量、未知组件 raw。
 - 命令树遍历、通用路径、参数范围。

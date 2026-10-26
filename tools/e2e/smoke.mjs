@@ -425,6 +425,38 @@ async function main() {
   }
   await page.screenshot({ path: join(ARTIFACTS, 'gamerule-form.png') })
 
+  // worldborder 世界边界
+  await page.locator('.command-item', { hasText: '世界边界' }).first().click()
+  await page.waitForSelector('#worldborder-distance', { timeout: 10_000 })
+  await page.waitForTimeout(300)
+  const borderSet = await page.locator('.output-code .cm-content').innerText()
+  if (!borderSet.includes('worldborder set 1000')) {
+    throw new Error(`worldborder 设置输出不符合预期：${borderSet}`)
+  }
+  await page.getByRole('button', { name: '扩展/收缩', exact: true }).click()
+  await page.getByLabel('指定过渡时间').check()
+  await page.fill('#worldborder-time', '10s')
+  await page.waitForTimeout(300)
+  const borderAdd = await page.locator('.output-code .cm-content').innerText()
+  if (!borderAdd.includes('worldborder add 1000 10s')) {
+    throw new Error(`worldborder 过渡输出不符合预期：${borderAdd}`)
+  }
+  await page.getByRole('button', { name: '设置中心', exact: true }).click()
+  await page.fill('#worldborder-x', '100')
+  await page.fill('#worldborder-z', '-200')
+  await page.waitForTimeout(300)
+  const borderCenter = await page.locator('.output-code .cm-content').innerText()
+  if (!borderCenter.includes('worldborder center 100 -200')) {
+    throw new Error(`worldborder 中心输出不符合预期：${borderCenter}`)
+  }
+  await page.screenshot({ path: join(ARTIFACTS, 'worldborder-form.png') })
+  await page.getByRole('button', { name: '查询尺寸', exact: true }).click()
+  await page.waitForTimeout(200)
+  const borderGet = await page.locator('.output-code .cm-content').innerText()
+  if (!borderGet.includes('worldborder get')) {
+    throw new Error(`worldborder 查询输出不符合预期：${borderGet}`)
+  }
+
   // scoreboard 可视化
   await page.locator('.command-item', { hasText: '记分板' }).first().click()
   await page.waitForSelector('#scoreboard-objective', { timeout: 10_000 })

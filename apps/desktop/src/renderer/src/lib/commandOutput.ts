@@ -19,6 +19,7 @@ import {
   type TagOptions,
   type ClearOptions,
   type GameruleOptions,
+  type WorldborderOptions,
   type SoundOptions,
   type SummonOptions,
   type TeleportOptions,
@@ -46,6 +47,7 @@ import {
   selectTagOutput,
   selectClearOutput,
   selectGameruleOutput,
+  selectWorldborderOutput,
   selectSoundOutput,
   selectSummonOutput,
   selectTellrawOutput,
@@ -87,6 +89,7 @@ export function getCommandOutput(
   tag: TagOptions,
   clear: ClearOptions,
   gamerule: GameruleOptions,
+  worldborder: WorldborderOptions,
   generic: GenericDraft
 ): BuildResult {
   if (!activeCommandId) return { text: '', diagnostics: [] }
@@ -112,6 +115,7 @@ export function getCommandOutput(
   if (activeCommandId === 'tag') return selectTagOutput(tag)
   if (activeCommandId === 'clear') return selectClearOutput(clear)
   if (activeCommandId === 'gamerule') return selectGameruleOutput(gamerule)
+  if (activeCommandId === 'worldborder') return selectWorldborderOutput(worldborder)
   if (activeCommandId === 'playsound' || activeCommandId === 'stopsound') {
     return selectSoundOutput(sound)
   }
@@ -143,6 +147,7 @@ export function getCurrentOutput(
   tag: TagOptions,
   clear: ClearOptions,
   gamerule: GameruleOptions,
+  worldborder: WorldborderOptions,
   generic: GenericDraft,
   outputMode: OutputMode,
   commandBlock: CommandBlockOptions
@@ -171,6 +176,7 @@ export function getCurrentOutput(
     tag,
     clear,
     gamerule,
+    worldborder,
     generic
   )
   if (outputMode === 'command') {

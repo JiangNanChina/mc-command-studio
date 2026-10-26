@@ -28,6 +28,7 @@ import { WorldControlForm } from './components/WorldControlForm'
 import { TagForm } from './components/TagForm'
 import { ClearForm } from './components/ClearForm'
 import { GameruleForm } from './components/GameruleForm'
+import { WorldborderForm } from './components/WorldborderForm'
 import { GenericBuilder } from './components/GenericBuilder'
 import { OutputPanel } from './components/OutputPanel'
 import { StatusBar } from './components/StatusBar'
@@ -131,6 +132,7 @@ export default function App() {
   const tag = state.tag
   const clear = state.clear
   const gamerule = state.gamerule
+  const worldborder = state.worldborder
   const generic = state.generic
   const commandBlock = state.commandBlock
   const outputMode = state.outputMode
@@ -251,6 +253,7 @@ export default function App() {
           store.tag,
           store.clear,
           store.gamerule,
+          store.worldborder,
           store.generic,
           store.outputMode,
           store.commandBlock
@@ -279,7 +282,7 @@ export default function App() {
       void useAppStore.getState().autosave()
     }, 4000)
     return () => clearTimeout(timer)
-  }, [dirty, give, summon, setblock, execute, teleport, effect, fill, clone, chain, enchant, xp, tellraw, title, sound, bossbar, scoreboard, particle, world, tag, clear, gamerule, generic, commandBlock, outputMode, activeCommandId, projectName])
+  }, [dirty, give, summon, setblock, execute, teleport, effect, fill, clone, chain, enchant, xp, tellraw, title, sound, bossbar, scoreboard, particle, world, tag, clear, gamerule, worldborder, generic, commandBlock, outputMode, activeCommandId, projectName])
 
   useEffect(() => {
     if (!toast) return
@@ -365,6 +368,8 @@ export default function App() {
             <ClearForm />
           ) : activeCommandId === 'gamerule' ? (
             <GameruleForm />
+          ) : activeCommandId === 'worldborder' ? (
+            <WorldborderForm />
           ) : (
             <GenericBuilder />
           )}

@@ -22,6 +22,41 @@ const REPO = 'https://github.com/JiangNanChina/mc-command-studio'
  */
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: '0.1.18',
+    date: '2026-10-26',
+    title: '可视化世界边界 worldborder',
+    highlights: [
+      '尺寸/中心/伤害/警告/查询全部可视化。',
+      '过渡时间与边界预览，范围提示。'
+    ],
+    sections: [
+      {
+        type: 'added',
+        items: [
+          'worldborder：set/add/center/damage amount/damage buffer/warning distance/warning time/get。',
+          '尺寸过渡时间、中心坐标、边界示意预览。'
+        ]
+      },
+      {
+        type: 'improved',
+        items: [
+          '按操作切换字段与默认值。',
+          '数值/时间校验。',
+          '单元测试 137 → 141；冒烟测试覆盖四种操作。'
+        ]
+      },
+      {
+        type: 'fixed',
+        items: ['无。']
+      },
+      {
+        type: 'known',
+        items: ['team/item/attribute 等命令仍在高级命令树。', '安装包尚未配置代码签名。']
+      }
+    ],
+    releaseUrl: `${REPO}/releases/tag/v0.1.18`
+  },
+  {
     version: '0.1.17',
     date: '2026-10-26',
     title: '可视化游戏规则 gamerule',

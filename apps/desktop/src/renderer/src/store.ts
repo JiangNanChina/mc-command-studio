@@ -16,6 +16,7 @@ import {
   buildTagCommand,
   buildClearCommand,
   buildGameruleCommand,
+  buildWorldborderCommand,
   buildSoundCommand,
   buildSummonCommand,
   buildTeleportCommand,
@@ -38,6 +39,7 @@ import {
   createDefaultTagOptions,
   createDefaultClearOptions,
   createDefaultGameruleOptions,
+  createDefaultWorldborderOptions,
   createDefaultSetblockOptions,
   createDefaultSoundOptions,
   createDefaultSummonOptions,
@@ -73,6 +75,7 @@ import {
   type TagOptions,
   type ClearOptions,
   type GameruleOptions,
+  type WorldborderOptions,
   type TimeOptions,
   type SetblockMode,
   type SetblockOptions,
@@ -154,6 +157,7 @@ export interface ProjectPayload {
   tag: TagOptions
   clear: ClearOptions
   gamerule: GameruleOptions
+  worldborder: WorldborderOptions
   datapack: DatapackDraft
   generic: GenericDraft
   commandBlock: CommandBlockOptions
@@ -199,6 +203,7 @@ interface AppStore {
   tag: TagOptions
   clear: ClearOptions
   gamerule: GameruleOptions
+  worldborder: WorldborderOptions
   datapack: DatapackDraft
   generic: GenericDraft
   commandBlock: CommandBlockOptions
@@ -258,6 +263,7 @@ interface AppStore {
   updateTag: (patch: Partial<TagOptions>) => void
   updateClear: (patch: Partial<ClearOptions>) => void
   updateGamerule: (patch: Partial<GameruleOptions>) => void
+  updateWorldborder: (patch: Partial<WorldborderOptions>) => void
   openDatapack: () => void
   updateDatapackMeta: (patch: Partial<Pick<DatapackDraft, 'namespace' | 'description'>>) => void
   addDatapackFunction: () => void
@@ -906,6 +912,34 @@ function normalizeGamerule(input: Partial<GameruleOptions> | undefined): Gamerul
   }
 }
 
+function normalizeWorldborder(
+  input: Partial<WorldborderOptions> | undefined
+): WorldborderOptions {
+  const fallback = createDefaultWorldborderOptions()
+  if (!input) return fallback
+  const actions: WorldborderOptions['action'][] = [
+    'set',
+    'add',
+    'center',
+    'damage-amount',
+    'damage-buffer',
+    'warning-distance',
+    'warning-time',
+    'get'
+  ]
+  return {
+    action: actions.includes(input.action as WorldborderOptions['action'])
+      ? (input.action as WorldborderOptions['action'])
+      : 'set',
+    distance: typeof input.distance === 'string' ? input.distance : fallback.distance,
+    timeEnabled: Boolean(input.timeEnabled),
+    time: typeof input.time === 'string' ? input.time : fallback.time,
+    x: typeof input.x === 'string' ? input.x : fallback.x,
+    z: typeof input.z === 'string' ? input.z : fallback.z,
+    value: typeof input.value === 'string' ? input.value : fallback.value
+  }
+}
+
 function normalizeGive(input: Partial<GiveOptions> | undefined): GiveOptions {
   const fallback = createDefaultGiveOptions()
   if (!input) return fallback
@@ -950,6 +984,7 @@ function normalizePayload(input: unknown): ProjectPayload {
     tag: normalizeTag(data.tag),
     clear: normalizeClear(data.clear),
     gamerule: normalizeGamerule(data.gamerule),
+    worldborder: normalizeWorldborder(data.worldborder),
     datapack: normalizeDatapack(data.datapack),
     generic:
       data.generic && Array.isArray(data.generic.steps)
@@ -992,6 +1027,7 @@ function documentSnapshot(state: AppStore): string {
     tag: state.tag,
     clear: state.clear,
     gamerule: state.gamerule,
+    worldborder: state.worldborder,
     datapack: state.datapack,
     generic: state.generic,
     commandBlock: state.commandBlock
@@ -1048,6 +1084,7 @@ export const useAppStore = create<AppStore>()(
     tag: createDefaultTagOptions(),
     clear: createDefaultClearOptions(),
     gamerule: createDefaultGameruleOptions(),
+    worldborder: createDefaultWorldborderOptions(),
     datapack: defaultDatapackDraft(),
     generic: emptyGeneric(),
     commandBlock: createDefaultCommandBlockOptions(),
@@ -1426,6 +1463,13 @@ export const useAppStore = create<AppStore>()(
       })
     },
 
+    updateWorldborder: (patch) => {
+      set((state) => {
+        state.worldborder = { ...state.worldborder, ...patch }
+        state.dirty = true
+      })
+    },
+
     openDatapack: () => {
       set((state) => {
         state.activeCommandId = 'datapack'
@@ -1717,6 +1761,7 @@ export const useAppStore = create<AppStore>()(
         state.tag = createDefaultTagOptions()
         state.clear = createDefaultClearOptions()
         state.gamerule = createDefaultGameruleOptions()
+        state.worldborder = createDefaultWorldborderOptions()
         state.datapack = defaultDatapackDraft()
         state.generic = emptyGeneric()
         state.commandBlock = createDefaultCommandBlockOptions()
@@ -1763,6 +1808,7 @@ export const useAppStore = create<AppStore>()(
         tag: state.tag,
         clear: state.clear,
         gamerule: state.gamerule,
+        worldborder: state.worldborder,
         datapack: state.datapack,
         generic: state.generic,
         commandBlock: state.commandBlock,
@@ -1805,6 +1851,7 @@ export const useAppStore = create<AppStore>()(
         state.tag = payload.tag
         state.clear = payload.clear
         state.gamerule = payload.gamerule
+        state.worldborder = payload.worldborder
         state.datapack = payload.datapack
         state.generic = payload.generic
         state.commandBlock = payload.commandBlock
@@ -2106,4 +2153,8 @@ export function selectClearOutput(clear: ClearOptions): BuildResult {
 
 export function selectGameruleOutput(gamerule: GameruleOptions): BuildResult {
   return buildGameruleCommand(gamerule)
+}
+
+export function selectWorldborderOutput(worldborder: WorldborderOptions): BuildResult {
+  return buildWorldborderCommand(worldborder)
 }

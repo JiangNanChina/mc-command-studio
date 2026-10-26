@@ -1854,6 +1854,52 @@ a {
   margin-top: 3px;
 }
 
+/* ---------- Worldborder ---------- */
+.worldborder-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.worldborder-preview {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 10px;
+  border: 1px dashed var(--border-strong);
+  border-radius: 7px;
+  background: var(--panel);
+}
+
+.worldborder-box {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 150px;
+  height: 82px;
+  border: 2px dashed rgba(255, 80, 80, 0.8);
+  border-radius: 3px;
+  background: rgba(255, 80, 80, 0.06);
+}
+
+.worldborder-dot {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #7ee787;
+  box-shadow: 0 0 8px #7ee787;
+}
+
+.worldborder-label {
+  color: #ff8a8a;
+  font-family: var(--mono);
+  font-size: 11px;
+}
+
 /* ---------- Gamerule ---------- */
 .gamerule-grid {
   display: grid;
