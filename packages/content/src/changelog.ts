@@ -22,6 +22,37 @@ const REPO = 'https://github.com/JiangNanChina/mc-command-studio'
  */
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: '0.1.34',
+    date: '2026-10-27',
+    title: '一键模板库',
+    highlights: [
+      '7 个常用命令模板。',
+      '套用后直接进入表单继续修改。'
+    ],
+    sections: [
+      {
+        type: 'added',
+        items: [
+          '新手礼包、全服回血、欢迎语。',
+          '活动 BOSS 栏、击杀计分板、红队、定时公告。',
+          '顶栏模板入口。'
+        ]
+      },
+      {
+        type: 'improved',
+        items: [
+          '模板弹窗提升到页面级，避免裁切。',
+          '冒烟测试覆盖模板套用。'
+        ]
+      },
+      {
+        type: 'fixed',
+        items: ['无。']
+      }
+    ],
+    releaseUrl: `${REPO}/releases/tag/v0.1.34`
+  },
+  {
     version: '0.1.33',
     date: '2026-10-27',
     title: '1.20.4 树模式与版本化数据包目录',

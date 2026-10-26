@@ -1,6 +1,8 @@
+import { useState } from 'react'
 import {
   Bell,
   FolderOpen,
+  LayoutTemplate,
   Moon,
   Save,
   Settings,
@@ -13,16 +15,19 @@ import {
 } from 'lucide-react'
 import { useAppStore } from '../store'
 import icon from '../assets/icon.png'
+import { TemplateDialog } from './TemplateDialog'
 
 export function Header() {
   const state = useAppStore()
   const loading = !state.booted
+  const [templatesOpen, setTemplatesOpen] = useState(false)
   const announcementUnread = Boolean(
     state.appInfo && state.settings.lastSeenVersion !== state.appInfo.version
   )
 
   return (
-    <header className="header">
+    <>
+      <header className="header">
       <div className="brand">
         <div className="brand-mark">
           <img src={icon} alt="MC 指令工坊" />
@@ -65,6 +70,15 @@ export function Header() {
             <span className="pack-count">{state.pack.manifest.counts.roots} 命令</span>
           ) : null}
         </div>
+        <button
+          type="button"
+          className="btn btn-ghost"
+          onClick={() => setTemplatesOpen(true)}
+          disabled={loading}
+        >
+          <LayoutTemplate size={15} />
+          模板
+        </button>
         <button type="button" className="btn btn-ghost" onClick={() => state.newProject()} disabled={loading}>
           <FilePlus2 size={15} />
           新建
@@ -132,6 +146,8 @@ export function Header() {
           <Settings size={17} />
         </button>
       </div>
-    </header>
+      </header>
+      {templatesOpen ? <TemplateDialog onClose={() => setTemplatesOpen(false)} /> : null}
+    </>
   )
 }

@@ -915,6 +915,21 @@ async function main() {
   await page.waitForTimeout(150)
   await page.screenshot({ path: join(ARTIFACTS, 'command-block.png') })
 
+  // 模板库
+  await page.getByRole('button', { name: '模板', exact: true }).click()
+  await page.waitForSelector('.template-card', { timeout: 10_000 })
+  await page.locator('.template-card', { hasText: '新手礼包' }).click()
+  await page.waitForSelector('#give-count', { timeout: 10_000 })
+  const templateCount = await page.inputValue('#give-count')
+  if (templateCount !== '16') {
+    throw new Error(`模板礼包数量不符合预期：${templateCount}`)
+  }
+  const templateOutput = await page.locator('.output-code .cm-content').innerText()
+  if (!templateOutput.includes('minecraft:bread')) {
+    throw new Error(`模板礼包输出不符合预期：${templateOutput}`)
+  }
+  await page.screenshot({ path: join(ARTIFACTS, 'templates.png') })
+
   // 多版本数据包切换
   const packOptions = await page.locator('#pack-select option').allTextContents()
   if (!packOptions.includes('1.21.1') || !packOptions.includes('1.20.4') || !packOptions.includes('26.3')) {
