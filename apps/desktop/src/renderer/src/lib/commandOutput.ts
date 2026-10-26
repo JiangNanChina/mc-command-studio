@@ -12,6 +12,7 @@ import {
   type FillOptions,
   type GiveOptions,
   type SetblockOptions,
+  type SoundOptions,
   type SummonOptions,
   type TeleportOptions,
   type TellrawOptions,
@@ -29,6 +30,7 @@ import {
   selectGenericOutput,
   selectGiveOutput,
   selectSetblockOutput,
+  selectSoundOutput,
   selectSummonOutput,
   selectTellrawOutput,
   selectTeleportOutput,
@@ -61,6 +63,7 @@ export function getCommandOutput(
   xp: XpOptions,
   tellraw: TellrawOptions,
   title: TitleOptions,
+  sound: SoundOptions,
   generic: GenericDraft
 ): BuildResult {
   if (!activeCommandId) return { text: '', diagnostics: [] }
@@ -77,6 +80,9 @@ export function getCommandOutput(
   if (activeCommandId === 'xp') return selectXpOutput(xp)
   if (activeCommandId === 'tellraw') return selectTellrawOutput(tellraw)
   if (activeCommandId === 'title') return selectTitleOutput(title)
+  if (activeCommandId === 'playsound' || activeCommandId === 'stopsound') {
+    return selectSoundOutput(sound)
+  }
   if (!pack) return { text: '', diagnostics: [] }
   return selectGenericOutput(pack, { ...generic, root: generic.root ?? activeCommandId })
 }
@@ -97,6 +103,7 @@ export function getCurrentOutput(
   xp: XpOptions,
   tellraw: TellrawOptions,
   title: TitleOptions,
+  sound: SoundOptions,
   generic: GenericDraft,
   outputMode: OutputMode,
   commandBlock: CommandBlockOptions
@@ -117,6 +124,7 @@ export function getCurrentOutput(
     xp,
     tellraw,
     title,
+    sound,
     generic
   )
   if (outputMode === 'command') {

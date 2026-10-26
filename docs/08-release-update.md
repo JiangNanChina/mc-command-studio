@@ -17,10 +17,10 @@
 
 | 文件 | 大小 |
 |---|---:|
-| `MC-Command-Studio-Setup-0.1.9.exe` | 126,811,321 B ≈ 120.9 MiB |
-| `MC-Command-Studio-0.1.9-portable.exe` | 114,566,173 B ≈ 109.3 MiB |
-| `MC-Command-Studio-Setup-0.1.9.exe.blockmap` | 133,869 B |
-| `latest.yml` | 363 B |
+| `MC-Command-Studio-Setup-0.1.10.exe` | 127,543,818 B ≈ 121.6 MiB |
+| `MC-Command-Studio-0.1.10-portable.exe` | 115,308,821 B ≈ 110.0 MiB |
+| `MC-Command-Studio-Setup-0.1.10.exe.blockmap` | 134,718 B |
+| `latest.yml` | 366 B |
 
 安装目录为 `%LOCALAPPDATA%\Programs\MC Command Studio`（per-user），卸载器保留用户项目与设置，可选择手动删除。
 
@@ -72,7 +72,8 @@ publish:
 ```
 
 本仓库已完成配置，并已发布：
-[MC 指令工坊 v0.1.9](https://github.com/JiangNanChina/mc-command-studio/releases/tag/v0.1.9)（最新）、
+[MC 指令工坊 v0.1.10](https://github.com/JiangNanChina/mc-command-studio/releases/tag/v0.1.10)（最新）、
+[v0.1.9](https://github.com/JiangNanChina/mc-command-studio/releases/tag/v0.1.9)、
 [v0.1.8](https://github.com/JiangNanChina/mc-command-studio/releases/tag/v0.1.8)、
 [v0.1.7](https://github.com/JiangNanChina/mc-command-studio/releases/tag/v0.1.7)、
 [v0.1.6](https://github.com/JiangNanChina/mc-command-studio/releases/tag/v0.1.6)、
@@ -159,7 +160,7 @@ CI 已经透传这两个 secrets；没有配置时构建继续，但产物未签
 
 ## 6. 版本、渠道与回滚
 
-- SemVer：`0.1.9`；tag `v0.1.9`。
+- SemVer：`0.1.10`；tag `v0.1.10`。
 - 软件版本与游戏版本（`26.3`）解耦；数据包版本在设置中显示。
 - 渠道：stable（默认）/ beta（设置切换）。
 - 不自动降级；回滚 = 发布一个更高版本的修复版，或让用户手动安装 Releases 里的旧安装包。
@@ -221,8 +222,8 @@ $env:MCSTUDIO_UPDATE_URL = "http://127.0.0.1:8123/updates/"
 - [x] 便携版提示手动更新（`PORTABLE_EXECUTABLE_DIR` 模式实测）
 
 **实测结果（2026-10-26）**：
-- `0.1.8 → 0.1.9`：安装 0.1.8，设置 `MCSTUDIO_UPDATE_URL=http://127.0.0.1:8123/updates/`，检查 → 下载 → 重启安装，exe 产品版本变为 **0.1.9.0**，静默完成，用户数据保留。
-- `0.1.7 → 0.1.8`、`0.1.6 → 0.1.7`、`0.1.5 → 0.1.6`、`0.1.4 → 0.1.5`、`0.1.3 → 0.1.4`、`0.1.2 → 0.1.3`、`0.1.1 → 0.1.2`、`0.1.0 → 0.1.1` 同样通过。
+- `0.1.9 → 0.1.10`：安装 0.1.9，设置 `MCSTUDIO_UPDATE_URL=http://127.0.0.1:8123/updates/`，检查 → 下载 → 重启安装，exe 产品版本变为 **0.1.10.0**，静默完成，用户数据保留。
+- `0.1.8 → 0.1.9`、`0.1.7 → 0.1.8`、`0.1.6 → 0.1.7`、`0.1.5 → 0.1.6`、`0.1.4 → 0.1.5`、`0.1.3 → 0.1.4`、`0.1.2 → 0.1.3`、`0.1.1 → 0.1.2`、`0.1.0 → 0.1.1` 同样通过。
 
 > 已发布的 v0.1.0 使用旧 updater 代码，点击“重启并安装”会显示 NSIS 安装向导；从 v0.1.1 起改为静默安装（`quitAndInstall(true, true)`）。
 

@@ -246,6 +246,42 @@ async function main() {
   }
   await page.screenshot({ path: join(ARTIFACTS, 'title-form.png') })
 
+  // playsound / stopsound 可视化
+  await page.locator('.command-item', { hasText: '播放声音' }).first().click()
+  await page.waitForSelector('#sound-volume', { timeout: 10_000 })
+  await page.waitForTimeout(300)
+  const soundOutput = await page.locator('.output-code .cm-content').innerText()
+  if (!soundOutput.includes('playsound minecraft:ui.button.click master @s ~ ~ ~ 1 1 0')) {
+    throw new Error(`playsound 输出不符合预期：${soundOutput}`)
+  }
+  await page.getByRole('button', { name: '选择声音' }).click()
+  await page.waitForSelector('.mc-grid', { timeout: 10_000 })
+  await page.locator('.modal input[placeholder*="搜索中文名"]').fill('箱子')
+  await page.waitForTimeout(300)
+  await page.screenshot({ path: join(ARTIFACTS, 'sound-picker.png') })
+  await page.locator('.mc-tile', { hasText: 'block.chest.open' }).first().click()
+  await page.waitForTimeout(300)
+  const soundChest = await page.locator('.output-code .cm-content').innerText()
+  if (!soundChest.includes('playsound minecraft:block.chest.open')) {
+    throw new Error(`playsound 选择声音不符合预期：${soundChest}`)
+  }
+  await page.screenshot({ path: join(ARTIFACTS, 'sound-form.png') })
+
+  await page.locator('.command-item', { hasText: '停止声音' }).first().click()
+  await page.locator('.hero-id', { hasText: 'stopsound' }).waitFor({ timeout: 10_000 })
+  await page.waitForTimeout(300)
+  const stopOutput = await page.locator('.output-code .cm-content').innerText()
+  if (!stopOutput.includes('stopsound @s')) {
+    throw new Error(`stopsound 输出不符合预期：${stopOutput}`)
+  }
+  await page.getByRole('button', { name: '指定来源' }).click()
+  await page.waitForSelector('#stop-source', { timeout: 10_000 })
+  await page.waitForTimeout(300)
+  const stopSource = await page.locator('.output-code .cm-content').innerText()
+  if (!stopSource.includes('stopsound @s master')) {
+    throw new Error(`stopsound 来源输出不符合预期：${stopSource}`)
+  }
+
   // clone 专用表单 + 撤销/重做
   await page.locator('.command-item', { hasText: '复制区域' }).first().click()
   await page.waitForSelector('#clone-mode', { timeout: 10_000 })

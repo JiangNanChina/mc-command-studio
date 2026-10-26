@@ -195,6 +195,7 @@ export function OutputPanel() {
     state.xp,
     state.tellraw,
     state.title,
+    state.sound,
     state.generic,
     state.outputMode,
     state.commandBlock

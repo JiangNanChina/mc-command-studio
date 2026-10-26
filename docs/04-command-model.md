@@ -234,7 +234,25 @@ interface TitleOptions {
 
 times 开启时输出两行：`title <target> times <in> <stay> <out>` 与 `title <target> <action> <json>`；否则只输出内容行。
 
-### 1.15 通用构建器：所有 94 个根命令
+### 1.15 专用表单：`playsound` / `stopsound`
+
+```ts
+interface SoundOptions {
+  action: 'play' | 'stop'
+  target: Selector
+  sound: string
+  source: 'master' | 'music' | 'record' | 'weather' | 'block' | 'hostile' | 'neutral' | 'player' | 'ambient' | 'voice'
+  position: Position
+  volume: string
+  pitch: string
+  minVolume: string
+  stopMode: 'all' | 'source' | 'sound'
+}
+```
+
+播放生成 `playsound <sound> <source> <target> <pos> <volume> <pitch> <minVolume>`；停止按 stopMode 生成 `stopsound <target> [source] [sound]`。
+
+### 1.16 通用构建器：所有 94 个根命令
 
 ```ts
 interface GenericStep {
@@ -367,7 +385,7 @@ type Unit =
 
 ## 7. 测试
 
-`packages/core/src/*.test.ts` 与 `apps/desktop/src/shared/*.test.ts` 共 108 个用例，覆盖：
+`packages/core/src/*.test.ts` 与 `apps/desktop/src/shared/*.test.ts` 共 111 个用例，覆盖：
 
 - SNBT / 命令方块字符串转义。
 - 选择器排序、引号、范围、NBT 括号、分数。
@@ -385,6 +403,7 @@ type Unit =
 - `/xp` add/set/query、points/levels、数量范围。
 - 文本组件：单段/extra、颜色/样式、点击/悬停、JSON 转义。
 - `/tellraw` 目标与 JSON；`/title` 三种位置、times 时序、非法 tick。
+- `/playsound` 声音/来源/坐标/音量/音调；`/stopsound` 全部/来源/指定声音。
 - 数据包文件树、load/tick 标签、多行函数、非法命名空间/函数名/空命令。
 - `/give` 文本导入：选择器、组件、数量、未知组件 raw。
 - 命令树遍历、通用路径、参数范围。

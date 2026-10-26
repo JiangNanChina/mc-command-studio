@@ -22,6 +22,41 @@ const REPO = 'https://github.com/JiangNanChina/mc-command-studio'
  */
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: '0.1.10',
+    date: '2026-10-26',
+    title: '可视化声音 playsound / stopsound',
+    highlights: [
+      '1,991 个声音支持中文名/ID 搜索与图标选择。',
+      'playsound 可视化音量/音调/坐标；stopsound 支持全部/来源/指定声音。'
+    ],
+    sections: [
+      {
+        type: 'added',
+        items: [
+          'playsound：声音选择器、来源、目标、坐标、音量/音调/最小音量。',
+          'stopsound：全部声音、指定来源、指定声音。',
+          '声音中文字幕名 + 首字图标，支持中文搜索。'
+        ]
+      },
+      {
+        type: 'improved',
+        items: [
+          '进入 playsound/stopsound 自动切换播放/停止模式。',
+          '单元测试 108 → 111；冒烟测试覆盖声音选择与 stopsound。'
+        ]
+      },
+      {
+        type: 'fixed',
+        items: ['无。']
+      },
+      {
+        type: 'known',
+        items: ['部分声音没有官方字幕，显示英文 ID 名称。', '安装包尚未配置代码签名。']
+      }
+    ],
+    releaseUrl: `${REPO}/releases/tag/v0.1.10`
+  },
+  {
     version: '0.1.9',
     date: '2026-10-26',
     title: '可视化富文本 tellraw / title',

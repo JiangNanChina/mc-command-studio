@@ -19,6 +19,7 @@ import { EnchantForm } from './components/EnchantForm'
 import { XpForm } from './components/XpForm'
 import { TellrawForm } from './components/TellrawForm'
 import { TitleForm } from './components/TitleForm'
+import { SoundForm } from './components/SoundForm'
 import { GenericBuilder } from './components/GenericBuilder'
 import { OutputPanel } from './components/OutputPanel'
 import { StatusBar } from './components/StatusBar'
@@ -114,6 +115,7 @@ export default function App() {
   const xp = state.xp
   const tellraw = state.tellraw
   const title = state.title
+  const sound = state.sound
   const generic = state.generic
   const commandBlock = state.commandBlock
   const outputMode = state.outputMode
@@ -226,6 +228,7 @@ export default function App() {
           store.xp,
           store.tellraw,
           store.title,
+          store.sound,
           store.generic,
           store.outputMode,
           store.commandBlock
@@ -254,7 +257,7 @@ export default function App() {
       void useAppStore.getState().autosave()
     }, 4000)
     return () => clearTimeout(timer)
-  }, [dirty, give, summon, setblock, execute, teleport, effect, fill, clone, chain, enchant, xp, tellraw, title, generic, commandBlock, outputMode, activeCommandId, projectName])
+  }, [dirty, give, summon, setblock, execute, teleport, effect, fill, clone, chain, enchant, xp, tellraw, title, sound, generic, commandBlock, outputMode, activeCommandId, projectName])
 
   useEffect(() => {
     if (!toast) return
@@ -320,6 +323,8 @@ export default function App() {
             <TellrawForm />
           ) : activeCommandId === 'title' ? (
             <TitleForm />
+          ) : activeCommandId === 'playsound' || activeCommandId === 'stopsound' ? (
+            <SoundForm />
           ) : (
             <GenericBuilder />
           )}

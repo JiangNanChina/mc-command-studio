@@ -2,7 +2,13 @@ import atlasUrl from '../assets/mc-icons.png'
 import atlasData from '../data/mc-icons.json'
 import namesData from '../data/mc-names.json'
 
-export type McCategory = 'items' | 'blocks' | 'effects' | 'enchantments' | 'entities'
+export type McCategory =
+  | 'items'
+  | 'blocks'
+  | 'effects'
+  | 'enchantments'
+  | 'entities'
+  | 'sounds'
 
 interface AtlasData {
   cell: number
@@ -16,6 +22,7 @@ interface NamesData {
   effects: Record<string, string>
   enchantments: Record<string, string>
   entities: Record<string, string>
+  sounds: Record<string, string>
 }
 
 const atlas = atlasData as AtlasData

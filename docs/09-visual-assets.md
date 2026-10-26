@@ -15,7 +15,7 @@
 |---|---|
 | `apps/desktop/src/renderer/src/data/mc-names.json` | 物品/方块/效果/附魔/实体的中文名 |
 | `apps/desktop/src/renderer/src/data/mc-icons.json` | 图集行列、每类 ID → 图集索引 |
-| `apps/desktop/src/renderer/src/assets/mc-icons.png` | 2048×1600 图标图集（32px 单元、64 列） |
+| `apps/desktop/src/renderer/src/assets/mc-icons.png` | 2048×2592 图标图集（32px 单元、64 列） |
 | `apps/desktop/src/renderer/src/lib/mcAssets.ts` | 名称/索引查询 |
 | `apps/desktop/src/renderer/src/components/McIcon.tsx` | 图集渲染 + 占位图标 |
 
@@ -23,7 +23,8 @@
 
 - 物品 1,476/1,658 使用真实材质，其余占位图标。
 - 方块 994/1,286 使用真实材质，其余占位图标。
-- 效果 40、附魔 43、实体 161 使用占位图标。
+- 效果 40、附魔 43、实体 161、声音 1,991 使用占位图标。
+- 声音名称优先使用官方字幕（subtitles.*），没有字幕时回退英文 ID。
 
 ## 重新生成
 
@@ -37,7 +38,7 @@ python tools/assets/build_mc_assets.py `
   --out-app apps/desktop/src/renderer/src
 ```
 
-脚本只读取本地 jar、注册表和语言文件，不联网。图标图集约 1.3 MB，随应用打包。
+脚本只读取本地 jar、注册表和语言文件，不联网。图标图集约 2.0 MB，随应用打包。
 
 ## 后续改进
 

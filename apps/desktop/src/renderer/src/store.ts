@@ -7,6 +7,7 @@ import {
   buildFillCommand,
   buildGiveCommand,
   buildSetblockCommand,
+  buildSoundCommand,
   buildSummonCommand,
   buildTeleportCommand,
   buildTellrawCommand,
@@ -22,6 +23,7 @@ import {
   createDefaultFillOptions,
   createDefaultGiveOptions,
   createDefaultSetblockOptions,
+  createDefaultSoundOptions,
   createDefaultSummonOptions,
   createDefaultTeleportOptions,
   createDefaultTellrawOptions,
@@ -50,6 +52,7 @@ import {
   type Selector,
   type SetblockMode,
   type SetblockOptions,
+  type SoundOptions,
   type SummonOptions,
   type TeleportDestination,
   type TeleportOptions,
@@ -93,6 +96,7 @@ export interface ProjectPayload {
   xp: XpOptions
   tellraw: TellrawOptions
   title: TitleOptions
+  sound: SoundOptions
   generic: GenericDraft
   commandBlock: CommandBlockOptions
   outputMode: OutputMode
@@ -129,6 +133,7 @@ interface AppStore {
   xp: XpOptions
   tellraw: TellrawOptions
   title: TitleOptions
+  sound: SoundOptions
   generic: GenericDraft
   commandBlock: CommandBlockOptions
   outputMode: OutputMode
@@ -177,6 +182,7 @@ interface AppStore {
   updateXp: (patch: Partial<XpOptions>) => void
   updateTellraw: (patch: Partial<TellrawOptions>) => void
   updateTitle: (patch: Partial<TitleOptions>) => void
+  updateSound: (patch: Partial<SoundOptions>) => void
   openChain: () => void
   updateChain: (patch: Partial<ChainOptions>) => void
   addChainBlock: () => void
@@ -534,6 +540,37 @@ function normalizeTitle(input: Partial<TitleOptions> | undefined): TitleOptions 
   }
 }
 
+function normalizeSound(input: Partial<SoundOptions> | undefined): SoundOptions {
+  const fallback = createDefaultSoundOptions()
+  if (!input) return fallback
+  const sources: SoundOptions['source'][] = [
+    'master',
+    'music',
+    'record',
+    'weather',
+    'block',
+    'hostile',
+    'neutral',
+    'player',
+    'ambient',
+    'voice'
+  ]
+  return {
+    action: input.action === 'stop' ? 'stop' : 'play',
+    target: input.target?.base ? input.target : fallback.target,
+    sound: typeof input.sound === 'string' ? input.sound : fallback.sound,
+    source: sources.includes(input.source as SoundOptions['source'])
+      ? (input.source as SoundOptions['source'])
+      : 'master',
+    position: normalizePosition(input.position),
+    volume: typeof input.volume === 'string' ? input.volume : fallback.volume,
+    pitch: typeof input.pitch === 'string' ? input.pitch : fallback.pitch,
+    minVolume: typeof input.minVolume === 'string' ? input.minVolume : fallback.minVolume,
+    stopMode:
+      input.stopMode === 'source' || input.stopMode === 'sound' ? input.stopMode : 'all'
+  }
+}
+
 function normalizeGive(input: Partial<GiveOptions> | undefined): GiveOptions {
   const fallback = createDefaultGiveOptions()
   if (!input) return fallback
@@ -570,6 +607,7 @@ function normalizePayload(input: unknown): ProjectPayload {
     xp: normalizeXp(data.xp),
     tellraw: normalizeTellraw(data.tellraw),
     title: normalizeTitle(data.title),
+    sound: normalizeSound(data.sound),
     generic:
       data.generic && Array.isArray(data.generic.steps)
         ? {
@@ -603,6 +641,7 @@ function documentSnapshot(state: AppStore): string {
     xp: state.xp,
     tellraw: state.tellraw,
     title: state.title,
+    sound: state.sound,
     generic: state.generic,
     commandBlock: state.commandBlock
   })
@@ -650,6 +689,7 @@ export const useAppStore = create<AppStore>()(
     xp: createDefaultXpOptions(),
     tellraw: createDefaultTellrawOptions(),
     title: createDefaultTitleOptions(),
+    sound: createDefaultSoundOptions(),
     generic: emptyGeneric(),
     commandBlock: createDefaultCommandBlockOptions(),
     outputMode: 'command',
@@ -957,6 +997,13 @@ export const useAppStore = create<AppStore>()(
       })
     },
 
+    updateSound: (patch) => {
+      set((state) => {
+        state.sound = { ...state.sound, ...patch }
+        state.dirty = true
+      })
+    },
+
     openChain: () => {
       set((state) => {
         state.activeCommandId = 'chain'
@@ -1158,6 +1205,7 @@ export const useAppStore = create<AppStore>()(
         state.xp = createDefaultXpOptions()
         state.tellraw = createDefaultTellrawOptions()
         state.title = createDefaultTitleOptions()
+        state.sound = createDefaultSoundOptions()
         state.generic = emptyGeneric()
         state.commandBlock = createDefaultCommandBlockOptions()
         state.outputMode = 'command'
@@ -1195,6 +1243,7 @@ export const useAppStore = create<AppStore>()(
         xp: state.xp,
         tellraw: state.tellraw,
         title: state.title,
+        sound: state.sound,
         generic: state.generic,
         commandBlock: state.commandBlock,
         outputMode: state.outputMode
@@ -1228,6 +1277,7 @@ export const useAppStore = create<AppStore>()(
         state.xp = payload.xp
         state.tellraw = payload.tellraw
         state.title = payload.title
+        state.sound = payload.sound
         state.generic = payload.generic
         state.commandBlock = payload.commandBlock
         state.outputMode = payload.outputMode
@@ -1486,4 +1536,8 @@ export function selectTellrawOutput(tellraw: TellrawOptions): BuildResult {
 
 export function selectTitleOutput(title: TitleOptions): BuildResult {
   return buildTitleCommand(title)
+}
+
+export function selectSoundOutput(sound: SoundOptions): BuildResult {
+  return buildSoundCommand(sound)
 }

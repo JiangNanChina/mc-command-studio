@@ -1,15 +1,16 @@
 import { describe, expect, it } from 'vitest'
+import { compareVersions } from '@mcstudio/core'
 import { CHANGELOG, getChangelogEntry, latestChangelog } from './changelog'
 
 describe('changelog', () => {
   it('is sorted from newest to oldest', () => {
     for (let i = 1; i < CHANGELOG.length; i += 1) {
-      expect(CHANGELOG[i - 1].version > CHANGELOG[i].version).toBe(true)
+      expect(compareVersions(CHANGELOG[i - 1].version, CHANGELOG[i].version)).toBeGreaterThan(0)
     }
   })
 
   it('has the current release at the top', () => {
-    expect(latestChangelog().version).toBe('0.1.9')
+    expect(latestChangelog().version).toBe('0.1.10')
   })
 
   it('contains non-empty sections and items', () => {

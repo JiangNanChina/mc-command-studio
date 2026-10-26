@@ -31,9 +31,10 @@
 ### P0（首个可发布版，已实现骨架）
 
 - 26.3 数据包：94 根命令、1,197 字面量、59 参数类型、1,658 物品、1,286 方块。
-- 专用表单：`give`、`summon`、`setblock`、`execute`、`tp`、`effect`、`fill`、`clone`、`enchant`、`xp`、`tellraw`、`title`；`setblock` 支持方块状态与方块实体 NBT。
-- 可视化资源库：26.3 官方中文名称与图标，物品/方块/效果/附魔/实体统一为图标网格选择，支持中文名搜索。
+- 专用表单：`give`、`summon`、`setblock`、`execute`、`tp`、`effect`、`fill`、`clone`、`enchant`、`xp`、`tellraw`、`title`、`playsound`、`stopsound`；`setblock` 支持方块状态与方块实体 NBT。
+- 可视化资源库：26.3 官方中文名称与图标，物品/方块/效果/附魔/实体/声音统一为图标网格选择，支持中文名搜索。
 - 富文本可视化：tellraw/title 多段文本、颜色、样式、点击/悬停、标题时序、实时预览。
+- 声音可视化：1,991 个声音、来源、目标、坐标、音量/音调/最小音量、stopsound 三种停止范围。
 - 命令方块链：最多 64 个脉冲/连锁/循环方块，按方向自动偏移坐标，生成整链 `/setblock`。
 - `execute` 执行链：as/at/positioned/align/anchored/facing/rotated/in/if/unless/store/raw + run，可排序。
 - 数据包导出：单命令或多行命令导出为 `.zip`，包含 `pack.mcmeta`、`.mcfunction` 与可选 load/tick 标签。
@@ -47,7 +48,7 @@
 - 项目保存 / 打开 / 自动保存 / 崩溃恢复；最近项目。
 - 深色/浅色主题、设置、诊断导出、本地日志。
 - NSIS 安装包 + 便携版；electron-updater 自动更新与发布流水线。
-- 单元测试 108 个；Electron 冒烟测试覆盖公告、give/导入/summon/setblock/tp/effect/fill/clone/enchant/xp/tellraw/title/execute/命令方块链/多行数据包/撤销重做/命令方块。
+- 单元测试 111 个；Electron 冒烟测试覆盖公告、give/导入/summon/setblock/tp/effect/fill/clone/enchant/xp/tellraw/title/playsound/stopsound/execute/命令方块链/多行数据包/撤销重做/命令方块。
 
 ### P1（现代版 MVP）
 
@@ -90,6 +91,7 @@
 | 撤销 / 重做 | ✅ 全局 100 步 + 快捷键 |
 | 可视化资源选择 | ✅ 中文名 + 图标；物品/方块/效果/附魔/实体 |
 | 富文本 tellraw/title | ✅ 颜色/样式/点击/悬停/时序/预览 |
+| 声音 playsound/stopsound | ✅ 1,991 声音 + 中文名/图标/来源/音量 |
 | 更新公告 / 版本历史 | ✅ 更新后首次启动横幅 + 顶栏铃铛 |
 | 命令方块链 | ✅ 2–64 个方块、方向偏移、整链输出 |
 | 数据包导出 | ✅ 单命令/多行命令 + load/tick |
@@ -98,7 +100,7 @@
 | 命令方块 setblock | ✅ 单块 + 命令方块链 |
 | 项目保存 / 自动保存 | ✅ JSON 文件 |
 | 安装包 / 便携版 | ✅ 未签名（见 08） |
-| 自动更新 | ✅ 0.1.8 → 0.1.9 静默升级已实测；GitHub v0.1.9 Release 已发布 |
+| 自动更新 | ✅ 0.1.9 → 0.1.10 静默升级已实测；GitHub v0.1.10 Release 已发布 |
 | 1.12.2 / 1.13–1.20.4 | ❌ 仅设计 |
 | 单元体系 | ❌ P1 后续 |
 

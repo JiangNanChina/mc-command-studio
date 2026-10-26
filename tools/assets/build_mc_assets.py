@@ -210,12 +210,30 @@ def main() -> None:
     effect_ids = [x.removeprefix("minecraft:") for x in registries.get("mob_effect", [])]
     enchant_ids = [x.removeprefix("minecraft:") for x in registries.get("enchantment", [])]
     entity_ids = [x.removeprefix("minecraft:") for x in registries.get("entity_type", [])]
+    sound_ids = [x.removeprefix("minecraft:") for x in registries.get("sound_event", [])]
+
+    sounds_json = {}
+    if "assets/minecraft/sounds.json" in names:
+        try:
+            sounds_json = json.loads(jar.read("assets/minecraft/sounds.json"))
+        except (json.JSONDecodeError, UnicodeDecodeError):
+            sounds_json = {}
+
+    def sound_name(identifier: str) -> str:
+        entry = sounds_json.get(identifier) or {}
+        subtitle = entry.get("subtitle")
+        if subtitle and lang.get(subtitle):
+            return clean_name(lang[subtitle])
+        if lang.get(f"subtitles.{identifier}"):
+            return clean_name(lang[f"subtitles.{identifier}"])
+        return title_name(identifier.split(".")[-1])
 
     item_names = names_for("item", item_ids, ["item.minecraft.", "block.minecraft."])
     block_names = names_for("block", block_ids, ["block.minecraft.", "item.minecraft."])
     effect_names = names_for("effect", effect_ids, ["effect.minecraft."])
     enchant_names = names_for("enchant", enchant_ids, ["enchantment.minecraft."])
     entity_names = names_for("entity", entity_ids, ["entity.minecraft."])
+    sound_names = {identifier: sound_name(identifier) for identifier in sound_ids}
 
     entries: list[tuple[str, str, Image.Image]] = []
     stats = {}
@@ -225,6 +243,7 @@ def main() -> None:
         ("effects", effect_ids, lambda _: None, effect_names),
         ("enchantments", enchant_ids, lambda _: None, enchant_names),
         ("entities", entity_ids, lambda _: None, entity_names),
+        ("sounds", sound_ids, lambda _: None, sound_names),
     ]:
         found = 0
         for identifier in ids:
@@ -261,6 +280,7 @@ def main() -> None:
                 "effects": effect_names,
                 "enchantments": enchant_names,
                 "entities": entity_names,
+                "sounds": sound_names,
             },
             ensure_ascii=False,
             separators=(",", ":"),

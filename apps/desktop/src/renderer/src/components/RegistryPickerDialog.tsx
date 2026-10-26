@@ -9,6 +9,7 @@ interface RegistryPickerDialogProps {
   category: McCategory
   ids: string[]
   current?: string
+  limit?: number
   onSelect: (id: string) => void
   onClose: () => void
 }
@@ -18,6 +19,7 @@ export function RegistryPickerDialog({
   category,
   ids,
   current,
+  limit = 400,
   onSelect,
   onClose
 }: RegistryPickerDialogProps) {
@@ -38,6 +40,8 @@ export function RegistryPickerDialog({
         )
       })
   }, [category, ids, query])
+
+  const visible = entries.slice(0, limit)
 
   return (
     <Modal
@@ -65,10 +69,10 @@ export function RegistryPickerDialog({
         />
       </div>
       <div className="mc-grid">
-        {entries.length === 0 ? (
+        {visible.length === 0 ? (
           <div className="list-empty">没有匹配项。</div>
         ) : (
-          entries.map((entry) => (
+          visible.map((entry) => (
             <button
               key={entry.full}
               type="button"
@@ -85,6 +89,11 @@ export function RegistryPickerDialog({
           ))
         )}
       </div>
+      {entries.length > limit ? (
+        <div className="hint" style={{ marginTop: 8 }}>
+          共 {entries.length} 项，只显示前 {limit} 项；输入中文名或 ID 缩小范围。
+        </div>
+      ) : null}
     </Modal>
   )
 }
