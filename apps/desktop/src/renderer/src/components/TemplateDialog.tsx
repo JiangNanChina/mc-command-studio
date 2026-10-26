@@ -1,13 +1,25 @@
+import { useState } from 'react'
 import { LayoutTemplate, Sparkles } from 'lucide-react'
 import { Modal } from './Modal'
 import { COMMAND_TEMPLATES, type CommandTemplate } from '../lib/templates'
 import { useAppStore } from '../store'
 
 export function TemplateDialog({ onClose }: { onClose: () => void }) {
-  const apply = (template: CommandTemplate): void => {
-    template.apply()
-    useAppStore.getState().showToast(`已应用模板：${template.title}`, 'success')
-    onClose()
+  const [busy, setBusy] = useState(false)
+  const apply = async (template: CommandTemplate): Promise<void> => {
+    if (busy) return
+    setBusy(true)
+    try {
+      await template.apply()
+      useAppStore.getState().showToast(`已应用模板：${template.title}`, 'success')
+      onClose()
+    } catch (error) {
+      useAppStore
+        .getState()
+        .showToast(`模板应用失败：${error instanceof Error ? error.message : String(error)}`, 'error')
+    } finally {
+      setBusy(false)
+    }
   }
 
   return (
@@ -32,7 +44,8 @@ export function TemplateDialog({ onClose }: { onClose: () => void }) {
             key={template.id}
             type="button"
             className="template-card"
-            onClick={() => apply(template)}
+            disabled={busy}
+            onClick={() => void apply(template)}
           >
             <div className="template-icon">
               <Sparkles size={17} />
@@ -41,6 +54,9 @@ export function TemplateDialog({ onClose }: { onClose: () => void }) {
               <div className="template-title">
                 {template.title}
                 <span className="command-id">{template.commandLabel}</span>
+                {template.packId ? (
+                  <span className="badge">{template.packId}</span>
+                ) : null}
               </div>
               <div className="template-desc">{template.description}</div>
             </div>

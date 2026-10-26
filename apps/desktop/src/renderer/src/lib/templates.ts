@@ -7,7 +7,8 @@ export interface CommandTemplate {
   description: string
   commandId: string
   commandLabel: string
-  apply: () => void
+  packId?: string
+  apply: () => void | Promise<void>
 }
 
 export const COMMAND_TEMPLATES: CommandTemplate[] = [
@@ -151,6 +152,31 @@ export const COMMAND_TEMPLATES: CommandTemplate[] = [
         displaySegments: []
       })
       state.selectCommand('team')
+    }
+  },
+  {
+    id: 'legacy-nbt-sword',
+    title: '1.20.4 NBT 剑',
+    description: '切换到 1.20.4，生成带名称、Lore、锋利 V、无法破坏的钻石剑。',
+    commandId: 'give',
+    commandLabel: 'give · NBT',
+    packId: '1.20.4',
+    apply: async () => {
+      const state = useAppStore.getState()
+      if (state.activePackId !== '1.20.4') {
+        await state.loadPack('1.20.4')
+      }
+      const next = useAppStore.getState()
+      next.updateNbtGive({
+        target: { base: '@p' },
+        item: 'minecraft:diamond_sword',
+        count: '1',
+        name: '旧版剑',
+        lore: '1.20.4 NBT 模板\n锋利 V',
+        enchantments: [{ id: 'minecraft:sharpness', level: '5' }],
+        unbreakable: true
+      })
+      next.selectCommand('give')
     }
   },
   {

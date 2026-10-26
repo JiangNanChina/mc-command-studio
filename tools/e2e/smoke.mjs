@@ -1006,6 +1006,24 @@ async function main() {
   }
   await page.screenshot({ path: join(ARTIFACTS, 'templates.png') })
 
+  // 跨版本模板：1.20.4 NBT 剑
+  await page.getByRole('button', { name: '模板', exact: true }).click()
+  await page.locator('.template-card', { hasText: '1.20.4 NBT 剑' }).click()
+  await page.waitForSelector('#nbt-give-count', { timeout: 15_000 })
+  await page.waitForFunction(
+    () => document.querySelector('#pack-select')?.value === '1.20.4',
+    { timeout: 15_000 }
+  )
+  const nbtTemplateOutput = await page.locator('.output-code .cm-content').innerText()
+  if (
+    !nbtTemplateOutput.includes('旧版剑') ||
+    !nbtTemplateOutput.includes('Enchantments:[{id:"minecraft:sharpness",lvl:5}]') ||
+    !nbtTemplateOutput.includes('Unbreakable:1b')
+  ) {
+    throw new Error(`1.20.4 NBT 模板输出不符合预期：${nbtTemplateOutput}`)
+  }
+  await page.screenshot({ path: join(ARTIFACTS, 'templates-nbt.png') })
+
   // 多版本数据包切换
   const packOptions = await page.locator('#pack-select option').allTextContents()
   if (!packOptions.includes('1.21.1') || !packOptions.includes('1.20.4') || !packOptions.includes('26.3')) {
@@ -1037,7 +1055,9 @@ async function main() {
   const nbtGiveOutput = await page.locator('.output-code .cm-content').innerText()
   if (
     !nbtGiveOutput.includes('display:{Name:') ||
-    !nbtGiveOutput.includes('Enchantments:[{id:"minecraft:sharpness",lvl:1}]')
+    !nbtGiveOutput.includes('Enchantments:[') ||
+    !nbtGiveOutput.includes('minecraft:sharpness') ||
+    !nbtGiveOutput.includes('旧版剑')
   ) {
     throw new Error(`1.20.4 NBT give 输出不符合预期：${nbtGiveOutput}`)
   }

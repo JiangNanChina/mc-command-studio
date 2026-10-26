@@ -22,6 +22,27 @@ const REPO = 'https://github.com/JiangNanChina/mc-command-studio'
  */
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: '0.1.43',
+    date: '2026-10-27',
+    title: '跨版本模板：1.20.4 NBT 剑',
+    highlights: ['模板可自动切换数据包版本。', '新增 1.20.4 NBT 物品模板。'],
+    sections: [
+      {
+        type: 'added',
+        items: ['模板目标版本与自动切换。', '1.20.4 NBT 剑模板。']
+      },
+      {
+        type: 'improved',
+        items: ['模板异步应用与错误提示。', '冒烟覆盖跨版本模板。']
+      },
+      {
+        type: 'fixed',
+        items: ['无。']
+      }
+    ],
+    releaseUrl: `${REPO}/releases/tag/v0.1.43`
+  },
+  {
     version: '0.1.42',
     date: '2026-10-27',
     title: '服务器/社交命令可视化',
