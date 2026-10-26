@@ -13,6 +13,9 @@ import {
   type FillOptions,
   type GiveOptions,
   type NbtGiveOptions,
+  type GamemodeOptions,
+  type DamageOptions,
+  type RotateOptions,
   type SetblockOptions,
   type ScoreboardOptions,
   type ParticleOptions,
@@ -40,6 +43,9 @@ import {
 import type { AutomationOptions } from '../store'
 import {
   selectNbtGiveOutput,
+  selectGamemodeOutput,
+  selectDamageOutput,
+  selectRotateOutput,
   selectChainOutput,
   selectCloneOutput,
   selectBossbarOutput,
@@ -92,6 +98,9 @@ export function getCommandOutput(
   activeCommandId: string | null,
   give: GiveOptions,
   nbtGive: NbtGiveOptions,
+  gamemode: GamemodeOptions,
+  damage: DamageOptions,
+  rotate: RotateOptions,
   summon: SummonOptions,
   setblock: SetblockOptions,
   execute: ExecuteOptions,
@@ -130,6 +139,9 @@ export function getCommandOutput(
       ? selectNbtGiveOutput(nbtGive)
       : selectGiveOutput(give)
   }
+  if (activeCommandId === 'gamemode') return selectGamemodeOutput(gamemode)
+  if (activeCommandId === 'damage') return selectDamageOutput(damage)
+  if (activeCommandId === 'rotate') return selectRotateOutput(rotate)
   if (activeCommandId === 'summon') return selectSummonOutput(summon)
   if (activeCommandId === 'setblock') return selectSetblockOutput(setblock)
   if (activeCommandId === 'execute') return selectExecuteOutput(execute)
@@ -179,6 +191,9 @@ export function getCurrentOutput(
   activeCommandId: string | null,
   give: GiveOptions,
   nbtGive: NbtGiveOptions,
+  gamemode: GamemodeOptions,
+  damage: DamageOptions,
+  rotate: RotateOptions,
   summon: SummonOptions,
   setblock: SetblockOptions,
   execute: ExecuteOptions,
@@ -218,6 +233,9 @@ export function getCurrentOutput(
     activeCommandId,
     give,
     nbtGive,
+    gamemode,
+    damage,
+    rotate,
     summon,
     setblock,
     execute,

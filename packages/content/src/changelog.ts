@@ -22,6 +22,37 @@ const REPO = 'https://github.com/JiangNanChina/mc-command-studio'
  */
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: '0.1.39',
+    date: '2026-10-27',
+    title: 'gamemode / damage / rotate 可视化',
+    highlights: [
+      '新增 3 个高频命令表单。',
+      '1.20.4 同步可用。'
+    ],
+    sections: [
+      {
+        type: 'added',
+        items: [
+          'gamemode 四种模式与目标。',
+          'damage 数值/类型/at/by 来源。',
+          'rotate 旋转/朝向坐标/朝向实体。'
+        ]
+      },
+      {
+        type: 'improved',
+        items: [
+          '可视化根命令 35 → 38。',
+          '单元测试 205 → 213；冒烟覆盖三个表单。'
+        ]
+      },
+      {
+        type: 'fixed',
+        items: ['无。']
+      }
+    ],
+    releaseUrl: `${REPO}/releases/tag/v0.1.39`
+  },
+  {
     version: '0.1.38',
     date: '2026-10-27',
     title: '1.20.4 loot 可视化',

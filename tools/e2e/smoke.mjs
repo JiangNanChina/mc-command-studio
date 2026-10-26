@@ -915,6 +915,32 @@ async function main() {
   await page.waitForTimeout(150)
   await page.screenshot({ path: join(ARTIFACTS, 'command-block.png') })
 
+  // gamemode / damage / rotate
+  await page.locator('.tab').filter({ hasText: /^\s*命令\s*$/ }).click()
+  await page.locator('.command-item', { hasText: '游戏模式' }).first().click()
+  await page.waitForTimeout(300)
+  const gamemodeOutput = await page.locator('.output-code .cm-content').innerText()
+  if (!gamemodeOutput.includes('gamemode creative @s')) {
+    throw new Error(`gamemode 输出不符合预期：${gamemodeOutput}`)
+  }
+  await page.locator('.command-item', { hasText: '造成伤害' }).first().click()
+  await page.waitForSelector('#damage-amount', { timeout: 10_000 })
+  await page.waitForTimeout(300)
+  const damageOutput = await page.locator('.output-code .cm-content').innerText()
+  if (!damageOutput.includes('damage @s 5 minecraft:generic')) {
+    throw new Error(`damage 输出不符合预期：${damageOutput}`)
+  }
+  await page.locator('.command-item', { hasText: '旋转实体' }).first().click()
+  await page.waitForSelector('#rotate-yaw', { timeout: 10_000 })
+  await page.fill('#rotate-yaw', '90')
+  await page.fill('#rotate-pitch', '0')
+  await page.waitForTimeout(300)
+  const rotateOutput = await page.locator('.output-code .cm-content').innerText()
+  if (!rotateOutput.includes('rotate @s 90 0')) {
+    throw new Error(`rotate 输出不符合预期：${rotateOutput}`)
+  }
+  await page.screenshot({ path: join(ARTIFACTS, 'misc-commands.png') })
+
   // 模板库
   await page.getByRole('button', { name: '模板', exact: true }).click()
   await page.waitForSelector('.template-card', { timeout: 10_000 })

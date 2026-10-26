@@ -28,7 +28,13 @@ import {
   buildItemCommand,
   buildDataCommand,
   buildNbtGiveCommand,
+  buildGamemodeCommand,
+  buildDamageCommand,
+  buildRotateCommand,
   createDefaultNbtGiveOptions,
+  createDefaultGamemodeOptions,
+  createDefaultDamageOptions,
+  createDefaultRotateOptions,
   buildLootCommand,
   buildSoundCommand,
   buildSummonCommand,
@@ -110,6 +116,9 @@ import {
   type ScheduleOptions,
   type ItemOptions,
   type NbtGiveOptions,
+  type GamemodeOptions,
+  type DamageOptions,
+  type RotateOptions,
   type DataOptions,
   type LootOptions,
   type TimeOptions,
@@ -241,6 +250,9 @@ export interface ProjectPayload {
   activeCommandId: string | null
   give: GiveOptions
   nbtGive: NbtGiveOptions
+  gamemode: GamemodeOptions
+  damage: DamageOptions
+  rotate: RotateOptions
   summon: SummonOptions
   setblock: SetblockOptions
   execute: ExecuteOptions
@@ -297,6 +309,9 @@ interface AppStore {
   activeCommandId: string | null
   give: GiveOptions
   nbtGive: NbtGiveOptions
+  gamemode: GamemodeOptions
+  damage: DamageOptions
+  rotate: RotateOptions
   summon: SummonOptions
   setblock: SetblockOptions
   execute: ExecuteOptions
@@ -371,6 +386,9 @@ interface AppStore {
   updateTeleport: (patch: Partial<TeleportOptions>) => void
   updateEffect: (patch: Partial<EffectOptions>) => void
   updateNbtGive: (patch: Partial<NbtGiveOptions>) => void
+  updateGamemode: (patch: Partial<GamemodeOptions>) => void
+  updateDamage: (patch: Partial<DamageOptions>) => void
+  updateRotate: (patch: Partial<RotateOptions>) => void
   updateFill: (patch: Partial<FillOptions>) => void
   updateClone: (patch: Partial<CloneOptions>) => void
   updateEnchant: (patch: Partial<EnchantOptions>) => void
@@ -1402,6 +1420,50 @@ function normalizeLoot(input: Partial<LootOptions> | undefined): LootOptions {
   }
 }
 
+function normalizeGamemode(input: Partial<GamemodeOptions> | undefined): GamemodeOptions {
+  const fallback = createDefaultGamemodeOptions()
+  if (!input) return fallback
+  const modes: GamemodeOptions['mode'][] = ['survival', 'creative', 'adventure', 'spectator']
+  return {
+    mode: modes.includes(input.mode as GamemodeOptions['mode'])
+      ? (input.mode as GamemodeOptions['mode'])
+      : 'creative',
+    target: input.target?.base ? input.target : fallback.target
+  }
+}
+
+function normalizeDamage(input: Partial<DamageOptions> | undefined): DamageOptions {
+  const fallback = createDefaultDamageOptions()
+  if (!input) return fallback
+  return {
+    target: input.target?.base ? input.target : fallback.target,
+    amount: typeof input.amount === 'string' ? input.amount : fallback.amount,
+    damageType: typeof input.damageType === 'string' ? input.damageType : fallback.damageType,
+    source:
+      input.source === 'at' || input.source === 'by' ? input.source : 'none',
+    position: normalizePosition(input.position),
+    sourceEntity: input.sourceEntity?.base ? input.sourceEntity : fallback.sourceEntity,
+    causeEntity: input.causeEntity?.base ? input.causeEntity : fallback.causeEntity
+  }
+}
+
+function normalizeRotate(input: Partial<RotateOptions> | undefined): RotateOptions {
+  const fallback = createDefaultRotateOptions()
+  if (!input) return fallback
+  const modes: RotateOptions['mode'][] = ['rotation', 'facingLocation', 'facingEntity']
+  return {
+    target: input.target?.base ? input.target : fallback.target,
+    mode: modes.includes(input.mode as RotateOptions['mode'])
+      ? (input.mode as RotateOptions['mode'])
+      : 'rotation',
+    yaw: typeof input.yaw === 'string' ? input.yaw : fallback.yaw,
+    pitch: typeof input.pitch === 'string' ? input.pitch : fallback.pitch,
+    position: normalizePosition(input.position),
+    facingTarget: input.facingTarget?.base ? input.facingTarget : fallback.facingTarget,
+    anchor: input.anchor === 'feet' ? 'feet' : 'eyes'
+  }
+}
+
 function normalizeNbtGive(input: Partial<NbtGiveOptions> | undefined): NbtGiveOptions {
   const fallback = createDefaultNbtGiveOptions()
   if (!input) return fallback
@@ -1448,6 +1510,9 @@ function normalizePayload(input: unknown): ProjectPayload {
     activeCommandId: typeof data.activeCommandId === 'string' ? data.activeCommandId : null,
     give: normalizeGive(data.give),
     nbtGive: normalizeNbtGive(data.nbtGive),
+    gamemode: normalizeGamemode(data.gamemode),
+    damage: normalizeDamage(data.damage),
+    rotate: normalizeRotate(data.rotate),
     summon: normalizeSummon(data.summon),
     setblock: normalizeSetblock(data.setblock),
     execute: normalizeExecute(data.execute),
@@ -1501,6 +1566,9 @@ function documentSnapshot(state: AppStore): string {
     projectName: state.projectName,
     give: state.give,
     nbtGive: state.nbtGive,
+    gamemode: state.gamemode,
+    damage: state.damage,
+    rotate: state.rotate,
     summon: state.summon,
     setblock: state.setblock,
     execute: state.execute,
@@ -1568,6 +1636,9 @@ export const useAppStore = create<AppStore>()(
     activeCommandId: null,
     give: createDefaultGiveOptions(),
     nbtGive: createDefaultNbtGiveOptions(),
+    gamemode: createDefaultGamemodeOptions(),
+    damage: createDefaultDamageOptions(),
+    rotate: createDefaultRotateOptions(),
     summon: createDefaultSummonOptions(),
     setblock: createDefaultSetblockOptions(),
     execute: createDefaultExecuteOptions(),
@@ -1871,6 +1942,27 @@ export const useAppStore = create<AppStore>()(
     updateNbtGive: (patch) => {
       set((state) => {
         state.nbtGive = { ...state.nbtGive, ...patch }
+        state.dirty = true
+      })
+    },
+
+    updateGamemode: (patch) => {
+      set((state) => {
+        state.gamemode = { ...state.gamemode, ...patch }
+        state.dirty = true
+      })
+    },
+
+    updateDamage: (patch) => {
+      set((state) => {
+        state.damage = { ...state.damage, ...patch }
+        state.dirty = true
+      })
+    },
+
+    updateRotate: (patch) => {
+      set((state) => {
+        state.rotate = { ...state.rotate, ...patch }
         state.dirty = true
       })
     },
@@ -2394,6 +2486,9 @@ export const useAppStore = create<AppStore>()(
         state.activeCommandId = null
         state.give = createDefaultGiveOptions()
         state.nbtGive = createDefaultNbtGiveOptions()
+        state.gamemode = createDefaultGamemodeOptions()
+        state.damage = createDefaultDamageOptions()
+        state.rotate = createDefaultRotateOptions()
         state.summon = createDefaultSummonOptions()
         state.setblock = createDefaultSetblockOptions()
         state.execute = createDefaultExecuteOptions()
@@ -2455,6 +2550,9 @@ export const useAppStore = create<AppStore>()(
         activeCommandId: state.activeCommandId,
         give: state.give,
         nbtGive: state.nbtGive,
+        gamemode: state.gamemode,
+        damage: state.damage,
+        rotate: state.rotate,
         summon: state.summon,
         setblock: state.setblock,
         execute: state.execute,
@@ -2508,6 +2606,9 @@ export const useAppStore = create<AppStore>()(
         state.activeCommandId = payload.activeCommandId
         state.give = payload.give
         state.nbtGive = payload.nbtGive
+        state.gamemode = payload.gamemode
+        state.damage = payload.damage
+        state.rotate = payload.rotate
         state.summon = payload.summon
         state.setblock = payload.setblock
         state.execute = payload.execute
@@ -2753,6 +2854,18 @@ export function selectGiveOutput(give: GiveOptions): BuildResult {
 
 export function selectNbtGiveOutput(nbtGive: NbtGiveOptions): BuildResult {
   return buildNbtGiveCommand(nbtGive)
+}
+
+export function selectGamemodeOutput(gamemode: GamemodeOptions): BuildResult {
+  return buildGamemodeCommand(gamemode)
+}
+
+export function selectDamageOutput(damage: DamageOptions): BuildResult {
+  return buildDamageCommand(damage)
+}
+
+export function selectRotateOutput(rotate: RotateOptions): BuildResult {
+  return buildRotateCommand(rotate)
 }
 
 export function selectSummonOutput(summon: SummonOptions): BuildResult {
