@@ -24,7 +24,7 @@
 - **命令方块**：一键生成 `/setblock … command_block[facing=up]{Command:"…"}`，处理引号/反斜杠转义。
 - **本地项目**：`.mcstudio` JSON、最近打开、4 秒防抖自动保存、异常退出恢复。
 - **桌面体验**：深色/浅色主题、中文界面、原生菜单、文件关联、单实例、高 DPI。
-- **分发与更新**：NSIS 安装包 + 便携版 + `latest.yml`；electron-updater 自动检查/下载/重启安装；GitHub Actions 发布流水线。已在本机验证 0.1.0 → 0.1.1 静默升级；便携版会禁用自动更新并提示手动下载。
+- **分发与更新**：NSIS 安装包 + 便携版 + `latest.yml`；electron-updater 自动检查/下载/重启安装；GitHub Actions 发布流水线。已在本机验证 0.1.1 → 0.1.2 静默升级；便携版会禁用自动更新并提示手动下载。
 
 ## 下载与安装
 
@@ -54,8 +54,8 @@ pnpm build:win          # 安装包 + 便携版 + latest.yml
 
 产物在 `release/`：
 
-- `MC-Command-Studio-Setup-0.1.1.exe`
-- `MC-Command-Studio-0.1.1-portable.exe`
+- `MC-Command-Studio-Setup-0.1.2.exe`
+- `MC-Command-Studio-0.1.2-portable.exe`
 - `latest.yml`、`.blockmap`
 
 如果 `pnpm install` 后没有 Electron 二进制，运行 `pnpm setup:electron`；国内网络可设置：

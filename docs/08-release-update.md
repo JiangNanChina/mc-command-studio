@@ -17,9 +17,9 @@
 
 | 文件 | 大小 |
 |---|---:|
-| `MC-Command-Studio-Setup-0.1.1.exe` | 125,314,346 B ≈ 119.5 MiB |
-| `MC-Command-Studio-0.1.1-portable.exe` | 113,089,090 B ≈ 107.8 MiB |
-| `MC-Command-Studio-Setup-0.1.1.exe.blockmap` | 132,506 B |
+| `MC-Command-Studio-Setup-0.1.2.exe` | 125,319,668 B ≈ 119.5 MiB |
+| `MC-Command-Studio-0.1.2-portable.exe` | 113,092,252 B ≈ 107.8 MiB |
+| `MC-Command-Studio-Setup-0.1.2.exe.blockmap` | 132,718 B |
 | `latest.yml` | 363 B |
 
 安装目录为 `%LOCALAPPDATA%\Programs\MC Command Studio`（per-user），卸载器保留用户项目与设置，可选择手动删除。
@@ -72,7 +72,8 @@ publish:
 ```
 
 本仓库已完成配置，并已发布：
-[MC 指令工坊 v0.1.1](https://github.com/JiangNanChina/mc-command-studio/releases/tag/v0.1.1)（最新）与
+[MC 指令工坊 v0.1.2](https://github.com/JiangNanChina/mc-command-studio/releases/tag/v0.1.2)（最新）、
+[v0.1.1](https://github.com/JiangNanChina/mc-command-studio/releases/tag/v0.1.1) 与
 [v0.1.0](https://github.com/JiangNanChina/mc-command-studio/releases/tag/v0.1.0)。
 
 如果你 fork 到其他账号，需要把 `owner/repo` 改成你的仓库，否则 `app-update.yml` 指向不存在的仓库，检查更新会失败。可以运行：
@@ -112,7 +113,7 @@ https://your-cdn.example.com/mc-command-studio/updates/
 3. `pnpm setup:electron`（Electron 45 不再有 postinstall）。
 4. `pnpm data:build` + `pnpm typecheck` + `pnpm test`。
 5. `pnpm build:win`（electron-builder）。
-6. `node tools/release/verify-version.mjs "$tag"` 校验版本与产物。
+6. `node tools/release/verify-version.mjs "$tag"` 校验版本、产物、`CHANGELOG.md` 与内置更新公告的当前版本。
 7. 生成 `checksums.txt`。
 8. 创建 **draft** Release，上传安装包、便携版、`latest.yml`、blockmap、checksums。
 
@@ -151,7 +152,7 @@ CI 已经透传这两个 secrets；没有配置时构建继续，但产物未签
 
 ## 6. 版本、渠道与回滚
 
-- SemVer：`0.1.1`；tag `v0.1.1`。
+- SemVer：`0.1.2`；tag `v0.1.2`。
 - 软件版本与游戏版本（`26.3`）解耦；数据包版本在设置中显示。
 - 渠道：stable（默认）/ beta（设置切换）。
 - 不自动降级；回滚 = 发布一个更高版本的修复版，或让用户手动安装 Releases 里的旧安装包。
@@ -212,15 +213,18 @@ $env:MCSTUDIO_UPDATE_URL = "http://127.0.0.1:8123/updates/"
 - [ ] “跳过此版本”（代码已实现，未单独 e2e）
 - [x] 便携版提示手动更新（`PORTABLE_EXECUTABLE_DIR` 模式实测）
 
-**实测结果（2026-10-26）**：使用与 0.1.1 相同 updater 代码的 0.1.0 测试构建，在 `artifacts/update-run` 安装，设置 `MCSTUDIO_UPDATE_URL=http://127.0.0.1:8123/updates/`，点击检查更新 → 下载 → 重启安装，安装目录中的 exe 产品版本变为 **0.1.1.0**，用户数据目录保留。
+**实测结果（2026-10-26）**：
+- `0.1.1 → 0.1.2`：安装 0.1.1，设置 `MCSTUDIO_UPDATE_URL=http://127.0.0.1:8123/updates/`，检查 → 下载 → 重启安装，exe 产品版本变为 **0.1.2.0**，静默完成，用户数据保留。
+- `0.1.0 → 0.1.1`：使用与 0.1.1 相同 updater 代码的 0.1.0 测试构建，同样升级到 0.1.1.0。
 
 > 已发布的 v0.1.0 使用旧 updater 代码，点击“重启并安装”会显示 NSIS 安装向导；从 v0.1.1 起改为静默安装（`quitAndInstall(true, true)`）。
 
 GitHub Actions 的 Release 工作流已在本仓库成功执行：
 - v0.1.0：run 40275025582 → [Release](https://github.com/JiangNanChina/mc-command-studio/releases/tag/v0.1.0)
 - v0.1.1：run 40280079017 → [Release](https://github.com/JiangNanChina/mc-command-studio/releases/tag/v0.1.1)
+- v0.1.2：run 40282580103 → [Release](https://github.com/JiangNanChina/mc-command-studio/releases/tag/v0.1.2)
 
-公开的 `releases/latest/download/latest.yml` 返回 200，内容版本 `0.1.1`，指向 `MC-Command-Studio-Setup-0.1.1.exe`，大小 125,314,346 字节，与 Release 资产一致。
+公开的 `releases/latest/download/latest.yml` 返回 200，内容版本 `0.1.2`，指向 `MC-Command-Studio-Setup-0.1.2.exe`，大小 125,319,668 字节，与 Release 资产一致。
 
 便携版模式通过 `PORTABLE_EXECUTABLE_DIR` 启动验证：自动更新被禁用，设置中显示“便携版不支持自动更新，请手动下载新版”（截图 `docs/assets/portable.png`）。
 
