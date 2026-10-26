@@ -22,6 +22,46 @@ const REPO = 'https://github.com/JiangNanChina/mc-command-studio'
  */
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: '0.1.8',
+    date: '2026-10-26',
+    title: '可视化资源选择器',
+    highlights: [
+      '物品/方块/效果/附魔/实体改为中文名 + 图标网格选择。',
+      '状态效果支持永久（infinite），不再只能填秒数。'
+    ],
+    sections: [
+      {
+        type: 'added',
+        items: [
+          '26.3 官方中文名称：物品、方块、状态效果、附魔、实体。',
+          '图标图集：真实材质优先，缺失项使用中文首字彩色图标。',
+          '统一选择器：中文名/ID 搜索，give/setblock/summon/fill/clone/effect/enchant 接入。',
+          '状态效果永久（infinite）开关。'
+        ]
+      },
+      {
+        type: 'improved',
+        items: [
+          '已选卡片显示中文名、ID 与图标。',
+          '单元测试 102 → 103；冒烟测试覆盖中文搜索与永久效果。'
+        ]
+      },
+      {
+        type: 'fixed',
+        items: ['无。']
+      },
+      {
+        type: 'known',
+        items: [
+          '图标来自 26.3 客户端资源，仅用于识别；缺失材质使用占位图标。',
+          '未覆盖的命令仍保留高级命令树。',
+          '安装包尚未配置代码签名。'
+        ]
+      }
+    ],
+    releaseUrl: `${REPO}/releases/tag/v0.1.8`
+  },
+  {
     version: '0.1.7',
     date: '2026-10-26',
     title: '附魔 / 经验与多行导出',

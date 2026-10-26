@@ -31,6 +31,17 @@ describe('effect', () => {
     ).toBe('effect clear @s')
   })
 
+  it('supports permanent effects', () => {
+    const result = buildEffectCommand({
+      ...createDefaultEffectOptions(),
+      effect: 'minecraft:night_vision',
+      permanent: true,
+      duration: '',
+      amplifier: '0'
+    })
+    expect(result.text).toBe('effect give @s minecraft:night_vision infinite 0')
+  })
+
   it('validates duration and amplifier', () => {
     const result = buildEffectCommand({
       ...createDefaultEffectOptions(),

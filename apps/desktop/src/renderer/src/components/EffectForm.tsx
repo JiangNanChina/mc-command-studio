@@ -1,6 +1,9 @@
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import { Clock, FlaskConical, Sparkles, Users } from 'lucide-react'
 import { COMMAND_MAP } from '@mcstudio/content'
+import { mcId, mcName } from '../lib/mcAssets'
+import { McIcon } from './McIcon'
+import { RegistryPickerDialog } from './RegistryPickerDialog'
 import { SelectorField } from './SelectorField'
 import { useAppStore } from '../store'
 
@@ -17,9 +20,10 @@ const QUICK_EFFECTS = [
 export function EffectForm() {
   const state = useAppStore()
   const effect = state.effect
+  const [pickerOpen, setPickerOpen] = useState(false)
   const effects = useMemo(() => {
     const list = state.pack?.registries.mob_effect ?? []
-    return list.map((id) => (id.includes(':') ? id : `minecraft:${id}`))
+    return list.map((id) => mcId(id))
   }, [state.pack])
 
   return (
@@ -84,30 +88,23 @@ export function EffectForm() {
           <div className="card-hint">{effects.length} 个效果</div>
         </div>
         <div className="card-body">
-          <div className="field">
-            <label className="field-label" htmlFor="effect-id">
-              效果 ID
-            </label>
-            <input
-              id="effect-id"
-              className="input"
-              list="effect-options"
-              value={effect.effect}
-              spellCheck={false}
-              placeholder={effect.action === 'clear' ? '留空移除全部效果' : 'minecraft:speed'}
-              onChange={(event) => state.updateEffect({ effect: event.target.value })}
-            />
-            <datalist id="effect-options">
-              {effects.map((id) => (
-                <option key={id} value={id} />
-              ))}
-            </datalist>
-            <div className="hint">
-              {effect.action === 'clear'
-                ? '留空时移除目标身上的全部效果。'
-                : '来自当前 26.3 的 mob_effect 注册表。'}
+          <div className="item-select">
+            <McIcon category="effects" id={effect.effect} size={38} />
+            <div className="item-main">
+              <div className="item-name">
+                {effect.effect ? mcName('effects', effect.effect) : '未选择效果'}
+              </div>
+              <div className="item-sub">
+                {effect.action === 'clear'
+                  ? '留空可移除全部效果'
+                  : effect.effect || '点击右侧选择状态效果'}
+              </div>
             </div>
+            <button type="button" className="btn" onClick={() => setPickerOpen(true)}>
+              选择效果
+            </button>
           </div>
+
           <div className="row wrap" style={{ marginTop: 10 }}>
             {QUICK_EFFECTS.map((id) => (
               <button
@@ -116,9 +113,13 @@ export function EffectForm() {
                 className={`chip${effect.effect === id ? ' active' : ''}`}
                 onClick={() => state.updateEffect({ effect: id })}
               >
-                {id.replace('minecraft:', '')}
+                <McIcon category="effects" id={id} size={16} />
+                {mcName('effects', id)}
               </button>
             ))}
+          </div>
+          <div className="hint" style={{ marginTop: 8 }}>
+            选择效果后，下方可设置持续时间或永久；等级 0 对应游戏内的 I 级。
           </div>
         </div>
       </div>
@@ -132,6 +133,14 @@ export function EffectForm() {
             </div>
           </div>
           <div className="card-body">
+            <label className="checkline" style={{ marginBottom: 10 }}>
+              <input
+                type="checkbox"
+                checked={effect.permanent}
+                onChange={(event) => state.updateEffect({ permanent: event.target.checked })}
+              />
+              永久效果（infinite）
+            </label>
             <div className="grid-2">
               <div className="field">
                 <label className="field-label" htmlFor="effect-duration">
@@ -140,7 +149,8 @@ export function EffectForm() {
                 <input
                   id="effect-duration"
                   className="input"
-                  value={effect.duration}
+                  value={effect.permanent ? '无限' : effect.duration}
+                  disabled={effect.permanent}
                   onChange={(event) => state.updateEffect({ duration: event.target.value })}
                 />
               </div>
@@ -184,6 +194,17 @@ export function EffectForm() {
           </div>
         </div>
       )}
+
+      {pickerOpen ? (
+        <RegistryPickerDialog
+          title="选择状态效果"
+          category="effects"
+          ids={effects}
+          current={effect.effect}
+          onSelect={(id) => state.updateEffect({ effect: id })}
+          onClose={() => setPickerOpen(false)}
+        />
+      ) : null}
     </div>
   )
 }

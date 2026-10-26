@@ -373,7 +373,8 @@ function normalizeEffect(input: Partial<EffectOptions> | undefined): EffectOptio
     effect: typeof input.effect === 'string' ? input.effect : fallback.effect,
     duration: typeof input.duration === 'string' ? input.duration : fallback.duration,
     amplifier: typeof input.amplifier === 'string' ? input.amplifier : fallback.amplifier,
-    hideParticles: Boolean(input.hideParticles)
+    hideParticles: Boolean(input.hideParticles),
+    permanent: Boolean(input.permanent)
   }
 }
 

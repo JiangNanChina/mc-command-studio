@@ -32,20 +32,21 @@
 
 - 26.3 数据包：94 根命令、1,197 字面量、59 参数类型、1,658 物品、1,286 方块。
 - 专用表单：`give`、`summon`、`setblock`、`execute`、`tp`、`effect`、`fill`、`clone`、`enchant`、`xp`；`setblock` 支持方块状态与方块实体 NBT。
+- 可视化资源库：26.3 官方中文名称与图标，物品/方块/效果/附魔/实体统一为图标网格选择，支持中文名搜索。
 - 命令方块链：最多 64 个脉冲/连锁/循环方块，按方向自动偏移坐标，生成整链 `/setblock`。
 - `execute` 执行链：as/at/positioned/align/anchored/facing/rotated/in/if/unless/store/raw + run，可排序。
 - 数据包导出：单命令或多行命令导出为 `.zip`，包含 `pack.mcmeta`、`.mcfunction` 与可选 load/tick 标签。
-- `tp`：坐标/实体目的地、可选朝向；`effect`：give/clear、时长、等级、隐藏粒子；`fill`/`clone`：区域、方块状态、模式、过滤；`enchant`/`xp`：附魔、经验。
+- `tp`：坐标/实体目的地、可选朝向；`effect`：give/clear、固定时长或永久、等级、隐藏粒子；`fill`/`clone`：区域、方块状态、模式、过滤；`enchant`/`xp`：附魔、经验。
 - 撤销/重做：所有表单、通用构建器、项目名称、命令方块设置；Ctrl+Z / Ctrl+Shift+Z / Ctrl+Y，最多 100 步。
 - `give` 13 类组件（自定义名称、默认名称、描述、附魔、无法破坏、堆叠、耐久、伤害、稀有度、光效、模型数据、自定义数据、raw）。
 - `give` 文本导入：粘贴命令还原为表单，未知组件保留为 raw。
 - 更新公告：每次版本的新增/改进/修复/已知问题内置在应用，更新后首次启动显示横幅，铃铛查看历史。
-- 通用构建器：其余根命令均可按官方命令树逐层拼接。
+- 通用构建器：未覆盖命令仍保留官方命令树作为高级兜底。
 - 实时输出 + 基础校验 + 复制；命令方块模式生成 `/setblock`。
 - 项目保存 / 打开 / 自动保存 / 崩溃恢复；最近项目。
 - 深色/浅色主题、设置、诊断导出、本地日志。
 - NSIS 安装包 + 便携版；electron-updater 自动更新与发布流水线。
-- 单元测试 102 个；Electron 冒烟测试覆盖公告、give/导入/summon/setblock/tp/effect/fill/clone/enchant/xp/execute/命令方块链/多行数据包/撤销重做/命令方块。
+- 单元测试 103 个；Electron 冒烟测试覆盖公告、give/导入/summon/setblock/tp/effect/fill/clone/enchant/xp/execute/命令方块链/多行数据包/撤销重做/命令方块。
 
 ### P1（现代版 MVP）
 
@@ -86,6 +87,7 @@
 | `give` / `summon` / `setblock` / `execute` / `tp` / `effect` / `fill` / `clone` / `enchant` / `xp` 专用表单 | ✅ |
 | `give` 文本导入 | ✅ 组件无法解析时保留 raw |
 | 撤销 / 重做 | ✅ 全局 100 步 + 快捷键 |
+| 可视化资源选择 | ✅ 中文名 + 图标；物品/方块/效果/附魔/实体 |
 | 更新公告 / 版本历史 | ✅ 更新后首次启动横幅 + 顶栏铃铛 |
 | 命令方块链 | ✅ 2–64 个方块、方向偏移、整链输出 |
 | 数据包导出 | ✅ 单命令/多行命令 + load/tick |
@@ -94,7 +96,7 @@
 | 命令方块 setblock | ✅ 单块 + 命令方块链 |
 | 项目保存 / 自动保存 | ✅ JSON 文件 |
 | 安装包 / 便携版 | ✅ 未签名（见 08） |
-| 自动更新 | ✅ 0.1.6 → 0.1.7 静默升级已实测；GitHub v0.1.7 Release 已发布 |
+| 自动更新 | ✅ 0.1.7 → 0.1.8 静默升级已实测；GitHub v0.1.8 Release 已发布 |
 | 1.12.2 / 1.13–1.20.4 | ❌ 仅设计 |
 | 单元体系 | ❌ P1 后续 |
 

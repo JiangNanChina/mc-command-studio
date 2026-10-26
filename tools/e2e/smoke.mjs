@@ -90,8 +90,10 @@ async function main() {
   // 搜索并选择 diamond_sword
   await page.locator('button', { hasText: '选择物品' }).first().click()
   await page.waitForSelector('.modal', { timeout: 10_000 })
-  await page.locator('.modal input[placeholder*="搜索物品"]').fill('diamond_sword')
-  await page.locator('.item-row', { hasText: 'minecraft:diamond_sword' }).first().click()
+  await page.locator('.modal input[placeholder*="搜索中文名"]').fill('钻石剑')
+  await page.waitForTimeout(300)
+  await page.screenshot({ path: join(ARTIFACTS, 'item-picker.png') })
+  await page.locator('.mc-tile', { hasText: 'diamond_sword' }).first().click()
   await page.waitForSelector('#give-count', { timeout: 10_000 })
 
   // 添加自定义名称组件
@@ -128,8 +130,10 @@ async function main() {
 
   // summon 专用表单
   await page.locator('.command-item', { hasText: '召唤实体' }).first().click()
-  await page.waitForSelector('#summon-entity', { timeout: 10_000 })
-  await page.locator('#summon-entity').fill('minecraft:armor_stand')
+  await page.locator('.hero-id', { hasText: 'summon' }).waitFor({ timeout: 10_000 })
+  await page.getByRole('button', { name: '选择实体' }).click()
+  await page.locator('.modal input[placeholder*="搜索中文名"]').fill('盔甲架')
+  await page.locator('.mc-tile', { hasText: 'armor_stand' }).first().click()
   await page.waitForTimeout(400)
   const summonText = await page.locator('.output-code .cm-content').innerText()
   if (!summonText.includes('summon minecraft:armor_stand ~ ~ ~')) {
@@ -142,8 +146,10 @@ async function main() {
   await page.waitForSelector('#setblock-x', { timeout: 10_000 })
   await page.getByRole('button', { name: '选择方块' }).click()
   await page.waitForSelector('.modal', { timeout: 10_000 })
-  await page.locator('.modal input[placeholder*="搜索方块"]').fill('chest')
-  await page.locator('.item-row', { hasText: 'minecraft:chest' }).first().click()
+  await page.locator('.modal input[placeholder*="搜索中文名"]').fill('箱子')
+  await page.waitForTimeout(300)
+  await page.screenshot({ path: join(ARTIFACTS, 'block-picker.png') })
+  await page.locator('.mc-tile', { hasText: 'chest' }).first().click()
   await page.waitForTimeout(400)
   const blockText = await page.locator('.output-code .cm-content').innerText()
   if (!blockText.includes('setblock ~ ~ ~ minecraft:chest[')) {
@@ -171,17 +177,23 @@ async function main() {
 
   // effect 专用表单
   await page.locator('.command-item', { hasText: '状态效果' }).first().click()
-  await page.waitForSelector('#effect-id', { timeout: 10_000 })
+  await page.waitForSelector('#effect-amplifier', { timeout: 10_000 })
   await page.waitForTimeout(300)
   const effectOutput = await page.locator('.output-code .cm-content').innerText()
   if (!effectOutput.includes('effect give @s minecraft:speed 30 0')) {
     throw new Error(`effect 输出不符合预期：${effectOutput}`)
   }
+  await page.locator('.checkline', { hasText: '永久效果' }).locator('input').check()
+  await page.waitForTimeout(300)
+  const permanentEffect = await page.locator('.output-code .cm-content').innerText()
+  if (!permanentEffect.includes('effect give @s minecraft:speed infinite 0')) {
+    throw new Error(`永久 effect 输出不符合预期：${permanentEffect}`)
+  }
   await page.screenshot({ path: join(ARTIFACTS, 'effect-form.png') })
 
   // fill 专用表单
   await page.locator('.command-item', { hasText: '填充区域' }).first().click()
-  await page.waitForSelector('#fill-block', { timeout: 10_000 })
+  await page.waitForSelector('.hero-id', { timeout: 10_000 })
   await page.waitForTimeout(300)
   const fillOutput = await page.locator('.output-code .cm-content').innerText()
   if (!fillOutput.includes('fill ~ ~ ~ ~2 ~2 ~2 minecraft:stone')) {
@@ -191,7 +203,7 @@ async function main() {
 
   // enchant / xp 专用表单
   await page.locator('.command-item', { hasText: 'enchant' }).first().click()
-  await page.waitForSelector('#enchant-id', { timeout: 10_000 })
+  await page.waitForSelector('#enchant-level', { timeout: 10_000 })
   await page.waitForTimeout(300)
   const enchantOutput = await page.locator('.output-code .cm-content').innerText()
   if (!enchantOutput.includes('enchant @s minecraft:sharpness 1')) {

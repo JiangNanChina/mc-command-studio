@@ -12,6 +12,7 @@ export interface EffectOptions {
   duration: string
   amplifier: string
   hideParticles: boolean
+  permanent: boolean
 }
 
 export function createDefaultEffectOptions(): EffectOptions {
@@ -21,7 +22,8 @@ export function createDefaultEffectOptions(): EffectOptions {
     effect: 'minecraft:speed',
     duration: '30',
     amplifier: '0',
-    hideParticles: false
+    hideParticles: false,
+    permanent: false
   }
 }
 
@@ -48,11 +50,11 @@ export function buildEffectCommand(options: EffectOptions): BuildResult {
   }
 
   const parts = ['effect', 'give', target.text, effect]
-  const duration = options.duration.trim()
+  const duration = options.permanent ? 'infinite' : options.duration.trim()
   const amplifier = options.amplifier.trim()
 
   if (duration) {
-    if (!integerInRange(duration, 1, 1_000_000)) {
+    if (!options.permanent && !integerInRange(duration, 1, 1_000_000)) {
       diagnostics.push(error('effect.duration', '持续时间必须是 1–1,000,000 的整数秒', 'duration'))
     }
     parts.push(duration)
@@ -66,7 +68,12 @@ export function buildEffectCommand(options: EffectOptions): BuildResult {
     }
     parts.push(amplifier)
   }
-  if (options.hideParticles) parts.push('true')
+  if (options.hideParticles) {
+    if (!amplifier) {
+      diagnostics.push(error('effect.hide', '隐藏粒子前需要填写等级（可填 0）', 'amplifier'))
+    }
+    parts.push('true')
+  }
 
   return finish(parts, diagnostics)
 }

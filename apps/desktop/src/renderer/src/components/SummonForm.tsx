@@ -1,6 +1,9 @@
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import { Braces, Crosshair, Ghost, MapPin } from 'lucide-react'
 import { COMMAND_MAP } from '@mcstudio/content'
+import { mcId, mcName } from '../lib/mcAssets'
+import { McIcon } from './McIcon'
+import { RegistryPickerDialog } from './RegistryPickerDialog'
 import { useAppStore } from '../store'
 
 const QUICK_ENTITIES = [
@@ -16,9 +19,10 @@ const meta = COMMAND_MAP.get('summon')
 export function SummonForm() {
   const state = useAppStore()
   const summon = state.summon
+  const [pickerOpen, setPickerOpen] = useState(false)
   const entities = useMemo(() => {
     const list = state.pack?.registries.entity_type ?? []
-    return list.map((id) => (id.includes(':') ? id : `minecraft:${id}`))
+    return list.map((id) => mcId(id))
   }, [state.pack])
 
   return (
@@ -52,24 +56,15 @@ export function SummonForm() {
           <div className="card-hint">{entities.length} 个实体类型</div>
         </div>
         <div className="card-body">
-          <div className="field">
-            <label className="field-label" htmlFor="summon-entity">
-              实体 ID
-            </label>
-            <input
-              id="summon-entity"
-              className="input"
-              list="summon-entity-options"
-              value={summon.entity}
-              spellCheck={false}
-              onChange={(event) => state.updateSummon({ entity: event.target.value })}
-            />
-            <datalist id="summon-entity-options">
-              {entities.map((id) => (
-                <option key={id} value={id} />
-              ))}
-            </datalist>
-            <div className="hint">来自当前 26.3 注册表；也支持手动输入模组实体 ID。</div>
+          <div className="item-select">
+            <McIcon category="entities" id={summon.entity} size={38} />
+            <div className="item-main">
+              <div className="item-name">{mcName('entities', summon.entity)}</div>
+              <div className="item-sub">{summon.entity}</div>
+            </div>
+            <button type="button" className="btn" onClick={() => setPickerOpen(true)}>
+              选择实体
+            </button>
           </div>
           <div className="row wrap" style={{ marginTop: 10 }}>
             {QUICK_ENTITIES.map((id) => (
@@ -79,12 +74,27 @@ export function SummonForm() {
                 className={`chip${summon.entity === id ? ' active' : ''}`}
                 onClick={() => state.updateSummon({ entity: id })}
               >
-                {id.replace('minecraft:', '')}
+                <McIcon category="entities" id={id} size={16} />
+                {mcName('entities', id)}
               </button>
             ))}
           </div>
+          <div className="hint" style={{ marginTop: 8 }}>
+            来自当前 26.3 实体注册表；模组实体可用通用构建器或手动输入。
+          </div>
         </div>
       </div>
+
+      {pickerOpen ? (
+        <RegistryPickerDialog
+          title="选择实体"
+          category="entities"
+          ids={entities}
+          current={summon.entity}
+          onSelect={(id) => state.updateSummon({ entity: id })}
+          onClose={() => setPickerOpen(false)}
+        />
+      ) : null}
 
       <div className="card">
         <div className="card-head">

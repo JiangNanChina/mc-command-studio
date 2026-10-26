@@ -12,23 +12,25 @@
 
 ![give 表单](docs/assets/give-form.png)
 
-## 功能（0.1.7）
+## 功能（0.1.8）
 
-- **26.3 数据包**：94 个根命令、1,197 个字面量、59 种参数类型、1,658 个物品、1,286 个方块。
-- **专用表单**：`give`、`summon`、`setblock`、`execute`、`tp`、`effect`、`fill`、`clone`、`enchant`、`xp` 已从通用构建器升级为专用界面。
+- **可视化选择**：物品、方块、状态效果、附魔、实体统一为中文名 + 图标网格；支持中文名 / ID 搜索。
+- **中文资源库**：26.3 官方中文名称（1,658 物品、1,286 方块、40 效果、43 附魔、161 实体）+ 图标图集。
+- **26.3 数据包**：94 个根命令、1,197 个字面量、59 种参数类型。
+- **专用表单**：`give`、`summon`、`setblock`、`execute`、`tp`、`effect`、`fill`、`clone`、`enchant`、`xp`。
 - **命令方块链**：按方向排布最多 64 个脉冲/连锁/循环方块，自动偏移坐标，生成整链 `/setblock`。
 - **execute 执行链**：as/at/positioned/align/anchored/facing/rotated/in/if/unless/store/raw 可排序积木 + run。
-- **tp / effect / fill / clone / enchant / xp**：传送、状态效果、区域填充/复制、附魔、经验。
+- **状态效果**：可视化选择效果，支持自定义秒数或永久（infinite）、等级、隐藏粒子。
 - **撤销 / 重做**：覆盖所有表单、通用构建器、项目名称和命令方块设置；Ctrl+Z / Ctrl+Shift+Z / Ctrl+Y，最多 100 步。
-- **give**：目标选择器、物品搜索、数量、13 类物品组件（名称、描述、附魔、耐久、稀有度、自定义数据等）。
+- **give**：目标选择器、物品搜索、数量、13 类物品组件。
 - **give 文本导入**：粘贴 `/give` 命令，还原成可编辑表单；未知组件保留为 raw。
-- **setblock**：方块搜索、方块状态属性、方块实体 NBT、4 种放置模式。
+- **setblock**：方块选择、方块状态属性、方块实体 NBT、4 种放置模式。
 - **数据包导出**：单命令或多行命令导出为 `.zip`（pack.mcmeta + mcfunction + 可选 load/tick 标签）。
 - **更新公告**：每个版本的新增 / 改进 / 修复 / 已知问题内置在应用中；更新后首次启动显示横幅，顶栏铃铛随时查看版本历史。
-- **通用构建器**：其余根命令按官方命令树逐层拼接；未覆盖参数用原始文本 + 基础校验兜底。
+- **通用构建器**：未覆盖命令仍保留官方命令树作为高级兜底。
 - **本地项目**：`.mcstudio` JSON、最近打开、4 秒防抖自动保存、异常退出恢复。
 - **桌面体验**：深色/浅色主题、中文界面、原生菜单、文件关联、单实例、高 DPI。
-- **分发与更新**：NSIS 安装包 + 便携版 + `latest.yml`；electron-updater 自动检查/下载/重启安装；GitHub Actions 发布流水线。已在本机验证 0.1.6 → 0.1.7 静默升级；便携版会禁用自动更新并提示手动下载。
+- **分发与更新**：NSIS 安装包 + 便携版 + `latest.yml`；electron-updater 自动检查/下载/重启安装；GitHub Actions 发布流水线。已在本机验证 0.1.7 → 0.1.8 静默升级；便携版会禁用自动更新并提示手动下载。
 
 ## 下载与安装
 
@@ -58,8 +60,8 @@ pnpm build:win          # 安装包 + 便携版 + latest.yml
 
 产物在 `release/`：
 
-- `MC-Command-Studio-Setup-0.1.7.exe`
-- `MC-Command-Studio-0.1.7-portable.exe`
+- `MC-Command-Studio-Setup-0.1.8.exe`
+- `MC-Command-Studio-0.1.8-portable.exe`
 - `latest.yml`、`.blockmap`
 
 如果 `pnpm install` 后没有 Electron 二进制，运行 `pnpm setup:electron`；国内网络可设置：
@@ -83,7 +85,7 @@ pnpm data:verify
 ## 测试
 
 ```bash
-pnpm test        # 102 个核心逻辑用例
+pnpm test        # 103 个核心逻辑用例
 pnpm e2e         # Playwright 启动 Electron，覆盖 give/导入/summon/setblock/命令方块
 ```
 
@@ -147,3 +149,4 @@ release/             打包产物（不入库）
 - [全版本路线](docs/06-version-matrix.md)
 - [路线图与风险](docs/07-roadmap-risks.md)
 - [发布与自动更新](docs/08-release-update.md)
+- [中文名称与图标资源](docs/09-visual-assets.md)

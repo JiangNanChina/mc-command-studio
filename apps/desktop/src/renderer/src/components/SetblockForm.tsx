@@ -3,6 +3,8 @@ import { Boxes, Braces, MapPin, Settings2 } from 'lucide-react'
 import { COMMAND_MAP } from '@mcstudio/content'
 import { shortId, type SetblockMode } from '@mcstudio/core'
 import { BlockPickerDialog } from './BlockPickerDialog'
+import { McIcon } from './McIcon'
+import { mcName } from '../lib/mcAssets'
 import { useAppStore } from '../store'
 
 const meta = COMMAND_MAP.get('setblock')
@@ -99,9 +101,12 @@ export function SetblockForm() {
         </div>
         <div className="card-body">
           <div className="item-select">
+            <McIcon category="blocks" id={options.block.id} size={38} />
             <div className="item-main">
-              <div className="item-name">{options.block.id}</div>
+              <div className="item-name">{mcName('blocks', options.block.id)}</div>
               <div className="item-sub">
+                <span className="id">{options.block.id}</span>
+                {' · '}
                 {properties.length > 0 ? `${properties.length} 个方块属性` : '无方块属性'}
               </div>
             </div>

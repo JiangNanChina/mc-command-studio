@@ -1,6 +1,9 @@
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import { Sparkles, Star, Wand2 } from 'lucide-react'
 import { COMMAND_MAP } from '@mcstudio/content'
+import { mcId, mcName } from '../lib/mcAssets'
+import { McIcon } from './McIcon'
+import { RegistryPickerDialog } from './RegistryPickerDialog'
 import { SelectorField } from './SelectorField'
 import { useAppStore } from '../store'
 
@@ -18,9 +21,10 @@ const QUICK_ENCHANTS = [
 export function EnchantForm() {
   const state = useAppStore()
   const enchant = state.enchant
+  const [pickerOpen, setPickerOpen] = useState(false)
   const enchantments = useMemo(() => {
     const list = state.pack?.registries.enchantment ?? []
-    return list.map((id) => (id.includes(':') ? id : `minecraft:${id}`))
+    return list.map((id) => mcId(id))
   }, [state.pack])
 
   return (
@@ -69,24 +73,15 @@ export function EnchantForm() {
           </div>
         </div>
         <div className="card-body">
-          <div className="field">
-            <label className="field-label" htmlFor="enchant-id">
-              附魔 ID
-            </label>
-            <input
-              id="enchant-id"
-              className="input"
-              list="enchant-options"
-              value={enchant.enchantment}
-              spellCheck={false}
-              onChange={(event) => state.updateEnchant({ enchantment: event.target.value })}
-            />
-            <datalist id="enchant-options">
-              {enchantments.map((id) => (
-                <option key={id} value={id} />
-              ))}
-            </datalist>
-            <div className="hint">来自当前 26.3 的 enchantment 注册表；支持手动输入模组 ID。</div>
+          <div className="item-select">
+            <McIcon category="enchantments" id={enchant.enchantment} size={38} />
+            <div className="item-main">
+              <div className="item-name">{mcName('enchantments', enchant.enchantment)}</div>
+              <div className="item-sub">{enchant.enchantment}</div>
+            </div>
+            <button type="button" className="btn" onClick={() => setPickerOpen(true)}>
+              选择附魔
+            </button>
           </div>
 
           <div className="row wrap" style={{ marginTop: 10 }}>
@@ -97,7 +92,8 @@ export function EnchantForm() {
                 className={`chip${enchant.enchantment === id ? ' active' : ''}`}
                 onClick={() => state.updateEnchant({ enchantment: id })}
               >
-                {id.replace('minecraft:', '')}
+                <McIcon category="enchantments" id={id} size={16} />
+                {mcName('enchantments', id)}
               </button>
             ))}
           </div>
@@ -116,6 +112,17 @@ export function EnchantForm() {
           </div>
         </div>
       </div>
+
+      {pickerOpen ? (
+        <RegistryPickerDialog
+          title="选择附魔"
+          category="enchantments"
+          ids={enchantments}
+          current={enchant.enchantment}
+          onSelect={(id) => state.updateEnchant({ enchantment: id })}
+          onClose={() => setPickerOpen(false)}
+        />
+      ) : null}
     </div>
   )
 }

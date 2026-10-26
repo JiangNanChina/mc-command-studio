@@ -1,44 +1,60 @@
 import { useMemo, useState } from 'react'
 import { Boxes, Search } from 'lucide-react'
 import { getApi } from '../lib/api'
+import { mcId, mcName } from '../lib/mcAssets'
 import { Modal } from './Modal'
+import { McIcon } from './McIcon'
 import { useAppStore } from '../store'
 
-const LIMIT = 160
+const LIMIT = 320
 
-export function BlockPickerDialog({ onClose }: { onClose: () => void }) {
+interface BlockPickerDialogProps {
+  currentId?: string
+  onSelect?: (block: { id: string; states: Record<string, string> }) => void
+  onClose: () => void
+}
+
+export function BlockPickerDialog({ currentId, onSelect, onClose }: BlockPickerDialogProps) {
   const state = useAppStore()
   const [query, setQuery] = useState('')
   const [manual, setManual] = useState('')
   const allBlocks = state.pack?.registries.block ?? []
+  const current = currentId ?? state.setblock.block.id
 
   const blocks = useMemo(() => {
     const normalized = query.trim().toLowerCase()
     const list = normalized
-      ? allBlocks.filter((id) => id.toLowerCase().includes(normalized))
+      ? allBlocks.filter((id) => {
+          const full = mcId(id)
+          return (
+            id.toLowerCase().includes(normalized) ||
+            mcName('blocks', full).toLowerCase().includes(normalized)
+          )
+        })
       : allBlocks
     return list.slice(0, LIMIT)
   }, [allBlocks, query])
 
   const choose = (id: string): void => {
-    const normalized = id.includes(':') ? id : `minecraft:${id}`
+    const normalized = mcId(id)
     const key = normalized.replace(/^minecraft:/, '')
     const definition = state.pack?.blocks[key]
     const defaults = definition?.[1] ?? {}
-    state.selectBlock({ id: normalized, states: { ...defaults }, nbt: '' })
+    if (onSelect) onSelect({ id: normalized, states: { ...defaults } })
+    else state.selectBlock({ id: normalized, states: { ...defaults }, nbt: '' })
     onClose()
   }
 
   return (
     <Modal
       title="选择方块"
-      subtitle={`当前版本共 ${allBlocks.length} 个方块；选择后会带出默认方块状态。`}
+      subtitle={`当前版本共 ${allBlocks.length} 个方块；支持中文名 / ID 搜索，选择后带出默认方块状态。`}
       icon={<Boxes size={17} />}
       onClose={onClose}
       wide
       footer={
         <>
-          <div className="left">当前：{state.setblock.block.id}</div>
+          <div className="left">当前：{mcName('blocks', current)}</div>
           <button type="button" className="btn" onClick={onClose}>
             取消
           </button>
@@ -49,7 +65,7 @@ export function BlockPickerDialog({ onClose }: { onClose: () => void }) {
         <input
           className="input"
           autoFocus
-          placeholder="搜索方块 ID，例如 stone、stairs、command_block"
+          placeholder="搜索中文名或 ID，例如 石头、stairs、command_block"
           value={query}
           onChange={(event) => setQuery(event.target.value)}
         />
@@ -58,7 +74,7 @@ export function BlockPickerDialog({ onClose }: { onClose: () => void }) {
           className="btn"
           onClick={() => {
             void getApi()
-              .clipboard.write(state.setblock.block.id)
+              .clipboard.write(current)
               .then(() => state.showToast('已复制方块 ID', 'success'))
               .catch(() => state.showToast('复制失败', 'error'))
           }}
@@ -91,24 +107,28 @@ export function BlockPickerDialog({ onClose }: { onClose: () => void }) {
         </div>
       </div>
 
-      <div className="item-list">
+      <div className="mc-grid">
         {blocks.length === 0 ? (
           <div className="list-empty">没有匹配的方块，试试手动输入完整 ID。</div>
         ) : (
           blocks.map((id) => {
-            const full = id.includes(':') ? id : `minecraft:${id}`
-            const active = full === state.setblock.block.id
+            const full = mcId(id)
+            const active = full === current
             const props = state.pack?.blocks[id]?.[0] ?? {}
             const propCount = Object.keys(props).length
             return (
               <button
                 key={id}
                 type="button"
-                className={`item-row${active ? ' active' : ''}`}
+                className={`mc-tile${active ? ' active' : ''}`}
                 onClick={() => choose(full)}
               >
-                <span>{full}</span>
-                <span className="short">{propCount > 0 ? `${propCount} 个属性` : '无状态'}</span>
+                <McIcon category="blocks" id={full} size={30} />
+                <span className="mc-tile-name">{mcName('blocks', full)}</span>
+                <span className="mc-tile-id">
+                  {id}
+                  {propCount > 0 ? ` · ${propCount} 属性` : ''}
+                </span>
               </button>
             )
           })

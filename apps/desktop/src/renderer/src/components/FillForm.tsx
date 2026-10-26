@@ -1,7 +1,10 @@
-import { useMemo } from 'react'
+import { useState } from 'react'
 import { Boxes, Layers, Maximize2 } from 'lucide-react'
 import { COMMAND_MAP } from '@mcstudio/content'
 import type { FillMode } from '@mcstudio/core'
+import { mcName } from '../lib/mcAssets'
+import { BlockPickerDialog } from './BlockPickerDialog'
+import { McIcon } from './McIcon'
 import { PositionInput } from './PositionInput'
 import { useAppStore } from '../store'
 
@@ -21,10 +24,7 @@ const QUICK_BLOCKS = ['minecraft:stone', 'minecraft:oak_planks', 'minecraft:glas
 export function FillForm() {
   const state = useAppStore()
   const fill = state.fill
-  const blocks = useMemo(() => {
-    const list = state.pack?.registries.block ?? []
-    return list.map((id) => (id.includes(':') ? id : `minecraft:${id}`))
-  }, [state.pack])
+  const [pickerOpen, setPickerOpen] = useState(false)
 
   return (
     <div className="content">
@@ -79,28 +79,16 @@ export function FillForm() {
             <Layers size={15} />
             方块
           </div>
-          <div className="card-hint">{blocks.length} 个方块</div>
+          <button type="button" className="btn btn-sm" onClick={() => setPickerOpen(true)}>
+            选择方块
+          </button>
         </div>
         <div className="card-body">
-          <div className="field">
-            <label className="field-label" htmlFor="fill-block">
-              方块 ID
-            </label>
-            <input
-              id="fill-block"
-              className="input"
-              list="fill-block-options"
-              value={fill.block}
-              spellCheck={false}
-              onChange={(event) => state.updateFill({ block: event.target.value })}
-            />
-            <datalist id="fill-block-options">
-              {blocks.map((id) => (
-                <option key={id} value={id} />
-              ))}
-            </datalist>
-            <div className="hint">
-              支持方块状态：<code className="code-inline">minecraft:oak_log[axis=y]</code>。
+          <div className="item-select">
+            <McIcon category="blocks" id={fill.block} size={38} />
+            <div className="item-main">
+              <div className="item-name">{mcName('blocks', fill.block)}</div>
+              <div className="item-sub">{fill.block}</div>
             </div>
           </div>
           <div className="row wrap" style={{ marginTop: 10 }}>
@@ -111,9 +99,14 @@ export function FillForm() {
                 className={`chip${fill.block === id ? ' active' : ''}`}
                 onClick={() => state.updateFill({ block: id })}
               >
-                {id.replace('minecraft:', '')}
+                <McIcon category="blocks" id={id} size={16} />
+                {mcName('blocks', id)}
               </button>
             ))}
+          </div>
+          <div className="hint" style={{ marginTop: 8 }}>
+            选择方块后可手动追加方块状态，例如{' '}
+            <code className="code-inline">minecraft:oak_log[axis=y]</code>。
           </div>
         </div>
       </div>
@@ -166,6 +159,14 @@ export function FillForm() {
           </div>
         </div>
       </div>
+
+      {pickerOpen ? (
+        <BlockPickerDialog
+          currentId={fill.block}
+          onSelect={(block) => state.updateFill({ block: block.id })}
+          onClose={() => setPickerOpen(false)}
+        />
+      ) : null}
     </div>
   )
 }

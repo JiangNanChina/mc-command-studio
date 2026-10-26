@@ -113,10 +113,11 @@ interface EffectOptions {
   duration: string
   amplifier: string
   hideParticles: boolean
+  permanent: boolean
 }
 ```
 
-`give` 生成 `effect give <target> <effect> [duration] [amplifier] [true]`；`clear` 生成 `effect clear <target> [effect]`。时长 1–1,000,000 秒，等级 0–255。
+`give` 生成 `effect give <target> <effect> [duration] [amplifier] [true]`；`clear` 生成 `effect clear <target> [effect]`。时长 1–1,000,000 秒；勾选“永久”时写入 `infinite`，等级 0–255。
 
 ### 1.8 专用表单：`fill`
 
@@ -327,7 +328,7 @@ type Unit =
 
 ## 7. 测试
 
-`packages/core/src/*.test.ts` 与 `apps/desktop/src/shared/*.test.ts` 共 102 个用例，覆盖：
+`packages/core/src/*.test.ts` 与 `apps/desktop/src/shared/*.test.ts` 共 103 个用例，覆盖：
 
 - SNBT / 命令方块字符串转义。
 - 选择器排序、引号、范围、NBT 括号、分数。
@@ -337,7 +338,7 @@ type Unit =
 - `/setblock` 方块状态、NBT 紧贴、模式、坐标/属性校验。
 - `/execute` 子命令顺序、if/unless 条件、score/store、raw 与缺失 run。
 - `/tp` 坐标/实体目的地、朝向、实体朝向警告。
-- `/effect` give/clear、时长/等级/隐藏粒子、非法数值。
+- `/effect` give/clear、固定时长/永久、等级/隐藏粒子、非法数值。
 - `/fill` 模式、replace 过滤、非法方块与忽略过滤警告。
 - `/clone` 模式、filtered 过滤必填、force/move。
 - 命令方块链方向偏移、方块类型、条件/自动、引号转义、`^` 坐标报错。

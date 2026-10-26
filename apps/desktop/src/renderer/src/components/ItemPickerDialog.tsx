@@ -1,10 +1,12 @@
 import { useMemo, useState } from 'react'
 import { Package, Search } from 'lucide-react'
 import { getApi } from '../lib/api'
+import { mcId, mcName } from '../lib/mcAssets'
 import { Modal } from './Modal'
+import { McIcon } from './McIcon'
 import { useAppStore } from '../store'
 
-const LIMIT = 160
+const LIMIT = 320
 
 export function ItemPickerDialog() {
   const state = useAppStore()
@@ -15,7 +17,13 @@ export function ItemPickerDialog() {
   const items = useMemo(() => {
     const normalized = query.trim().toLowerCase()
     const list = normalized
-      ? allItems.filter((id) => id.toLowerCase().includes(normalized))
+      ? allItems.filter((id) => {
+          const full = mcId(id)
+          return (
+            id.toLowerCase().includes(normalized) ||
+            mcName('items', full).toLowerCase().includes(normalized)
+          )
+        })
       : allItems
     return list.slice(0, LIMIT)
   }, [allItems, query])
@@ -28,13 +36,13 @@ export function ItemPickerDialog() {
   return (
     <Modal
       title="选择物品"
-      subtitle={`当前版本共 ${allItems.length} 个物品；支持搜索 ID，也可以手动输入资源包/模组物品。`}
+      subtitle={`当前版本共 ${allItems.length} 个物品；支持中文名 / ID 搜索，也可以手动输入模组物品。`}
       icon={<Package size={17} />}
       onClose={() => state.setDialog('itemPicker', false)}
       wide
       footer={
         <>
-          <div className="left">已选择：{state.give.item.id}</div>
+          <div className="left">已选择：{mcName('items', state.give.item.id)}</div>
           <button type="button" className="btn" onClick={() => state.setDialog('itemPicker', false)}>
             取消
           </button>
@@ -45,7 +53,7 @@ export function ItemPickerDialog() {
         <input
           className="input"
           autoFocus
-          placeholder="搜索物品 ID，例如 diamond、sword、glass"
+          placeholder="搜索中文名或 ID，例如 钻石剑、diamond、glass"
           value={query}
           onChange={(event) => setQuery(event.target.value)}
         />
@@ -87,22 +95,23 @@ export function ItemPickerDialog() {
         </div>
       </div>
 
-      <div className="item-list">
+      <div className="mc-grid">
         {items.length === 0 ? (
           <div className="list-empty">没有匹配的物品，试试手动输入完整 ID。</div>
         ) : (
           items.map((id) => {
-            const full = id.includes(':') ? id : `minecraft:${id}`
+            const full = mcId(id)
             const active = full === state.give.item.id || id === state.give.item.id
             return (
               <button
                 key={id}
                 type="button"
-                className={`item-row${active ? ' active' : ''}`}
+                className={`mc-tile${active ? ' active' : ''}`}
                 onClick={() => choose(full)}
               >
-                <span>{full}</span>
-                <span className="short">{id.split('_').join(' ')}</span>
+                <McIcon category="items" id={full} size={30} />
+                <span className="mc-tile-name">{mcName('items', full)}</span>
+                <span className="mc-tile-id">{id}</span>
               </button>
             )
           })

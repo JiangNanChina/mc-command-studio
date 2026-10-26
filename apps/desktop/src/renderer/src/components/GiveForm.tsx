@@ -4,6 +4,8 @@ import { COMMAND_MAP, ITEM_COMPONENTS } from '@mcstudio/content'
 import { SELECTOR_BASES, serializeSelector } from '@mcstudio/core'
 import { ComponentsEditor } from './ComponentsEditor'
 import { GiveImportDialog } from './GiveImportDialog'
+import { McIcon } from './McIcon'
+import { mcName } from '../lib/mcAssets'
 import { useAppStore } from '../store'
 
 const meta = COMMAND_MAP.get('give')
@@ -99,9 +101,12 @@ export function GiveForm() {
         </div>
         <div className="card-body">
           <div className="item-select">
+            <McIcon category="items" id={state.give.item.id} size={38} />
             <div className="item-main">
-              <div className="item-name">{state.give.item.id}</div>
+              <div className="item-name">{mcName('items', state.give.item.id)}</div>
               <div className="item-sub">
+                <span className="id">{state.give.item.id}</span>
+                {' · '}
                 {itemComponents.length > 0 ? `已附加 ${itemComponents.length} 个组件` : '未附加组件'}
               </div>
             </div>

@@ -1,7 +1,10 @@
-import { useMemo } from 'react'
+import { useState } from 'react'
 import { Copy, Layers, Move3d } from 'lucide-react'
 import { COMMAND_MAP } from '@mcstudio/content'
 import type { CloneMode, CloneMove } from '@mcstudio/core'
+import { mcName } from '../lib/mcAssets'
+import { BlockPickerDialog } from './BlockPickerDialog'
+import { McIcon } from './McIcon'
 import { PositionInput } from './PositionInput'
 import { useAppStore } from '../store'
 
@@ -22,10 +25,7 @@ const MOVES: { value: CloneMove; label: string }[] = [
 export function CloneForm() {
   const state = useAppStore()
   const clone = state.clone
-  const blocks = useMemo(() => {
-    const list = state.pack?.registries.block ?? []
-    return list.map((id) => (id.includes(':') ? id : `minecraft:${id}`))
-  }, [state.pack])
+  const [pickerOpen, setPickerOpen] = useState(false)
 
   return (
     <div className="content">
@@ -130,22 +130,19 @@ export function CloneForm() {
 
           {clone.mode === 'filtered' ? (
             <div className="field" style={{ marginTop: 10 }}>
-              <label className="field-label" htmlFor="clone-filter">
-                过滤方块
-              </label>
-              <input
-                id="clone-filter"
-                className="input"
-                list="clone-filter-options"
-                value={clone.filter}
-                placeholder="minecraft:stone"
-                onChange={(event) => state.updateClone({ filter: event.target.value })}
-              />
-              <datalist id="clone-filter-options">
-                {blocks.map((id) => (
-                  <option key={id} value={id} />
-                ))}
-              </datalist>
+              <label className="field-label">过滤方块</label>
+              <div className="item-select">
+                <McIcon category="blocks" id={clone.filter} size={34} />
+                <div className="item-main">
+                  <div className="item-name">
+                    {clone.filter ? mcName('blocks', clone.filter) : '未选择过滤方块'}
+                  </div>
+                  <div className="item-sub">{clone.filter || 'filtered 模式必须选择'}</div>
+                </div>
+                <button type="button" className="btn btn-sm" onClick={() => setPickerOpen(true)}>
+                  选择方块
+                </button>
+              </div>
             </div>
           ) : null}
 
@@ -155,6 +152,14 @@ export function CloneForm() {
           </div>
         </div>
       </div>
+
+      {pickerOpen ? (
+        <BlockPickerDialog
+          currentId={clone.filter}
+          onSelect={(block) => state.updateClone({ filter: block.id })}
+          onClose={() => setPickerOpen(false)}
+        />
+      ) : null}
     </div>
   )
 }
