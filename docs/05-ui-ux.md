@@ -208,6 +208,16 @@
 - 运算支持 `= += -= *= /= %= < > ><`。
 - 侧边栏预览：目标名、玩家、分数或运算表达式。
 
+## 3.17 particle 粒子效果
+
+![particle 表单](assets/particle-form.png)
+
+- 128 种粒子，中文名 / ID 搜索；粒子选择器统一使用粒子图标。
+- 参数类型可自动推断，也可手动切换：方块 / 红石尘 / 渐变 / 物品 / 药水颜色 / RGBA / 原始 SNBT。
+- 26.3 使用 SNBT 参数，例如 `minecraft:dust{color:[1,0.333,0.333],scale:2}`。
+- 方块/物品参数复用中文图标选择器。
+- 位置、ΔX/ΔY/ΔZ、speed、count、force、viewers 全部可视化。
+
 ## 4. 通用构建器
 
 ![通用构建器进入方式](assets/command-block.png)

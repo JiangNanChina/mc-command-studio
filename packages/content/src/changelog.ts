@@ -22,6 +22,42 @@ const REPO = 'https://github.com/JiangNanChina/mc-command-studio'
  */
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: '0.1.14',
+    date: '2026-10-26',
+    title: '可视化粒子 particle',
+    highlights: [
+      '128 种粒子中文名选择，支持粉尘/方块/物品/颜色/原始 SNBT 参数。',
+      '位置、扩散、速度、数量、force 与可见玩家全部可视化。'
+    ],
+    sections: [
+      {
+        type: 'added',
+        items: [
+          'particle 粒子选择器：128 种粒子、中文名、ID 搜索。',
+          'SNBT 参数：block/dust/dust_color_transition/item/color/rgba/raw。',
+          '位置、ΔXYZ、speed、count、force、viewers。'
+        ]
+      },
+      {
+        type: 'improved',
+        items: [
+          '按粒子类型自动推断参数并填充默认 SNBT。',
+          '方块/物品参数复用中文图标选择器。',
+          '单元测试 119 → 125；冒烟测试覆盖红石尘输出。'
+        ]
+      },
+      {
+        type: 'fixed',
+        items: ['无。']
+      },
+      {
+        type: 'known',
+        items: ['trail/vibration 等极复杂参数使用原始 SNBT 编辑。', '安装包尚未配置代码签名。']
+      }
+    ],
+    releaseUrl: `${REPO}/releases/tag/v0.1.14`
+  },
+  {
     version: '0.1.13',
     date: '2026-10-26',
     title: '可视化计分板 scoreboard',

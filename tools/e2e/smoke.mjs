@@ -302,6 +302,28 @@ async function main() {
   }
   await page.getByRole('button', { name: '创建并配置' }).click()
 
+  // particle 可视化（dust SNBT 参数）
+  await page.locator('.command-item', { hasText: '粒子效果' }).first().click()
+  await page.waitForSelector('#particle-mode', { timeout: 10_000 })
+  await page.waitForTimeout(300)
+  const particleOutput = await page.locator('.output-code .cm-content').innerText()
+  if (!particleOutput.includes('particle minecraft:flame ~ ~1 ~ 0 0 0 0 1 normal')) {
+    throw new Error(`particle 输出不符合预期：${particleOutput}`)
+  }
+  await page.getByRole('button', { name: '选择粒子' }).click()
+  await page.waitForSelector('.mc-grid', { timeout: 10_000 })
+  await page.locator('.modal input[placeholder*="粒子"]').fill('红石尘')
+  await page.waitForTimeout(300)
+  await page.locator('.mc-tile', { hasText: '红石尘' }).first().click()
+  await page.waitForSelector('#particle-scale', { timeout: 10_000 })
+  await page.fill('#particle-scale', '2')
+  await page.waitForTimeout(300)
+  const particleDust = await page.locator('.output-code .cm-content').innerText()
+  if (!particleDust.includes('particle minecraft:dust{color:[1,0.333,0.333],scale:2}')) {
+    throw new Error(`particle dust 输出不符合预期：${particleDust}`)
+  }
+  await page.screenshot({ path: join(ARTIFACTS, 'particle-form.png') })
+
   // scoreboard 可视化
   await page.locator('.command-item', { hasText: '记分板' }).first().click()
   await page.waitForSelector('#scoreboard-objective', { timeout: 10_000 })

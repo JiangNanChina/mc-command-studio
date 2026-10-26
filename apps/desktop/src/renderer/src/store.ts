@@ -9,6 +9,7 @@ import {
   buildGiveCommand,
   buildSetblockCommand,
   buildScoreboardCommand,
+  buildParticleCommand,
   buildSoundCommand,
   buildSummonCommand,
   buildTeleportCommand,
@@ -26,6 +27,7 @@ import {
   createDefaultFillOptions,
   createDefaultGiveOptions,
   createDefaultScoreboardOptions,
+  createDefaultParticleOptions,
   createDefaultSetblockOptions,
   createDefaultSoundOptions,
   createDefaultSummonOptions,
@@ -56,6 +58,7 @@ import {
   type Position,
   type Selector,
   type ScoreboardOptions,
+  type ParticleOptions,
   type SetblockMode,
   type SetblockOptions,
   type SoundOptions,
@@ -131,6 +134,7 @@ export interface ProjectPayload {
   sound: SoundOptions
   bossbar: BossbarOptions
   scoreboard: ScoreboardOptions
+  particle: ParticleOptions
   datapack: DatapackDraft
   generic: GenericDraft
   commandBlock: CommandBlockOptions
@@ -171,6 +175,7 @@ interface AppStore {
   sound: SoundOptions
   bossbar: BossbarOptions
   scoreboard: ScoreboardOptions
+  particle: ParticleOptions
   datapack: DatapackDraft
   generic: GenericDraft
   commandBlock: CommandBlockOptions
@@ -223,6 +228,7 @@ interface AppStore {
   updateSound: (patch: Partial<SoundOptions>) => void
   updateBossbar: (patch: Partial<BossbarOptions>) => void
   updateScoreboard: (patch: Partial<ScoreboardOptions>) => void
+  updateParticle: (patch: Partial<ParticleOptions>) => void
   openDatapack: () => void
   updateDatapackMeta: (patch: Partial<Pick<DatapackDraft, 'namespace' | 'description'>>) => void
   addDatapackFunction: () => void
@@ -739,6 +745,49 @@ function normalizeScoreboard(input: Partial<ScoreboardOptions> | undefined): Sco
   }
 }
 
+function normalizeParticle(input: Partial<ParticleOptions> | undefined): ParticleOptions {
+  const fallback = createDefaultParticleOptions()
+  if (!input) return fallback
+  const modes: ParticleOptions['optionMode'][] = [
+    'auto',
+    'none',
+    'block',
+    'dust',
+    'dust_transition',
+    'item',
+    'color',
+    'rgba',
+    'raw'
+  ]
+  return {
+    particle: typeof input.particle === 'string' ? input.particle : fallback.particle,
+    optionMode: modes.includes(input.optionMode as ParticleOptions['optionMode'])
+      ? (input.optionMode as ParticleOptions['optionMode'])
+      : 'auto',
+    block: typeof input.block === 'string' ? input.block : fallback.block,
+    dustColor: typeof input.dustColor === 'string' ? input.dustColor : fallback.dustColor,
+    fromColor: typeof input.fromColor === 'string' ? input.fromColor : fallback.fromColor,
+    toColor: typeof input.toColor === 'string' ? input.toColor : fallback.toColor,
+    scale: typeof input.scale === 'string' ? input.scale : fallback.scale,
+    item: typeof input.item === 'string' ? input.item : fallback.item,
+    effectColor:
+      typeof input.effectColor === 'string' ? input.effectColor : fallback.effectColor,
+    alpha: typeof input.alpha === 'string' ? input.alpha : fallback.alpha,
+    power: typeof input.power === 'string' ? input.power : fallback.power,
+    rawOptions:
+      typeof input.rawOptions === 'string' ? input.rawOptions : fallback.rawOptions,
+    position: normalizePosition(input.position),
+    deltaX: typeof input.deltaX === 'string' ? input.deltaX : fallback.deltaX,
+    deltaY: typeof input.deltaY === 'string' ? input.deltaY : fallback.deltaY,
+    deltaZ: typeof input.deltaZ === 'string' ? input.deltaZ : fallback.deltaZ,
+    speed: typeof input.speed === 'string' ? input.speed : fallback.speed,
+    count: typeof input.count === 'string' ? input.count : fallback.count,
+    force: Boolean(input.force),
+    viewersEnabled: Boolean(input.viewersEnabled),
+    viewers: input.viewers?.base ? input.viewers : fallback.viewers
+  }
+}
+
 function normalizeGive(input: Partial<GiveOptions> | undefined): GiveOptions {
   const fallback = createDefaultGiveOptions()
   if (!input) return fallback
@@ -778,6 +827,7 @@ function normalizePayload(input: unknown): ProjectPayload {
     sound: normalizeSound(data.sound),
     bossbar: normalizeBossbar(data.bossbar),
     scoreboard: normalizeScoreboard(data.scoreboard),
+    particle: normalizeParticle(data.particle),
     datapack: normalizeDatapack(data.datapack),
     generic:
       data.generic && Array.isArray(data.generic.steps)
@@ -815,6 +865,7 @@ function documentSnapshot(state: AppStore): string {
     sound: state.sound,
     bossbar: state.bossbar,
     scoreboard: state.scoreboard,
+    particle: state.particle,
     datapack: state.datapack,
     generic: state.generic,
     commandBlock: state.commandBlock
@@ -866,6 +917,7 @@ export const useAppStore = create<AppStore>()(
     sound: createDefaultSoundOptions(),
     bossbar: createDefaultBossbarOptions(),
     scoreboard: createDefaultScoreboardOptions(),
+    particle: createDefaultParticleOptions(),
     datapack: defaultDatapackDraft(),
     generic: emptyGeneric(),
     commandBlock: createDefaultCommandBlockOptions(),
@@ -1195,6 +1247,13 @@ export const useAppStore = create<AppStore>()(
       })
     },
 
+    updateParticle: (patch) => {
+      set((state) => {
+        state.particle = { ...state.particle, ...patch }
+        state.dirty = true
+      })
+    },
+
     openDatapack: () => {
       set((state) => {
         state.activeCommandId = 'datapack'
@@ -1481,6 +1540,7 @@ export const useAppStore = create<AppStore>()(
         state.sound = createDefaultSoundOptions()
         state.bossbar = createDefaultBossbarOptions()
         state.scoreboard = createDefaultScoreboardOptions()
+        state.particle = createDefaultParticleOptions()
         state.datapack = defaultDatapackDraft()
         state.generic = emptyGeneric()
         state.commandBlock = createDefaultCommandBlockOptions()
@@ -1522,6 +1582,7 @@ export const useAppStore = create<AppStore>()(
         sound: state.sound,
         bossbar: state.bossbar,
         scoreboard: state.scoreboard,
+        particle: state.particle,
         datapack: state.datapack,
         generic: state.generic,
         commandBlock: state.commandBlock,
@@ -1559,6 +1620,7 @@ export const useAppStore = create<AppStore>()(
         state.sound = payload.sound
         state.bossbar = payload.bossbar
         state.scoreboard = payload.scoreboard
+        state.particle = payload.particle
         state.datapack = payload.datapack
         state.generic = payload.generic
         state.commandBlock = payload.commandBlock
@@ -1830,4 +1892,8 @@ export function selectBossbarOutput(bossbar: BossbarOptions): BuildResult {
 
 export function selectScoreboardOutput(scoreboard: ScoreboardOptions): BuildResult {
   return buildScoreboardCommand(scoreboard)
+}
+
+export function selectParticleOutput(particle: ParticleOptions): BuildResult {
+  return buildParticleCommand(particle)
 }

@@ -32,7 +32,7 @@
 
 - 26.3 数据包：94 根命令、1,197 字面量、59 参数类型、1,658 物品、1,286 方块。
 - 数据包工作区：独立于命令编辑，多函数管理、load/tick 标签、文件预览与 zip 导出。
-- 专用表单：`give`、`summon`、`setblock`、`execute`、`tp`、`effect`、`fill`、`clone`、`enchant`、`xp`、`tellraw`、`title`、`playsound`、`stopsound`、`bossbar`、`scoreboard`；`setblock` 支持方块状态与方块实体 NBT。
+- 专用表单：`give`、`summon`、`setblock`、`execute`、`tp`、`effect`、`fill`、`clone`、`enchant`、`xp`、`tellraw`、`title`、`playsound`、`stopsound`、`bossbar`、`scoreboard`、`particle`；`setblock` 支持方块状态与方块实体 NBT。
 - 可视化资源库：26.3 官方中文名称与图标，物品/方块/效果/附魔/实体/声音统一为图标网格选择，支持中文名搜索。
 - 富文本可视化：tellraw/title 多段文本、颜色、样式、点击/悬停、标题时序、实时预览。
 - 声音可视化：1,991 个声音、来源、目标、坐标、音量/音调/最小音量、stopsound 三种停止范围。
@@ -50,7 +50,7 @@
 - 项目保存 / 打开 / 自动保存 / 崩溃恢复；最近项目。
 - 深色/浅色主题、设置、诊断导出、本地日志。
 - NSIS 安装包 + 便携版；electron-updater 自动更新与发布流水线。
-- 单元测试 119 个；Electron 冒烟测试覆盖公告、give/导入/summon/setblock/tp/effect/fill/clone/enchant/xp/tellraw/title/playsound/stopsound/bossbar/scoreboard/execute/命令方块链/数据包工作区/撤销重做/命令方块。
+- 单元测试 125 个；Electron 冒烟测试覆盖公告、give/导入/summon/setblock/tp/effect/fill/clone/enchant/xp/tellraw/title/playsound/stopsound/bossbar/particle/scoreboard/execute/命令方块链/数据包工作区/撤销重做/命令方块。
 
 ### P1（现代版 MVP）
 
@@ -96,6 +96,7 @@
 | 声音 playsound/stopsound | ✅ 1,991 声音 + 中文名/图标/来源/音量 |
 | BOSS 栏 bossbar | ✅ 创建/更新/移除 + 颜色/样式/数值/玩家 |
 | 计分板 scoreboard | ✅ 目标/显示位置/玩家分数/运算 |
+| 粒子 particle | ✅ 128 粒子 + SNBT 参数 + 扩散/速度/数量 |
 | 更新公告 / 版本历史 | ✅ 更新后首次启动横幅 + 顶栏铃铛 |
 | 命令方块链 | ✅ 2–64 个方块、方向偏移、整链输出 |
 | 数据包导出 | ✅ 独立工作区、多函数、load/tick |
@@ -104,7 +105,7 @@
 | 命令方块 setblock | ✅ 单块 + 命令方块链 |
 | 项目保存 / 自动保存 | ✅ JSON 文件 |
 | 安装包 / 便携版 | ✅ 未签名（见 08） |
-| 自动更新 | ✅ 0.1.12 → 0.1.13 静默升级已实测；GitHub v0.1.13 Release 已发布 |
+| 自动更新 | ✅ 0.1.13 → 0.1.14 静默升级已实测；GitHub v0.1.14 Release 已发布 |
 | 1.12.2 / 1.13–1.20.4 | ❌ 仅设计 |
 | 单元体系 | ❌ P1 后续 |
 

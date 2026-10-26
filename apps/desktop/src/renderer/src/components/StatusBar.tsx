@@ -44,6 +44,7 @@ export function StatusBar() {
     state.sound,
     state.bossbar,
     state.scoreboard,
+    state.particle,
     state.generic,
     state.outputMode,
     state.commandBlock

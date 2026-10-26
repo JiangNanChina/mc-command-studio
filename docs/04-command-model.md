@@ -305,7 +305,38 @@ interface ScoreboardOptions {
 
 目标名限制 1–16 位字母/数字/下划线/点/连字符；分数必须是整数。`objective-display` 允许目标名为空以清除显示。`players-operation` 生成 `<op>` 及来源玩家/来源目标。
 
-### 1.18 通用构建器：所有 94 个根命令
+### 1.18 专用表单：`particle`
+
+```ts
+interface ParticleOptions {
+  particle: string
+  optionMode: 'auto' | 'none' | 'block' | 'dust' | 'dust_transition'
+    | 'item' | 'color' | 'rgba' | 'raw'
+  block: string
+  dustColor: string
+  fromColor: string
+  toColor: string
+  scale: string
+  item: string
+  effectColor: string
+  alpha: string
+  power: string
+  rawOptions: string
+  position: Position
+  deltaX: string
+  deltaY: string
+  deltaZ: string
+  speed: string
+  count: string
+  force: boolean
+  viewersEnabled: boolean
+  viewers: Selector
+}
+```
+
+26.3 使用 SNBT 参数：`particle minecraft:dust{color:[1,0,0],scale:1} ...`。按粒子类型自动推断 `block/dust/dust_transition/item/color/rgba/raw`；`trail`、`vibration`、`sculk_charge`、`shriek` 提供默认 SNBT，可继续原始编辑。
+
+### 1.19 通用构建器：所有 94 个根命令
 
 ```ts
 interface GenericStep {
@@ -438,7 +469,7 @@ type Unit =
 
 ## 7. 测试
 
-`packages/core/src/*.test.ts` 与 `apps/desktop/src/shared/*.test.ts` 共 119 个用例，覆盖：
+`packages/core/src/*.test.ts` 与 `apps/desktop/src/shared/*.test.ts` 共 125 个用例，覆盖：
 
 - SNBT / 命令方块字符串转义。
 - 选择器排序、引号、范围、NBT 括号、分数。
@@ -459,6 +490,7 @@ type Unit =
 - `/playsound` 声音/来源/坐标/音量/音调；`/stopsound` 全部/来源/指定声音。
 - `/bossbar` 创建序列、更新跳过 add、移除、ID/最大值/当前值校验。
 - `/scoreboard` 目标增删/显示位置、玩家分数、查询、运算、目标名/分数校验。
+- `/particle` 无参数/方块/红石尘/渐变/物品/RGBA/原始 SNBT、扩散/速度/数量/观察者。
 - 数据包文件树、load/tick 标签、多行函数、非法命名空间/函数名/空命令。
 - `/give` 文本导入：选择器、组件、数量、未知组件 raw。
 - 命令树遍历、通用路径、参数范围。

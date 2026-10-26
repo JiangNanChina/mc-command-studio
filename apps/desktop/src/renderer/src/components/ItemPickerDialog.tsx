@@ -8,11 +8,18 @@ import { useAppStore } from '../store'
 
 const LIMIT = 320
 
-export function ItemPickerDialog() {
+interface ItemPickerDialogProps {
+  onSelect?: (id: string) => void
+  currentId?: string
+  onClose?: () => void
+}
+
+export function ItemPickerDialog({ onSelect, currentId, onClose }: ItemPickerDialogProps = {}) {
   const state = useAppStore()
   const [query, setQuery] = useState('')
   const [manual, setManual] = useState('')
   const allItems = state.pack?.registries.item ?? []
+  const close = onClose ?? (() => state.setDialog('itemPicker', false))
 
   const items = useMemo(() => {
     const normalized = query.trim().toLowerCase()
@@ -29,8 +36,9 @@ export function ItemPickerDialog() {
   }, [allItems, query])
 
   const choose = (id: string): void => {
-    state.setItemId(id)
-    state.setDialog('itemPicker', false)
+    if (onSelect) onSelect(id)
+    else state.setItemId(id)
+    close()
   }
 
   return (
@@ -38,12 +46,12 @@ export function ItemPickerDialog() {
       title="选择物品"
       subtitle={`当前版本共 ${allItems.length} 个物品；支持中文名 / ID 搜索，也可以手动输入模组物品。`}
       icon={<Package size={17} />}
-      onClose={() => state.setDialog('itemPicker', false)}
+      onClose={close}
       wide
       footer={
         <>
-          <div className="left">已选择：{mcName('items', state.give.item.id)}</div>
-          <button type="button" className="btn" onClick={() => state.setDialog('itemPicker', false)}>
+          <div className="left">已选择：{mcName('items', currentId ?? state.give.item.id)}</div>
+          <button type="button" className="btn" onClick={close}>
             取消
           </button>
         </>

@@ -1924,6 +1924,40 @@ a {
   line-height: 1.6;
 }
 
+/* ---------- Particle ---------- */
+.particle-glyph {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--panel);
+  color: #c792ea;
+}
+
+.particle-glyph.big {
+  width: 38px;
+  height: 38px;
+}
+
+.color-input {
+  width: 100%;
+  height: 34px;
+  padding: 2px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--panel);
+  cursor: pointer;
+}
+
+.particle-raw {
+  min-height: 90px;
+  font-family: var(--mono);
+  font-size: 12px;
+}
+
 /* ---------- Scoreboard ---------- */
 .seg-label {
   margin-bottom: 6px;

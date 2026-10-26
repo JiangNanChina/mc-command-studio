@@ -14,6 +14,7 @@ import {
   type GiveOptions,
   type SetblockOptions,
   type ScoreboardOptions,
+  type ParticleOptions,
   type SoundOptions,
   type SummonOptions,
   type TeleportOptions,
@@ -34,6 +35,7 @@ import {
   selectGiveOutput,
   selectSetblockOutput,
   selectScoreboardOutput,
+  selectParticleOutput,
   selectSoundOutput,
   selectSummonOutput,
   selectTellrawOutput,
@@ -70,6 +72,7 @@ export function getCommandOutput(
   sound: SoundOptions,
   bossbar: BossbarOptions,
   scoreboard: ScoreboardOptions,
+  particle: ParticleOptions,
   generic: GenericDraft
 ): BuildResult {
   if (!activeCommandId) return { text: '', diagnostics: [] }
@@ -88,6 +91,7 @@ export function getCommandOutput(
   if (activeCommandId === 'title') return selectTitleOutput(title)
   if (activeCommandId === 'bossbar') return selectBossbarOutput(bossbar)
   if (activeCommandId === 'scoreboard') return selectScoreboardOutput(scoreboard)
+  if (activeCommandId === 'particle') return selectParticleOutput(particle)
   if (activeCommandId === 'playsound' || activeCommandId === 'stopsound') {
     return selectSoundOutput(sound)
   }
@@ -114,6 +118,7 @@ export function getCurrentOutput(
   sound: SoundOptions,
   bossbar: BossbarOptions,
   scoreboard: ScoreboardOptions,
+  particle: ParticleOptions,
   generic: GenericDraft,
   outputMode: OutputMode,
   commandBlock: CommandBlockOptions
@@ -137,6 +142,7 @@ export function getCurrentOutput(
     sound,
     bossbar,
     scoreboard,
+    particle,
     generic
   )
   if (outputMode === 'command') {
