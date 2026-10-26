@@ -10,6 +10,9 @@ import { GiveForm } from './components/GiveForm'
 import { SummonForm } from './components/SummonForm'
 import { SetblockForm } from './components/SetblockForm'
 import { ExecuteForm } from './components/ExecuteForm'
+import { TeleportForm } from './components/TeleportForm'
+import { EffectForm } from './components/EffectForm'
+import { FillForm } from './components/FillForm'
 import { GenericBuilder } from './components/GenericBuilder'
 import { OutputPanel } from './components/OutputPanel'
 import { StatusBar } from './components/StatusBar'
@@ -96,6 +99,9 @@ export default function App() {
   const summon = state.summon
   const setblock = state.setblock
   const execute = state.execute
+  const teleport = state.teleport
+  const effect = state.effect
+  const fill = state.fill
   const generic = state.generic
   const commandBlock = state.commandBlock
   const outputMode = state.outputMode
@@ -173,6 +179,9 @@ export default function App() {
           store.summon,
           store.setblock,
           store.execute,
+          store.teleport,
+          store.effect,
+          store.fill,
           store.generic,
           store.outputMode,
           store.commandBlock
@@ -201,7 +210,7 @@ export default function App() {
       void useAppStore.getState().autosave()
     }, 4000)
     return () => clearTimeout(timer)
-  }, [dirty, give, summon, setblock, execute, generic, commandBlock, outputMode, activeCommandId, projectName])
+  }, [dirty, give, summon, setblock, execute, teleport, effect, fill, generic, commandBlock, outputMode, activeCommandId, projectName])
 
   useEffect(() => {
     if (!toast) return
@@ -249,6 +258,12 @@ export default function App() {
             <SetblockForm />
           ) : activeCommandId === 'execute' ? (
             <ExecuteForm />
+          ) : activeCommandId === 'tp' ? (
+            <TeleportForm />
+          ) : activeCommandId === 'effect' ? (
+            <EffectForm />
+          ) : activeCommandId === 'fill' ? (
+            <FillForm />
           ) : (
             <GenericBuilder />
           )}

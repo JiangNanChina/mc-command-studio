@@ -22,6 +22,41 @@ const REPO = 'https://github.com/JiangNanChina/mc-command-studio'
  */
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: '0.1.4',
+    date: '2026-10-26',
+    title: '高频表单：tp / effect / fill',
+    highlights: [
+      '新增 tp、effect、fill 三个专用表单，目标/坐标/方块不再手写。',
+      '抽出可复用坐标输入与选择器字段，表单体验保持一致。'
+    ],
+    sections: [
+      {
+        type: 'added',
+        items: [
+          'tp：传送到坐标或实体，可选偏航/俯仰。',
+          'effect：give/clear、状态效果补全、时长、等级、隐藏粒子。',
+          'fill：起止坐标、方块状态、6 种模式、replace 过滤方块。'
+        ]
+      },
+      {
+        type: 'improved',
+        items: [
+          '项目文件保存 tp/effect/fill 状态。',
+          '单元测试 77 → 86；冒烟测试覆盖三个新表单。'
+        ]
+      },
+      {
+        type: 'fixed',
+        items: ['无。']
+      },
+      {
+        type: 'known',
+        items: ['tp 以实体为目标时不支持同时设置朝向。', '安装包尚未配置代码签名。']
+      }
+    ],
+    releaseUrl: `${REPO}/releases/tag/v0.1.4`
+  },
+  {
     version: '0.1.3',
     date: '2026-10-26',
     title: 'execute 执行链与数据包导出',

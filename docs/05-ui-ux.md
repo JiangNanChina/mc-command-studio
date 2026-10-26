@@ -82,6 +82,33 @@
 - 用当前 26.3 数据包的 `pack_format=121`；导出为 `.zip`，可直接放进世界 `datapacks/`。
 - 弹窗底部提示 `/reload` 与 `/function <ns>:<name>` 的用法。
 
+## 3.5 tp 传送表单
+
+![tp 表单](assets/tp-form.png)
+
+- “传送谁”选择器；支持玩家、实体、标签等。
+- 目的地切换：坐标 / 实体。坐标模式为 X/Y/Z 三连框；实体模式复用选择器。
+- “同时设置朝向”勾选后出现偏航/俯仰输入，生成 `tp @s ~ ~ ~ 90 0`。
+- 实体目的地不支持朝向，界面会提示。
+
+## 3.6 effect 状态效果
+
+![effect 表单](assets/effect-form.png)
+
+- 给予 / 移除模式切换。
+- 40 个状态效果补全 + 快捷效果（speed/slowness/strength/regeneration/night_vision）。
+- 给予模式可填持续秒数、等级（0 = I）、隐藏粒子。
+- 移除模式可留空效果 ID 以清除全部效果。
+
+## 3.7 fill 填充区域
+
+![fill 表单](assets/fill-form.png)
+
+- 起点/终点各三个坐标框，支持相对坐标。
+- 方块 ID 补全（1,286 个）+ 快捷方块；支持方块状态。
+- 模式：replace/destroy/hollow/keep/outline/strict。
+- replace 模式可填过滤方块；其他模式会忽略并提示。
+
 ## 4. 通用构建器
 
 ![通用构建器进入方式](assets/command-block.png)

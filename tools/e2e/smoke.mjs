@@ -154,6 +154,41 @@ async function main() {
   })
   await page.screenshot({ path: join(ARTIFACTS, 'setblock-form.png') })
 
+  // tp 专用表单
+  await page.locator('.command-item', { hasText: '传送' }).first().click()
+  await page.locator('.hero-id', { hasText: 'tp' }).waitFor({ timeout: 10_000 })
+  await page.waitForTimeout(300)
+  let tpOutput = await page.locator('.output-code .cm-content').innerText()
+  if (!tpOutput.includes('tp @s')) throw new Error(`tp 输出不符合预期：${tpOutput}`)
+  await page.locator('.checkline', { hasText: '同时设置朝向' }).locator('input').check()
+  await page.waitForSelector('#tp-yaw', { timeout: 10_000 })
+  await page.waitForTimeout(300)
+  tpOutput = await page.locator('.output-code .cm-content').innerText()
+  if (!tpOutput.includes('tp @s ~ ~ ~ 0 0')) {
+    throw new Error(`tp 朝向输出不符合预期：${tpOutput}`)
+  }
+  await page.screenshot({ path: join(ARTIFACTS, 'tp-form.png') })
+
+  // effect 专用表单
+  await page.locator('.command-item', { hasText: '状态效果' }).first().click()
+  await page.waitForSelector('#effect-id', { timeout: 10_000 })
+  await page.waitForTimeout(300)
+  const effectOutput = await page.locator('.output-code .cm-content').innerText()
+  if (!effectOutput.includes('effect give @s minecraft:speed 30 0')) {
+    throw new Error(`effect 输出不符合预期：${effectOutput}`)
+  }
+  await page.screenshot({ path: join(ARTIFACTS, 'effect-form.png') })
+
+  // fill 专用表单
+  await page.locator('.command-item', { hasText: '填充区域' }).first().click()
+  await page.waitForSelector('#fill-block', { timeout: 10_000 })
+  await page.waitForTimeout(300)
+  const fillOutput = await page.locator('.output-code .cm-content').innerText()
+  if (!fillOutput.includes('fill ~ ~ ~ ~2 ~2 ~2 minecraft:stone')) {
+    throw new Error(`fill 输出不符合预期：${fillOutput}`)
+  }
+  await page.screenshot({ path: join(ARTIFACTS, 'fill-form.png') })
+
   // execute 执行链
   await page.locator('.command-item', { hasText: '执行上下文' }).first().click()
   await page.waitForSelector('#execute-run', { timeout: 10_000 })

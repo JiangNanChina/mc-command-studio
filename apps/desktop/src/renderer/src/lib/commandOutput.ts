@@ -4,18 +4,24 @@ import {
   type BuildResult,
   type CommandBlockOptions,
   type Diagnostic,
+  type EffectOptions,
   type ExecuteOptions,
+  type FillOptions,
   type GiveOptions,
   type SetblockOptions,
   type SummonOptions,
+  type TeleportOptions,
   type VersionPack
 } from '@mcstudio/core'
 import {
+  selectEffectOutput,
   selectExecuteOutput,
+  selectFillOutput,
   selectGenericOutput,
   selectGiveOutput,
   selectSetblockOutput,
   selectSummonOutput,
+  selectTeleportOutput,
   type GenericDraft,
   type OutputMode
 } from '../store'
@@ -34,6 +40,9 @@ export function getCommandOutput(
   summon: SummonOptions,
   setblock: SetblockOptions,
   execute: ExecuteOptions,
+  teleport: TeleportOptions,
+  effect: EffectOptions,
+  fill: FillOptions,
   generic: GenericDraft
 ): BuildResult {
   if (!activeCommandId) return { text: '', diagnostics: [] }
@@ -41,6 +50,9 @@ export function getCommandOutput(
   if (activeCommandId === 'summon') return selectSummonOutput(summon)
   if (activeCommandId === 'setblock') return selectSetblockOutput(setblock)
   if (activeCommandId === 'execute') return selectExecuteOutput(execute)
+  if (activeCommandId === 'tp') return selectTeleportOutput(teleport)
+  if (activeCommandId === 'effect') return selectEffectOutput(effect)
+  if (activeCommandId === 'fill') return selectFillOutput(fill)
   if (!pack) return { text: '', diagnostics: [] }
   return selectGenericOutput(pack, { ...generic, root: generic.root ?? activeCommandId })
 }
@@ -52,11 +64,25 @@ export function getCurrentOutput(
   summon: SummonOptions,
   setblock: SetblockOptions,
   execute: ExecuteOptions,
+  teleport: TeleportOptions,
+  effect: EffectOptions,
+  fill: FillOptions,
   generic: GenericDraft,
   outputMode: OutputMode,
   commandBlock: CommandBlockOptions
 ): CurrentOutput {
-  const command = getCommandOutput(pack, activeCommandId, give, summon, setblock, execute, generic)
+  const command = getCommandOutput(
+    pack,
+    activeCommandId,
+    give,
+    summon,
+    setblock,
+    execute,
+    teleport,
+    effect,
+    fill,
+    generic
+  )
   if (outputMode === 'command') {
     return {
       command,

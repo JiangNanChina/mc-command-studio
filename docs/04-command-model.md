@@ -87,7 +87,52 @@ data/minecraft/tags/function/tick.json   # 可选
 
 `pack_format` 直接取自数据包 manifest（26.3 为 121）。命名空间/函数名做小写资源名校验；函数内容不允许换行。主进程用 JSZip 打包，默认保存到“文档”目录。
 
-### 1.6 通用构建器：所有 94 个根命令
+### 1.6 专用表单：`tp`
+
+```ts
+interface TeleportOptions {
+  target: Selector
+  destination:
+    | { mode: 'position'; position: Position }
+    | { mode: 'entity'; target: Selector }
+  rotate: boolean
+  yaw: string
+  pitch: string
+}
+```
+
+`buildTeleportCommand` 生成 `tp <target> <pos|entity> [yaw pitch]`；实体目的地忽略朝向并给出警告。
+
+### 1.7 专用表单：`effect`
+
+```ts
+interface EffectOptions {
+  action: 'give' | 'clear'
+  target: Selector
+  effect: string
+  duration: string
+  amplifier: string
+  hideParticles: boolean
+}
+```
+
+`give` 生成 `effect give <target> <effect> [duration] [amplifier] [true]`；`clear` 生成 `effect clear <target> [effect]`。时长 1–1,000,000 秒，等级 0–255。
+
+### 1.8 专用表单：`fill`
+
+```ts
+interface FillOptions {
+  from: Position
+  to: Position
+  block: string
+  mode: 'replace' | 'destroy' | 'hollow' | 'keep' | 'outline' | 'strict'
+  filter: string
+}
+```
+
+`replace` 模式可追加 `replace <filter>`；其他模式追加模式名，过滤方块给出“已忽略”警告。
+
+### 1.9 通用构建器：所有 94 个根命令
 
 ```ts
 interface GenericStep {
@@ -220,7 +265,7 @@ type Unit =
 
 ## 7. 测试
 
-`packages/core/src/*.test.ts` 与 `apps/desktop/src/shared/*.test.ts` 共 77 个用例，覆盖：
+`packages/core/src/*.test.ts` 与 `apps/desktop/src/shared/*.test.ts` 共 86 个用例，覆盖：
 
 - SNBT / 命令方块字符串转义。
 - 选择器排序、引号、范围、NBT 括号、分数。
@@ -229,6 +274,9 @@ type Unit =
 - `/summon` 坐标开关、NBT、未启用坐标的警告。
 - `/setblock` 方块状态、NBT 紧贴、模式、坐标/属性校验。
 - `/execute` 子命令顺序、if/unless 条件、score/store、raw 与缺失 run。
+- `/tp` 坐标/实体目的地、朝向、实体朝向警告。
+- `/effect` give/clear、时长/等级/隐藏粒子、非法数值。
+- `/fill` 模式、replace 过滤、非法方块与忽略过滤警告。
 - 数据包文件树、load/tick 标签、非法命名空间/函数名/换行命令。
 - `/give` 文本导入：选择器、组件、数量、未知组件 raw。
 - 命令树遍历、通用路径、参数范围。

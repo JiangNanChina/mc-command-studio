@@ -1,13 +1,19 @@
 import {
+  buildEffectCommand,
   buildExecuteCommand,
+  buildFillCommand,
   buildGiveCommand,
   buildSetblockCommand,
   buildSummonCommand,
+  buildTeleportCommand,
   createDefaultCommandBlockOptions,
+  createDefaultEffectOptions,
   createDefaultExecuteOptions,
+  createDefaultFillOptions,
   createDefaultGiveOptions,
   createDefaultSetblockOptions,
   createDefaultSummonOptions,
+  createDefaultTeleportOptions,
   createProjectFile,
   parseProjectFile,
   serializeGeneric,
@@ -15,8 +21,10 @@ import {
   type BuildResult,
   type CommandBlockOptions,
   type CommandNodeData,
+  type EffectOptions,
   type ExecuteClause,
   type ExecuteOptions,
+  type FillOptions,
   type GenericStep,
   type GiveOptions,
   type ItemComponent,
@@ -25,6 +33,8 @@ import {
   type SetblockMode,
   type SetblockOptions,
   type SummonOptions,
+  type TeleportDestination,
+  type TeleportOptions,
   type VersionPack
 } from '@mcstudio/core'
 import type { CommandCategory } from '@mcstudio/content'
@@ -52,6 +62,9 @@ export interface ProjectPayload {
   summon: SummonOptions
   setblock: SetblockOptions
   execute: ExecuteOptions
+  teleport: TeleportOptions
+  effect: EffectOptions
+  fill: FillOptions
   generic: GenericDraft
   commandBlock: CommandBlockOptions
   outputMode: OutputMode
@@ -79,6 +92,9 @@ interface AppStore {
   summon: SummonOptions
   setblock: SetblockOptions
   execute: ExecuteOptions
+  teleport: TeleportOptions
+  effect: EffectOptions
+  fill: FillOptions
   generic: GenericDraft
   commandBlock: CommandBlockOptions
   outputMode: OutputMode
@@ -117,6 +133,9 @@ interface AppStore {
   moveExecuteClause: (id: string, direction: -1 | 1) => void
   setExecuteRun: (run: string) => void
   setExecuteClauses: (clauses: ExecuteClause[]) => void
+  updateTeleport: (patch: Partial<TeleportOptions>) => void
+  updateEffect: (patch: Partial<EffectOptions>) => void
+  updateFill: (patch: Partial<FillOptions>) => void
   setGenericRoot: (root: string | null) => void
   pushGenericStep: (step: { name: string; value?: string }) => void
   popGenericStep: () => void
@@ -288,6 +307,55 @@ function normalizeExecute(input: Partial<ExecuteOptions> | undefined): ExecuteOp
   }
 }
 
+function normalizeTeleport(input: Partial<TeleportOptions> | undefined): TeleportOptions {
+  const fallback = createDefaultTeleportOptions()
+  if (!input) return fallback
+  const destination: TeleportDestination =
+    input.destination?.mode === 'entity' && input.destination.target?.base
+      ? { mode: 'entity', target: input.destination.target }
+      : {
+          mode: 'position',
+          position: normalizePosition(
+            input.destination?.mode === 'position' ? input.destination.position : undefined
+          )
+        }
+  return {
+    target: input.target?.base ? input.target : fallback.target,
+    destination,
+    rotate: Boolean(input.rotate),
+    yaw: typeof input.yaw === 'string' ? input.yaw : fallback.yaw,
+    pitch: typeof input.pitch === 'string' ? input.pitch : fallback.pitch
+  }
+}
+
+function normalizeEffect(input: Partial<EffectOptions> | undefined): EffectOptions {
+  const fallback = createDefaultEffectOptions()
+  if (!input) return fallback
+  return {
+    action: input.action === 'clear' ? 'clear' : 'give',
+    target: input.target?.base ? input.target : fallback.target,
+    effect: typeof input.effect === 'string' ? input.effect : fallback.effect,
+    duration: typeof input.duration === 'string' ? input.duration : fallback.duration,
+    amplifier: typeof input.amplifier === 'string' ? input.amplifier : fallback.amplifier,
+    hideParticles: Boolean(input.hideParticles)
+  }
+}
+
+function normalizeFill(input: Partial<FillOptions> | undefined): FillOptions {
+  const fallback = createDefaultFillOptions()
+  if (!input) return fallback
+  const modes: FillOptions['mode'][] = ['replace', 'destroy', 'hollow', 'keep', 'outline', 'strict']
+  return {
+    from: normalizePosition(input.from),
+    to: normalizePosition(input.to),
+    block: typeof input.block === 'string' ? input.block : fallback.block,
+    mode: modes.includes(input.mode as FillOptions['mode'])
+      ? (input.mode as FillOptions['mode'])
+      : 'replace',
+    filter: typeof input.filter === 'string' ? input.filter : ''
+  }
+}
+
 function normalizeGive(input: Partial<GiveOptions> | undefined): GiveOptions {
   const fallback = createDefaultGiveOptions()
   if (!input) return fallback
@@ -315,6 +383,9 @@ function normalizePayload(input: unknown): ProjectPayload {
     summon: normalizeSummon(data.summon),
     setblock: normalizeSetblock(data.setblock),
     execute: normalizeExecute(data.execute),
+    teleport: normalizeTeleport(data.teleport),
+    effect: normalizeEffect(data.effect),
+    fill: normalizeFill(data.fill),
     generic:
       data.generic && Array.isArray(data.generic.steps)
         ? {
@@ -347,6 +418,9 @@ export const useAppStore = create<AppStore>()(
     summon: createDefaultSummonOptions(),
     setblock: createDefaultSetblockOptions(),
     execute: createDefaultExecuteOptions(),
+    teleport: createDefaultTeleportOptions(),
+    effect: createDefaultEffectOptions(),
+    fill: createDefaultFillOptions(),
     generic: emptyGeneric(),
     commandBlock: createDefaultCommandBlockOptions(),
     outputMode: 'command',
@@ -596,6 +670,27 @@ export const useAppStore = create<AppStore>()(
       })
     },
 
+    updateTeleport: (patch) => {
+      set((state) => {
+        state.teleport = { ...state.teleport, ...patch }
+        state.dirty = true
+      })
+    },
+
+    updateEffect: (patch) => {
+      set((state) => {
+        state.effect = { ...state.effect, ...patch }
+        state.dirty = true
+      })
+    },
+
+    updateFill: (patch) => {
+      set((state) => {
+        state.fill = { ...state.fill, ...patch }
+        state.dirty = true
+      })
+    },
+
     setGenericRoot: (root) => {
       set((state) => {
         state.generic = { root, steps: [] }
@@ -740,6 +835,9 @@ export const useAppStore = create<AppStore>()(
         state.summon = createDefaultSummonOptions()
         state.setblock = createDefaultSetblockOptions()
         state.execute = createDefaultExecuteOptions()
+        state.teleport = createDefaultTeleportOptions()
+        state.effect = createDefaultEffectOptions()
+        state.fill = createDefaultFillOptions()
         state.generic = emptyGeneric()
         state.commandBlock = createDefaultCommandBlockOptions()
         state.outputMode = 'command'
@@ -767,6 +865,9 @@ export const useAppStore = create<AppStore>()(
         summon: state.summon,
         setblock: state.setblock,
         execute: state.execute,
+        teleport: state.teleport,
+        effect: state.effect,
+        fill: state.fill,
         generic: state.generic,
         commandBlock: state.commandBlock,
         outputMode: state.outputMode
@@ -791,6 +892,9 @@ export const useAppStore = create<AppStore>()(
         state.summon = payload.summon
         state.setblock = payload.setblock
         state.execute = payload.execute
+        state.teleport = payload.teleport
+        state.effect = payload.effect
+        state.fill = payload.fill
         state.generic = payload.generic
         state.commandBlock = payload.commandBlock
         state.outputMode = payload.outputMode
@@ -971,4 +1075,16 @@ export function selectSetblockOutput(setblock: SetblockOptions): BuildResult {
 
 export function selectExecuteOutput(execute: ExecuteOptions): BuildResult {
   return buildExecuteCommand(execute)
+}
+
+export function selectTeleportOutput(teleport: TeleportOptions): BuildResult {
+  return buildTeleportCommand(teleport)
+}
+
+export function selectEffectOutput(effect: EffectOptions): BuildResult {
+  return buildEffectCommand(effect)
+}
+
+export function selectFillOutput(fill: FillOptions): BuildResult {
+  return buildFillCommand(fill)
 }

@@ -32,6 +32,9 @@ export function StatusBar() {
     state.summon,
     state.setblock,
     state.execute,
+    state.teleport,
+    state.effect,
+    state.fill,
     state.generic,
     state.outputMode,
     state.commandBlock
