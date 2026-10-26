@@ -1868,6 +1868,83 @@ a {
   margin-top: 3px;
 }
 
+/* ---------- Attribute ---------- */
+.attribute-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 8px;
+  max-height: 500px;
+  overflow-y: auto;
+}
+
+.attribute-tile {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  background: var(--panel);
+  color: var(--text);
+  text-align: left;
+}
+
+.attribute-tile:hover {
+  border-color: var(--border-strong);
+}
+
+.attribute-tile.active {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+
+.attribute-tile-name {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.attribute-tile-id {
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: 10.5px;
+}
+
+.attribute-selected {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  background: var(--panel);
+  color: var(--text);
+  text-align: left;
+}
+
+.attribute-selected:hover {
+  border-color: var(--border-strong);
+}
+
+.attribute-selected-main {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  min-width: 0;
+}
+
+.attribute-selected-name {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.attribute-selected-id {
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: 11px;
+}
+
 /* ---------- Team ---------- */
 .team-colors {
   display: flex;

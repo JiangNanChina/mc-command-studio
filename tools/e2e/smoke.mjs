@@ -537,6 +537,41 @@ async function main() {
     throw new Error(`forceload 移除全部输出不符合预期：${forceloadAll}`)
   }
 
+  // attribute 实体属性
+  await page.locator('.command-item', { hasText: '实体属性' }).first().click()
+  await page.waitForSelector('.attribute-selected', { timeout: 10_000 })
+  await page.waitForTimeout(300)
+  const attributeGet = await page.locator('.output-code .cm-content').innerText()
+  if (!attributeGet.includes('attribute @s minecraft:max_health get')) {
+    throw new Error(`attribute 查询输出不符合预期：${attributeGet}`)
+  }
+  await page.getByRole('button', { name: '设置基础值', exact: true }).click()
+  await page.fill('#attribute-value', '30')
+  await page.waitForTimeout(300)
+  const attributeSet = await page.locator('.output-code .cm-content').innerText()
+  if (!attributeSet.includes('attribute @s minecraft:max_health base set 30')) {
+    throw new Error(`attribute 设置输出不符合预期：${attributeSet}`)
+  }
+  await page.getByRole('button', { name: '添加修饰符', exact: true }).click()
+  await page.fill('#attribute-modifier-id', 'mcstudio:bonus')
+  await page.fill('#attribute-modifier-value', '5')
+  await page.waitForTimeout(300)
+  const attributeModifier = await page.locator('.output-code .cm-content').innerText()
+  if (!attributeModifier.includes('modifier add mcstudio:bonus 5 add_value')) {
+    throw new Error(`attribute 修饰符输出不符合预期：${attributeModifier}`)
+  }
+  await page.locator('.attribute-selected').click()
+  await page.waitForSelector('.attribute-grid', { timeout: 10_000 })
+  await page.locator('.modal input[placeholder*="属性"]').fill('movement_speed')
+  await page.waitForTimeout(300)
+  await page.locator('.attribute-tile', { hasText: 'minecraft:movement_speed' }).first().click()
+  await page.waitForTimeout(300)
+  const attributePick = await page.locator('.output-code .cm-content').innerText()
+  if (!attributePick.includes('minecraft:movement_speed')) {
+    throw new Error(`attribute 选择属性输出不符合预期：${attributePick}`)
+  }
+  await page.screenshot({ path: join(ARTIFACTS, 'attribute-form.png') })
+
   // scoreboard 可视化
   await page.locator('.command-item', { hasText: '记分板' }).first().click()
   await page.waitForSelector('#scoreboard-objective', { timeout: 10_000 })

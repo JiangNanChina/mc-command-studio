@@ -31,6 +31,7 @@ import { GameruleForm } from './components/GameruleForm'
 import { WorldborderForm } from './components/WorldborderForm'
 import { TeamForm } from './components/TeamForm'
 import { WorldSettingsForm } from './components/WorldSettingsForm'
+import { AttributeForm } from './components/AttributeForm'
 import { GenericBuilder } from './components/GenericBuilder'
 import { OutputPanel } from './components/OutputPanel'
 import { StatusBar } from './components/StatusBar'
@@ -139,6 +140,7 @@ export default function App() {
   const spawnpoint = state.spawnpoint
   const worldSpawn = state.worldSpawn
   const forceload = state.forceload
+  const attribute = state.attribute
   const generic = state.generic
   const commandBlock = state.commandBlock
   const outputMode = state.outputMode
@@ -264,6 +266,7 @@ export default function App() {
           store.spawnpoint,
           store.worldSpawn,
           store.forceload,
+          store.attribute,
           store.generic,
           store.outputMode,
           store.commandBlock
@@ -292,7 +295,7 @@ export default function App() {
       void useAppStore.getState().autosave()
     }, 4000)
     return () => clearTimeout(timer)
-  }, [dirty, give, summon, setblock, execute, teleport, effect, fill, clone, chain, enchant, xp, tellraw, title, sound, bossbar, scoreboard, particle, world, tag, clear, gamerule, worldborder, team, spawnpoint, worldSpawn, forceload, generic, commandBlock, outputMode, activeCommandId, projectName])
+  }, [dirty, give, summon, setblock, execute, teleport, effect, fill, clone, chain, enchant, xp, tellraw, title, sound, bossbar, scoreboard, particle, world, tag, clear, gamerule, worldborder, team, spawnpoint, worldSpawn, forceload, attribute, generic, commandBlock, outputMode, activeCommandId, projectName])
 
   useEffect(() => {
     if (!toast) return
@@ -386,6 +389,8 @@ export default function App() {
             activeCommandId === 'setworldspawn' ||
             activeCommandId === 'forceload' ? (
             <WorldSettingsForm />
+          ) : activeCommandId === 'attribute' ? (
+            <AttributeForm />
           ) : (
             <GenericBuilder />
           )}

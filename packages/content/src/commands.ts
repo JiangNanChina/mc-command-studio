@@ -40,6 +40,7 @@ export const COMMANDS: CommandMeta[] = [
   { id: 'rotate', name: '旋转实体', category: '实体', description: '直接设置实体的朝向（偏航与俯仰）。', example: 'rotate @s 90 0' },
   { id: 'tag', name: '实体标签', category: '实体', description: '给实体添加或移除标签，用选择器批量筛选。', example: 'tag @s add vip' },
   { id: 'team', name: '队伍', category: '实体', description: '创建队伍、设置颜色与友伤规则，并管理成员。', example: 'team add red' },
+  { id: 'attribute', name: '实体属性', category: '实体', description: '查询或设置实体属性，管理加算/乘算修饰符。', example: 'attribute @s minecraft:max_health get' },
   { id: 'test', name: '游戏测试', category: '实体', description: '运行或管理内置的游戏测试实例。' },
 
   { id: 'time', name: '时间', category: '世界', description: '设置或推进世界时间（白天、夜晚、正午等）。', example: 'time set day' },

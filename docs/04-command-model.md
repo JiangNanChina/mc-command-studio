@@ -425,7 +425,26 @@ interface ForceloadOptions {
 
 出生点坐标使用 block_pos，朝向可选 yaw/pitch；forceload 使用整数区块坐标，支持单区块与矩形区域，`remove all` 单独生成。三个命令共用页面，标签切换。
 
-### 1.25 通用构建器：所有 94 个根命令
+### 1.25 实体属性：`attribute`
+
+```ts
+interface AttributeOptions {
+  action: 'get' | 'base-get' | 'base-set' | 'base-reset'
+    | 'modifier-add' | 'modifier-remove' | 'modifier-value'
+  target: Selector
+  attribute: string
+  value: string
+  scaleEnabled: boolean
+  scale: string
+  modifierId: string
+  modifierValue: string
+  operation: 'add_value' | 'add_multiplied_base' | 'add_multiplied_total'
+}
+```
+
+40 个属性来自 26.3 注册表与官方中文名。属性/修饰符 ID 做 `namespace:path` 校验；基础值、修饰符值、scale 做数字校验。
+
+### 1.26 通用构建器：所有 94 个根命令
 
 ```ts
 interface GenericStep {
@@ -558,7 +577,7 @@ type Unit =
 
 ## 7. 测试
 
-`packages/core/src/*.test.ts` 与 `apps/desktop/src/shared/*.test.ts` 共 149 个用例，覆盖：
+`packages/core/src/*.test.ts` 与 `apps/desktop/src/shared/*.test.ts` 共 153 个用例，覆盖：
 
 - SNBT / 命令方块字符串转义。
 - 选择器排序、引号、范围、NBT 括号、分数。
@@ -586,6 +605,7 @@ type Unit =
 - `/worldborder` 尺寸/过渡/中心/伤害/警告/查询、数值与时间校验。
 - `/team` 创建/修改/加入/离开/删除/查询、颜色/友伤/可见性/碰撞、队伍名校验。
 - `/spawnpoint`/`/setworldspawn` 坐标与朝向；`/forceload` 单区块/矩形/全部移除/查询。
+- `/attribute` 总值/基础值/修饰符增删与查询、ID/数值校验。
 - 数据包文件树、load/tick 标签、多行函数、非法命名空间/函数名/空命令。
 - `/give` 文本导入：选择器、组件、数量、未知组件 raw。
 - 命令树遍历、通用路径、参数范围。

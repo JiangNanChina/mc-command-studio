@@ -21,6 +21,7 @@ import {
   buildSpawnpointCommand,
   buildWorldSpawnCommand,
   buildForceloadCommand,
+  buildAttributeCommand,
   buildSoundCommand,
   buildSummonCommand,
   buildTeleportCommand,
@@ -48,6 +49,7 @@ import {
   createDefaultSpawnpointOptions,
   createDefaultWorldSpawnOptions,
   createDefaultForceloadOptions,
+  createDefaultAttributeOptions,
   createDefaultSetblockOptions,
   createDefaultSoundOptions,
   createDefaultSummonOptions,
@@ -88,6 +90,7 @@ import {
   type SpawnpointOptions,
   type WorldSpawnOptions,
   type ForceloadOptions,
+  type AttributeOptions,
   type TimeOptions,
   type SetblockMode,
   type SetblockOptions,
@@ -174,6 +177,7 @@ export interface ProjectPayload {
   spawnpoint: SpawnpointOptions
   worldSpawn: WorldSpawnOptions
   forceload: ForceloadOptions
+  attribute: AttributeOptions
   datapack: DatapackDraft
   generic: GenericDraft
   commandBlock: CommandBlockOptions
@@ -224,6 +228,7 @@ interface AppStore {
   spawnpoint: SpawnpointOptions
   worldSpawn: WorldSpawnOptions
   forceload: ForceloadOptions
+  attribute: AttributeOptions
   datapack: DatapackDraft
   generic: GenericDraft
   commandBlock: CommandBlockOptions
@@ -288,6 +293,7 @@ interface AppStore {
   updateSpawnpoint: (patch: Partial<SpawnpointOptions>) => void
   updateWorldSpawn: (patch: Partial<WorldSpawnOptions>) => void
   updateForceload: (patch: Partial<ForceloadOptions>) => void
+  updateAttribute: (patch: Partial<AttributeOptions>) => void
   openDatapack: () => void
   updateDatapackMeta: (patch: Partial<Pick<DatapackDraft, 'namespace' | 'description'>>) => void
   addDatapackFunction: () => void
@@ -1068,6 +1074,42 @@ function normalizeForceload(input: Partial<ForceloadOptions> | undefined): Force
   }
 }
 
+function normalizeAttribute(input: Partial<AttributeOptions> | undefined): AttributeOptions {
+  const fallback = createDefaultAttributeOptions()
+  if (!input) return fallback
+  const actions: AttributeOptions['action'][] = [
+    'get',
+    'base-get',
+    'base-set',
+    'base-reset',
+    'modifier-add',
+    'modifier-remove',
+    'modifier-value'
+  ]
+  const operations: AttributeOptions['operation'][] = [
+    'add_value',
+    'add_multiplied_base',
+    'add_multiplied_total'
+  ]
+  return {
+    action: actions.includes(input.action as AttributeOptions['action'])
+      ? (input.action as AttributeOptions['action'])
+      : 'get',
+    target: input.target?.base ? input.target : fallback.target,
+    attribute: typeof input.attribute === 'string' ? input.attribute : fallback.attribute,
+    value: typeof input.value === 'string' ? input.value : fallback.value,
+    scaleEnabled: Boolean(input.scaleEnabled),
+    scale: typeof input.scale === 'string' ? input.scale : fallback.scale,
+    modifierId:
+      typeof input.modifierId === 'string' ? input.modifierId : fallback.modifierId,
+    modifierValue:
+      typeof input.modifierValue === 'string' ? input.modifierValue : fallback.modifierValue,
+    operation: operations.includes(input.operation as AttributeOptions['operation'])
+      ? (input.operation as AttributeOptions['operation'])
+      : 'add_value'
+  }
+}
+
 function normalizeGive(input: Partial<GiveOptions> | undefined): GiveOptions {
   const fallback = createDefaultGiveOptions()
   if (!input) return fallback
@@ -1117,6 +1159,7 @@ function normalizePayload(input: unknown): ProjectPayload {
     spawnpoint: normalizeSpawnpoint(data.spawnpoint),
     worldSpawn: normalizeWorldSpawn(data.worldSpawn),
     forceload: normalizeForceload(data.forceload),
+    attribute: normalizeAttribute(data.attribute),
     datapack: normalizeDatapack(data.datapack),
     generic:
       data.generic && Array.isArray(data.generic.steps)
@@ -1164,6 +1207,7 @@ function documentSnapshot(state: AppStore): string {
     spawnpoint: state.spawnpoint,
     worldSpawn: state.worldSpawn,
     forceload: state.forceload,
+    attribute: state.attribute,
     datapack: state.datapack,
     generic: state.generic,
     commandBlock: state.commandBlock
@@ -1225,6 +1269,7 @@ export const useAppStore = create<AppStore>()(
     spawnpoint: createDefaultSpawnpointOptions(),
     worldSpawn: createDefaultWorldSpawnOptions(),
     forceload: createDefaultForceloadOptions(),
+    attribute: createDefaultAttributeOptions(),
     datapack: defaultDatapackDraft(),
     generic: emptyGeneric(),
     commandBlock: createDefaultCommandBlockOptions(),
@@ -1638,6 +1683,13 @@ export const useAppStore = create<AppStore>()(
       })
     },
 
+    updateAttribute: (patch) => {
+      set((state) => {
+        state.attribute = { ...state.attribute, ...patch }
+        state.dirty = true
+      })
+    },
+
     openDatapack: () => {
       set((state) => {
         state.activeCommandId = 'datapack'
@@ -1934,6 +1986,7 @@ export const useAppStore = create<AppStore>()(
         state.spawnpoint = createDefaultSpawnpointOptions()
         state.worldSpawn = createDefaultWorldSpawnOptions()
         state.forceload = createDefaultForceloadOptions()
+        state.attribute = createDefaultAttributeOptions()
         state.datapack = defaultDatapackDraft()
         state.generic = emptyGeneric()
         state.commandBlock = createDefaultCommandBlockOptions()
@@ -1985,6 +2038,7 @@ export const useAppStore = create<AppStore>()(
         spawnpoint: state.spawnpoint,
         worldSpawn: state.worldSpawn,
         forceload: state.forceload,
+        attribute: state.attribute,
         datapack: state.datapack,
         generic: state.generic,
         commandBlock: state.commandBlock,
@@ -2032,6 +2086,7 @@ export const useAppStore = create<AppStore>()(
         state.spawnpoint = payload.spawnpoint
         state.worldSpawn = payload.worldSpawn
         state.forceload = payload.forceload
+        state.attribute = payload.attribute
         state.datapack = payload.datapack
         state.generic = payload.generic
         state.commandBlock = payload.commandBlock
@@ -2353,4 +2408,8 @@ export function selectWorldSpawnOutput(worldSpawn: WorldSpawnOptions): BuildResu
 
 export function selectForceloadOutput(forceload: ForceloadOptions): BuildResult {
   return buildForceloadCommand(forceload)
+}
+
+export function selectAttributeOutput(attribute: AttributeOptions): BuildResult {
+  return buildAttributeCommand(attribute)
 }

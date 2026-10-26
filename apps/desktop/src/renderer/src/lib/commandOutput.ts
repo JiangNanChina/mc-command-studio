@@ -24,6 +24,7 @@ import {
   type SpawnpointOptions,
   type WorldSpawnOptions,
   type ForceloadOptions,
+  type AttributeOptions,
   type SoundOptions,
   type SummonOptions,
   type TeleportOptions,
@@ -56,6 +57,7 @@ import {
   selectSpawnpointOutput,
   selectWorldSpawnOutput,
   selectForceloadOutput,
+  selectAttributeOutput,
   selectSoundOutput,
   selectSummonOutput,
   selectTellrawOutput,
@@ -102,6 +104,7 @@ export function getCommandOutput(
   spawnpoint: SpawnpointOptions,
   worldSpawn: WorldSpawnOptions,
   forceload: ForceloadOptions,
+  attribute: AttributeOptions,
   generic: GenericDraft
 ): BuildResult {
   if (!activeCommandId) return { text: '', diagnostics: [] }
@@ -132,6 +135,7 @@ export function getCommandOutput(
   if (activeCommandId === 'spawnpoint') return selectSpawnpointOutput(spawnpoint)
   if (activeCommandId === 'setworldspawn') return selectWorldSpawnOutput(worldSpawn)
   if (activeCommandId === 'forceload') return selectForceloadOutput(forceload)
+  if (activeCommandId === 'attribute') return selectAttributeOutput(attribute)
   if (activeCommandId === 'playsound' || activeCommandId === 'stopsound') {
     return selectSoundOutput(sound)
   }
@@ -168,6 +172,7 @@ export function getCurrentOutput(
   spawnpoint: SpawnpointOptions,
   worldSpawn: WorldSpawnOptions,
   forceload: ForceloadOptions,
+  attribute: AttributeOptions,
   generic: GenericDraft,
   outputMode: OutputMode,
   commandBlock: CommandBlockOptions
@@ -201,6 +206,7 @@ export function getCurrentOutput(
     spawnpoint,
     worldSpawn,
     forceload,
+    attribute,
     generic
   )
   if (outputMode === 'command') {

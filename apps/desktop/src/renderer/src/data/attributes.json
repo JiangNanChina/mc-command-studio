@@ -1,0 +1,162 @@
+[
+  {
+    "id": "minecraft:air_drag_modifier",
+    "name": "空气阻力修正系数"
+  },
+  {
+    "id": "minecraft:armor",
+    "name": "护甲值"
+  },
+  {
+    "id": "minecraft:armor_toughness",
+    "name": "盔甲韧性"
+  },
+  {
+    "id": "minecraft:attack_damage",
+    "name": "攻击伤害"
+  },
+  {
+    "id": "minecraft:attack_knockback",
+    "name": "击退"
+  },
+  {
+    "id": "minecraft:attack_speed",
+    "name": "攻击速度"
+  },
+  {
+    "id": "minecraft:below_name_distance",
+    "name": "名牌分数距离"
+  },
+  {
+    "id": "minecraft:block_break_speed",
+    "name": "方块破坏速度"
+  },
+  {
+    "id": "minecraft:block_interaction_range",
+    "name": "方块交互距离"
+  },
+  {
+    "id": "minecraft:bounciness",
+    "name": "弹性"
+  },
+  {
+    "id": "minecraft:burning_time",
+    "name": "着火时间"
+  },
+  {
+    "id": "minecraft:camera_distance",
+    "name": "镜头距离"
+  },
+  {
+    "id": "minecraft:entity_interaction_range",
+    "name": "实体交互距离"
+  },
+  {
+    "id": "minecraft:explosion_knockback_resistance",
+    "name": "爆炸击退抗性"
+  },
+  {
+    "id": "minecraft:fall_damage_multiplier",
+    "name": "摔落伤害倍数"
+  },
+  {
+    "id": "minecraft:flying_speed",
+    "name": "飞行速度"
+  },
+  {
+    "id": "minecraft:follow_range",
+    "name": "生物跟随距离"
+  },
+  {
+    "id": "minecraft:friction_modifier",
+    "name": "摩擦力修正系数"
+  },
+  {
+    "id": "minecraft:gravity",
+    "name": "重力"
+  },
+  {
+    "id": "minecraft:jump_strength",
+    "name": "跳跃力度"
+  },
+  {
+    "id": "minecraft:knockback_resistance",
+    "name": "击退抗性"
+  },
+  {
+    "id": "minecraft:luck",
+    "name": "幸运值"
+  },
+  {
+    "id": "minecraft:max_absorption",
+    "name": "最大伤害吸收值"
+  },
+  {
+    "id": "minecraft:max_health",
+    "name": "最大生命值"
+  },
+  {
+    "id": "minecraft:mining_efficiency",
+    "name": "挖掘效率"
+  },
+  {
+    "id": "minecraft:movement_efficiency",
+    "name": "移动效率"
+  },
+  {
+    "id": "minecraft:movement_speed",
+    "name": "速度"
+  },
+  {
+    "id": "minecraft:name_tag_distance",
+    "name": "name_tag_distance"
+  },
+  {
+    "id": "minecraft:oxygen_bonus",
+    "name": "额外氧气"
+  },
+  {
+    "id": "minecraft:safe_fall_distance",
+    "name": "安全摔落高度"
+  },
+  {
+    "id": "minecraft:scale",
+    "name": "尺寸"
+  },
+  {
+    "id": "minecraft:sneaking_speed",
+    "name": "潜行速度"
+  },
+  {
+    "id": "minecraft:spawn_reinforcements",
+    "name": "僵尸增援"
+  },
+  {
+    "id": "minecraft:step_height",
+    "name": "最大行走高度"
+  },
+  {
+    "id": "minecraft:submerged_mining_speed",
+    "name": "水下挖掘速度"
+  },
+  {
+    "id": "minecraft:sweeping_damage_ratio",
+    "name": "横扫伤害比率"
+  },
+  {
+    "id": "minecraft:tempt_range",
+    "name": "生物引诱范围"
+  },
+  {
+    "id": "minecraft:water_movement_efficiency",
+    "name": "水中移动效率"
+  },
+  {
+    "id": "minecraft:waypoint_receive_range",
+    "name": "路径点接收距离"
+  },
+  {
+    "id": "minecraft:waypoint_transmit_range",
+    "name": "路径点传输距离"
+  }
+]

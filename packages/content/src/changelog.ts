@@ -22,6 +22,37 @@ const REPO = 'https://github.com/JiangNanChina/mc-command-studio'
  */
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: '0.1.22',
+    date: '2026-10-26',
+    title: '可视化实体属性 attribute',
+    highlights: [
+      '总属性/基础值查询与设置、基础值重置。',
+      '修饰符增删与查询，40 个属性中文名选择器。'
+    ],
+    sections: [
+      {
+        type: 'added',
+        items: [
+          'attribute：get / base get / base set / base reset。',
+          'modifier add / remove / value get。',
+          '40 个属性中文名选择器、scale 缩放查询。'
+        ]
+      },
+      {
+        type: 'improved',
+        items: [
+          '属性/修饰符资源名校验。',
+          '单元测试 149 → 153；冒烟测试覆盖主要操作。'
+        ]
+      },
+      {
+        type: 'fixed',
+        items: ['无。']
+      }
+    ],
+    releaseUrl: `${REPO}/releases/tag/v0.1.22`
+  },
+  {
     version: '0.1.21',
     date: '2026-10-26',
     title: '全新图标与更简洁的更新公告',
