@@ -4,8 +4,8 @@
 
 | 阶段 | 目标 | 交付 | 估时（1 人 / 20h 周） |
 |---|---|---|---|
-| **M0 本轮** | 可运行骨架 + 文档 + 更新闭环 | 26.3 数据包、`give` 端到端、通用构建器、命令方块、项目、安装包、自动更新代码、129 测试 | 10–14 天 |
-| M1 现代版 MVP | 常用命令覆盖 | 20+ 专用编辑器、选择器/物品/NBT/文本组件、单元体系、数据包导出、文本导入（高频命令）**（v0.1.1 summon/setblock/导入/13 组件；v0.1.2 更新公告；v0.1.3 execute/数据包；v0.1.4 tp/effect/fill；v0.1.5 clone/撤销重做；v0.1.6 命令方块链；v0.1.7 enchant/xp；v0.1.8 中文名/图标；v0.1.9 tellraw/title；v0.1.10 playsound/stopsound；v0.1.11 bossbar；v0.1.12 独立数据包工作区；v0.1.13 scoreboard；v0.1.14 particle；v0.1.15 世界控制）** | 4–5 周 |
+| **M0 本轮** | 可运行骨架 + 文档 + 更新闭环 | 26.3 数据包、`give` 端到端、通用构建器、命令方块、项目、安装包、自动更新代码、134 测试 | 10–14 天 |
+| M1 现代版 MVP | 常用命令覆盖 | 20+ 专用编辑器、选择器/物品/NBT/文本组件、单元体系、数据包导出、文本导入（高频命令）**（v0.1.1 summon/setblock/导入/13 组件；v0.1.2 更新公告；v0.1.3 execute/数据包；v0.1.4 tp/effect/fill；v0.1.5 clone/撤销重做；v0.1.6 命令方块链；v0.1.7 enchant/xp；v0.1.8 中文名/图标；v0.1.9 tellraw/title；v0.1.10 playsound/stopsound；v0.1.11 bossbar；v0.1.12 独立数据包工作区；v0.1.13 scoreboard；v0.1.14 particle；v0.1.15 世界控制；v0.1.16 tag/clear）** | 4–5 周 |
 | M2 26.x 完整 | 命令方块工作区 | 链式布局、朝向计算、数据包/函数导出、命令历史、撤销重做 | 3–4 周 |
 | M3 1.20.5–1.21.x | 同引擎多版本 | 数据包、差异适配、迁移提示 | 2–3 周 |
 | M4 1.13–1.20.4 | NBT 引擎 | 物品/实体 NBT 编辑器、旧 execute、版本数据管线 | 6–8 周 |
@@ -17,11 +17,11 @@
 | 项 | 状态 |
 |---|---|
 | 数据包 26.3 | ✅ 2.2 MB，校验通过 |
-| 单元测试 | ✅ 129 个 |
-| Electron 冒烟 | ✅ 公告→give（中文搜索）→setblock（方块图标）→tp/effect（永久）/fill/enchant/xp/tellraw/title/playsound/stopsound/bossbar/particle/time/weather/difficulty/scoreboard/clone→撤销重做→命令方块链→数据包工作区→execute |
+| 单元测试 | ✅ 134 个 |
+| Electron 冒烟 | ✅ 公告→give（中文搜索）→setblock（方块图标）→tp/effect（永久）/fill/enchant/xp/tellraw/title/playsound/stopsound/bossbar/particle/time/weather/difficulty/tag/clear/scoreboard/clone→撤销重做→命令方块链→数据包工作区→execute |
 | 安装包 | ✅ NSIS 约 121.7 MiB |
 | 便携版 | ✅ 约 110.0 MiB |
-| 自动更新代码 | ✅ 0.1.14 → 0.1.15 静默升级已实测；GitHub v0.1.15 Release 已发布；便携版禁用自动更新已实测 |
+| 自动更新代码 | ✅ 0.1.15 → 0.1.16 静默升级已实测；GitHub v0.1.16 Release 已发布；便携版禁用自动更新已实测 |
 | 可视化资源 | ✅ 中文名 + 图标：物品/方块/效果/附魔/实体/声音 |
 | 富文本 | ✅ tellraw/title 颜色/样式/点击/悬停/时序 |
 | 声音 | ✅ playsound/stopsound 1,991 声音 |
@@ -29,6 +29,7 @@
 | 计分板 | ✅ scoreboard 目标/显示位置/分数/运算 |
 | 粒子 | ✅ particle 128 粒子 + SNBT 参数 |
 | 世界控制 | ✅ time/weather/difficulty |
+| 标签/清除 | ✅ tag/clear |
 | 可视化资源 | ✅ 中文名 + 图标：物品/方块/效果/附魔/实体 |
 | 更新公告 | ✅ 更新后首次启动横幅 + 铃铛 + 版本历史 |
 | execute 执行链 | ✅ as/at/positioned/if/store/run |

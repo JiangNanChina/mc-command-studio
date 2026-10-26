@@ -22,6 +22,41 @@ const REPO = 'https://github.com/JiangNanChina/mc-command-studio'
  */
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: '0.1.16',
+    date: '2026-10-26',
+    title: '可视化标签与清除物品',
+    highlights: [
+      'tag 添加/移除/查询实体标签。',
+      'clear 清除全部或指定物品，支持数量上限。'
+    ],
+    sections: [
+      {
+        type: 'added',
+        items: [
+          'tag：实体选择器、标签名、添加/移除/查询。',
+          'clear：全部物品/指定物品、最大数量、0 仅统计。',
+          '指定物品复用中文图标选择器。'
+        ]
+      },
+      {
+        type: 'improved',
+        items: [
+          '标签名空格校验与命名空间提示。',
+          '单元测试 129 → 134；冒烟测试覆盖 tag 与 clear。'
+        ]
+      },
+      {
+        type: 'fixed',
+        items: ['无。']
+      },
+      {
+        type: 'known',
+        items: ['team/gamerule 等命令仍在高级命令树。', '安装包尚未配置代码签名。']
+      }
+    ],
+    releaseUrl: `${REPO}/releases/tag/v0.1.16`
+  },
+  {
     version: '0.1.15',
     date: '2026-10-26',
     title: '世界控制 time/weather/difficulty',

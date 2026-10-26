@@ -355,6 +355,48 @@ async function main() {
     throw new Error(`difficulty 输出不符合预期：${difficultyOutput}`)
   }
 
+  // tag 实体标签
+  await page.locator('.command-item', { hasText: '实体标签' }).first().click()
+  await page.waitForSelector('#tag-name', { timeout: 10_000 })
+  await page.waitForTimeout(300)
+  const tagOutput = await page.locator('.output-code .cm-content').innerText()
+  if (!tagOutput.includes('tag @s add mcstudio.tag')) {
+    throw new Error(`tag 输出不符合预期：${tagOutput}`)
+  }
+  await page.getByRole('button', { name: '查询', exact: true }).click()
+  await page.waitForTimeout(300)
+  const tagList = await page.locator('.output-code .cm-content').innerText()
+  if (!tagList.includes('tag @s list')) {
+    throw new Error(`tag 查询输出不符合预期：${tagList}`)
+  }
+  await page.screenshot({ path: join(ARTIFACTS, 'tag-form.png') })
+
+  // clear 清除物品
+  await page.locator('.command-item', { hasText: '清除物品' }).first().click()
+  await page.waitForTimeout(300)
+  const clearAll = await page.locator('.output-code .cm-content').innerText()
+  if (!clearAll.includes('clear @s')) {
+    throw new Error(`clear 全部物品输出不符合预期：${clearAll}`)
+  }
+  await page.getByRole('button', { name: '指定物品', exact: true }).click()
+  await page.getByRole('button', { name: '选择物品', exact: true }).click()
+  await page.waitForSelector('.mc-grid', { timeout: 10_000 })
+  await page.locator('.modal input[placeholder*="搜索中文名"]').fill('钻石')
+  await page.waitForTimeout(300)
+  await page
+    .locator('.mc-tile')
+    .filter({ has: page.locator('.mc-tile-name', { hasText: /^钻石$/ }) })
+    .first()
+    .click()
+  await page.getByLabel('限制最大清除数量').check()
+  await page.fill('#clear-max-count', '5')
+  await page.waitForTimeout(300)
+  const clearDiamond = await page.locator('.output-code .cm-content').innerText()
+  if (!clearDiamond.includes('clear @s minecraft:diamond 5')) {
+    throw new Error(`clear 指定物品输出不符合预期：${clearDiamond}`)
+  }
+  await page.screenshot({ path: join(ARTIFACTS, 'clear-form.png') })
+
   // scoreboard 可视化
   await page.locator('.command-item', { hasText: '记分板' }).first().click()
   await page.waitForSelector('#scoreboard-objective', { timeout: 10_000 })

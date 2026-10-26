@@ -348,7 +348,22 @@ interface WorldOptions {
 
 三个命令共用页面：`time set/add/query`、`weather <type> [seconds]`、`difficulty <level>`。自定义时间 tick 与天气秒数做整数校验。
 
-### 1.20 通用构建器：所有 94 个根命令
+### 1.20 标签与清除：`tag` / `clear`
+
+```ts
+interface TagOptions { action: 'add' | 'remove' | 'list'; target: Selector; name: string }
+interface ClearOptions {
+  target: Selector
+  allItems: boolean
+  item: string
+  maxCountEnabled: boolean
+  maxCount: string
+}
+```
+
+`tag <targets> add|remove <name>`、`tag <targets> list`；标签名不能含空格。`clear <targets> [<item>] [<maxCount>]`；全部物品时忽略数量上限，指定物品时可选 0（只统计）。
+
+### 1.21 通用构建器：所有 94 个根命令
 
 ```ts
 interface GenericStep {
@@ -481,7 +496,7 @@ type Unit =
 
 ## 7. 测试
 
-`packages/core/src/*.test.ts` 与 `apps/desktop/src/shared/*.test.ts` 共 129 个用例，覆盖：
+`packages/core/src/*.test.ts` 与 `apps/desktop/src/shared/*.test.ts` 共 134 个用例，覆盖：
 
 - SNBT / 命令方块字符串转义。
 - 选择器排序、引号、范围、NBT 括号、分数。
@@ -504,6 +519,7 @@ type Unit =
 - `/scoreboard` 目标增删/显示位置、玩家分数、查询、运算、目标名/分数校验。
 - `/particle` 无参数/方块/红石尘/渐变/物品/RGBA/原始 SNBT、扩散/速度/数量/观察者。
 - `/time` 设置/推进/查询、自定义 tick；`/weather` 类型与持续时间；`/difficulty`。
+- `/tag` 添加/移除/查询、标签名校验；`/clear` 全部/指定物品/数量/0 统计。
 - 数据包文件树、load/tick 标签、多行函数、非法命名空间/函数名/空命令。
 - `/give` 文本导入：选择器、组件、数量、未知组件 raw。
 - 命令树遍历、通用路径、参数范围。

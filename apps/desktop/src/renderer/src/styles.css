@@ -1854,6 +1854,31 @@ a {
   margin-top: 3px;
 }
 
+/* ---------- Tag / Clear ---------- */
+.tag-preview {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.tag-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 10px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-family: var(--mono);
+  font-size: 12px;
+}
+
+.tag-target {
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: 12px;
+}
+
 /* ---------- World control ---------- */
 .world-tabs {
   display: flex;

@@ -197,6 +197,8 @@ export function OutputPanel() {
     state.scoreboard,
     state.particle,
     state.world,
+    state.tag,
+    state.clear,
     state.generic,
     state.outputMode,
     state.commandBlock

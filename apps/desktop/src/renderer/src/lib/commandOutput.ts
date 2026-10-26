@@ -16,6 +16,8 @@ import {
   type ScoreboardOptions,
   type ParticleOptions,
   type WorldOptions,
+  type TagOptions,
+  type ClearOptions,
   type SoundOptions,
   type SummonOptions,
   type TeleportOptions,
@@ -40,6 +42,8 @@ import {
   selectTimeOutput,
   selectWeatherOutput,
   selectDifficultyOutput,
+  selectTagOutput,
+  selectClearOutput,
   selectSoundOutput,
   selectSummonOutput,
   selectTellrawOutput,
@@ -78,6 +82,8 @@ export function getCommandOutput(
   scoreboard: ScoreboardOptions,
   particle: ParticleOptions,
   world: WorldOptions,
+  tag: TagOptions,
+  clear: ClearOptions,
   generic: GenericDraft
 ): BuildResult {
   if (!activeCommandId) return { text: '', diagnostics: [] }
@@ -100,6 +106,8 @@ export function getCommandOutput(
   if (activeCommandId === 'time') return selectTimeOutput(world.time)
   if (activeCommandId === 'weather') return selectWeatherOutput(world.weather)
   if (activeCommandId === 'difficulty') return selectDifficultyOutput(world.difficulty)
+  if (activeCommandId === 'tag') return selectTagOutput(tag)
+  if (activeCommandId === 'clear') return selectClearOutput(clear)
   if (activeCommandId === 'playsound' || activeCommandId === 'stopsound') {
     return selectSoundOutput(sound)
   }
@@ -128,6 +136,8 @@ export function getCurrentOutput(
   scoreboard: ScoreboardOptions,
   particle: ParticleOptions,
   world: WorldOptions,
+  tag: TagOptions,
+  clear: ClearOptions,
   generic: GenericDraft,
   outputMode: OutputMode,
   commandBlock: CommandBlockOptions
@@ -153,6 +163,8 @@ export function getCurrentOutput(
     scoreboard,
     particle,
     world,
+    tag,
+    clear,
     generic
   )
   if (outputMode === 'command') {

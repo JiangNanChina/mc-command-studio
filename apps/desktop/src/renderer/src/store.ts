@@ -13,6 +13,8 @@ import {
   buildTimeCommand,
   buildWeatherCommand,
   buildDifficultyCommand,
+  buildTagCommand,
+  buildClearCommand,
   buildSoundCommand,
   buildSummonCommand,
   buildTeleportCommand,
@@ -32,6 +34,8 @@ import {
   createDefaultScoreboardOptions,
   createDefaultParticleOptions,
   createDefaultWorldOptions,
+  createDefaultTagOptions,
+  createDefaultClearOptions,
   createDefaultSetblockOptions,
   createDefaultSoundOptions,
   createDefaultSummonOptions,
@@ -64,6 +68,8 @@ import {
   type ScoreboardOptions,
   type ParticleOptions,
   type WorldOptions,
+  type TagOptions,
+  type ClearOptions,
   type TimeOptions,
   type SetblockMode,
   type SetblockOptions,
@@ -142,6 +148,8 @@ export interface ProjectPayload {
   scoreboard: ScoreboardOptions
   particle: ParticleOptions
   world: WorldOptions
+  tag: TagOptions
+  clear: ClearOptions
   datapack: DatapackDraft
   generic: GenericDraft
   commandBlock: CommandBlockOptions
@@ -184,6 +192,8 @@ interface AppStore {
   scoreboard: ScoreboardOptions
   particle: ParticleOptions
   world: WorldOptions
+  tag: TagOptions
+  clear: ClearOptions
   datapack: DatapackDraft
   generic: GenericDraft
   commandBlock: CommandBlockOptions
@@ -240,6 +250,8 @@ interface AppStore {
   updateTime: (patch: Partial<TimeOptions>) => void
   updateWeather: (patch: Partial<WorldOptions['weather']>) => void
   updateDifficulty: (patch: Partial<WorldOptions['difficulty']>) => void
+  updateTag: (patch: Partial<TagOptions>) => void
+  updateClear: (patch: Partial<ClearOptions>) => void
   openDatapack: () => void
   updateDatapackMeta: (patch: Partial<Pick<DatapackDraft, 'namespace' | 'description'>>) => void
   addDatapackFunction: () => void
@@ -854,6 +866,29 @@ function normalizeWorld(input: Partial<WorldOptions> | undefined): WorldOptions 
   }
 }
 
+function normalizeTag(input: Partial<TagOptions> | undefined): TagOptions {
+  const fallback = createDefaultTagOptions()
+  if (!input) return fallback
+  return {
+    action:
+      input.action === 'remove' || input.action === 'list' ? input.action : 'add',
+    target: input.target?.base ? input.target : fallback.target,
+    name: typeof input.name === 'string' ? input.name : fallback.name
+  }
+}
+
+function normalizeClear(input: Partial<ClearOptions> | undefined): ClearOptions {
+  const fallback = createDefaultClearOptions()
+  if (!input) return fallback
+  return {
+    target: input.target?.base ? input.target : fallback.target,
+    allItems: input.allItems !== false,
+    item: typeof input.item === 'string' ? input.item : fallback.item,
+    maxCountEnabled: Boolean(input.maxCountEnabled),
+    maxCount: typeof input.maxCount === 'string' ? input.maxCount : fallback.maxCount
+  }
+}
+
 function normalizeGive(input: Partial<GiveOptions> | undefined): GiveOptions {
   const fallback = createDefaultGiveOptions()
   if (!input) return fallback
@@ -895,6 +930,8 @@ function normalizePayload(input: unknown): ProjectPayload {
     scoreboard: normalizeScoreboard(data.scoreboard),
     particle: normalizeParticle(data.particle),
     world: normalizeWorld(data.world),
+    tag: normalizeTag(data.tag),
+    clear: normalizeClear(data.clear),
     datapack: normalizeDatapack(data.datapack),
     generic:
       data.generic && Array.isArray(data.generic.steps)
@@ -934,6 +971,8 @@ function documentSnapshot(state: AppStore): string {
     scoreboard: state.scoreboard,
     particle: state.particle,
     world: state.world,
+    tag: state.tag,
+    clear: state.clear,
     datapack: state.datapack,
     generic: state.generic,
     commandBlock: state.commandBlock
@@ -987,6 +1026,8 @@ export const useAppStore = create<AppStore>()(
     scoreboard: createDefaultScoreboardOptions(),
     particle: createDefaultParticleOptions(),
     world: createDefaultWorldOptions(),
+    tag: createDefaultTagOptions(),
+    clear: createDefaultClearOptions(),
     datapack: defaultDatapackDraft(),
     generic: emptyGeneric(),
     commandBlock: createDefaultCommandBlockOptions(),
@@ -1344,6 +1385,20 @@ export const useAppStore = create<AppStore>()(
       })
     },
 
+    updateTag: (patch) => {
+      set((state) => {
+        state.tag = { ...state.tag, ...patch }
+        state.dirty = true
+      })
+    },
+
+    updateClear: (patch) => {
+      set((state) => {
+        state.clear = { ...state.clear, ...patch }
+        state.dirty = true
+      })
+    },
+
     openDatapack: () => {
       set((state) => {
         state.activeCommandId = 'datapack'
@@ -1632,6 +1687,8 @@ export const useAppStore = create<AppStore>()(
         state.scoreboard = createDefaultScoreboardOptions()
         state.particle = createDefaultParticleOptions()
         state.world = createDefaultWorldOptions()
+        state.tag = createDefaultTagOptions()
+        state.clear = createDefaultClearOptions()
         state.datapack = defaultDatapackDraft()
         state.generic = emptyGeneric()
         state.commandBlock = createDefaultCommandBlockOptions()
@@ -1675,6 +1732,8 @@ export const useAppStore = create<AppStore>()(
         scoreboard: state.scoreboard,
         particle: state.particle,
         world: state.world,
+        tag: state.tag,
+        clear: state.clear,
         datapack: state.datapack,
         generic: state.generic,
         commandBlock: state.commandBlock,
@@ -1714,6 +1773,8 @@ export const useAppStore = create<AppStore>()(
         state.scoreboard = payload.scoreboard
         state.particle = payload.particle
         state.world = payload.world
+        state.tag = payload.tag
+        state.clear = payload.clear
         state.datapack = payload.datapack
         state.generic = payload.generic
         state.commandBlock = payload.commandBlock
@@ -2003,4 +2064,12 @@ export function selectDifficultyOutput(
   difficulty: WorldOptions['difficulty']
 ): BuildResult {
   return buildDifficultyCommand(difficulty)
+}
+
+export function selectTagOutput(tag: TagOptions): BuildResult {
+  return buildTagCommand(tag)
+}
+
+export function selectClearOutput(clear: ClearOptions): BuildResult {
+  return buildClearCommand(clear)
 }
