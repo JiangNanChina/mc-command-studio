@@ -6,6 +6,8 @@ import {
   Settings,
   Sun,
   RotateCcw,
+  Redo2,
+  Undo2,
   FilePlus2,
   Sparkles
 } from 'lucide-react'
@@ -51,6 +53,26 @@ export function Header() {
         <button type="button" className="btn btn-ghost" onClick={() => state.openProject()} disabled={loading}>
           <FolderOpen size={15} />
           打开
+        </button>
+        <button
+          type="button"
+          className="icon-btn"
+          title="撤销 (Ctrl+Z)"
+          aria-label="撤销"
+          disabled={state.historyPast.length === 0}
+          onClick={() => state.undo()}
+        >
+          <Undo2 size={17} />
+        </button>
+        <button
+          type="button"
+          className="icon-btn"
+          title="重做 (Ctrl+Shift+Z / Ctrl+Y)"
+          aria-label="重做"
+          disabled={state.historyFuture.length === 0}
+          onClick={() => state.redo()}
+        >
+          <Redo2 size={17} />
         </button>
         <button type="button" className="btn" onClick={() => state.saveProject()} disabled={loading}>
           <Save size={15} />

@@ -22,6 +22,42 @@ const REPO = 'https://github.com/JiangNanChina/mc-command-studio'
  */
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: '0.1.5',
+    date: '2026-10-26',
+    title: 'clone 表单与撤销重做',
+    highlights: [
+      '新增 clone 专用表单：源区域、目标位置、masked/filtered、force/move。',
+      '全局撤销/重做：Ctrl+Z / Ctrl+Shift+Z，顶栏按钮，最多 100 步。'
+    ],
+    sections: [
+      {
+        type: 'added',
+        items: [
+          'clone：源区域起止坐标、目标起点、replace/masked/filtered、normal/force/move。',
+          '撤销/重做覆盖所有表单、通用构建器、项目名称与命令方块设置。',
+          '顶栏撤销/重做按钮与 Ctrl+Z / Ctrl+Shift+Z / Ctrl+Y 快捷键。'
+        ]
+      },
+      {
+        type: 'improved',
+        items: [
+          '连续输入按 500ms 合并，避免每个字符一步。',
+          '新建/打开项目自动清空历史，历史不写入项目文件。',
+          '单元测试 86 → 90；冒烟测试覆盖 clone 与撤销/重做。'
+        ]
+      },
+      {
+        type: 'fixed',
+        items: ['无。']
+      },
+      {
+        type: 'known',
+        items: ['撤销历史只存在于当前会话，关闭应用后清空。', '安装包尚未配置代码签名。']
+      }
+    ],
+    releaseUrl: `${REPO}/releases/tag/v0.1.5`
+  },
+  {
     version: '0.1.4',
     date: '2026-10-26',
     title: '高频表单：tp / effect / fill',

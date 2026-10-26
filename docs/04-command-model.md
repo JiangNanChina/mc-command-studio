@@ -132,7 +132,22 @@ interface FillOptions {
 
 `replace` 模式可追加 `replace <filter>`；其他模式追加模式名，过滤方块给出“已忽略”警告。
 
-### 1.9 通用构建器：所有 94 个根命令
+### 1.9 专用表单：`clone`
+
+```ts
+interface CloneOptions {
+  begin: Position
+  end: Position
+  destination: Position
+  mode: 'replace' | 'masked' | 'filtered'
+  filter: string
+  move: 'normal' | 'force' | 'move'
+}
+```
+
+`buildCloneCommand` 生成 `clone <begin> <end> <destination> [mode] [filter] [move]`；`filtered` 必须提供过滤方块，`normal` 省略移动参数。
+
+### 1.10 通用构建器：所有 94 个根命令
 
 ```ts
 interface GenericStep {
@@ -265,7 +280,7 @@ type Unit =
 
 ## 7. 测试
 
-`packages/core/src/*.test.ts` 与 `apps/desktop/src/shared/*.test.ts` 共 86 个用例，覆盖：
+`packages/core/src/*.test.ts` 与 `apps/desktop/src/shared/*.test.ts` 共 90 个用例，覆盖：
 
 - SNBT / 命令方块字符串转义。
 - 选择器排序、引号、范围、NBT 括号、分数。
@@ -277,6 +292,7 @@ type Unit =
 - `/tp` 坐标/实体目的地、朝向、实体朝向警告。
 - `/effect` give/clear、时长/等级/隐藏粒子、非法数值。
 - `/fill` 模式、replace 过滤、非法方块与忽略过滤警告。
+- `/clone` 模式、filtered 过滤必填、force/move。
 - 数据包文件树、load/tick 标签、非法命名空间/函数名/换行命令。
 - `/give` 文本导入：选择器、组件、数量、未知组件 raw。
 - 命令树遍历、通用路径、参数范围。

@@ -189,6 +189,29 @@ async function main() {
   }
   await page.screenshot({ path: join(ARTIFACTS, 'fill-form.png') })
 
+  // clone 专用表单 + 撤销/重做
+  await page.locator('.command-item', { hasText: '复制区域' }).first().click()
+  await page.waitForSelector('#clone-mode', { timeout: 10_000 })
+  await page.waitForTimeout(300)
+  const cloneOutput = await page.locator('.output-code .cm-content').innerText()
+  if (!cloneOutput.includes('clone ~ ~ ~ ~2 ~2 ~2 ~ ~ ~')) {
+    throw new Error(`clone 输出不符合预期：${cloneOutput}`)
+  }
+  await page.waitForTimeout(700)
+  await page.selectOption('#clone-move', 'force')
+  await page.waitForTimeout(300)
+  const forcedClone = await page.locator('.output-code .cm-content').innerText()
+  if (!forcedClone.includes(' force')) throw new Error(`clone force 输出不符合预期：${forcedClone}`)
+  await page.getByRole('button', { name: '撤销' }).click()
+  await page.waitForTimeout(300)
+  const undoneClone = await page.locator('.output-code .cm-content').innerText()
+  if (undoneClone.includes(' force')) throw new Error(`撤销后仍包含 force：${undoneClone}`)
+  await page.getByRole('button', { name: '重做' }).click()
+  await page.waitForTimeout(300)
+  const redoneClone = await page.locator('.output-code .cm-content').innerText()
+  if (!redoneClone.includes(' force')) throw new Error(`重做后缺少 force：${redoneClone}`)
+  await page.screenshot({ path: join(ARTIFACTS, 'clone-form.png') })
+
   // execute 执行链
   await page.locator('.command-item', { hasText: '执行上下文' }).first().click()
   await page.waitForSelector('#execute-run', { timeout: 10_000 })

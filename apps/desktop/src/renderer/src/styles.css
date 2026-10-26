@@ -338,6 +338,17 @@ a {
   color: var(--text);
 }
 
+.icon-btn:disabled {
+  cursor: default;
+  opacity: 0.35;
+}
+
+.icon-btn:disabled:hover {
+  background: transparent;
+  border-color: transparent;
+  color: var(--muted);
+}
+
 .kbd {
   display: inline-flex;
   align-items: center;

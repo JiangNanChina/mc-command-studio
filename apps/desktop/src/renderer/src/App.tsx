@@ -13,6 +13,7 @@ import { ExecuteForm } from './components/ExecuteForm'
 import { TeleportForm } from './components/TeleportForm'
 import { EffectForm } from './components/EffectForm'
 import { FillForm } from './components/FillForm'
+import { CloneForm } from './components/CloneForm'
 import { GenericBuilder } from './components/GenericBuilder'
 import { OutputPanel } from './components/OutputPanel'
 import { StatusBar } from './components/StatusBar'
@@ -102,6 +103,7 @@ export default function App() {
   const teleport = state.teleport
   const effect = state.effect
   const fill = state.fill
+  const clone = state.clone
   const generic = state.generic
   const commandBlock = state.commandBlock
   const outputMode = state.outputMode
@@ -111,6 +113,32 @@ export default function App() {
 
   useEffect(() => {
     void useAppStore.getState().boot()
+  }, [])
+
+  useEffect(() => {
+    const onKeyDown = (event: KeyboardEvent): void => {
+      if (!(event.ctrlKey || event.metaKey) || event.altKey) return
+      const target = event.target as HTMLElement | null
+      if (
+        target &&
+        (target.tagName === 'INPUT' ||
+          target.tagName === 'TEXTAREA' ||
+          target.isContentEditable)
+      ) {
+        return
+      }
+      const key = event.key.toLowerCase()
+      if (key === 'z') {
+        event.preventDefault()
+        if (event.shiftKey) useAppStore.getState().redo()
+        else useAppStore.getState().undo()
+      } else if (key === 'y') {
+        event.preventDefault()
+        useAppStore.getState().redo()
+      }
+    }
+    window.addEventListener('keydown', onKeyDown)
+    return () => window.removeEventListener('keydown', onKeyDown)
   }, [])
 
   useEffect(() => {
@@ -182,6 +210,7 @@ export default function App() {
           store.teleport,
           store.effect,
           store.fill,
+          store.clone,
           store.generic,
           store.outputMode,
           store.commandBlock
@@ -210,7 +239,7 @@ export default function App() {
       void useAppStore.getState().autosave()
     }, 4000)
     return () => clearTimeout(timer)
-  }, [dirty, give, summon, setblock, execute, teleport, effect, fill, generic, commandBlock, outputMode, activeCommandId, projectName])
+  }, [dirty, give, summon, setblock, execute, teleport, effect, fill, clone, generic, commandBlock, outputMode, activeCommandId, projectName])
 
   useEffect(() => {
     if (!toast) return
@@ -264,6 +293,8 @@ export default function App() {
             <EffectForm />
           ) : activeCommandId === 'fill' ? (
             <FillForm />
+          ) : activeCommandId === 'clone' ? (
+            <CloneForm />
           ) : (
             <GenericBuilder />
           )}

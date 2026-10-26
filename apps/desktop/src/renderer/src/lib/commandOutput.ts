@@ -2,6 +2,7 @@ import {
   buildCommandBlockSetblock,
   hasErrors,
   type BuildResult,
+  type CloneOptions,
   type CommandBlockOptions,
   type Diagnostic,
   type EffectOptions,
@@ -14,6 +15,7 @@ import {
   type VersionPack
 } from '@mcstudio/core'
 import {
+  selectCloneOutput,
   selectEffectOutput,
   selectExecuteOutput,
   selectFillOutput,
@@ -43,6 +45,7 @@ export function getCommandOutput(
   teleport: TeleportOptions,
   effect: EffectOptions,
   fill: FillOptions,
+  clone: CloneOptions,
   generic: GenericDraft
 ): BuildResult {
   if (!activeCommandId) return { text: '', diagnostics: [] }
@@ -53,6 +56,7 @@ export function getCommandOutput(
   if (activeCommandId === 'tp') return selectTeleportOutput(teleport)
   if (activeCommandId === 'effect') return selectEffectOutput(effect)
   if (activeCommandId === 'fill') return selectFillOutput(fill)
+  if (activeCommandId === 'clone') return selectCloneOutput(clone)
   if (!pack) return { text: '', diagnostics: [] }
   return selectGenericOutput(pack, { ...generic, root: generic.root ?? activeCommandId })
 }
@@ -67,6 +71,7 @@ export function getCurrentOutput(
   teleport: TeleportOptions,
   effect: EffectOptions,
   fill: FillOptions,
+  clone: CloneOptions,
   generic: GenericDraft,
   outputMode: OutputMode,
   commandBlock: CommandBlockOptions
@@ -81,6 +86,7 @@ export function getCurrentOutput(
     teleport,
     effect,
     fill,
+    clone,
     generic
   )
   if (outputMode === 'command') {

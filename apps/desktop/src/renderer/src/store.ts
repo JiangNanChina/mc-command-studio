@@ -1,4 +1,5 @@
 import {
+  buildCloneCommand,
   buildEffectCommand,
   buildExecuteCommand,
   buildFillCommand,
@@ -6,6 +7,7 @@ import {
   buildSetblockCommand,
   buildSummonCommand,
   buildTeleportCommand,
+  createDefaultCloneOptions,
   createDefaultCommandBlockOptions,
   createDefaultEffectOptions,
   createDefaultExecuteOptions,
@@ -19,6 +21,7 @@ import {
   serializeGeneric,
   type BlockStateValue,
   type BuildResult,
+  type CloneOptions,
   type CommandBlockOptions,
   type CommandNodeData,
   type EffectOptions,
@@ -65,6 +68,7 @@ export interface ProjectPayload {
   teleport: TeleportOptions
   effect: EffectOptions
   fill: FillOptions
+  clone: CloneOptions
   generic: GenericDraft
   commandBlock: CommandBlockOptions
   outputMode: OutputMode
@@ -95,6 +99,7 @@ interface AppStore {
   teleport: TeleportOptions
   effect: EffectOptions
   fill: FillOptions
+  clone: CloneOptions
   generic: GenericDraft
   commandBlock: CommandBlockOptions
   outputMode: OutputMode
@@ -106,6 +111,8 @@ interface AppStore {
   autosaveAvailable: boolean
   lastAutosaveAt: string | null
   announcementOpen: boolean
+  historyPast: string[]
+  historyFuture: string[]
   dialogs: Record<DialogName, boolean>
   toast: Toast | null
 
@@ -136,6 +143,7 @@ interface AppStore {
   updateTeleport: (patch: Partial<TeleportOptions>) => void
   updateEffect: (patch: Partial<EffectOptions>) => void
   updateFill: (patch: Partial<FillOptions>) => void
+  updateClone: (patch: Partial<CloneOptions>) => void
   setGenericRoot: (root: string | null) => void
   pushGenericStep: (step: { name: string; value?: string }) => void
   popGenericStep: () => void
@@ -167,6 +175,9 @@ interface AppStore {
   openAnnouncement: () => void
   closeAnnouncement: () => Promise<void>
   markAnnouncementSeen: () => Promise<void>
+  undo: () => void
+  redo: () => void
+  clearHistory: () => void
   setDialog: (name: DialogName, open: boolean) => void
 }
 
@@ -356,6 +367,25 @@ function normalizeFill(input: Partial<FillOptions> | undefined): FillOptions {
   }
 }
 
+function normalizeClone(input: Partial<CloneOptions> | undefined): CloneOptions {
+  const fallback = createDefaultCloneOptions()
+  if (!input) return fallback
+  const modes: CloneOptions['mode'][] = ['replace', 'masked', 'filtered']
+  const moves: CloneOptions['move'][] = ['normal', 'force', 'move']
+  return {
+    begin: normalizePosition(input.begin),
+    end: normalizePosition(input.end),
+    destination: normalizePosition(input.destination),
+    mode: modes.includes(input.mode as CloneOptions['mode'])
+      ? (input.mode as CloneOptions['mode'])
+      : 'replace',
+    filter: typeof input.filter === 'string' ? input.filter : '',
+    move: moves.includes(input.move as CloneOptions['move'])
+      ? (input.move as CloneOptions['move'])
+      : 'normal'
+  }
+}
+
 function normalizeGive(input: Partial<GiveOptions> | undefined): GiveOptions {
   const fallback = createDefaultGiveOptions()
   if (!input) return fallback
@@ -386,6 +416,7 @@ function normalizePayload(input: unknown): ProjectPayload {
     teleport: normalizeTeleport(data.teleport),
     effect: normalizeEffect(data.effect),
     fill: normalizeFill(data.fill),
+    clone: normalizeClone(data.clone),
     generic:
       data.generic && Array.isArray(data.generic.steps)
         ? {
@@ -403,8 +434,42 @@ function normalizePayload(input: unknown): ProjectPayload {
   }
 }
 
+function documentSnapshot(state: AppStore): string {
+  return JSON.stringify({
+    projectName: state.projectName,
+    give: state.give,
+    summon: state.summon,
+    setblock: state.setblock,
+    execute: state.execute,
+    teleport: state.teleport,
+    effect: state.effect,
+    fill: state.fill,
+    clone: state.clone,
+    generic: state.generic,
+    commandBlock: state.commandBlock
+  })
+}
+
 export const useAppStore = create<AppStore>()(
-  immer((set, get) => ({
+  immer((setRaw, get) => {
+    let restoring = false
+    let lastPushAt = 0
+
+    const set = ((updater: any, replace?: boolean) => {
+      const before = documentSnapshot(get())
+      ;(setRaw as any)(updater, replace)
+      const after = documentSnapshot(get())
+      if (!restoring && before !== after && Date.now() - lastPushAt > 500) {
+        setRaw((state) => {
+          state.historyPast.push(before)
+          if (state.historyPast.length > 100) state.historyPast.shift()
+          state.historyFuture = []
+        })
+        lastPushAt = Date.now()
+      }
+    }) as typeof setRaw
+
+    return {
     booted: false,
     bootError: null,
     appInfo: null,
@@ -421,6 +486,7 @@ export const useAppStore = create<AppStore>()(
     teleport: createDefaultTeleportOptions(),
     effect: createDefaultEffectOptions(),
     fill: createDefaultFillOptions(),
+    clone: createDefaultCloneOptions(),
     generic: emptyGeneric(),
     commandBlock: createDefaultCommandBlockOptions(),
     outputMode: 'command',
@@ -432,6 +498,8 @@ export const useAppStore = create<AppStore>()(
     autosaveAvailable: false,
     lastAutosaveAt: null,
     announcementOpen: false,
+    historyPast: [],
+    historyFuture: [],
     dialogs: { settings: false, about: false, itemPicker: false, selector: false },
     toast: null,
 
@@ -691,6 +759,13 @@ export const useAppStore = create<AppStore>()(
       })
     },
 
+    updateClone: (patch) => {
+      set((state) => {
+        state.clone = { ...state.clone, ...patch }
+        state.dirty = true
+      })
+    },
+
     setGenericRoot: (root) => {
       set((state) => {
         state.generic = { root, steps: [] }
@@ -838,6 +913,7 @@ export const useAppStore = create<AppStore>()(
         state.teleport = createDefaultTeleportOptions()
         state.effect = createDefaultEffectOptions()
         state.fill = createDefaultFillOptions()
+        state.clone = createDefaultCloneOptions()
         state.generic = emptyGeneric()
         state.commandBlock = createDefaultCommandBlockOptions()
         state.outputMode = 'command'
@@ -846,6 +922,7 @@ export const useAppStore = create<AppStore>()(
         state.dirty = false
         state.autosaveAvailable = false
       })
+      get().clearHistory()
       void getApi().project.clearAutosave()
       get().showToast('已新建项目', 'info')
     },
@@ -868,6 +945,7 @@ export const useAppStore = create<AppStore>()(
         teleport: state.teleport,
         effect: state.effect,
         fill: state.fill,
+        clone: state.clone,
         generic: state.generic,
         commandBlock: state.commandBlock,
         outputMode: state.outputMode
@@ -895,6 +973,7 @@ export const useAppStore = create<AppStore>()(
         state.teleport = payload.teleport
         state.effect = payload.effect
         state.fill = payload.fill
+        state.clone = payload.clone
         state.generic = payload.generic
         state.commandBlock = payload.commandBlock
         state.outputMode = payload.outputMode
@@ -903,6 +982,7 @@ export const useAppStore = create<AppStore>()(
         state.dirty = false
         state.autosaveAvailable = false
       })
+      get().clearHistory()
       await getApi().project.clearAutosave()
       get().showToast('项目已打开', 'success')
     },
@@ -1025,8 +1105,49 @@ export const useAppStore = create<AppStore>()(
       set((state) => {
         state.dialogs[name] = open
       })
+    },
+
+    undo: () => {
+      const state = get()
+      const previous = state.historyPast[state.historyPast.length - 1]
+      if (!previous) return
+      const current = documentSnapshot(state)
+      restoring = true
+      set((draft) => {
+        Object.assign(draft, JSON.parse(previous))
+        draft.historyPast.pop()
+        draft.historyFuture.push(current)
+        draft.dirty = true
+      })
+      restoring = false
+      lastPushAt = 0
+    },
+
+    redo: () => {
+      const state = get()
+      const next = state.historyFuture[state.historyFuture.length - 1]
+      if (!next) return
+      const current = documentSnapshot(state)
+      restoring = true
+      set((draft) => {
+        Object.assign(draft, JSON.parse(next))
+        draft.historyFuture.pop()
+        draft.historyPast.push(current)
+        draft.dirty = true
+      })
+      restoring = false
+      lastPushAt = 0
+    },
+
+    clearHistory: () => {
+      set((state) => {
+        state.historyPast = []
+        state.historyFuture = []
+      })
+      lastPushAt = 0
     }
-  }))
+  }
+  })
 )
 
 /** 当前泛型构建器所在的命令节点。 */
@@ -1087,4 +1208,8 @@ export function selectEffectOutput(effect: EffectOptions): BuildResult {
 
 export function selectFillOutput(fill: FillOptions): BuildResult {
   return buildFillCommand(fill)
+}
+
+export function selectCloneOutput(clone: CloneOptions): BuildResult {
+  return buildCloneCommand(clone)
 }

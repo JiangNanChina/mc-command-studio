@@ -17,9 +17,9 @@
 
 | 文件 | 大小 |
 |---|---:|
-| `MC-Command-Studio-Setup-0.1.4.exe` | 125,504,716 B ≈ 119.7 MiB |
-| `MC-Command-Studio-0.1.4-portable.exe` | 113,265,633 B ≈ 108.0 MiB |
-| `MC-Command-Studio-Setup-0.1.4.exe.blockmap` | 133,003 B |
+| `MC-Command-Studio-Setup-0.1.5.exe` | 125,506,061 B ≈ 119.7 MiB |
+| `MC-Command-Studio-0.1.5-portable.exe` | 113,267,382 B ≈ 108.0 MiB |
+| `MC-Command-Studio-Setup-0.1.5.exe.blockmap` | 132,976 B |
 | `latest.yml` | 363 B |
 
 安装目录为 `%LOCALAPPDATA%\Programs\MC Command Studio`（per-user），卸载器保留用户项目与设置，可选择手动删除。
@@ -72,7 +72,8 @@ publish:
 ```
 
 本仓库已完成配置，并已发布：
-[MC 指令工坊 v0.1.4](https://github.com/JiangNanChina/mc-command-studio/releases/tag/v0.1.4)（最新）、
+[MC 指令工坊 v0.1.5](https://github.com/JiangNanChina/mc-command-studio/releases/tag/v0.1.5)（最新）、
+[v0.1.4](https://github.com/JiangNanChina/mc-command-studio/releases/tag/v0.1.4)、
 [v0.1.3](https://github.com/JiangNanChina/mc-command-studio/releases/tag/v0.1.3)、
 [v0.1.2](https://github.com/JiangNanChina/mc-command-studio/releases/tag/v0.1.2)、
 [v0.1.1](https://github.com/JiangNanChina/mc-command-studio/releases/tag/v0.1.1) 与
@@ -154,7 +155,7 @@ CI 已经透传这两个 secrets；没有配置时构建继续，但产物未签
 
 ## 6. 版本、渠道与回滚
 
-- SemVer：`0.1.4`；tag `v0.1.4`。
+- SemVer：`0.1.5`；tag `v0.1.5`。
 - 软件版本与游戏版本（`26.3`）解耦；数据包版本在设置中显示。
 - 渠道：stable（默认）/ beta（设置切换）。
 - 不自动降级；回滚 = 发布一个更高版本的修复版，或让用户手动安装 Releases 里的旧安装包。
@@ -216,8 +217,8 @@ $env:MCSTUDIO_UPDATE_URL = "http://127.0.0.1:8123/updates/"
 - [x] 便携版提示手动更新（`PORTABLE_EXECUTABLE_DIR` 模式实测）
 
 **实测结果（2026-10-26）**：
-- `0.1.3 → 0.1.4`：安装 0.1.3，设置 `MCSTUDIO_UPDATE_URL=http://127.0.0.1:8123/updates/`，检查 → 下载 → 重启安装，exe 产品版本变为 **0.1.4.0**，静默完成，用户数据保留。
-- `0.1.2 → 0.1.3`、`0.1.1 → 0.1.2`、`0.1.0 → 0.1.1` 同样通过。
+- `0.1.4 → 0.1.5`：安装 0.1.4，设置 `MCSTUDIO_UPDATE_URL=http://127.0.0.1:8123/updates/`，检查 → 下载 → 重启安装，exe 产品版本变为 **0.1.5.0**，静默完成，用户数据保留。
+- `0.1.3 → 0.1.4`、`0.1.2 → 0.1.3`、`0.1.1 → 0.1.2`、`0.1.0 → 0.1.1` 同样通过。
 
 > 已发布的 v0.1.0 使用旧 updater 代码，点击“重启并安装”会显示 NSIS 安装向导；从 v0.1.1 起改为静默安装（`quitAndInstall(true, true)`）。
 
