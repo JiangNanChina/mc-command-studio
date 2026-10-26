@@ -169,6 +169,22 @@ export function SettingsDialog() {
             ) : null}
           </div>
         </div>
+        <div className="setting-row">
+          <div>
+            <div className="setting-label">更新公告</div>
+            <div className="setting-desc">查看每个版本新增、改进、修复与已知问题。</div>
+          </div>
+          <button
+            type="button"
+            className="btn"
+            onClick={() => {
+              state.setDialog('settings', false)
+              state.openAnnouncement()
+            }}
+          >
+            查看公告
+          </button>
+        </div>
       </div>
 
       <div className="settings-section">

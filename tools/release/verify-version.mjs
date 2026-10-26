@@ -41,6 +41,33 @@ for (const file of required) {
   }
 }
 
+const changelogPath = join(ROOT, 'CHANGELOG.md')
+const announcementPath = join(ROOT, 'packages/content/src/changelog.ts')
+try {
+  const changelog = readFileSync(changelogPath, 'utf8')
+  if (!changelog.includes(`## [${rootPkg.version}]`)) {
+    errors.push(`CHANGELOG.md 缺少当前版本 ${rootPkg.version}`)
+  }
+  const firstVersion = changelog.match(/^## \[([^\]]+)\]/m)?.[1]
+  if (firstVersion && firstVersion !== rootPkg.version) {
+    errors.push(`CHANGELOG.md 最新条目是 ${firstVersion}，不是 ${rootPkg.version}`)
+  }
+} catch {
+  errors.push('CHANGELOG.md 不存在')
+}
+
+try {
+  const announcement = readFileSync(announcementPath, 'utf8')
+  const firstVersion = announcement.match(/version:\s*'([^']+)'/)?.[1]
+  if (firstVersion !== rootPkg.version) {
+    errors.push(
+      `内置更新公告最新版本是 ${firstVersion ?? '无'}，不是 ${rootPkg.version}`
+    )
+  }
+} catch {
+  errors.push('packages/content/src/changelog.ts 不存在')
+}
+
 if (errors.length > 0) {
   console.error('✗ 发布校验失败：')
   for (const error of errors) console.error(`  - ${error}`)

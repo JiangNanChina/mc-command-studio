@@ -50,6 +50,23 @@ async function main() {
     throw new Error(`数据包加载失败：${text}`)
   }
 
+  // 首次启动：更新公告横幅 → 版本历史弹窗
+  await page.waitForSelector('.banner.announcement', { timeout: 10_000 })
+  const announcementText = await page.locator('.banner.announcement').innerText()
+  if (!announcementText.includes('v0.1.2')) {
+    throw new Error(`公告横幅版本不正确：${announcementText}`)
+  }
+  await page.getByRole('button', { name: '查看详情' }).click()
+  await page.waitForSelector('.modal', { timeout: 10_000 })
+  await page.waitForTimeout(300)
+  await page.screenshot({ path: join(ARTIFACTS, 'announcement.png') })
+  const modal = page.locator('.modal')
+  if ((await modal.getByRole('button', { name: '知道了' }).count()) === 0) {
+    throw new Error('公告弹窗缺少“知道了”按钮')
+  }
+  await modal.getByRole('button', { name: '知道了' }).click()
+  await page.waitForSelector('.banner.announcement', { state: 'detached', timeout: 10_000 })
+
   await page.screenshot({ path: join(ARTIFACTS, 'welcome.png') })
 
   // 从侧边栏选择 give

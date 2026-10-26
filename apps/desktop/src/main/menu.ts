@@ -68,6 +68,7 @@ export function buildMenu(): void {
             send('check-update')
           }
         },
+        { label: '更新公告', click: () => send('announcement') },
         {
           label: '打开发布页',
           click: () => {

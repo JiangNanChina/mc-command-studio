@@ -1,10 +1,11 @@
 #!/usr/bin/env node
 /**
- * 本地自动更新验收：安装 0.1.0 → 通过本地 generic 源升级到 0.1.1。
+ * 本地自动更新验收：安装 FROM → 通过本地 generic 源升级到 TO。
+ * 用法：node tools/e2e/update-test.mjs 0.1.1 0.1.2
  *
  * 前置：
- *   - 已把 0.1.0 安装到 artifacts/update-run（脚本会自动查找 exe）
- *   - release/update-feed 含 0.1.1 的 latest.yml / Setup / blockmap
+ *   - 已把旧版安装到 artifacts/update-run（脚本会自动查找 exe）
+ *   - release/update-feed 含新版 latest.yml / Setup / blockmap
  *   - node tools/release/mock-update-server.mjs release/update-feed 8123
  */
 import { _electron as electron } from 'playwright'
@@ -20,6 +21,8 @@ const INSTALL_ROOT = join(ROOT, 'artifacts/update-run')
 const USER_DATA = join(ROOT, 'artifacts/update-userdata')
 const FEED = 'http://127.0.0.1:8123/updates/'
 const EXE_NAME = 'MC Command Studio.exe'
+const FROM = process.argv[2] ?? '0.1.0'
+const TO = process.argv[3] ?? '0.1.1'
 
 function findExe(directory = INSTALL_ROOT, depth = 0) {
   if (!existsSync(directory) || depth > 3) return null
@@ -65,10 +68,10 @@ async function waitForVersion(expected, timeoutMs = 90_000) {
 async function main() {
   const initial = findExe()
   if (!initial) {
-    throw new Error(`找不到已安装的 0.1.0（${INSTALL_ROOT}）。请先安装 0.1.0。`)
+    throw new Error(`找不到已安装的 ${FROM}（${INSTALL_ROOT}）。请先安装 ${FROM}。`)
   }
   const before = productVersion(initial)
-  if (!before.startsWith('0.1.0')) throw new Error(`安装目录版本应为 0.1.0，实际 ${before}`)
+  if (!before.startsWith(FROM)) throw new Error(`安装目录版本应为 ${FROM}，实际 ${before}`)
   if (!existsSync(join(ROOT, 'release/update-feed/latest.yml'))) {
     throw new Error('release/update-feed 未准备')
   }
@@ -94,7 +97,7 @@ async function main() {
   try {
     const page = await app.firstWindow()
     await page.waitForSelector('.sidebar', { timeout: 30_000 })
-    await page.screenshot({ path: join(ROOT, 'artifacts/update-0.1.0.png') })
+    await page.screenshot({ path: join(ROOT, `artifacts/update-${FROM}.png`) })
 
     await page.locator('button[title="设置 (Ctrl+,)"]').click()
     await page.waitForSelector('.modal', { timeout: 10_000 })
@@ -120,8 +123,8 @@ async function main() {
     if (!installed) await app.close().catch(() => undefined)
   }
 
-  const after = await waitForVersion('0.1.1')
-  if (!after.version?.startsWith('0.1.1')) {
+  const after = await waitForVersion(TO)
+  if (!after.version?.startsWith(TO)) {
     let logTail = ''
     try {
       logTail = await readFile(join(USER_DATA, 'logs/main.log'), 'utf8')

@@ -1,4 +1,5 @@
 import {
+  Bell,
   FolderOpen,
   Moon,
   Save,
@@ -13,6 +14,9 @@ import { useAppStore } from '../store'
 export function Header() {
   const state = useAppStore()
   const loading = !state.booted
+  const announcementUnread = Boolean(
+    state.appInfo && state.settings.lastSeenVersion !== state.appInfo.version
+  )
 
   return (
     <header className="header">
@@ -51,6 +55,16 @@ export function Header() {
         <button type="button" className="btn" onClick={() => state.saveProject()} disabled={loading}>
           <Save size={15} />
           保存
+        </button>
+        <button
+          type="button"
+          className="icon-btn"
+          title="更新公告"
+          aria-label="更新公告"
+          onClick={() => state.openAnnouncement()}
+        >
+          <Bell size={17} />
+          {announcementUnread ? <span className="unread-dot" /> : null}
         </button>
         <button
           type="button"

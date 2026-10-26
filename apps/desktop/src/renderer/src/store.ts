@@ -83,6 +83,7 @@ interface AppStore {
   dirty: boolean
   autosaveAvailable: boolean
   lastAutosaveAt: string | null
+  announcementOpen: boolean
   dialogs: Record<DialogName, boolean>
   toast: Toast | null
 
@@ -132,6 +133,9 @@ interface AppStore {
   dismissAutosave: () => Promise<void>
   showToast: (message: string, kind?: Toast['kind']) => void
   hideToast: () => void
+  openAnnouncement: () => void
+  closeAnnouncement: () => Promise<void>
+  markAnnouncementSeen: () => Promise<void>
   setDialog: (name: DialogName, open: boolean) => void
 }
 
@@ -292,6 +296,7 @@ export const useAppStore = create<AppStore>()(
     dirty: false,
     autosaveAvailable: false,
     lastAutosaveAt: null,
+    announcementOpen: false,
     dialogs: { settings: false, about: false, itemPicker: false, selector: false },
     toast: null,
 
@@ -780,6 +785,25 @@ export const useAppStore = create<AppStore>()(
       set((state) => {
         state.toast = null
       })
+    },
+
+    openAnnouncement: () => {
+      set((state) => {
+        state.announcementOpen = true
+      })
+    },
+
+    closeAnnouncement: async () => {
+      set((state) => {
+        state.announcementOpen = false
+      })
+      await get().markAnnouncementSeen()
+    },
+
+    markAnnouncementSeen: async () => {
+      const version = get().appInfo?.version
+      if (!version || get().settings.lastSeenVersion === version) return
+      await get().updateSettings({ lastSeenVersion: version })
     },
 
     setDialog: (name, open) => {

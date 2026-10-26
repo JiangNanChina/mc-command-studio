@@ -34,6 +34,7 @@ export interface UserSettings {
   autoUpdate: boolean
   updateChannel: 'stable' | 'beta'
   skippedVersion: string | null
+  lastSeenVersion: string | null
   recentProjects: RecentProject[]
   lastPackId: string | null
 }
@@ -43,6 +44,7 @@ export const DEFAULT_SETTINGS: UserSettings = {
   autoUpdate: true,
   updateChannel: 'stable',
   skippedVersion: null,
+  lastSeenVersion: null,
   recentProjects: [],
   lastPackId: '26.3'
 }
@@ -110,6 +112,7 @@ export type MenuAction =
   | 'save-project-as'
   | 'settings'
   | 'about'
+  | 'announcement'
   | 'check-update'
   | 'toggle-theme'
   | 'show-welcome'

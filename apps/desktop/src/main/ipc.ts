@@ -56,6 +56,7 @@ const settingsPatchSchema = z
     autoUpdate: z.boolean().optional(),
     updateChannel: z.enum(['stable', 'beta']).optional(),
     skippedVersion: z.string().nullable().optional(),
+    lastSeenVersion: z.string().max(64).nullable().optional(),
     recentProjects: z
       .array(
         z.object({

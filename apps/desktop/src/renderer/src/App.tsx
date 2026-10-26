@@ -17,6 +17,8 @@ import { AboutDialog } from './components/AboutDialog'
 import { SelectorDialog } from './components/SelectorDialog'
 import { ItemPickerDialog } from './components/ItemPickerDialog'
 import { UpdateBanner } from './components/UpdateBanner'
+import { AnnouncementBanner } from './components/AnnouncementBanner'
+import { AnnouncementDialog } from './components/AnnouncementDialog'
 import { AutosaveBanner } from './components/AutosaveBanner'
 import { Toast } from './components/Toast'
 
@@ -138,6 +140,9 @@ export default function App() {
         case 'about':
           store.setDialog('about', true)
           break
+        case 'announcement':
+          store.openAnnouncement()
+          break
         case 'check-update':
           void store.checkForUpdates(true)
           break
@@ -216,6 +221,7 @@ export default function App() {
   return (
     <div className="app">
       <Header />
+      <AnnouncementBanner />
       <UpdateBanner />
       <AutosaveBanner />
       <div className="workspace">
@@ -248,6 +254,7 @@ export default function App() {
 
       {state.dialogs.settings ? <SettingsDialog /> : null}
       {state.dialogs.about ? <AboutDialog /> : null}
+      {state.announcementOpen ? <AnnouncementDialog /> : null}
       {state.dialogs.selector ? <SelectorDialog /> : null}
       {state.dialogs.itemPicker ? <ItemPickerDialog /> : null}
       <Toast />
