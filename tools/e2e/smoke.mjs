@@ -486,6 +486,15 @@ async function main() {
   if (!teamPrefix.includes('team modify red_team prefix {"text":"[RED]"}')) {
     throw new Error(`team 前缀输出不符合预期：${teamPrefix}`)
   }
+  await page.getByLabel('使用高级文本组件显示名').check()
+  const teamMainCard = page.locator('.card').filter({ has: page.locator('#team-name') })
+  await teamMainCard.getByRole('button', { name: /添加文本片段/ }).first().click()
+  await teamMainCard.locator('.text-segment input.input').first().fill('红队')
+  await page.waitForTimeout(300)
+  const teamDisplay = await page.locator('.output-code .cm-content').innerText()
+  if (!teamDisplay.includes('team add red_team {"text":"红队"}')) {
+    throw new Error(`team 高级显示名输出不符合预期：${teamDisplay}`)
+  }
   await page.screenshot({ path: join(ARTIFACTS, 'team-form.png') })
   await page.getByRole('button', { name: '加入队伍', exact: true }).click()
   await page.waitForTimeout(300)
@@ -703,6 +712,15 @@ async function main() {
   const dataModify = await page.locator('.output-code .cm-content').innerText()
   if (!dataModify.includes('data modify entity @s Health set value {id:"minecraft:stone"}')) {
     throw new Error(`data 修改输出不符合预期：${dataModify}`)
+  }
+  await page.getByLabel('从其他 NBT 来源复制（from）').check()
+  await page.getByRole('button', { name: '来源：命令存储', exact: true }).click()
+  await page.fill('#data-from-storage', 'mcstudio:data')
+  await page.fill('#data-from-path', 'item')
+  await page.waitForTimeout(300)
+  const dataFrom = await page.locator('.output-code .cm-content').innerText()
+  if (!dataFrom.includes('data modify entity @s Health set from storage mcstudio:data item')) {
+    throw new Error(`data from 输出不符合预期：${dataFrom}`)
   }
   await page.screenshot({ path: join(ARTIFACTS, 'data-form.png') })
 

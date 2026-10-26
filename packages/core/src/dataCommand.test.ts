@@ -70,6 +70,36 @@ describe('data', () => {
     expect(bad.diagnostics.some((item) => item.code === 'data.nbt')).toBe(true)
   })
 
+  it('modifies from another NBT source', () => {
+    const base = {
+      ...createDefaultDataOptions(),
+      action: 'modify' as const,
+      path: 'Inventory[0]',
+      fromEnabled: true
+    }
+    expect(buildDataCommand(base).text).toBe(
+      'data modify entity @s Inventory[0] set from entity @s'
+    )
+    expect(
+      buildDataCommand({
+        ...base,
+        fromTargetType: 'storage',
+        fromStorage: 'mcstudio:data',
+        fromPath: 'item'
+      }).text
+    ).toBe('data modify entity @s Inventory[0] set from storage mcstudio:data item')
+    expect(
+      buildDataCommand({
+        ...base,
+        modifyOperation: 'insert',
+        index: '1',
+        fromTargetType: 'block',
+        fromPosition: { x: '0', y: '64', z: '0' },
+        fromPath: 'Items[0]'
+      }).text
+    ).toBe('data modify entity @s Inventory[0] insert 1 from block 0 64 0 Items[0]')
+  })
+
   it('validates path, nbt and scale', () => {
     const result = buildDataCommand({
       ...createDefaultDataOptions(),

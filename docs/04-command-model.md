@@ -506,7 +506,7 @@ interface LootOptions {
 }
 ```
 
-data 支持实体/方块实体/命令存储，get/merge/remove/modify；modify 含 set/merge/append/prepend/insert/remove 与列表索引。loot 支持 give/spawn/insert，战利品表可来自数据包工作区。
+data 支持实体/方块实体/命令存储，get/merge/remove/modify；modify 含 set/merge/append/prepend/insert/remove、列表索引，以及从实体/方块/存储复制的 `from` 来源。loot 支持 give/spawn/insert，战利品表可来自数据包工作区。team 前缀/后缀与高级显示名使用文本组件。
 
 ### 1.30 通用构建器：所有 94 个根命令
 
@@ -641,7 +641,7 @@ type Unit =
 
 ## 7. 测试
 
-`packages/core/src/*.test.ts` 与 `apps/desktop/src/shared/*.test.ts` 共 180 个用例，覆盖：
+`packages/core/src/*.test.ts` 与 `apps/desktop/src/shared/*.test.ts` 共 182 个用例，覆盖：
 
 - SNBT / 命令方块字符串转义。
 - 选择器排序、引号、范围、NBT 括号、分数。
@@ -675,7 +675,8 @@ type Unit =
 - 数据包高级文件：谓词/进度/战利品表、JSON 校验、重复路径。
 - 单元体系：资源 ID、数值、物品栈、槽位。
 - `/data` 实体/方块/存储的 get/merge/remove/modify、路径/scale；`/loot` give/spawn/insert。
-- `/team` 前缀/后缀文本组件。
+- `/team` 前缀/后缀/高级显示名文本组件。
+- `/data` 的 modify from 来源。
 - 数据包文件树、load/tick 标签、多行函数、非法命名空间/函数名/空命令。
 - `/give` 文本导入：选择器、组件、数量、未知组件 raw。
 - 命令树遍历、通用路径、参数范围。

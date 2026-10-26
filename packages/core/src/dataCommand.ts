@@ -6,6 +6,7 @@ import type { BuildResult, Diagnostic } from './types'
 
 export type DataAction = 'get' | 'merge' | 'remove' | 'modify'
 export type DataTargetType = 'entity' | 'block' | 'storage'
+export type DataSourceType = 'entity' | 'block' | 'storage'
 export type DataModifyOperation = 'set' | 'merge' | 'append' | 'prepend' | 'insert' | 'remove'
 
 export interface DataOptions {
@@ -20,6 +21,12 @@ export interface DataOptions {
   nbt: string
   modifyOperation: DataModifyOperation
   index: string
+  fromEnabled: boolean
+  fromTargetType: DataSourceType
+  fromTarget: Selector
+  fromPosition: Position
+  fromStorage: string
+  fromPath: string
 }
 
 export function createDefaultDataOptions(): DataOptions {
@@ -34,12 +41,37 @@ export function createDefaultDataOptions(): DataOptions {
     scale: '1',
     nbt: '{}',
     modifyOperation: 'set',
-    index: '0'
+    index: '0',
+    fromEnabled: false,
+    fromTargetType: 'entity',
+    fromTarget: { base: '@s' },
+    fromPosition: { x: '~', y: '~', z: '~' },
+    fromStorage: 'mcstudio:data',
+    fromPath: ''
   }
 }
 
 function isNumber(value: string): boolean {
   return /^-?(?:\d+\.?\d*|\.\d+)$/.test(value.trim())
+}
+
+function buildSource(options: DataOptions, diagnostics: Diagnostic[]): string {
+  const path = options.fromPath.trim()
+  const suffix = path ? ` ${path}` : ''
+  if (options.fromTargetType === 'entity') {
+    const target = serializeSelector(options.fromTarget)
+    diagnostics.push(...target.diagnostics)
+    return `entity ${target.text}${suffix}`
+  }
+  if (options.fromTargetType === 'block') {
+    const position = serializePosition(options.fromPosition)
+    diagnostics.push(...position.diagnostics)
+    return `block ${position.text}${suffix}`
+  }
+  if (!isValidResourceLocation(options.fromStorage)) {
+    diagnostics.push(error('data.fromStorage', '来源存储 ID 必须是 namespace:path', 'fromStorage'))
+  }
+  return `storage ${options.fromStorage.trim()}${suffix}`
 }
 
 export function buildDataCommand(options: DataOptions): BuildResult {
@@ -78,19 +110,26 @@ export function buildDataCommand(options: DataOptions): BuildResult {
 
   if (options.action === 'modify') {
     const operation = options.modifyOperation
+    const from = options.fromEnabled && operation !== 'remove' ? buildSource(options, diagnostics) : null
     if (operation === 'insert' || operation === 'remove') {
       if (!/^\d+$/.test(options.index.trim())) {
         diagnostics.push(error('data.index', '列表索引必须是非负整数', 'index'))
       }
       if (operation === 'insert') {
-        const nbt = options.nbt.trim()
-        if (!nbt.startsWith('{') || !nbt.endsWith('}')) {
-          diagnostics.push(error('data.nbt', '插入内容必须是 { ... } 形式的 SNBT', 'nbt'))
+        if (from) {
+          parts.push('insert', options.index.trim(), 'from', from)
+        } else {
+          const nbt = options.nbt.trim()
+          if (!nbt.startsWith('{') || !nbt.endsWith('}')) {
+            diagnostics.push(error('data.nbt', '插入内容必须是 { ... } 形式的 SNBT', 'nbt'))
+          }
+          parts.push('insert', options.index.trim(), 'value', nbt)
         }
-        parts.push('insert', options.index.trim(), 'value', nbt)
       } else {
         parts.push('remove', options.index.trim())
       }
+    } else if (from) {
+      parts.push(operation, 'from', from)
     } else {
       const nbt = options.nbt.trim()
       if (!nbt.startsWith('{') || !nbt.endsWith('}')) {

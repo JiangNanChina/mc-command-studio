@@ -56,6 +56,19 @@ describe('team', () => {
     expect(lines).toContain('team modify red_team suffix {"text":"<>"}')
   })
 
+  it('uses a text component display name when enabled', () => {
+    const display = { ...createTextSegment(), text: '红队', color: 'red' }
+    const lines = buildTeamCommands({
+      ...createDefaultTeamOptions(),
+      action: 'modify',
+      displayAdvanced: true,
+      displaySegments: [display]
+    }).text.split('\n')
+    expect(lines).toContain(
+      'team modify red_team displayName {"text":"红队","color":"red"}'
+    )
+  })
+
   it('validates team names', () => {
     expect(
       buildTeamCommands({ ...createDefaultTeamOptions(), name: 'bad name' }).diagnostics.some(

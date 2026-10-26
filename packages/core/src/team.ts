@@ -37,6 +37,8 @@ export interface TeamOptions {
   target: Selector
   prefix: TextSegment[]
   suffix: TextSegment[]
+  displayAdvanced: boolean
+  displaySegments: TextSegment[]
 }
 
 export const TEAM_COLORS: { value: TeamColor; label: string; hex: string }[] = [
@@ -84,7 +86,9 @@ export function createDefaultTeamOptions(): TeamOptions {
     collisionRule: 'always',
     target: { base: '@a' },
     prefix: [],
-    suffix: []
+    suffix: [],
+    displayAdvanced: false,
+    displaySegments: []
   }
 }
 
@@ -101,17 +105,27 @@ export function buildTeamCommands(options: TeamOptions): BuildResult {
 
   for (const [kind, segments] of [
     ['prefix', options.prefix],
-    ['suffix', options.suffix]
+    ['suffix', options.suffix],
+    ['display', options.displaySegments]
   ] as const) {
     if (segments.some((segment) => /[\r\n]/.test(segment.text))) {
-      diagnostics.push(error(`team.${kind}`, '队伍前缀/后缀不能包含换行', kind))
+      diagnostics.push(error(`team.${kind}`, '队伍文本不能包含换行', kind))
     }
   }
 
-  const modifyLines = (): string[] => {
-    const display = options.displayName.trim()
+  const display = options.displayName.trim()
+  const displayPayload =
+    options.displayAdvanced && options.displaySegments.length
+      ? textComponentJson(options.displaySegments)
+      : display
+        ? snbtString(display)
+        : ''
+
+  const modifyLines = (includeDisplay = true): string[] => {
     return [
-      ...(display ? [`team modify ${name} displayName ${snbtString(display)}`] : []),
+      ...(includeDisplay && displayPayload
+        ? [`team modify ${name} displayName ${displayPayload}`]
+        : []),
       `team modify ${name} color ${options.color}`,
       `team modify ${name} friendlyFire ${options.friendlyFire ? 'true' : 'false'}`,
       `team modify ${name} seeFriendlyInvisibles ${options.seeFriendlyInvisibles ? 'true' : 'false'}`,
@@ -128,11 +142,10 @@ export function buildTeamCommands(options: TeamOptions): BuildResult {
 
   switch (options.action) {
     case 'create': {
-      const display = options.displayName.trim()
       return {
         text: [
-          `team add ${name}${display ? ` ${snbtString(display)}` : ''}`,
-          ...modifyLines().slice(display ? 1 : 0)
+          `team add ${name}${displayPayload ? ` ${displayPayload}` : ''}`,
+          ...modifyLines(false)
         ].join('\n'),
         diagnostics
       }

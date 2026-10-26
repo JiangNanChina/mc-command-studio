@@ -88,7 +88,7 @@ export function TeamForm() {
               />
               <div className="hint">1–16 位字母/数字/下划线/点/连字符。</div>
             </div>
-            {showOptions ? (
+            {showOptions && !team.displayAdvanced ? (
               <div className="field">
                 <label className="field-label" htmlFor="team-display">
                   显示名称
@@ -102,6 +102,34 @@ export function TeamForm() {
               </div>
             ) : null}
           </div>
+
+          {showOptions ? (
+            <div style={{ marginTop: 12 }}>
+              <label className="checkline">
+                <input
+                  type="checkbox"
+                  checked={team.displayAdvanced}
+                  onChange={(event) =>
+                    state.updateTeam({ displayAdvanced: event.target.checked })
+                  }
+                />
+                使用高级文本组件显示名
+              </label>
+              {team.displayAdvanced ? (
+                <>
+                  <TextSegmentsEditor
+                    segments={team.displaySegments}
+                    onChange={(displaySegments) =>
+                      state.updateTeam({ displaySegments })
+                    }
+                  />
+                  {team.displaySegments.length ? (
+                    <TextPreview segments={team.displaySegments} />
+                  ) : null}
+                </>
+              ) : null}
+            </div>
+          ) : null}
 
           {showTarget ? (
             <div style={{ marginTop: 12 }}>

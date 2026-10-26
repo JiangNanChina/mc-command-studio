@@ -2,6 +2,7 @@ import { Braces, Database } from 'lucide-react'
 import {
   type DataAction,
   type DataModifyOperation,
+  type DataSourceType,
   type DataTargetType
 } from '@mcstudio/core'
 import { COMMAND_MAP } from '@mcstudio/content'
@@ -28,6 +29,12 @@ const MODIFY_OPERATIONS: { value: DataModifyOperation; label: string }[] = [
 ]
 
 const TARGETS: { value: DataTargetType; label: string }[] = [
+  { value: 'entity', label: '实体' },
+  { value: 'block', label: '方块实体' },
+  { value: 'storage', label: '命令存储' }
+]
+
+const SOURCES: { value: DataSourceType; label: string }[] = [
   { value: 'entity', label: '实体' },
   { value: 'block', label: '方块实体' },
   { value: 'storage', label: '命令存储' }
@@ -209,20 +216,100 @@ export function DataCommandForm() {
                     ) : null}
                   </div>
                   {options.modifyOperation !== 'remove' ? (
-                    <div className="field" style={{ marginTop: 10 }}>
-                      <label className="field-label" htmlFor="data-nbt">
-                        SNBT 值
+                    <>
+                      <label className="checkline" style={{ marginTop: 10 }}>
+                        <input
+                          type="checkbox"
+                          checked={options.fromEnabled}
+                          onChange={(event) =>
+                            state.updateDataCommand({ fromEnabled: event.target.checked })
+                          }
+                        />
+                        从其他 NBT 来源复制（from）
                       </label>
-                      <textarea
-                        id="data-nbt"
-                        className="textarea particle-raw"
-                        value={options.nbt}
-                        spellCheck={false}
-                        onChange={(event) =>
-                          state.updateDataCommand({ nbt: event.target.value })
-                        }
-                      />
-                    </div>
+                      {options.fromEnabled ? (
+                        <div style={{ marginTop: 10 }}>
+                          <div className="row" style={{ flexWrap: 'wrap', marginBottom: 8 }}>
+                            {SOURCES.map((source) => (
+                              <button
+                                key={source.value}
+                                type="button"
+                                className={`btn btn-sm${options.fromTargetType === source.value ? ' btn-primary' : ''}`}
+                                onClick={() =>
+                                  state.updateDataCommand({ fromTargetType: source.value })
+                                }
+                              >
+                                来源：{source.label}
+                              </button>
+                            ))}
+                          </div>
+                          {options.fromTargetType === 'entity' ? (
+                            <SelectorField
+                              value={options.fromTarget}
+                              label="来源实体"
+                              onChange={(fromTarget) =>
+                                state.updateDataCommand({ fromTarget })
+                              }
+                            />
+                          ) : options.fromTargetType === 'block' ? (
+                            <PositionInput
+                              label="来源方块坐标"
+                              value={options.fromPosition}
+                              onChange={(fromPosition) =>
+                                state.updateDataCommand({ fromPosition })
+                              }
+                            />
+                          ) : (
+                            <div className="field">
+                              <label className="field-label" htmlFor="data-from-storage">
+                                来源存储 ID
+                              </label>
+                              <input
+                                id="data-from-storage"
+                                className="input"
+                                value={options.fromStorage}
+                                spellCheck={false}
+                                onChange={(event) =>
+                                  state.updateDataCommand({
+                                    fromStorage: event.target.value
+                                  })
+                                }
+                              />
+                            </div>
+                          )}
+                          <div className="field" style={{ marginTop: 10 }}>
+                            <label className="field-label" htmlFor="data-from-path">
+                              来源路径（可选）
+                            </label>
+                            <input
+                              id="data-from-path"
+                              className="input"
+                              value={options.fromPath}
+                              spellCheck={false}
+                              placeholder="Inventory[0]"
+                              onChange={(event) =>
+                                state.updateDataCommand({ fromPath: event.target.value })
+                              }
+                            />
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="field" style={{ marginTop: 10 }}>
+                          <label className="field-label" htmlFor="data-nbt">
+                            SNBT 值
+                          </label>
+                          <textarea
+                            id="data-nbt"
+                            className="textarea particle-raw"
+                            value={options.nbt}
+                            spellCheck={false}
+                            onChange={(event) =>
+                              state.updateDataCommand({ nbt: event.target.value })
+                            }
+                          />
+                        </div>
+                      )}
+                    </>
                   ) : null}
                 </>
               ) : null}

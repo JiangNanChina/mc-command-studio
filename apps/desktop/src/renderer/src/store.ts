@@ -1156,6 +1156,10 @@ function normalizeTeam(input: Partial<TeamOptions> | undefined): TeamOptions {
       : [],
     suffix: Array.isArray(input.suffix)
       ? input.suffix.map(normalizeTextSegment)
+      : [],
+    displayAdvanced: Boolean(input.displayAdvanced),
+    displaySegments: Array.isArray(input.displaySegments)
+      ? input.displaySegments.map(normalizeTextSegment)
       : []
   }
 }
@@ -1335,7 +1339,17 @@ function normalizeDataCommand(input: Partial<DataOptions> | undefined): DataOpti
     modifyOperation: operations.includes(input.modifyOperation as DataOptions['modifyOperation'])
       ? (input.modifyOperation as DataOptions['modifyOperation'])
       : 'set',
-    index: typeof input.index === 'string' ? input.index : fallback.index
+    index: typeof input.index === 'string' ? input.index : fallback.index,
+    fromEnabled: Boolean(input.fromEnabled),
+    fromTargetType:
+      input.fromTargetType === 'block' || input.fromTargetType === 'storage'
+        ? input.fromTargetType
+        : 'entity',
+    fromTarget: input.fromTarget?.base ? input.fromTarget : fallback.fromTarget,
+    fromPosition: normalizePosition(input.fromPosition),
+    fromStorage:
+      typeof input.fromStorage === 'string' ? input.fromStorage : fallback.fromStorage,
+    fromPath: typeof input.fromPath === 'string' ? input.fromPath : fallback.fromPath
   }
 }
 

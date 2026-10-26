@@ -22,6 +22,37 @@ const REPO = 'https://github.com/JiangNanChina/mc-command-studio'
  */
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: '0.1.27',
+    date: '2026-10-27',
+    title: 'data from 与队伍高级显示名',
+    highlights: [
+      'data modify 支持从实体/方块/存储复制。',
+      'team 高级显示名文本组件。'
+    ],
+    sections: [
+      {
+        type: 'added',
+        items: [
+          'data modify from：实体/方块实体/命令存储，来源路径可选。',
+          'set/merge/append/prepend/insert 支持 from。',
+          'team 高级显示名文本片段编辑与预览。'
+        ]
+      },
+      {
+        type: 'improved',
+        items: [
+          '来源存储/路径校验。',
+          '单元测试 180 → 182；冒烟测试覆盖新功能。'
+        ]
+      },
+      {
+        type: 'fixed',
+        items: ['无。']
+      }
+    ],
+    releaseUrl: `${REPO}/releases/tag/v0.1.27`
+  },
+  {
     version: '0.1.26',
     date: '2026-10-26',
     title: 'data modify 与队伍前缀后缀',
