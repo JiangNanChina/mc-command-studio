@@ -26,8 +26,18 @@ const FILES = {
   versions: 'versions/data.json'
 }
 
-function parseArgs(argv) {
-  const args = { version: '26.3', force: false, source: 'mcmeta' }
+function versionAtLeast(version, target) {
+  const left = String(version).split('.').map((part) => Number(part))
+  const right = String(target).split('.').map((part) => Number(part))
+  for (let i = 0; i < Math.max(left.length, right.length); i += 1) {
+    const a = left[i] ?? 0
+    const b = right[i] ?? 0
+    if (a !== b) return a > b
+  }
+  return true
+}
+
+function parseArgs(argv) {  const args = { version: '26.3', force: false, source: 'mcmeta' }
   for (let i = 0; i < argv.length; i += 1) {
     const arg = argv[i]
     if (arg === '--version') args.version = argv[++i]
@@ -113,13 +123,27 @@ async function main() {
   console.log(`→ 构建数据包 ${args.version}`)
   console.log(`  源：${base}`)
 
-  const [versions, commands, registries, blocks, itemComponents] = await Promise.all([
+  const [versions, commands, registries, blocks] = await Promise.all([
     fetchJson(`${base}/${FILES.versions}`, 'versions'),
     fetchJson(`${base}/${FILES.commands}`, 'commands'),
     fetchJson(`${base}/${FILES.registries}`, 'registries'),
-    fetchJson(`${base}/${FILES.blocks}`, 'blocks'),
-    fetchJson(`${base}/${FILES.itemComponents}`, 'item_components')
+    fetchJson(`${base}/${FILES.blocks}`, 'blocks')
   ])
+
+  // 1.20.4 及更早版本没有 item_components 数据，使用空表并标记为 NBT 引擎。
+  let itemComponents
+  try {
+    itemComponents = await fetchJson(`${base}/${FILES.itemComponents}`, 'item_components')
+  } catch {
+    const empty = Buffer.from('{}')
+    itemComponents = {
+      json: {},
+      buffer: empty,
+      url: `${base}/${FILES.itemComponents}`,
+      label: 'item_components'
+    }
+    console.log('  ! 该版本没有 item_components，使用空表（NBT 引擎）')
+  }
 
   const versionEntry = Array.isArray(versions.json)
     ? versions.json.find((entry) => entry.id === args.version)
@@ -127,6 +151,8 @@ async function main() {
   if (!versionEntry) {
     throw new Error(`versions 数据里找不到版本 ${args.version}`)
   }
+
+  const engine = versionAtLeast(args.version, '1.20.5') ? 'components' : 'nbt'
 
   const stats = countTree(commands.json)
   const items = registries.json.item?.length ?? 0
@@ -157,6 +183,7 @@ async function main() {
     gameVersion: versionEntry.id,
     dataVersion: versionEntry.data_version ?? 0,
     packFormat: versionEntry.data_pack_version ?? 0,
+    engine,
     type: versionEntry.type === 'release' ? 'release' : 'snapshot',
     generatedAt: new Date().toISOString(),
     sources: [
@@ -209,6 +236,7 @@ async function updateIndex(version, manifest) {
     gameVersion: manifest.gameVersion,
     dataVersion: manifest.dataVersion,
     packFormat: manifest.packFormat,
+    engine: manifest.engine,
     type: manifest.type,
     builtAt: manifest.generatedAt,
     manifest: `${version}/manifest.json`

@@ -917,7 +917,7 @@ async function main() {
 
   // 多版本数据包切换
   const packOptions = await page.locator('#pack-select option').allTextContents()
-  if (!packOptions.includes('1.21.1') || !packOptions.includes('26.3')) {
+  if (!packOptions.includes('1.21.1') || !packOptions.includes('1.20.4') || !packOptions.includes('26.3')) {
     throw new Error(`版本选项不符合预期：${packOptions.join(', ')}`)
   }
   await page.selectOption('#pack-select', '1.21.1')
@@ -927,12 +927,30 @@ async function main() {
     throw new Error(`1.21.1 命令数量不符合预期：${pack121}`)
   }
   await page.screenshot({ path: join(ARTIFACTS, 'pack-1.21.1.png') })
+  await page.selectOption('#pack-select', '1.20.4')
+  await page.waitForTimeout(500)
+  const pack1204 = await page.locator('.pack-count').innerText()
+  if (!pack1204.includes('82')) {
+    throw new Error(`1.20.4 命令数量不符合预期：${pack1204}`)
+  }
+  const notice1204 = await page.locator('.version-notice').innerText()
+  if (!notice1204.includes('NBT')) {
+    throw new Error(`1.20.4 树模式提示不符合预期：${notice1204}`)
+  }
+  await page.locator('.command-item', { hasText: '给予物品' }).first().click()
+  await page.waitForTimeout(500)
+  if ((await page.locator('#give-count').count()) !== 0) {
+    throw new Error('1.20.4 树模式不应显示 give 表单')
+  }
+  await page.screenshot({ path: join(ARTIFACTS, 'pack-1.20.4.png') })
   await page.selectOption('#pack-select', '26.3')
   await page.waitForSelector('.version-notice', { state: 'detached', timeout: 15_000 })
   const pack26 = await page.locator('.pack-count').innerText()
   if (!pack26.includes('94')) {
     throw new Error(`26.3 命令数量不符合预期：${pack26}`)
   }
+  await page.locator('.command-item', { hasText: '给予物品' }).first().click()
+  await page.waitForSelector('#give-count', { timeout: 10_000 })
 
   // 设置弹窗
   await page.locator('button[title="设置 (Ctrl+,)"]').click()

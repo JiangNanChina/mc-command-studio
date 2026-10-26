@@ -1660,7 +1660,7 @@ export const useAppStore = create<AppStore>()(
     selectCommand: (id) => {
       set((state) => {
         state.activeCommandId = id
-        if (id && id !== 'give') {
+        if (id) {
           state.generic = { root: id, steps: [] }
         }
         state.dirty = true

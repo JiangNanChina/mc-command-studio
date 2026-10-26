@@ -34,10 +34,23 @@ export interface DatapackBuildResult {
 const NAMESPACE = /^[a-z0-9_.-]+$/
 const FUNCTION = /^[a-z0-9_.-]+(?:\/[a-z0-9_.-]+)*$/ // 允许子目录，禁止空段
 const DATA_FILE = /^[a-z0-9_.-]+(?:\/[a-z0-9_.-]+)*$/
-const DATA_FOLDER: Record<DatapackDataFileType, string> = {
-  advancement: 'advancement',
-  predicate: 'predicate',
-  loot_table: 'loot_table'
+
+export function usesModernDatapackFolders(packFormat: number): boolean {
+  return packFormat >= 48
+}
+
+export function datapackDataFolder(
+  packFormat: number,
+  type: DatapackDataFileType
+): string {
+  if (usesModernDatapackFolders(packFormat)) {
+    return type
+  }
+  return type === 'advancement'
+    ? 'advancements'
+    : type === 'predicate'
+      ? 'predicates'
+      : 'loot_tables'
 }
 
 function normalizeCommands(source: string): string {
@@ -80,6 +93,9 @@ export function buildDatapackFiles(options: DatapackExportOptions): DatapackBuil
   }
 
   const functionId = (name: string): string => `${namespace}:${name}`
+  const modern = usesModernDatapackFolders(options.packFormat)
+  const functionFolder = modern ? 'function' : 'functions'
+  const tagFolder = modern ? 'tags/function' : 'tags/functions'
   const files: DatapackFile[] = [
     {
       path: 'pack.mcmeta',
@@ -95,7 +111,7 @@ export function buildDatapackFiles(options: DatapackExportOptions): DatapackBuil
       )}\n`
     },
     ...functions.map((item) => ({
-      path: `data/${namespace}/function/${item.name}.mcfunction`,
+      path: `data/${namespace}/${functionFolder}/${item.name}.mcfunction`,
       content: item.content
     }))
   ]
@@ -104,7 +120,7 @@ export function buildDatapackFiles(options: DatapackExportOptions): DatapackBuil
   if (loadFunction) {
     if (!names.includes(loadFunction)) throw new Error('load 函数不存在')
     files.push({
-      path: 'data/minecraft/tags/function/load.json',
+      path: `data/minecraft/${tagFolder}/load.json`,
       content: `${JSON.stringify({ values: [functionId(loadFunction)] }, null, 2)}\n`
     })
   }
@@ -112,7 +128,7 @@ export function buildDatapackFiles(options: DatapackExportOptions): DatapackBuil
   if (tickFunction) {
     if (!names.includes(tickFunction)) throw new Error('tick 函数不存在')
     files.push({
-      path: 'data/minecraft/tags/function/tick.json',
+      path: `data/minecraft/${tagFolder}/tick.json`,
       content: `${JSON.stringify({ values: [functionId(tickFunction)] }, null, 2)}\n`
     })
   }
@@ -123,7 +139,7 @@ export function buildDatapackFiles(options: DatapackExportOptions): DatapackBuil
   for (const file of dataFiles) {
     const name = file.name.trim().replace(/\.json$/i, '')
     if (!DATA_FILE.test(name)) throw new Error(`数据文件名不合法：${file.name || '(空)'}`)
-    const path = `data/${namespace}/${DATA_FOLDER[file.type]}/${name}.json`
+    const path = `data/${namespace}/${datapackDataFolder(options.packFormat, file.type)}/${name}.json`
     if (dataPaths.has(path)) throw new Error(`数据文件重复：${path}`)
     dataPaths.add(path)
     let parsed: unknown

@@ -483,6 +483,8 @@ interface ItemOptions {
 
 提供模板、路径预览、JSON 校验；重复路径或非法 JSON 会在导出前报错。战利品表、进度与谓词还支持常用结构化编辑（战利品表：类型/rolls/权重/数量；进度：显示/图标/框架/触发器；谓词：概率/天气/时间/实体状态与 all_of/any_of），复杂结构自动回退 JSON。构建器位于 `apps/desktop/src/shared/datapack.ts`，模型位于 `lootTable.ts`、`advancement.ts`、`predicate.ts`。
 
+数据包目录随 `packFormat` 切换：1.21+ 使用 `function` / `tags/function` / `predicate` / `loot_table` / `advancement`；1.20.4 使用 `functions` / `tags/functions` / `predicates` / `loot_tables` / `advancements`。
+
 ### 1.29 NBT 与战利品：`data` / `loot`
 
 ```ts

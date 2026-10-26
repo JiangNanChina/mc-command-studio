@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { buildDatapackFiles } from './datapack'
+import { buildDatapackFiles, datapackDataFolder } from './datapack'
 
 const base = {
   namespace: 'mcstudio',
@@ -59,6 +59,27 @@ describe('datapack export', () => {
       })
     ).toThrow()
     expect(() => buildDatapackFiles({ ...base, loadFunction: 'missing' })).toThrow()
+  })
+
+  it('uses plural folders before 1.21 and singular folders in 1.21+', () => {
+    const legacy = buildDatapackFiles({
+      ...base,
+      packFormat: 26,
+      loadFunction: 'main',
+      files: [
+        { type: 'predicate', name: 'is_sneaking', content: '{}' },
+        { type: 'loot_table', name: 'reward', content: '{}' },
+        { type: 'advancement', name: 'root', content: '{}' }
+      ]
+    })
+    const paths = legacy.files.map((file) => file.path)
+    expect(paths).toContain('data/mcstudio/functions/main.mcfunction')
+    expect(paths).toContain('data/minecraft/tags/functions/load.json')
+    expect(paths).toContain('data/mcstudio/predicates/is_sneaking.json')
+    expect(paths).toContain('data/mcstudio/loot_tables/reward.json')
+    expect(paths).toContain('data/mcstudio/advancements/root.json')
+    expect(datapackDataFolder(121, 'loot_table')).toBe('loot_table')
+    expect(datapackDataFolder(26, 'loot_table')).toBe('loot_tables')
   })
 
   it('adds advancement, predicate and loot table JSON files', () => {

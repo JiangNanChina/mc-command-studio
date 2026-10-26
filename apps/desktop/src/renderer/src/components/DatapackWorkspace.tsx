@@ -9,7 +9,7 @@ import {
   Save,
   Trash2
 } from 'lucide-react'
-import { buildDatapackFiles } from '../../../shared/datapack'
+import { buildDatapackFiles, datapackDataFolder, usesModernDatapackFolders } from '../../../shared/datapack'
 import { getApi } from '../lib/api'
 import { useAppStore, type DatapackDataFileDraft } from '../store'
 import { LootTableEditor } from './LootTableEditor'
@@ -275,6 +275,10 @@ export function DatapackWorkspace() {
 
               <div className="hint" style={{ marginTop: 8 }}>
                 每行一条命令，前导 / 可省略；函数名、命名空间和标签会在导出前校验。
+                当前版本导出目录：
+                <code className="code-inline">
+                  data/{datapack.namespace}/{usesModernDatapackFolders(packFormat) ? 'function' : 'functions'}/
+                </code>。
               </div>
             </div>
           ) : null}
@@ -423,12 +427,8 @@ export function DatapackWorkspace() {
                   <div className="row" style={{ marginTop: 8, justifyContent: 'space-between' }}>
                     <div className="hint">
                       data/{datapack.namespace}/
-                      {activeData.type === 'advancement'
-                        ? 'advancement'
-                        : activeData.type === 'predicate'
-                          ? 'predicate'
-                          : 'loot_table'}
-                      /{activeData.name || 'file'}.json
+                      {datapackDataFolder(packFormat, activeData.type)}/
+                      {activeData.name || 'file'}.json
                     </div>
                     <button
                       type="button"

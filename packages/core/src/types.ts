@@ -41,6 +41,7 @@ export interface PackManifest {
   gameVersion: string
   dataVersion: number
   packFormat: number
+  engine?: 'components' | 'nbt' | 'legacy'
   type: 'release' | 'snapshot'
   generatedAt: string
   sources: PackSource[]

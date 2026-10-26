@@ -22,6 +22,38 @@ const REPO = 'https://github.com/JiangNanChina/mc-command-studio'
  */
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: '0.1.33',
+    date: '2026-10-27',
+    title: '1.20.4 树模式与版本化数据包目录',
+    highlights: [
+      '1.20.4 命令树模式。',
+      '数据包目录随版本切换。'
+    ],
+    sections: [
+      {
+        type: 'added',
+        items: [
+          '1.20.4 数据包：82 根命令，NBT 引擎。',
+          '1.20.4 仅命令树/通用构建器，可视化表单禁用。',
+          '版本化数据包目录（复数/单数文件夹）。'
+        ]
+      },
+      {
+        type: 'improved',
+        items: [
+          '数据包引擎元数据。',
+          'Release 打包冒烟门禁。',
+          '单元测试 196 → 197。'
+        ]
+      },
+      {
+        type: 'fixed',
+        items: ['无。']
+      }
+    ],
+    releaseUrl: `${REPO}/releases/tag/v0.1.33`
+  },
+  {
     version: '0.1.32',
     date: '2026-10-27',
     title: '多版本数据包：1.21.1 试验支持',

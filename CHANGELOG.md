@@ -2,6 +2,25 @@
 
 所有版本变更记录在此。版本号遵循 SemVer。
 
+## [0.1.33] - 2026-10-27
+
+1.20.4 树模式与版本化数据包目录。
+
+### 新增
+
+- 新增 1.20.4 数据包（82 根命令，NBT 引擎）。
+- 1.20.4 使用命令树/通用构建器模式，可视化表单自动禁用。
+- 数据包导出按版本切换目录：
+  - 1.20.4：`functions` / `tags/functions` / `predicates` / `loot_tables` / `advancements`
+  - 1.21+：`function` / `tags/function` / `predicate` / `loot_table` / `advancement`
+- Release 工作流加入打包版 Electron 冒烟门禁。
+
+### 改进
+
+- 数据包引擎元数据（components / nbt）。
+- 版本切换提示区分树模式与组件模式。
+- 单元测试 196 → 197；冒烟覆盖 1.20.4 树模式。
+
 ## [0.1.32] - 2026-10-27
 
 多版本数据包：1.21.1 试验支持。

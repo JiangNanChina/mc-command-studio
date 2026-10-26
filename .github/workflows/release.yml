@@ -48,6 +48,11 @@ jobs:
           CSC_KEY_PASSWORD: ${{ secrets.CSC_KEY_PASSWORD }}
         run: pnpm build:win
 
+      - name: Packaged Electron smoke
+        env:
+          MCSTUDIO_E2E_EXE: release/win-unpacked/MC Command Studio.exe
+        run: node tools/e2e/smoke.mjs
+
       - name: Verify tag and artifacts
         run: node tools/release/verify-version.mjs "${{ github.ref_name }}"
 

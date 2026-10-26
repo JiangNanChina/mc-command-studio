@@ -1,6 +1,6 @@
 {
   "name": "mc-command-studio",
-  "version": "0.1.32",
+  "version": "0.1.33",
   "private": true,
   "description": "MC 指令工坊 - Windows 桌面版 Minecraft Java 命令编辑器",
   "packageManager": "pnpm@11.28.5",
@@ -13,8 +13,8 @@
     "typecheck": "pnpm -r --if-present typecheck",
     "test": "vitest run",
     "test:watch": "vitest",
-    "data:build": "node tools/pipeline/build-pack.mjs --version 26.3 && node tools/pipeline/build-pack.mjs --version 1.21.1",
-    "data:verify": "node tools/pipeline/verify-pack.mjs packs/26.3/manifest.json && node tools/pipeline/verify-pack.mjs packs/1.21.1/manifest.json",
+    "data:build": "node tools/pipeline/build-pack.mjs --version 26.3 && node tools/pipeline/build-pack.mjs --version 1.21.1 && node tools/pipeline/build-pack.mjs --version 1.20.4",
+    "data:verify": "node tools/pipeline/verify-pack.mjs packs/26.3/manifest.json && node tools/pipeline/verify-pack.mjs packs/1.21.1/manifest.json && node tools/pipeline/verify-pack.mjs packs/1.20.4/manifest.json",
     "check:version": "node tools/release/verify-version.mjs",
     "configure:github": "node tools/release/configure-github.mjs",
     "release:patch": "node tools/release/bump.mjs patch",

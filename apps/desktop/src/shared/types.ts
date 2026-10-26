@@ -55,6 +55,7 @@ export interface PackSummary {
   gameVersion: string
   dataVersion: number
   packFormat: number
+  engine?: 'components' | 'nbt' | 'legacy'
   type: 'release' | 'snapshot'
   builtAt: string
 }

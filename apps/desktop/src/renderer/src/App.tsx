@@ -157,6 +157,7 @@ export default function App() {
   const activeCommandId = state.activeCommandId
   const projectName = state.projectName
   const toast = state.toast
+  const treeOnly = pack?.manifest.engine === 'nbt'
 
   useEffect(() => {
     void useAppStore.getState().boot()
@@ -338,8 +339,9 @@ export default function App() {
       {pack && pack.manifest.id !== '26.3' ? (
         <div className="version-notice">
           <Info size={14} />
-          当前使用 {pack.manifest.gameVersion} 数据包：命令树与通用构建器来自该版本；
-          可视化表单按 26.3 语法生成，跨版本使用前请核对。
+          {treeOnly
+            ? `当前使用 ${pack.manifest.gameVersion}（NBT 引擎）：命令树与通用构建器可用，可视化表单已禁用。`
+            : `当前使用 ${pack.manifest.gameVersion} 数据包：命令树与通用构建器来自该版本；可视化表单按 26.3 语法生成，跨版本使用前请核对。`}
         </div>
       ) : null}
       <div className={`workspace${activeCommandId === 'datapack' ? ' no-output' : ''}`}>
@@ -356,6 +358,12 @@ export default function App() {
             )
           ) : showWelcome ? (
             <Welcome />
+          ) : activeCommandId === 'datapack' ? (
+            <DatapackWorkspace />
+          ) : activeCommandId === 'chain' ? (
+            <ChainBuilder />
+          ) : treeOnly ? (
+            <GenericBuilder />
           ) : activeCommandId === 'give' ? (
             <GiveForm />
           ) : activeCommandId === 'summon' ? (
