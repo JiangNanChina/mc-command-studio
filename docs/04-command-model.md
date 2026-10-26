@@ -393,7 +393,25 @@ interface WorldborderOptions {
 
 尺寸支持可选过渡时间（`10s`/`10t`/`10d`）；中心 X/Z、伤害/缓冲、警告距离/时间分别校验。`get` 生成查询命令。
 
-### 1.23 通用构建器：所有 94 个根命令
+### 1.23 队伍：`team`
+
+```ts
+interface TeamOptions {
+  action: 'create' | 'modify' | 'join' | 'leave' | 'remove' | 'list'
+  name: string
+  displayName: string
+  color: TeamColor
+  friendlyFire: boolean
+  seeFriendlyInvisibles: boolean
+  nametagVisibility: 'always' | 'hideForOtherTeams' | 'hideForOwnTeam' | 'never'
+  collisionRule: 'always' | 'pushOtherTeams' | 'pushOwnTeam' | 'never'
+  target: Selector
+}
+```
+
+创建生成 `team add` + 5 条 `team modify`；修改只生成 modify；加入/离开/删除/查询分别生成单条命令。队伍名 1–16 位。
+
+### 1.24 通用构建器：所有 94 个根命令
 
 ```ts
 interface GenericStep {
@@ -526,7 +544,7 @@ type Unit =
 
 ## 7. 测试
 
-`packages/core/src/*.test.ts` 与 `apps/desktop/src/shared/*.test.ts` 共 141 个用例，覆盖：
+`packages/core/src/*.test.ts` 与 `apps/desktop/src/shared/*.test.ts` 共 145 个用例，覆盖：
 
 - SNBT / 命令方块字符串转义。
 - 选择器排序、引号、范围、NBT 括号、分数。
@@ -552,6 +570,7 @@ type Unit =
 - `/tag` 添加/移除/查询、标签名校验；`/clear` 全部/指定物品/数量/0 统计。
 - `/gamerule` 布尔/整数设置与查询、规则名和值类型校验。
 - `/worldborder` 尺寸/过渡/中心/伤害/警告/查询、数值与时间校验。
+- `/team` 创建/修改/加入/离开/删除/查询、颜色/友伤/可见性/碰撞、队伍名校验。
 - 数据包文件树、load/tick 标签、多行函数、非法命名空间/函数名/空命令。
 - `/give` 文本导入：选择器、组件、数量、未知组件 raw。
 - 命令树遍历、通用路径、参数范围。

@@ -1854,6 +1854,48 @@ a {
   margin-top: 3px;
 }
 
+/* ---------- Team ---------- */
+.team-colors {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 6px;
+}
+
+.team-color {
+  width: 28px;
+  height: 28px;
+  border: 2px solid transparent;
+  border-radius: 6px;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.35);
+}
+
+.team-color:hover {
+  transform: scale(1.06);
+}
+
+.team-color.active {
+  border-color: var(--text);
+  box-shadow: 0 0 0 2px var(--accent);
+}
+
+.team-preview {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.team-chip {
+  display: inline-flex;
+  padding: 5px 10px;
+  border: 1px solid;
+  border-radius: 999px;
+  background: var(--panel);
+  font-size: 12px;
+  font-weight: 700;
+}
+
 /* ---------- Worldborder ---------- */
 .worldborder-actions {
   display: flex;

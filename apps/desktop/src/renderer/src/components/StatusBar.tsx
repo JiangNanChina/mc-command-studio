@@ -50,6 +50,7 @@ export function StatusBar() {
     state.clear,
     state.gamerule,
     state.worldborder,
+    state.team,
     state.generic,
     state.outputMode,
     state.commandBlock

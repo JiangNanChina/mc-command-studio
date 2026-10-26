@@ -17,6 +17,7 @@ import {
   buildClearCommand,
   buildGameruleCommand,
   buildWorldborderCommand,
+  buildTeamCommands,
   buildSoundCommand,
   buildSummonCommand,
   buildTeleportCommand,
@@ -40,6 +41,7 @@ import {
   createDefaultClearOptions,
   createDefaultGameruleOptions,
   createDefaultWorldborderOptions,
+  createDefaultTeamOptions,
   createDefaultSetblockOptions,
   createDefaultSoundOptions,
   createDefaultSummonOptions,
@@ -76,6 +78,7 @@ import {
   type ClearOptions,
   type GameruleOptions,
   type WorldborderOptions,
+  type TeamOptions,
   type TimeOptions,
   type SetblockMode,
   type SetblockOptions,
@@ -158,6 +161,7 @@ export interface ProjectPayload {
   clear: ClearOptions
   gamerule: GameruleOptions
   worldborder: WorldborderOptions
+  team: TeamOptions
   datapack: DatapackDraft
   generic: GenericDraft
   commandBlock: CommandBlockOptions
@@ -204,6 +208,7 @@ interface AppStore {
   clear: ClearOptions
   gamerule: GameruleOptions
   worldborder: WorldborderOptions
+  team: TeamOptions
   datapack: DatapackDraft
   generic: GenericDraft
   commandBlock: CommandBlockOptions
@@ -264,6 +269,7 @@ interface AppStore {
   updateClear: (patch: Partial<ClearOptions>) => void
   updateGamerule: (patch: Partial<GameruleOptions>) => void
   updateWorldborder: (patch: Partial<WorldborderOptions>) => void
+  updateTeam: (patch: Partial<TeamOptions>) => void
   openDatapack: () => void
   updateDatapackMeta: (patch: Partial<Pick<DatapackDraft, 'namespace' | 'description'>>) => void
   addDatapackFunction: () => void
@@ -940,6 +946,71 @@ function normalizeWorldborder(
   }
 }
 
+function normalizeTeam(input: Partial<TeamOptions> | undefined): TeamOptions {
+  const fallback = createDefaultTeamOptions()
+  if (!input) return fallback
+  const actions: TeamOptions['action'][] = [
+    'create',
+    'modify',
+    'join',
+    'leave',
+    'remove',
+    'list'
+  ]
+  const colors: TeamOptions['color'][] = [
+    'black',
+    'dark_blue',
+    'dark_green',
+    'dark_aqua',
+    'dark_red',
+    'dark_purple',
+    'gold',
+    'gray',
+    'dark_gray',
+    'blue',
+    'green',
+    'aqua',
+    'red',
+    'light_purple',
+    'yellow',
+    'white'
+  ]
+  const visibilities: TeamOptions['nametagVisibility'][] = [
+    'always',
+    'hideForOtherTeams',
+    'hideForOwnTeam',
+    'never'
+  ]
+  const collisions: TeamOptions['collisionRule'][] = [
+    'always',
+    'pushOtherTeams',
+    'pushOwnTeam',
+    'never'
+  ]
+  return {
+    action: actions.includes(input.action as TeamOptions['action'])
+      ? (input.action as TeamOptions['action'])
+      : 'create',
+    name: typeof input.name === 'string' ? input.name : fallback.name,
+    displayName:
+      typeof input.displayName === 'string' ? input.displayName : fallback.displayName,
+    color: colors.includes(input.color as TeamOptions['color'])
+      ? (input.color as TeamOptions['color'])
+      : 'red',
+    friendlyFire: Boolean(input.friendlyFire),
+    seeFriendlyInvisibles: input.seeFriendlyInvisibles !== false,
+    nametagVisibility: visibilities.includes(
+      input.nametagVisibility as TeamOptions['nametagVisibility']
+    )
+      ? (input.nametagVisibility as TeamOptions['nametagVisibility'])
+      : 'always',
+    collisionRule: collisions.includes(input.collisionRule as TeamOptions['collisionRule'])
+      ? (input.collisionRule as TeamOptions['collisionRule'])
+      : 'always',
+    target: input.target?.base ? input.target : fallback.target
+  }
+}
+
 function normalizeGive(input: Partial<GiveOptions> | undefined): GiveOptions {
   const fallback = createDefaultGiveOptions()
   if (!input) return fallback
@@ -985,6 +1056,7 @@ function normalizePayload(input: unknown): ProjectPayload {
     clear: normalizeClear(data.clear),
     gamerule: normalizeGamerule(data.gamerule),
     worldborder: normalizeWorldborder(data.worldborder),
+    team: normalizeTeam(data.team),
     datapack: normalizeDatapack(data.datapack),
     generic:
       data.generic && Array.isArray(data.generic.steps)
@@ -1028,6 +1100,7 @@ function documentSnapshot(state: AppStore): string {
     clear: state.clear,
     gamerule: state.gamerule,
     worldborder: state.worldborder,
+    team: state.team,
     datapack: state.datapack,
     generic: state.generic,
     commandBlock: state.commandBlock
@@ -1085,6 +1158,7 @@ export const useAppStore = create<AppStore>()(
     clear: createDefaultClearOptions(),
     gamerule: createDefaultGameruleOptions(),
     worldborder: createDefaultWorldborderOptions(),
+    team: createDefaultTeamOptions(),
     datapack: defaultDatapackDraft(),
     generic: emptyGeneric(),
     commandBlock: createDefaultCommandBlockOptions(),
@@ -1470,6 +1544,13 @@ export const useAppStore = create<AppStore>()(
       })
     },
 
+    updateTeam: (patch) => {
+      set((state) => {
+        state.team = { ...state.team, ...patch }
+        state.dirty = true
+      })
+    },
+
     openDatapack: () => {
       set((state) => {
         state.activeCommandId = 'datapack'
@@ -1762,6 +1843,7 @@ export const useAppStore = create<AppStore>()(
         state.clear = createDefaultClearOptions()
         state.gamerule = createDefaultGameruleOptions()
         state.worldborder = createDefaultWorldborderOptions()
+        state.team = createDefaultTeamOptions()
         state.datapack = defaultDatapackDraft()
         state.generic = emptyGeneric()
         state.commandBlock = createDefaultCommandBlockOptions()
@@ -1809,6 +1891,7 @@ export const useAppStore = create<AppStore>()(
         clear: state.clear,
         gamerule: state.gamerule,
         worldborder: state.worldborder,
+        team: state.team,
         datapack: state.datapack,
         generic: state.generic,
         commandBlock: state.commandBlock,
@@ -1852,6 +1935,7 @@ export const useAppStore = create<AppStore>()(
         state.clear = payload.clear
         state.gamerule = payload.gamerule
         state.worldborder = payload.worldborder
+        state.team = payload.team
         state.datapack = payload.datapack
         state.generic = payload.generic
         state.commandBlock = payload.commandBlock
@@ -2157,4 +2241,8 @@ export function selectGameruleOutput(gamerule: GameruleOptions): BuildResult {
 
 export function selectWorldborderOutput(worldborder: WorldborderOptions): BuildResult {
   return buildWorldborderCommand(worldborder)
+}
+
+export function selectTeamOutput(team: TeamOptions): BuildResult {
+  return buildTeamCommands(team)
 }

@@ -22,6 +22,42 @@ const REPO = 'https://github.com/JiangNanChina/mc-command-studio'
  */
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: '0.1.19',
+    date: '2026-10-26',
+    title: '可视化队伍 team',
+    highlights: [
+      '队伍创建/修改/加入/离开/删除/查询。',
+      '16 色、友伤、隐身队友、名字标签、碰撞规则。'
+    ],
+    sections: [
+      {
+        type: 'added',
+        items: [
+          'team 六种操作：create/modify/join/leave/remove/list。',
+          '16 种颜色、显示名称、friendlyFire、seeFriendlyInvisibles。',
+          'nametagVisibility 与 collisionRule。'
+        ]
+      },
+      {
+        type: 'improved',
+        items: [
+          '多行 team 输出禁用单命令方块。',
+          '队伍名校验。',
+          '单元测试 141 → 145；冒烟测试覆盖创建/加入/离开。'
+        ]
+      },
+      {
+        type: 'fixed',
+        items: ['无。']
+      },
+      {
+        type: 'known',
+        items: ['team prefix/suffix 等组件选项仍在高级命令树。', '安装包尚未配置代码签名。']
+      }
+    ],
+    releaseUrl: `${REPO}/releases/tag/v0.1.19`
+  },
+  {
     version: '0.1.18',
     date: '2026-10-26',
     title: '可视化世界边界 worldborder',

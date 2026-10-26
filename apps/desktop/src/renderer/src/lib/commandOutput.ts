@@ -20,6 +20,7 @@ import {
   type ClearOptions,
   type GameruleOptions,
   type WorldborderOptions,
+  type TeamOptions,
   type SoundOptions,
   type SummonOptions,
   type TeleportOptions,
@@ -48,6 +49,7 @@ import {
   selectClearOutput,
   selectGameruleOutput,
   selectWorldborderOutput,
+  selectTeamOutput,
   selectSoundOutput,
   selectSummonOutput,
   selectTellrawOutput,
@@ -90,6 +92,7 @@ export function getCommandOutput(
   clear: ClearOptions,
   gamerule: GameruleOptions,
   worldborder: WorldborderOptions,
+  team: TeamOptions,
   generic: GenericDraft
 ): BuildResult {
   if (!activeCommandId) return { text: '', diagnostics: [] }
@@ -116,6 +119,7 @@ export function getCommandOutput(
   if (activeCommandId === 'clear') return selectClearOutput(clear)
   if (activeCommandId === 'gamerule') return selectGameruleOutput(gamerule)
   if (activeCommandId === 'worldborder') return selectWorldborderOutput(worldborder)
+  if (activeCommandId === 'team') return selectTeamOutput(team)
   if (activeCommandId === 'playsound' || activeCommandId === 'stopsound') {
     return selectSoundOutput(sound)
   }
@@ -148,6 +152,7 @@ export function getCurrentOutput(
   clear: ClearOptions,
   gamerule: GameruleOptions,
   worldborder: WorldborderOptions,
+  team: TeamOptions,
   generic: GenericDraft,
   outputMode: OutputMode,
   commandBlock: CommandBlockOptions
@@ -177,6 +182,7 @@ export function getCurrentOutput(
     clear,
     gamerule,
     worldborder,
+    team,
     generic
   )
   if (outputMode === 'command') {

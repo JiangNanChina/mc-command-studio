@@ -457,6 +457,32 @@ async function main() {
     throw new Error(`worldborder 查询输出不符合预期：${borderGet}`)
   }
 
+  // team 队伍
+  await page.locator('.command-item', { hasText: '队伍' }).first().click()
+  await page.waitForSelector('#team-name', { timeout: 10_000 })
+  await page.waitForTimeout(300)
+  const teamCreate = await page.locator('.output-code .cm-content').innerText()
+  if (!teamCreate.includes('team add red_team "红队"')) {
+    throw new Error(`team 创建输出不符合预期：${teamCreate}`)
+  }
+  if (!teamCreate.includes('team modify red_team friendlyFire false')) {
+    throw new Error(`team 选项输出不符合预期：${teamCreate}`)
+  }
+  await page.screenshot({ path: join(ARTIFACTS, 'team-form.png') })
+  await page.getByRole('button', { name: '加入队伍', exact: true }).click()
+  await page.waitForTimeout(300)
+  const teamJoin = await page.locator('.output-code .cm-content').innerText()
+  if (!teamJoin.includes('team join red_team @a')) {
+    throw new Error(`team 加入输出不符合预期：${teamJoin}`)
+  }
+  await page.getByRole('button', { name: '离开队伍', exact: true }).click()
+  await page.waitForTimeout(300)
+  const teamLeave = await page.locator('.output-code .cm-content').innerText()
+  if (!teamLeave.includes('team leave @a')) {
+    throw new Error(`team 离开输出不符合预期：${teamLeave}`)
+  }
+  await page.getByRole('button', { name: '创建队伍', exact: true }).click()
+
   // scoreboard 可视化
   await page.locator('.command-item', { hasText: '记分板' }).first().click()
   await page.waitForSelector('#scoreboard-objective', { timeout: 10_000 })

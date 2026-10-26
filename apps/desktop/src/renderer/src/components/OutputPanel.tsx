@@ -201,6 +201,7 @@ export function OutputPanel() {
     state.clear,
     state.gamerule,
     state.worldborder,
+    state.team,
     state.generic,
     state.outputMode,
     state.commandBlock
@@ -210,6 +211,7 @@ export function OutputPanel() {
   const multiLineMode =
     chainMode ||
     state.activeCommandId === 'bossbar' ||
+    state.activeCommandId === 'team' ||
     (state.activeCommandId === 'title' && state.title.times)
   const permission = state.activeCommandId
     ? permissionLabel(
