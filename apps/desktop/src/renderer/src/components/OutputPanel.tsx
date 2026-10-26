@@ -184,6 +184,8 @@ export function OutputPanel() {
     state.gamemode,
     state.damage,
     state.rotate,
+    state.spreadplayers,
+    state.ride,
     state.summon,
     state.setblock,
     state.execute,

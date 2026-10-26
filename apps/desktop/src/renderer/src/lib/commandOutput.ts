@@ -16,6 +16,8 @@ import {
   type GamemodeOptions,
   type DamageOptions,
   type RotateOptions,
+  type SpreadplayersOptions,
+  type RideOptions,
   type SetblockOptions,
   type ScoreboardOptions,
   type ParticleOptions,
@@ -46,6 +48,8 @@ import {
   selectGamemodeOutput,
   selectDamageOutput,
   selectRotateOutput,
+  selectSpreadplayersOutput,
+  selectRideOutput,
   selectChainOutput,
   selectCloneOutput,
   selectBossbarOutput,
@@ -101,6 +105,8 @@ export function getCommandOutput(
   gamemode: GamemodeOptions,
   damage: DamageOptions,
   rotate: RotateOptions,
+  spreadplayers: SpreadplayersOptions,
+  ride: RideOptions,
   summon: SummonOptions,
   setblock: SetblockOptions,
   execute: ExecuteOptions,
@@ -142,6 +148,8 @@ export function getCommandOutput(
   if (activeCommandId === 'gamemode') return selectGamemodeOutput(gamemode)
   if (activeCommandId === 'damage') return selectDamageOutput(damage)
   if (activeCommandId === 'rotate') return selectRotateOutput(rotate)
+  if (activeCommandId === 'spreadplayers') return selectSpreadplayersOutput(spreadplayers)
+  if (activeCommandId === 'ride') return selectRideOutput(ride)
   if (activeCommandId === 'summon') return selectSummonOutput(summon)
   if (activeCommandId === 'setblock') return selectSetblockOutput(setblock)
   if (activeCommandId === 'execute') return selectExecuteOutput(execute)
@@ -194,6 +202,8 @@ export function getCurrentOutput(
   gamemode: GamemodeOptions,
   damage: DamageOptions,
   rotate: RotateOptions,
+  spreadplayers: SpreadplayersOptions,
+  ride: RideOptions,
   summon: SummonOptions,
   setblock: SetblockOptions,
   execute: ExecuteOptions,
@@ -236,6 +246,8 @@ export function getCurrentOutput(
     gamemode,
     damage,
     rotate,
+    spreadplayers,
+    ride,
     summon,
     setblock,
     execute,

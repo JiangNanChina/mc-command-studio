@@ -31,10 +31,14 @@ import {
   buildGamemodeCommand,
   buildDamageCommand,
   buildRotateCommand,
+  buildSpreadplayersCommand,
+  buildRideCommand,
   createDefaultNbtGiveOptions,
   createDefaultGamemodeOptions,
   createDefaultDamageOptions,
   createDefaultRotateOptions,
+  createDefaultSpreadplayersOptions,
+  createDefaultRideOptions,
   buildLootCommand,
   buildSoundCommand,
   buildSummonCommand,
@@ -119,6 +123,8 @@ import {
   type GamemodeOptions,
   type DamageOptions,
   type RotateOptions,
+  type SpreadplayersOptions,
+  type RideOptions,
   type DataOptions,
   type LootOptions,
   type TimeOptions,
@@ -253,6 +259,8 @@ export interface ProjectPayload {
   gamemode: GamemodeOptions
   damage: DamageOptions
   rotate: RotateOptions
+  spreadplayers: SpreadplayersOptions
+  ride: RideOptions
   summon: SummonOptions
   setblock: SetblockOptions
   execute: ExecuteOptions
@@ -312,6 +320,8 @@ interface AppStore {
   gamemode: GamemodeOptions
   damage: DamageOptions
   rotate: RotateOptions
+  spreadplayers: SpreadplayersOptions
+  ride: RideOptions
   summon: SummonOptions
   setblock: SetblockOptions
   execute: ExecuteOptions
@@ -389,6 +399,8 @@ interface AppStore {
   updateGamemode: (patch: Partial<GamemodeOptions>) => void
   updateDamage: (patch: Partial<DamageOptions>) => void
   updateRotate: (patch: Partial<RotateOptions>) => void
+  updateSpreadplayers: (patch: Partial<SpreadplayersOptions>) => void
+  updateRide: (patch: Partial<RideOptions>) => void
   updateFill: (patch: Partial<FillOptions>) => void
   updateClone: (patch: Partial<CloneOptions>) => void
   updateEnchant: (patch: Partial<EnchantOptions>) => void
@@ -1464,6 +1476,34 @@ function normalizeRotate(input: Partial<RotateOptions> | undefined): RotateOptio
   }
 }
 
+function normalizeSpreadplayers(
+  input: Partial<SpreadplayersOptions> | undefined
+): SpreadplayersOptions {
+  const fallback = createDefaultSpreadplayersOptions()
+  if (!input) return fallback
+  return {
+    centerX: typeof input.centerX === 'string' ? input.centerX : fallback.centerX,
+    centerZ: typeof input.centerZ === 'string' ? input.centerZ : fallback.centerZ,
+    spreadDistance:
+      typeof input.spreadDistance === 'string' ? input.spreadDistance : fallback.spreadDistance,
+    maxRange: typeof input.maxRange === 'string' ? input.maxRange : fallback.maxRange,
+    underEnabled: Boolean(input.underEnabled),
+    maxHeight: typeof input.maxHeight === 'string' ? input.maxHeight : fallback.maxHeight,
+    respectTeams: input.respectTeams !== false,
+    targets: input.targets?.base ? input.targets : fallback.targets
+  }
+}
+
+function normalizeRide(input: Partial<RideOptions> | undefined): RideOptions {
+  const fallback = createDefaultRideOptions()
+  if (!input) return fallback
+  return {
+    target: input.target?.base ? input.target : fallback.target,
+    action: input.action === 'dismount' ? 'dismount' : 'mount',
+    vehicle: input.vehicle?.base ? input.vehicle : fallback.vehicle
+  }
+}
+
 function normalizeNbtGive(input: Partial<NbtGiveOptions> | undefined): NbtGiveOptions {
   const fallback = createDefaultNbtGiveOptions()
   if (!input) return fallback
@@ -1513,6 +1553,8 @@ function normalizePayload(input: unknown): ProjectPayload {
     gamemode: normalizeGamemode(data.gamemode),
     damage: normalizeDamage(data.damage),
     rotate: normalizeRotate(data.rotate),
+    spreadplayers: normalizeSpreadplayers(data.spreadplayers),
+    ride: normalizeRide(data.ride),
     summon: normalizeSummon(data.summon),
     setblock: normalizeSetblock(data.setblock),
     execute: normalizeExecute(data.execute),
@@ -1569,6 +1611,8 @@ function documentSnapshot(state: AppStore): string {
     gamemode: state.gamemode,
     damage: state.damage,
     rotate: state.rotate,
+    spreadplayers: state.spreadplayers,
+    ride: state.ride,
     summon: state.summon,
     setblock: state.setblock,
     execute: state.execute,
@@ -1639,6 +1683,8 @@ export const useAppStore = create<AppStore>()(
     gamemode: createDefaultGamemodeOptions(),
     damage: createDefaultDamageOptions(),
     rotate: createDefaultRotateOptions(),
+    spreadplayers: createDefaultSpreadplayersOptions(),
+    ride: createDefaultRideOptions(),
     summon: createDefaultSummonOptions(),
     setblock: createDefaultSetblockOptions(),
     execute: createDefaultExecuteOptions(),
@@ -1963,6 +2009,20 @@ export const useAppStore = create<AppStore>()(
     updateRotate: (patch) => {
       set((state) => {
         state.rotate = { ...state.rotate, ...patch }
+        state.dirty = true
+      })
+    },
+
+    updateSpreadplayers: (patch) => {
+      set((state) => {
+        state.spreadplayers = { ...state.spreadplayers, ...patch }
+        state.dirty = true
+      })
+    },
+
+    updateRide: (patch) => {
+      set((state) => {
+        state.ride = { ...state.ride, ...patch }
         state.dirty = true
       })
     },
@@ -2489,6 +2549,8 @@ export const useAppStore = create<AppStore>()(
         state.gamemode = createDefaultGamemodeOptions()
         state.damage = createDefaultDamageOptions()
         state.rotate = createDefaultRotateOptions()
+        state.spreadplayers = createDefaultSpreadplayersOptions()
+        state.ride = createDefaultRideOptions()
         state.summon = createDefaultSummonOptions()
         state.setblock = createDefaultSetblockOptions()
         state.execute = createDefaultExecuteOptions()
@@ -2553,6 +2615,8 @@ export const useAppStore = create<AppStore>()(
         gamemode: state.gamemode,
         damage: state.damage,
         rotate: state.rotate,
+        spreadplayers: state.spreadplayers,
+        ride: state.ride,
         summon: state.summon,
         setblock: state.setblock,
         execute: state.execute,
@@ -2609,6 +2673,8 @@ export const useAppStore = create<AppStore>()(
         state.gamemode = payload.gamemode
         state.damage = payload.damage
         state.rotate = payload.rotate
+        state.spreadplayers = payload.spreadplayers
+        state.ride = payload.ride
         state.summon = payload.summon
         state.setblock = payload.setblock
         state.execute = payload.execute
@@ -2866,6 +2932,14 @@ export function selectDamageOutput(damage: DamageOptions): BuildResult {
 
 export function selectRotateOutput(rotate: RotateOptions): BuildResult {
   return buildRotateCommand(rotate)
+}
+
+export function selectSpreadplayersOutput(spreadplayers: SpreadplayersOptions): BuildResult {
+  return buildSpreadplayersCommand(spreadplayers)
+}
+
+export function selectRideOutput(ride: RideOptions): BuildResult {
+  return buildRideCommand(ride)
 }
 
 export function selectSummonOutput(summon: SummonOptions): BuildResult {

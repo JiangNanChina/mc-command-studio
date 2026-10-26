@@ -7,6 +7,8 @@ export const LEGACY_SAFE_FORMS = new Set([
   'gamemode',
   'damage',
   'rotate',
+  'spreadplayers',
+  'ride',
   'summon',
   'tp',
   'effect',

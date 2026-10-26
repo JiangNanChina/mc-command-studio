@@ -939,6 +939,20 @@ async function main() {
   if (!rotateOutput.includes('rotate @s 90 0')) {
     throw new Error(`rotate 输出不符合预期：${rotateOutput}`)
   }
+  await page.locator('.command-item', { hasText: '分散玩家' }).first().click()
+  await page.waitForSelector('#spread-center-x', { timeout: 10_000 })
+  await page.waitForTimeout(300)
+  const spreadOutput = await page.locator('.output-code .cm-content').innerText()
+  if (!spreadOutput.includes('spreadplayers 0 0 10 50 true @a')) {
+    throw new Error(`spreadplayers 输出不符合预期：${spreadOutput}`)
+  }
+  await page.locator('.command-item', { hasText: '骑乘' }).first().click()
+  await page.getByRole('button', { name: '骑上坐骑', exact: true }).waitFor()
+  await page.waitForTimeout(300)
+  const rideOutput = await page.locator('.output-code .cm-content').innerText()
+  if (!rideOutput.includes('ride @s mount @e[type=minecraft:horse]')) {
+    throw new Error(`ride 输出不符合预期：${rideOutput}`)
+  }
   await page.screenshot({ path: join(ARTIFACTS, 'misc-commands.png') })
 
   // 模板库

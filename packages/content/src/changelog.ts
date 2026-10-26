@@ -22,6 +22,27 @@ const REPO = 'https://github.com/JiangNanChina/mc-command-studio'
  */
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: '0.1.40',
+    date: '2026-10-27',
+    title: 'spreadplayers / ride 可视化',
+    highlights: ['新增分散玩家与骑乘表单。', '1.20.4 同步可用。'],
+    sections: [
+      {
+        type: 'added',
+        items: ['spreadplayers 中心/距离/范围/under/队伍。', 'ride 骑乘/下坐骑。']
+      },
+      {
+        type: 'improved',
+        items: ['可视化根命令 38 → 40。', '单元测试 213 → 218。']
+      },
+      {
+        type: 'fixed',
+        items: ['无。']
+      }
+    ],
+    releaseUrl: `${REPO}/releases/tag/v0.1.40`
+  },
+  {
     version: '0.1.39',
     date: '2026-10-27',
     title: 'gamemode / damage / rotate 可视化',

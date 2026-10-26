@@ -33,6 +33,8 @@ export function StatusBar() {
     state.gamemode,
     state.damage,
     state.rotate,
+    state.spreadplayers,
+    state.ride,
     state.summon,
     state.setblock,
     state.execute,
