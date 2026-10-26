@@ -9,6 +9,8 @@ export const LEGACY_SAFE_FORMS = new Set([
   'rotate',
   'spreadplayers',
   'ride',
+  'random',
+  'tick',
   'summon',
   'tp',
   'effect',

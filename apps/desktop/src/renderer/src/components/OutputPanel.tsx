@@ -186,6 +186,8 @@ export function OutputPanel() {
     state.rotate,
     state.spreadplayers,
     state.ride,
+    state.random,
+    state.tick,
     state.summon,
     state.setblock,
     state.execute,

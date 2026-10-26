@@ -33,12 +33,16 @@ import {
   buildRotateCommand,
   buildSpreadplayersCommand,
   buildRideCommand,
+  buildRandomCommand,
+  buildTickCommand,
   createDefaultNbtGiveOptions,
   createDefaultGamemodeOptions,
   createDefaultDamageOptions,
   createDefaultRotateOptions,
   createDefaultSpreadplayersOptions,
   createDefaultRideOptions,
+  createDefaultRandomOptions,
+  createDefaultTickOptions,
   buildLootCommand,
   buildSoundCommand,
   buildSummonCommand,
@@ -125,6 +129,8 @@ import {
   type RotateOptions,
   type SpreadplayersOptions,
   type RideOptions,
+  type RandomOptions,
+  type TickOptions,
   type DataOptions,
   type LootOptions,
   type TimeOptions,
@@ -261,6 +267,8 @@ export interface ProjectPayload {
   rotate: RotateOptions
   spreadplayers: SpreadplayersOptions
   ride: RideOptions
+  random: RandomOptions
+  tick: TickOptions
   summon: SummonOptions
   setblock: SetblockOptions
   execute: ExecuteOptions
@@ -322,6 +330,8 @@ interface AppStore {
   rotate: RotateOptions
   spreadplayers: SpreadplayersOptions
   ride: RideOptions
+  random: RandomOptions
+  tick: TickOptions
   summon: SummonOptions
   setblock: SetblockOptions
   execute: ExecuteOptions
@@ -401,6 +411,8 @@ interface AppStore {
   updateRotate: (patch: Partial<RotateOptions>) => void
   updateSpreadplayers: (patch: Partial<SpreadplayersOptions>) => void
   updateRide: (patch: Partial<RideOptions>) => void
+  updateRandom: (patch: Partial<RandomOptions>) => void
+  updateTick: (patch: Partial<TickOptions>) => void
   updateFill: (patch: Partial<FillOptions>) => void
   updateClone: (patch: Partial<CloneOptions>) => void
   updateEnchant: (patch: Partial<EnchantOptions>) => void
@@ -1504,6 +1516,37 @@ function normalizeRide(input: Partial<RideOptions> | undefined): RideOptions {
   }
 }
 
+function normalizeRandom(input: Partial<RandomOptions> | undefined): RandomOptions {
+  const fallback = createDefaultRandomOptions()
+  if (!input) return fallback
+  return {
+    mode: input.mode === 'roll' ? 'roll' : 'value',
+    range: typeof input.range === 'string' ? input.range : fallback.range,
+    sequence: typeof input.sequence === 'string' ? input.sequence : fallback.sequence
+  }
+}
+
+function normalizeTick(input: Partial<TickOptions> | undefined): TickOptions {
+  const fallback = createDefaultTickOptions()
+  if (!input) return fallback
+  const actions: TickOptions['action'][] = [
+    'freeze',
+    'unfreeze',
+    'sprint',
+    'sprintStop',
+    'rate',
+    'step',
+    'stepStop'
+  ]
+  return {
+    action: actions.includes(input.action as TickOptions['action'])
+      ? (input.action as TickOptions['action'])
+      : 'freeze',
+    rate: typeof input.rate === 'string' ? input.rate : fallback.rate,
+    time: typeof input.time === 'string' ? input.time : fallback.time
+  }
+}
+
 function normalizeNbtGive(input: Partial<NbtGiveOptions> | undefined): NbtGiveOptions {
   const fallback = createDefaultNbtGiveOptions()
   if (!input) return fallback
@@ -1555,6 +1598,8 @@ function normalizePayload(input: unknown): ProjectPayload {
     rotate: normalizeRotate(data.rotate),
     spreadplayers: normalizeSpreadplayers(data.spreadplayers),
     ride: normalizeRide(data.ride),
+    random: normalizeRandom(data.random),
+    tick: normalizeTick(data.tick),
     summon: normalizeSummon(data.summon),
     setblock: normalizeSetblock(data.setblock),
     execute: normalizeExecute(data.execute),
@@ -1613,6 +1658,8 @@ function documentSnapshot(state: AppStore): string {
     rotate: state.rotate,
     spreadplayers: state.spreadplayers,
     ride: state.ride,
+    random: state.random,
+    tick: state.tick,
     summon: state.summon,
     setblock: state.setblock,
     execute: state.execute,
@@ -1685,6 +1732,8 @@ export const useAppStore = create<AppStore>()(
     rotate: createDefaultRotateOptions(),
     spreadplayers: createDefaultSpreadplayersOptions(),
     ride: createDefaultRideOptions(),
+    random: createDefaultRandomOptions(),
+    tick: createDefaultTickOptions(),
     summon: createDefaultSummonOptions(),
     setblock: createDefaultSetblockOptions(),
     execute: createDefaultExecuteOptions(),
@@ -2023,6 +2072,20 @@ export const useAppStore = create<AppStore>()(
     updateRide: (patch) => {
       set((state) => {
         state.ride = { ...state.ride, ...patch }
+        state.dirty = true
+      })
+    },
+
+    updateRandom: (patch) => {
+      set((state) => {
+        state.random = { ...state.random, ...patch }
+        state.dirty = true
+      })
+    },
+
+    updateTick: (patch) => {
+      set((state) => {
+        state.tick = { ...state.tick, ...patch }
         state.dirty = true
       })
     },
@@ -2551,6 +2614,8 @@ export const useAppStore = create<AppStore>()(
         state.rotate = createDefaultRotateOptions()
         state.spreadplayers = createDefaultSpreadplayersOptions()
         state.ride = createDefaultRideOptions()
+        state.random = createDefaultRandomOptions()
+        state.tick = createDefaultTickOptions()
         state.summon = createDefaultSummonOptions()
         state.setblock = createDefaultSetblockOptions()
         state.execute = createDefaultExecuteOptions()
@@ -2617,6 +2682,8 @@ export const useAppStore = create<AppStore>()(
         rotate: state.rotate,
         spreadplayers: state.spreadplayers,
         ride: state.ride,
+        random: state.random,
+        tick: state.tick,
         summon: state.summon,
         setblock: state.setblock,
         execute: state.execute,
@@ -2675,6 +2742,8 @@ export const useAppStore = create<AppStore>()(
         state.rotate = payload.rotate
         state.spreadplayers = payload.spreadplayers
         state.ride = payload.ride
+        state.random = payload.random
+        state.tick = payload.tick
         state.summon = payload.summon
         state.setblock = payload.setblock
         state.execute = payload.execute
@@ -2940,6 +3009,14 @@ export function selectSpreadplayersOutput(spreadplayers: SpreadplayersOptions): 
 
 export function selectRideOutput(ride: RideOptions): BuildResult {
   return buildRideCommand(ride)
+}
+
+export function selectRandomOutput(random: RandomOptions): BuildResult {
+  return buildRandomCommand(random)
+}
+
+export function selectTickOutput(tick: TickOptions): BuildResult {
+  return buildTickCommand(tick)
 }
 
 export function selectSummonOutput(summon: SummonOptions): BuildResult {

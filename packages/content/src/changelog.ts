@@ -22,6 +22,27 @@ const REPO = 'https://github.com/JiangNanChina/mc-command-studio'
  */
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: '0.1.41',
+    date: '2026-10-27',
+    title: 'random / tick 可视化',
+    highlights: ['随机数与游戏刻控制。', '1.20.4 同步可用。'],
+    sections: [
+      {
+        type: 'added',
+        items: ['random value/roll + 序列。', 'tick 冻结/加速/速率/单步。']
+      },
+      {
+        type: 'improved',
+        items: ['可视化根命令 40 → 42。', '单元测试 218 → 224。']
+      },
+      {
+        type: 'fixed',
+        items: ['无。']
+      }
+    ],
+    releaseUrl: `${REPO}/releases/tag/v0.1.41`
+  },
+  {
     version: '0.1.40',
     date: '2026-10-27',
     title: 'spreadplayers / ride 可视化',

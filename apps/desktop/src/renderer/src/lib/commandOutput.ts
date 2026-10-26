@@ -18,6 +18,8 @@ import {
   type RotateOptions,
   type SpreadplayersOptions,
   type RideOptions,
+  type RandomOptions,
+  type TickOptions,
   type SetblockOptions,
   type ScoreboardOptions,
   type ParticleOptions,
@@ -50,6 +52,8 @@ import {
   selectRotateOutput,
   selectSpreadplayersOutput,
   selectRideOutput,
+  selectRandomOutput,
+  selectTickOutput,
   selectChainOutput,
   selectCloneOutput,
   selectBossbarOutput,
@@ -107,6 +111,8 @@ export function getCommandOutput(
   rotate: RotateOptions,
   spreadplayers: SpreadplayersOptions,
   ride: RideOptions,
+  random: RandomOptions,
+  tick: TickOptions,
   summon: SummonOptions,
   setblock: SetblockOptions,
   execute: ExecuteOptions,
@@ -150,6 +156,8 @@ export function getCommandOutput(
   if (activeCommandId === 'rotate') return selectRotateOutput(rotate)
   if (activeCommandId === 'spreadplayers') return selectSpreadplayersOutput(spreadplayers)
   if (activeCommandId === 'ride') return selectRideOutput(ride)
+  if (activeCommandId === 'random') return selectRandomOutput(random)
+  if (activeCommandId === 'tick') return selectTickOutput(tick)
   if (activeCommandId === 'summon') return selectSummonOutput(summon)
   if (activeCommandId === 'setblock') return selectSetblockOutput(setblock)
   if (activeCommandId === 'execute') return selectExecuteOutput(execute)
@@ -204,6 +212,8 @@ export function getCurrentOutput(
   rotate: RotateOptions,
   spreadplayers: SpreadplayersOptions,
   ride: RideOptions,
+  random: RandomOptions,
+  tick: TickOptions,
   summon: SummonOptions,
   setblock: SetblockOptions,
   execute: ExecuteOptions,
@@ -248,6 +258,8 @@ export function getCurrentOutput(
     rotate,
     spreadplayers,
     ride,
+    random,
+    tick,
     summon,
     setblock,
     execute,

@@ -953,6 +953,21 @@ async function main() {
   if (!rideOutput.includes('ride @s mount @e[type=minecraft:horse]')) {
     throw new Error(`ride 输出不符合预期：${rideOutput}`)
   }
+  await page.locator('.command-item', { hasText: '随机数' }).first().click()
+  await page.waitForSelector('#random-range', { timeout: 10_000 })
+  await page.waitForTimeout(300)
+  const randomOutput = await page.locator('.output-code .cm-content').innerText()
+  if (!randomOutput.includes('random value 1..6')) {
+    throw new Error(`random 输出不符合预期：${randomOutput}`)
+  }
+  await page.locator('.command-item', { hasText: '游戏刻控制' }).first().click()
+  await page.getByRole('button', { name: '设置速率', exact: true }).click()
+  await page.waitForSelector('#tick-rate', { timeout: 10_000 })
+  await page.waitForTimeout(300)
+  const tickOutput = await page.locator('.output-code .cm-content').innerText()
+  if (!tickOutput.includes('tick rate 20')) {
+    throw new Error(`tick 输出不符合预期：${tickOutput}`)
+  }
   await page.screenshot({ path: join(ARTIFACTS, 'misc-commands.png') })
 
   // 模板库

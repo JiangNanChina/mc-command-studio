@@ -44,6 +44,7 @@ export const COMMANDS: CommandMeta[] = [
   { id: 'test', name: '游戏测试', category: '实体', description: '运行或管理内置的游戏测试实例。' },
 
   { id: 'time', name: '时间', category: '世界', description: '设置或推进世界时间（白天、夜晚、正午等）。', example: 'time set day' },
+  { id: 'tick', name: '游戏刻控制', category: '世界', description: '冻结、加速、调速或单步执行游戏刻。', example: 'tick freeze' },
   { id: 'weather', name: '天气', category: '世界', description: '切换晴天、下雨或雷暴，并设置持续时间。', example: 'weather clear 6000' },
   { id: 'difficulty', name: '难度', category: '世界', description: '设置世界难度（和平/简单/普通/困难）。', example: 'difficulty hard' },
   { id: 'gamerule', name: '游戏规则', category: '世界', description: '开关keepInventory、doDaylightCycle等世界规则。', example: 'gamerule keepInventory true' },

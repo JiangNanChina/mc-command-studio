@@ -14,6 +14,8 @@ import { DamageForm } from './components/DamageForm'
 import { RotateForm } from './components/RotateForm'
 import { SpreadplayersForm } from './components/SpreadplayersForm'
 import { RideForm } from './components/RideForm'
+import { RandomForm } from './components/RandomForm'
+import { TickForm } from './components/TickForm'
 import { SummonForm } from './components/SummonForm'
 import { SetblockForm } from './components/SetblockForm'
 import { ExecuteForm } from './components/ExecuteForm'
@@ -134,6 +136,8 @@ export default function App() {
   const rotate = state.rotate
   const spreadplayers = state.spreadplayers
   const ride = state.ride
+  const random = state.random
+  const tick = state.tick
   const summon = state.summon
   const setblock = state.setblock
   const execute = state.execute
@@ -271,6 +275,8 @@ export default function App() {
           store.rotate,
           store.spreadplayers,
           store.ride,
+          store.random,
+          store.tick,
           store.summon,
           store.setblock,
           store.execute,
@@ -329,7 +335,7 @@ export default function App() {
       void useAppStore.getState().autosave()
     }, 4000)
     return () => clearTimeout(timer)
-  }, [dirty, give, nbtGive, gamemode, damage, rotate, spreadplayers, ride, summon, setblock, execute, teleport, effect, fill, clone, chain, enchant, xp, tellraw, title, sound, bossbar, scoreboard, particle, world, tag, clear, gamerule, worldborder, team, spawnpoint, worldSpawn, forceload, attribute, automation, itemCommand, dataCommand, loot, generic, commandBlock, outputMode, activeCommandId, projectName])
+  }, [dirty, give, nbtGive, gamemode, damage, rotate, spreadplayers, ride, random, tick, summon, setblock, execute, teleport, effect, fill, clone, chain, enchant, xp, tellraw, title, sound, bossbar, scoreboard, particle, world, tag, clear, gamerule, worldborder, team, spawnpoint, worldSpawn, forceload, attribute, automation, itemCommand, dataCommand, loot, generic, commandBlock, outputMode, activeCommandId, projectName])
 
   useEffect(() => {
     if (!toast) return
@@ -399,6 +405,10 @@ export default function App() {
             <SpreadplayersForm />
           ) : activeCommandId === 'ride' ? (
             <RideForm />
+          ) : activeCommandId === 'random' ? (
+            <RandomForm />
+          ) : activeCommandId === 'tick' ? (
+            <TickForm />
           ) : activeCommandId === 'summon' ? (
             <SummonForm />
           ) : activeCommandId === 'setblock' ? (
