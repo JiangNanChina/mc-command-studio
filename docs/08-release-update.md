@@ -66,12 +66,15 @@
 ```yaml
 publish:
   - provider: github
-    owner: REPLACE_ME
+    owner: JiangNanChina
     repo: mc-command-studio
     releaseType: draft
 ```
 
-**发布前必须把 `REPLACE_ME` 改成你的 GitHub 用户名/组织名**，否则 `app-update.yml` 指向不存在的仓库，检查更新会失败。可以运行：
+本仓库已完成配置，并已发布首个 Release：
+[MC 指令工坊 v0.1.0](https://github.com/JiangNanChina/mc-command-studio/releases/tag/v0.1.0)（5 个资产，包含 `latest.yml`）。
+
+如果你 fork 到其他账号，需要把 `owner/repo` 改成你的仓库，否则 `app-update.yml` 指向不存在的仓库，检查更新会失败。可以运行：
 
 ```bash
 pnpm configure:github <你的GitHub用户名> mc-command-studio
@@ -209,6 +212,8 @@ $env:MCSTUDIO_UPDATE_URL = "http://127.0.0.1:8123/updates/"
 - [x] 便携版提示手动更新（`PORTABLE_EXECUTABLE_DIR` 模式实测）
 
 **实测结果（2026-10-26）**：在 `artifacts/update-run` 安装最终 0.1.0，设置 `MCSTUDIO_UPDATE_URL=http://127.0.0.1:8123/updates/`，点击检查更新 → 下载 → 重启安装，安装目录中的 exe 产品版本变为 **0.1.1.0**，用户数据目录保留。
+
+GitHub Actions 的 Release 工作流已在本仓库成功执行（run 40275025582），创建并发布了 [v0.1.0 Release](https://github.com/JiangNanChina/mc-command-studio/releases/tag/v0.1.0)；公开的 `releases/latest/download/latest.yml` 返回 200，内容指向 `MC-Command-Studio-Setup-0.1.0.exe`，大小 125,302,228 字节，与 Release 资产一致。
 
 便携版模式通过 `PORTABLE_EXECUTABLE_DIR` 启动验证：自动更新被禁用，设置中显示“便携版不支持自动更新，请手动下载新版”（截图 `docs/assets/portable.png`）。
 
