@@ -55,6 +55,7 @@ export function StatusBar() {
     state.worldSpawn,
     state.forceload,
     state.attribute,
+    state.automation,
     state.generic,
     state.outputMode,
     state.commandBlock

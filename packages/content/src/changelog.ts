@@ -22,6 +22,38 @@ const REPO = 'https://github.com/JiangNanChina/mc-command-studio'
  */
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: '0.1.23',
+    date: '2026-10-26',
+    title: '可视化进度、函数与计划任务',
+    highlights: [
+      'advancement 授予/收回与五种范围。',
+      'function 宏参数、schedule 延迟/清除。'
+    ],
+    sections: [
+      {
+        type: 'added',
+        items: [
+          'advancement：grant/revoke、only/from/through/until/everything、criterion。',
+          'function：函数名与可选 SNBT 宏参数。',
+          'schedule：延迟运行、append/replace、clear。',
+          '函数名可从数据包工作区自动补全。'
+        ]
+      },
+      {
+        type: 'improved',
+        items: [
+          '资源名与时间格式校验。',
+          '单元测试 153 → 162；冒烟测试覆盖三项。'
+        ]
+      },
+      {
+        type: 'fixed',
+        items: ['无。']
+      }
+    ],
+    releaseUrl: `${REPO}/releases/tag/v0.1.23`
+  },
+  {
     version: '0.1.22',
     date: '2026-10-26',
     title: '可视化实体属性 attribute',

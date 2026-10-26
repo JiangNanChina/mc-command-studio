@@ -292,6 +292,15 @@
 - 修饰符添加、移除、查询值；支持加算、基础值乘算、总值乘算。
 - scale 缩放查询结果。
 
+## 3.26 advancement / function / schedule
+
+![进度表单](assets/advancement-form.png)
+
+- advancement：授予/收回、only/from/through/until/everything、条件名。
+- function：函数名、可选 SNBT 宏参数，数据包函数自动补全。
+- schedule：延迟运行、append/replace、清除计划。
+- 三个命令分别有独立表单，侧栏可直接打开。
+
 ## 4. 通用构建器
 
 ![通用构建器进入方式](assets/command-block.png)

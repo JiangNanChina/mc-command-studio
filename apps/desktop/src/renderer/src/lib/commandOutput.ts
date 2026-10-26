@@ -33,6 +33,7 @@ import {
   type VersionPack,
   type XpOptions
 } from '@mcstudio/core'
+import type { AutomationOptions } from '../store'
 import {
   selectChainOutput,
   selectCloneOutput,
@@ -58,6 +59,9 @@ import {
   selectWorldSpawnOutput,
   selectForceloadOutput,
   selectAttributeOutput,
+  selectAdvancementOutput,
+  selectFunctionOutput,
+  selectScheduleOutput,
   selectSoundOutput,
   selectSummonOutput,
   selectTellrawOutput,
@@ -105,6 +109,7 @@ export function getCommandOutput(
   worldSpawn: WorldSpawnOptions,
   forceload: ForceloadOptions,
   attribute: AttributeOptions,
+  automation: AutomationOptions,
   generic: GenericDraft
 ): BuildResult {
   if (!activeCommandId) return { text: '', diagnostics: [] }
@@ -136,6 +141,9 @@ export function getCommandOutput(
   if (activeCommandId === 'setworldspawn') return selectWorldSpawnOutput(worldSpawn)
   if (activeCommandId === 'forceload') return selectForceloadOutput(forceload)
   if (activeCommandId === 'attribute') return selectAttributeOutput(attribute)
+  if (activeCommandId === 'advancement') return selectAdvancementOutput(automation.advancement)
+  if (activeCommandId === 'function') return selectFunctionOutput(automation.function)
+  if (activeCommandId === 'schedule') return selectScheduleOutput(automation.schedule)
   if (activeCommandId === 'playsound' || activeCommandId === 'stopsound') {
     return selectSoundOutput(sound)
   }
@@ -173,6 +181,7 @@ export function getCurrentOutput(
   worldSpawn: WorldSpawnOptions,
   forceload: ForceloadOptions,
   attribute: AttributeOptions,
+  automation: AutomationOptions,
   generic: GenericDraft,
   outputMode: OutputMode,
   commandBlock: CommandBlockOptions
@@ -207,6 +216,7 @@ export function getCurrentOutput(
     worldSpawn,
     forceload,
     attribute,
+    automation,
     generic
   )
   if (outputMode === 'command') {

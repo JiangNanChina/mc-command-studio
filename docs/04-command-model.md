@@ -444,7 +444,19 @@ interface AttributeOptions {
 
 40 个属性来自 26.3 注册表与官方中文名。属性/修饰符 ID 做 `namespace:path` 校验；基础值、修饰符值、scale 做数字校验。
 
-### 1.26 通用构建器：所有 94 个根命令
+### 1.26 进度自动化：`advancement` / `function` / `schedule`
+
+```ts
+interface AutomationOptions {
+  advancement: { action: 'grant' | 'revoke'; mode: 'everything' | 'only' | 'from' | 'through' | 'until'; target: Selector; advancement: string; criterion: string }
+  function: { name: string; argumentsEnabled: boolean; arguments: string }
+  schedule: { action: 'function' | 'clear'; functionName: string; time: string; mode: 'append' | 'replace' }
+}
+```
+
+advancement 支持五种范围；function 可选 SNBT 宏参数；schedule 支持延迟与清除。函数名可从数据包工作区自动补全。资源名与时间格式均做校验。
+
+### 1.27 通用构建器：所有 94 个根命令
 
 ```ts
 interface GenericStep {
@@ -577,7 +589,7 @@ type Unit =
 
 ## 7. 测试
 
-`packages/core/src/*.test.ts` 与 `apps/desktop/src/shared/*.test.ts` 共 153 个用例，覆盖：
+`packages/core/src/*.test.ts` 与 `apps/desktop/src/shared/*.test.ts` 共 162 个用例，覆盖：
 
 - SNBT / 命令方块字符串转义。
 - 选择器排序、引号、范围、NBT 括号、分数。
@@ -606,6 +618,7 @@ type Unit =
 - `/team` 创建/修改/加入/离开/删除/查询、颜色/友伤/可见性/碰撞、队伍名校验。
 - `/spawnpoint`/`/setworldspawn` 坐标与朝向；`/forceload` 单区块/矩形/全部移除/查询。
 - `/attribute` 总值/基础值/修饰符增删与查询、ID/数值校验。
+- `/advancement` 五种范围、criterion；`/function` 宏参数；`/schedule` 延迟/清除。
 - 数据包文件树、load/tick 标签、多行函数、非法命名空间/函数名/空命令。
 - `/give` 文本导入：选择器、组件、数量、未知组件 raw。
 - 命令树遍历、通用路径、参数范围。

@@ -572,6 +572,65 @@ async function main() {
   }
   await page.screenshot({ path: join(ARTIFACTS, 'attribute-form.png') })
 
+  // advancement / function / schedule
+  await page.locator('.command-item', { hasText: '进度' }).first().click()
+  await page.waitForSelector('#advancement-id', { timeout: 10_000 })
+  await page.waitForTimeout(300)
+  const advancementOutput = await page.locator('.output-code .cm-content').innerText()
+  if (!advancementOutput.includes('advancement grant @s only minecraft:story/root')) {
+    throw new Error(`advancement 输出不符合预期：${advancementOutput}`)
+  }
+  await page.getByRole('button', { name: '收回', exact: true }).click()
+  await page.waitForTimeout(200)
+  const advancementRevoke = await page.locator('.output-code .cm-content').innerText()
+  if (!advancementRevoke.includes('advancement revoke @s only')) {
+    throw new Error(`advancement 收回输出不符合预期：${advancementRevoke}`)
+  }
+  await page.getByRole('button', { name: '全部进度', exact: true }).click()
+  await page.waitForTimeout(200)
+  const advancementAll = await page.locator('.output-code .cm-content').innerText()
+  if (!advancementAll.includes('advancement revoke @s everything')) {
+    throw new Error(`advancement 全部输出不符合预期：${advancementAll}`)
+  }
+  await page.screenshot({ path: join(ARTIFACTS, 'advancement-form.png') })
+
+  await page.locator('.command-item', { hasText: 'function' }).first().click()
+  await page.waitForSelector('#function-name', { timeout: 10_000 })
+  await page.waitForTimeout(300)
+  const functionOutput = await page.locator('.output-code .cm-content').innerText()
+  if (!functionOutput.includes('function mcstudio:main')) {
+    throw new Error(`function 输出不符合预期：${functionOutput}`)
+  }
+  await page.getByLabel('传入宏参数（SNBT）').check()
+  await page.fill('#function-arguments', '{"name":"Steve"}')
+  await page.waitForTimeout(300)
+  const functionArgs = await page.locator('.output-code .cm-content').innerText()
+  if (!functionArgs.includes('function mcstudio:main {"name":"Steve"}')) {
+    throw new Error(`function 参数输出不符合预期：${functionArgs}`)
+  }
+  await page.screenshot({ path: join(ARTIFACTS, 'function-form.png') })
+
+  await page.locator('.command-item', { hasText: '计划任务' }).first().click()
+  await page.waitForSelector('#schedule-function', { timeout: 10_000 })
+  await page.waitForTimeout(300)
+  const scheduleOutput = await page.locator('.output-code .cm-content').innerText()
+  if (!scheduleOutput.includes('schedule function mcstudio:main 1s replace')) {
+    throw new Error(`schedule 输出不符合预期：${scheduleOutput}`)
+  }
+  await page.fill('#schedule-time', '20t')
+  await page.waitForTimeout(300)
+  const scheduleTime = await page.locator('.output-code .cm-content').innerText()
+  if (!scheduleTime.includes('schedule function mcstudio:main 20t replace')) {
+    throw new Error(`schedule 时间输出不符合预期：${scheduleTime}`)
+  }
+  await page.getByRole('button', { name: '清除计划', exact: true }).click()
+  await page.waitForTimeout(200)
+  const scheduleClear = await page.locator('.output-code .cm-content').innerText()
+  if (!scheduleClear.includes('schedule clear mcstudio:main')) {
+    throw new Error(`schedule 清除输出不符合预期：${scheduleClear}`)
+  }
+  await page.screenshot({ path: join(ARTIFACTS, 'schedule-form.png') })
+
   // scoreboard 可视化
   await page.locator('.command-item', { hasText: '记分板' }).first().click()
   await page.waitForSelector('#scoreboard-objective', { timeout: 10_000 })

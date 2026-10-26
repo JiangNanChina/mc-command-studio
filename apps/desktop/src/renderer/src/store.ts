@@ -22,6 +22,9 @@ import {
   buildWorldSpawnCommand,
   buildForceloadCommand,
   buildAttributeCommand,
+  buildAdvancementCommand,
+  buildFunctionCommand,
+  buildScheduleCommand,
   buildSoundCommand,
   buildSummonCommand,
   buildTeleportCommand,
@@ -50,6 +53,9 @@ import {
   createDefaultWorldSpawnOptions,
   createDefaultForceloadOptions,
   createDefaultAttributeOptions,
+  createDefaultAdvancementOptions,
+  createDefaultFunctionOptions,
+  createDefaultScheduleOptions,
   createDefaultSetblockOptions,
   createDefaultSoundOptions,
   createDefaultSummonOptions,
@@ -91,6 +97,9 @@ import {
   type WorldSpawnOptions,
   type ForceloadOptions,
   type AttributeOptions,
+  type AdvancementOptions,
+  type FunctionOptions,
+  type ScheduleOptions,
   type TimeOptions,
   type SetblockMode,
   type SetblockOptions,
@@ -138,6 +147,12 @@ export interface DatapackDraft {
   tickFunction: string
 }
 
+export interface AutomationOptions {
+  advancement: AdvancementOptions
+  function: FunctionOptions
+  schedule: ScheduleOptions
+}
+
 function defaultDatapackDraft(): DatapackDraft {
   return {
     namespace: 'mcstudio',
@@ -178,6 +193,7 @@ export interface ProjectPayload {
   worldSpawn: WorldSpawnOptions
   forceload: ForceloadOptions
   attribute: AttributeOptions
+  automation: AutomationOptions
   datapack: DatapackDraft
   generic: GenericDraft
   commandBlock: CommandBlockOptions
@@ -229,6 +245,7 @@ interface AppStore {
   worldSpawn: WorldSpawnOptions
   forceload: ForceloadOptions
   attribute: AttributeOptions
+  automation: AutomationOptions
   datapack: DatapackDraft
   generic: GenericDraft
   commandBlock: CommandBlockOptions
@@ -294,6 +311,9 @@ interface AppStore {
   updateWorldSpawn: (patch: Partial<WorldSpawnOptions>) => void
   updateForceload: (patch: Partial<ForceloadOptions>) => void
   updateAttribute: (patch: Partial<AttributeOptions>) => void
+  updateAdvancement: (patch: Partial<AdvancementOptions>) => void
+  updateFunction: (patch: Partial<FunctionOptions>) => void
+  updateSchedule: (patch: Partial<ScheduleOptions>) => void
   openDatapack: () => void
   updateDatapackMeta: (patch: Partial<Pick<DatapackDraft, 'namespace' | 'description'>>) => void
   addDatapackFunction: () => void
@@ -1110,6 +1130,61 @@ function normalizeAttribute(input: Partial<AttributeOptions> | undefined): Attri
   }
 }
 
+function normalizeAutomation(input: Partial<AutomationOptions> | undefined): AutomationOptions {
+  const advancementFallback = createDefaultAdvancementOptions()
+  const functionFallback = createDefaultFunctionOptions()
+  const scheduleFallback = createDefaultScheduleOptions()
+  const advancementModes: AdvancementOptions['mode'][] = [
+    'everything',
+    'only',
+    'from',
+    'through',
+    'until'
+  ]
+  const scheduleModes: ScheduleOptions['mode'][] = ['append', 'replace']
+  return {
+    advancement: {
+      action: input?.advancement?.action === 'revoke' ? 'revoke' : 'grant',
+      mode: advancementModes.includes(input?.advancement?.mode as AdvancementOptions['mode'])
+        ? (input?.advancement?.mode as AdvancementOptions['mode'])
+        : 'only',
+      target: input?.advancement?.target?.base
+        ? input.advancement.target
+        : advancementFallback.target,
+      advancement:
+        typeof input?.advancement?.advancement === 'string'
+          ? input.advancement.advancement
+          : advancementFallback.advancement,
+      criterion:
+        typeof input?.advancement?.criterion === 'string'
+          ? input.advancement.criterion
+          : ''
+    },
+    function: {
+      name:
+        typeof input?.function?.name === 'string'
+          ? input.function.name
+          : functionFallback.name,
+      argumentsEnabled: Boolean(input?.function?.argumentsEnabled),
+      arguments:
+        typeof input?.function?.arguments === 'string'
+          ? input.function.arguments
+          : functionFallback.arguments
+    },
+    schedule: {
+      action: input?.schedule?.action === 'clear' ? 'clear' : 'function',
+      functionName:
+        typeof input?.schedule?.functionName === 'string'
+          ? input.schedule.functionName
+          : scheduleFallback.functionName,
+      time: typeof input?.schedule?.time === 'string' ? input.schedule.time : scheduleFallback.time,
+      mode: scheduleModes.includes(input?.schedule?.mode as ScheduleOptions['mode'])
+        ? (input?.schedule?.mode as ScheduleOptions['mode'])
+        : 'replace'
+    }
+  }
+}
+
 function normalizeGive(input: Partial<GiveOptions> | undefined): GiveOptions {
   const fallback = createDefaultGiveOptions()
   if (!input) return fallback
@@ -1160,6 +1235,7 @@ function normalizePayload(input: unknown): ProjectPayload {
     worldSpawn: normalizeWorldSpawn(data.worldSpawn),
     forceload: normalizeForceload(data.forceload),
     attribute: normalizeAttribute(data.attribute),
+    automation: normalizeAutomation(data.automation),
     datapack: normalizeDatapack(data.datapack),
     generic:
       data.generic && Array.isArray(data.generic.steps)
@@ -1208,6 +1284,7 @@ function documentSnapshot(state: AppStore): string {
     worldSpawn: state.worldSpawn,
     forceload: state.forceload,
     attribute: state.attribute,
+    automation: state.automation,
     datapack: state.datapack,
     generic: state.generic,
     commandBlock: state.commandBlock
@@ -1270,6 +1347,11 @@ export const useAppStore = create<AppStore>()(
     worldSpawn: createDefaultWorldSpawnOptions(),
     forceload: createDefaultForceloadOptions(),
     attribute: createDefaultAttributeOptions(),
+    automation: {
+      advancement: createDefaultAdvancementOptions(),
+      function: createDefaultFunctionOptions(),
+      schedule: createDefaultScheduleOptions()
+    },
     datapack: defaultDatapackDraft(),
     generic: emptyGeneric(),
     commandBlock: createDefaultCommandBlockOptions(),
@@ -1690,6 +1772,27 @@ export const useAppStore = create<AppStore>()(
       })
     },
 
+    updateAdvancement: (patch) => {
+      set((state) => {
+        state.automation.advancement = { ...state.automation.advancement, ...patch }
+        state.dirty = true
+      })
+    },
+
+    updateFunction: (patch) => {
+      set((state) => {
+        state.automation.function = { ...state.automation.function, ...patch }
+        state.dirty = true
+      })
+    },
+
+    updateSchedule: (patch) => {
+      set((state) => {
+        state.automation.schedule = { ...state.automation.schedule, ...patch }
+        state.dirty = true
+      })
+    },
+
     openDatapack: () => {
       set((state) => {
         state.activeCommandId = 'datapack'
@@ -1987,6 +2090,11 @@ export const useAppStore = create<AppStore>()(
         state.worldSpawn = createDefaultWorldSpawnOptions()
         state.forceload = createDefaultForceloadOptions()
         state.attribute = createDefaultAttributeOptions()
+        state.automation = {
+          advancement: createDefaultAdvancementOptions(),
+          function: createDefaultFunctionOptions(),
+          schedule: createDefaultScheduleOptions()
+        }
         state.datapack = defaultDatapackDraft()
         state.generic = emptyGeneric()
         state.commandBlock = createDefaultCommandBlockOptions()
@@ -2039,6 +2147,7 @@ export const useAppStore = create<AppStore>()(
         worldSpawn: state.worldSpawn,
         forceload: state.forceload,
         attribute: state.attribute,
+        automation: state.automation,
         datapack: state.datapack,
         generic: state.generic,
         commandBlock: state.commandBlock,
@@ -2087,6 +2196,7 @@ export const useAppStore = create<AppStore>()(
         state.worldSpawn = payload.worldSpawn
         state.forceload = payload.forceload
         state.attribute = payload.attribute
+        state.automation = payload.automation
         state.datapack = payload.datapack
         state.generic = payload.generic
         state.commandBlock = payload.commandBlock
@@ -2412,4 +2522,16 @@ export function selectForceloadOutput(forceload: ForceloadOptions): BuildResult 
 
 export function selectAttributeOutput(attribute: AttributeOptions): BuildResult {
   return buildAttributeCommand(attribute)
+}
+
+export function selectAdvancementOutput(advancement: AdvancementOptions): BuildResult {
+  return buildAdvancementCommand(advancement)
+}
+
+export function selectFunctionOutput(fn: FunctionOptions): BuildResult {
+  return buildFunctionCommand(fn)
+}
+
+export function selectScheduleOutput(schedule: ScheduleOptions): BuildResult {
+  return buildScheduleCommand(schedule)
 }
