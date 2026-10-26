@@ -4,8 +4,8 @@
 
 | 阶段 | 目标 | 交付 | 估时（1 人 / 20h 周） |
 |---|---|---|---|
-| **M0 本轮** | 可运行骨架 + 文档 + 更新闭环 | 26.3 数据包、`give` 端到端、通用构建器、命令方块、项目、安装包、自动更新代码、171 测试、品牌图标 | 10–14 天 |
-| M1 现代版 MVP | 常用命令覆盖 | 20+ 专用编辑器、选择器/物品/NBT/文本组件、单元体系、数据包导出、文本导入（高频命令）**（v0.1.1 summon/setblock/导入/13 组件；v0.1.2 更新公告；v0.1.3 execute/数据包；v0.1.4 tp/effect/fill；v0.1.5 clone/撤销重做；v0.1.6 命令方块链；v0.1.7 enchant/xp；v0.1.8 中文名/图标；v0.1.9 tellraw/title；v0.1.10 playsound/stopsound；v0.1.11 bossbar；v0.1.12 独立数据包工作区；v0.1.13 scoreboard；v0.1.14 particle；v0.1.15 世界控制；v0.1.16 tag/clear；v0.1.17 gamerule；v0.1.18 worldborder；v0.1.19 team；v0.1.20 出生点/加载；v0.1.21 品牌图标/公告；v0.1.22 attribute；v0.1.23 advancement/function/schedule；v0.1.24 item/高级数据文件/单元体系）** | 4–5 周 |
+| **M0 本轮** | 可运行骨架 + 文档 + 更新闭环 | 26.3 数据包、`give` 端到端、通用构建器、命令方块、项目、安装包、自动更新代码、178 测试、品牌图标 | 10–14 天 |
+| M1 现代版 MVP | 常用命令覆盖 | 20+ 专用编辑器、选择器/物品/NBT/文本组件、单元体系、数据包导出、文本导入（高频命令）**（v0.1.1 summon/setblock/导入/13 组件；v0.1.2 更新公告；v0.1.3 execute/数据包；v0.1.4 tp/effect/fill；v0.1.5 clone/撤销重做；v0.1.6 命令方块链；v0.1.7 enchant/xp；v0.1.8 中文名/图标；v0.1.9 tellraw/title；v0.1.10 playsound/stopsound；v0.1.11 bossbar；v0.1.12 独立数据包工作区；v0.1.13 scoreboard；v0.1.14 particle；v0.1.15 世界控制；v0.1.16 tag/clear；v0.1.17 gamerule；v0.1.18 worldborder；v0.1.19 team；v0.1.20 出生点/加载；v0.1.21 品牌图标/公告；v0.1.22 attribute；v0.1.23 advancement/function/schedule；v0.1.24 item/高级数据文件/单元体系；v0.1.25 data/loot）** | 4–5 周 |
 | M2 26.x 完整 | 命令方块工作区 | 链式布局、朝向计算、数据包/函数导出、命令历史、撤销重做 | 3–4 周 |
 | M3 1.20.5–1.21.x | 同引擎多版本 | 数据包、差异适配、迁移提示 | 2–3 周 |
 | M4 1.13–1.20.4 | NBT 引擎 | 物品/实体 NBT 编辑器、旧 execute、版本数据管线 | 6–8 周 |
@@ -17,13 +17,13 @@
 | 项 | 状态 |
 |---|---|
 | 数据包 26.3 | ✅ 2.2 MB，校验通过 |
-| 单元测试 | ✅ 171 个 |
-| Electron 冒烟 | ✅ 公告→give→…→attribute/advancement/function/schedule/item→scoreboard→clone→命令方块链→高级数据包→execute |
+| 单元测试 | ✅ 178 个 |
+| Electron 冒烟 | ✅ 公告→give→…→item/data/loot→scoreboard→clone→命令方块链→高级数据包→execute |
 | 安装包 | ✅ NSIS 约 123.5 MiB |
 | 便携版 | ✅ 约 111.7 MiB |
 | 更新公告 | ✅ 只显示当前版本 + GitHub 历史入口 |
 | 品牌 | ✅ 应用图标/安装包图标/界面 Logo |
-| 自动更新代码 | ✅ 0.1.23 → 0.1.24 静默升级已实测；GitHub v0.1.24 Release 已发布；便携版禁用自动更新已实测 |
+| 自动更新代码 | ✅ 0.1.24 → 0.1.25 静默升级已实测；GitHub v0.1.25 Release 已发布；便携版禁用自动更新已实测 |
 | 可视化资源 | ✅ 中文名 + 图标：物品/方块/效果/附魔/实体/声音 |
 | 富文本 | ✅ tellraw/title 颜色/样式/点击/悬停/时序 |
 | 声音 | ✅ playsound/stopsound 1,991 声音 |
@@ -40,6 +40,7 @@
 | 进度/自动化 | ✅ advancement/function/schedule |
 | 物品槽位 | ✅ item 替换/修饰符 |
 | 高级数据包 | ✅ 谓词/进度/战利品表 |
+| NBT/战利品 | ✅ data/loot |
 | 单元体系 | ✅ units.ts |
 | 可视化资源 | ✅ 中文名 + 图标：物品/方块/效果/附魔/实体 |
 | 更新公告 | ✅ 更新后首次启动横幅 + 铃铛 + 版本历史 |

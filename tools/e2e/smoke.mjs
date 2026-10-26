@@ -664,6 +664,54 @@ async function main() {
   }
   await page.screenshot({ path: join(ARTIFACTS, 'item-form.png') })
 
+  // data NBT
+  await page.locator('.command-item', { hasText: 'NBT 数据' }).first().click()
+  await page.waitForSelector('#data-path', { timeout: 10_000 })
+  await page.waitForTimeout(300)
+  const dataGet = await page.locator('.output-code .cm-content').innerText()
+  if (!dataGet.includes('data get entity @s Health')) {
+    throw new Error(`data 查询输出不符合预期：${dataGet}`)
+  }
+  await page.getByRole('button', { name: '合并', exact: true }).click()
+  await page.waitForSelector('#data-nbt', { timeout: 10_000 })
+  await page.fill('#data-nbt', '{Health:20}')
+  await page.waitForTimeout(300)
+  const dataMerge = await page.locator('.output-code .cm-content').innerText()
+  if (!dataMerge.includes('data merge entity @s {Health:20}')) {
+    throw new Error(`data 合并输出不符合预期：${dataMerge}`)
+  }
+  await page.getByRole('button', { name: '删除路径', exact: true }).click()
+  await page.waitForSelector('#data-path', { timeout: 10_000 })
+  await page.waitForTimeout(300)
+  const dataRemove = await page.locator('.output-code .cm-content').innerText()
+  if (!dataRemove.includes('data remove entity @s Health')) {
+    throw new Error(`data 删除输出不符合预期：${dataRemove}`)
+  }
+  await page.screenshot({ path: join(ARTIFACTS, 'data-form.png') })
+
+  // loot 战利品表
+  await page.locator('.command-item', { hasText: '战利品' }).first().click()
+  await page.waitForSelector('#loot-table', { timeout: 10_000 })
+  await page.waitForTimeout(300)
+  const lootGive = await page.locator('.output-code .cm-content').innerText()
+  if (!lootGive.includes('loot give @s loot minecraft:chests/simple_dungeon')) {
+    throw new Error(`loot 给予输出不符合预期：${lootGive}`)
+  }
+  await page.getByRole('button', { name: '生成掉落物', exact: true }).click()
+  await page.waitForTimeout(300)
+  const lootSpawn = await page.locator('.output-code .cm-content').innerText()
+  if (!lootSpawn.includes('loot spawn ~ ~ ~ loot minecraft:chests/simple_dungeon')) {
+    throw new Error(`loot 生成输出不符合预期：${lootSpawn}`)
+  }
+  await page.getByRole('button', { name: '插入容器', exact: true }).click()
+  await page.waitForSelector('#loot-slot', { timeout: 10_000 })
+  await page.waitForTimeout(300)
+  const lootInsert = await page.locator('.output-code .cm-content').innerText()
+  if (!lootInsert.includes('loot insert ~ ~ ~ loot minecraft:chests/simple_dungeon container.0')) {
+    throw new Error(`loot 插入输出不符合预期：${lootInsert}`)
+  }
+  await page.screenshot({ path: join(ARTIFACTS, 'loot-form.png') })
+
   // scoreboard 可视化
   await page.locator('.command-item', { hasText: '记分板' }).first().click()
   await page.waitForSelector('#scoreboard-objective', { timeout: 10_000 })

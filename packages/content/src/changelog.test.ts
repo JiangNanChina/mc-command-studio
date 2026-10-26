@@ -10,7 +10,7 @@ describe('changelog', () => {
   })
 
   it('has the current release at the top', () => {
-    expect(latestChangelog().version).toBe('0.1.24')
+    expect(latestChangelog().version).toBe('0.1.25')
   })
 
   it('contains non-empty sections and items', () => {

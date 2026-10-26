@@ -26,6 +26,8 @@ import {
   type ForceloadOptions,
   type AttributeOptions,
   type ItemOptions,
+  type DataOptions,
+  type LootOptions,
   type SoundOptions,
   type SummonOptions,
   type TeleportOptions,
@@ -64,6 +66,8 @@ import {
   selectFunctionOutput,
   selectScheduleOutput,
   selectItemCommandOutput,
+  selectDataCommandOutput,
+  selectLootOutput,
   selectSoundOutput,
   selectSummonOutput,
   selectTellrawOutput,
@@ -113,6 +117,8 @@ export function getCommandOutput(
   attribute: AttributeOptions,
   automation: AutomationOptions,
   itemCommand: ItemOptions,
+  dataCommand: DataOptions,
+  loot: LootOptions,
   generic: GenericDraft
 ): BuildResult {
   if (!activeCommandId) return { text: '', diagnostics: [] }
@@ -148,6 +154,8 @@ export function getCommandOutput(
   if (activeCommandId === 'function') return selectFunctionOutput(automation.function)
   if (activeCommandId === 'schedule') return selectScheduleOutput(automation.schedule)
   if (activeCommandId === 'item') return selectItemCommandOutput(itemCommand)
+  if (activeCommandId === 'data') return selectDataCommandOutput(dataCommand)
+  if (activeCommandId === 'loot') return selectLootOutput(loot)
   if (activeCommandId === 'playsound' || activeCommandId === 'stopsound') {
     return selectSoundOutput(sound)
   }
@@ -187,6 +195,8 @@ export function getCurrentOutput(
   attribute: AttributeOptions,
   automation: AutomationOptions,
   itemCommand: ItemOptions,
+  dataCommand: DataOptions,
+  loot: LootOptions,
   generic: GenericDraft,
   outputMode: OutputMode,
   commandBlock: CommandBlockOptions
@@ -223,6 +233,8 @@ export function getCurrentOutput(
     attribute,
     automation,
     itemCommand,
+    dataCommand,
+    loot,
     generic
   )
   if (outputMode === 'command') {

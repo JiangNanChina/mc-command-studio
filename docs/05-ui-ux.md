@@ -317,6 +317,14 @@
 - 新增命令优先复用单元校验，错误码稳定，便于 UI 定位字段。
 - 详细说明见 [单元体系](10-unit-system.md)。
 
+## 3.29 data / loot
+
+![data 表单](assets/data-form.png)
+
+- data：实体/方块实体/命令存储，查询、合并 SNBT、删除路径；查询支持 scale。
+- loot：给予玩家、生成掉落物、插入容器；战利品表支持数据包 loot_table 建议。
+- 两个表单分别从侧栏“NBT 数据”“战利品”打开。
+
 ## 4. 通用构建器
 
 ![通用构建器进入方式](assets/command-block.png)

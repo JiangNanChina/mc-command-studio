@@ -22,6 +22,37 @@ const REPO = 'https://github.com/JiangNanChina/mc-command-studio'
  */
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: '0.1.25',
+    date: '2026-10-26',
+    title: '可视化 NBT 与战利品表',
+    highlights: [
+      'data 查询/合并/删除 NBT。',
+      'loot 给予/生成/插入，战利品表自动建议。'
+    ],
+    sections: [
+      {
+        type: 'added',
+        items: [
+          'data：实体/方块实体/命令存储，get/merge/remove。',
+          'loot：give/spawn/insert，槽位与战利品表建议。',
+          '数据包 loot_table 文件自动出现在建议中。'
+        ]
+      },
+      {
+        type: 'improved',
+        items: [
+          'NBT/路径/战利品表/槽位校验。',
+          '单元测试 171 → 178；冒烟测试覆盖主要操作。'
+        ]
+      },
+      {
+        type: 'fixed',
+        items: ['无。']
+      }
+    ],
+    releaseUrl: `${REPO}/releases/tag/v0.1.25`
+  },
+  {
     version: '0.1.24',
     date: '2026-10-26',
     title: '物品、高级数据文件与单元体系',

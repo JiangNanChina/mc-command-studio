@@ -208,6 +208,8 @@ export function OutputPanel() {
     state.attribute,
     state.automation,
     state.itemCommand,
+    state.dataCommand,
+    state.loot,
     state.generic,
     state.outputMode,
     state.commandBlock

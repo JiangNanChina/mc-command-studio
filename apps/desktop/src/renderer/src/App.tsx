@@ -36,6 +36,8 @@ import { AdvancementForm } from './components/AdvancementForm'
 import { FunctionForm } from './components/FunctionForm'
 import { ScheduleForm } from './components/ScheduleForm'
 import { ItemCommandForm } from './components/ItemCommandForm'
+import { DataCommandForm } from './components/DataCommandForm'
+import { LootForm } from './components/LootForm'
 import { GenericBuilder } from './components/GenericBuilder'
 import { OutputPanel } from './components/OutputPanel'
 import { StatusBar } from './components/StatusBar'
@@ -147,6 +149,8 @@ export default function App() {
   const attribute = state.attribute
   const automation = state.automation
   const itemCommand = state.itemCommand
+  const dataCommand = state.dataCommand
+  const loot = state.loot
   const generic = state.generic
   const commandBlock = state.commandBlock
   const outputMode = state.outputMode
@@ -275,6 +279,8 @@ export default function App() {
           store.attribute,
           store.automation,
           store.itemCommand,
+          store.dataCommand,
+          store.loot,
           store.generic,
           store.outputMode,
           store.commandBlock
@@ -303,7 +309,7 @@ export default function App() {
       void useAppStore.getState().autosave()
     }, 4000)
     return () => clearTimeout(timer)
-  }, [dirty, give, summon, setblock, execute, teleport, effect, fill, clone, chain, enchant, xp, tellraw, title, sound, bossbar, scoreboard, particle, world, tag, clear, gamerule, worldborder, team, spawnpoint, worldSpawn, forceload, attribute, automation, itemCommand, generic, commandBlock, outputMode, activeCommandId, projectName])
+  }, [dirty, give, summon, setblock, execute, teleport, effect, fill, clone, chain, enchant, xp, tellraw, title, sound, bossbar, scoreboard, particle, world, tag, clear, gamerule, worldborder, team, spawnpoint, worldSpawn, forceload, attribute, automation, itemCommand, dataCommand, loot, generic, commandBlock, outputMode, activeCommandId, projectName])
 
   useEffect(() => {
     if (!toast) return
@@ -407,6 +413,10 @@ export default function App() {
             <ScheduleForm />
           ) : activeCommandId === 'item' ? (
             <ItemCommandForm />
+          ) : activeCommandId === 'data' ? (
+            <DataCommandForm />
+          ) : activeCommandId === 'loot' ? (
+            <LootForm />
           ) : (
             <GenericBuilder />
           )}

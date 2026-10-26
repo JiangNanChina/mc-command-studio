@@ -26,6 +26,8 @@ import {
   buildFunctionCommand,
   buildScheduleCommand,
   buildItemCommand,
+  buildDataCommand,
+  buildLootCommand,
   buildSoundCommand,
   buildSummonCommand,
   buildTeleportCommand,
@@ -58,6 +60,8 @@ import {
   createDefaultFunctionOptions,
   createDefaultScheduleOptions,
   createDefaultItemOptions,
+  createDefaultDataOptions,
+  createDefaultLootOptions,
   createDefaultSetblockOptions,
   createDefaultSoundOptions,
   createDefaultSummonOptions,
@@ -103,6 +107,8 @@ import {
   type FunctionOptions,
   type ScheduleOptions,
   type ItemOptions,
+  type DataOptions,
+  type LootOptions,
   type TimeOptions,
   type SetblockMode,
   type SetblockOptions,
@@ -259,6 +265,8 @@ export interface ProjectPayload {
   attribute: AttributeOptions
   automation: AutomationOptions
   itemCommand: ItemOptions
+  dataCommand: DataOptions
+  loot: LootOptions
   datapack: DatapackDraft
   generic: GenericDraft
   commandBlock: CommandBlockOptions
@@ -312,6 +320,8 @@ interface AppStore {
   attribute: AttributeOptions
   automation: AutomationOptions
   itemCommand: ItemOptions
+  dataCommand: DataOptions
+  loot: LootOptions
   datapack: DatapackDraft
   generic: GenericDraft
   commandBlock: CommandBlockOptions
@@ -381,6 +391,8 @@ interface AppStore {
   updateFunction: (patch: Partial<FunctionOptions>) => void
   updateSchedule: (patch: Partial<ScheduleOptions>) => void
   updateItemCommand: (patch: Partial<ItemOptions>) => void
+  updateDataCommand: (patch: Partial<DataOptions>) => void
+  updateLoot: (patch: Partial<LootOptions>) => void
   openDatapack: () => void
   updateDatapackMeta: (patch: Partial<Pick<DatapackDraft, 'namespace' | 'description'>>) => void
   addDatapackFunction: () => void
@@ -1287,6 +1299,39 @@ function normalizeItemCommand(input: Partial<ItemOptions> | undefined): ItemOpti
   }
 }
 
+function normalizeDataCommand(input: Partial<DataOptions> | undefined): DataOptions {
+  const fallback = createDefaultDataOptions()
+  if (!input) return fallback
+  return {
+    action:
+      input.action === 'merge' || input.action === 'remove' ? input.action : 'get',
+    targetType:
+      input.targetType === 'block' || input.targetType === 'storage'
+        ? input.targetType
+        : 'entity',
+    target: input.target?.base ? input.target : fallback.target,
+    position: normalizePosition(input.position),
+    storage: typeof input.storage === 'string' ? input.storage : fallback.storage,
+    path: typeof input.path === 'string' ? input.path : fallback.path,
+    scaleEnabled: Boolean(input.scaleEnabled),
+    scale: typeof input.scale === 'string' ? input.scale : fallback.scale,
+    nbt: typeof input.nbt === 'string' ? input.nbt : fallback.nbt
+  }
+}
+
+function normalizeLoot(input: Partial<LootOptions> | undefined): LootOptions {
+  const fallback = createDefaultLootOptions()
+  if (!input) return fallback
+  return {
+    action:
+      input.action === 'insert' || input.action === 'spawn' ? input.action : 'give',
+    target: input.target?.base ? input.target : fallback.target,
+    position: normalizePosition(input.position),
+    lootTable: typeof input.lootTable === 'string' ? input.lootTable : fallback.lootTable,
+    slot: typeof input.slot === 'string' ? input.slot : fallback.slot
+  }
+}
+
 function normalizeGive(input: Partial<GiveOptions> | undefined): GiveOptions {
   const fallback = createDefaultGiveOptions()
   if (!input) return fallback
@@ -1339,6 +1384,8 @@ function normalizePayload(input: unknown): ProjectPayload {
     attribute: normalizeAttribute(data.attribute),
     automation: normalizeAutomation(data.automation),
     itemCommand: normalizeItemCommand(data.itemCommand),
+    dataCommand: normalizeDataCommand(data.dataCommand),
+    loot: normalizeLoot(data.loot),
     datapack: normalizeDatapack(data.datapack),
     generic:
       data.generic && Array.isArray(data.generic.steps)
@@ -1389,6 +1436,8 @@ function documentSnapshot(state: AppStore): string {
     attribute: state.attribute,
     automation: state.automation,
     itemCommand: state.itemCommand,
+    dataCommand: state.dataCommand,
+    loot: state.loot,
     datapack: state.datapack,
     generic: state.generic,
     commandBlock: state.commandBlock
@@ -1457,6 +1506,8 @@ export const useAppStore = create<AppStore>()(
       schedule: createDefaultScheduleOptions()
     },
     itemCommand: createDefaultItemOptions(),
+    dataCommand: createDefaultDataOptions(),
+    loot: createDefaultLootOptions(),
     datapack: defaultDatapackDraft(),
     generic: emptyGeneric(),
     commandBlock: createDefaultCommandBlockOptions(),
@@ -1905,6 +1956,20 @@ export const useAppStore = create<AppStore>()(
       })
     },
 
+    updateDataCommand: (patch) => {
+      set((state) => {
+        state.dataCommand = { ...state.dataCommand, ...patch }
+        state.dirty = true
+      })
+    },
+
+    updateLoot: (patch) => {
+      set((state) => {
+        state.loot = { ...state.loot, ...patch }
+        state.dirty = true
+      })
+    },
+
     openDatapack: () => {
       set((state) => {
         state.activeCommandId = 'datapack'
@@ -2259,6 +2324,8 @@ export const useAppStore = create<AppStore>()(
           schedule: createDefaultScheduleOptions()
         }
         state.itemCommand = createDefaultItemOptions()
+        state.dataCommand = createDefaultDataOptions()
+        state.loot = createDefaultLootOptions()
         state.datapack = defaultDatapackDraft()
         state.generic = emptyGeneric()
         state.commandBlock = createDefaultCommandBlockOptions()
@@ -2313,6 +2380,8 @@ export const useAppStore = create<AppStore>()(
         attribute: state.attribute,
         automation: state.automation,
         itemCommand: state.itemCommand,
+        dataCommand: state.dataCommand,
+        loot: state.loot,
         datapack: state.datapack,
         generic: state.generic,
         commandBlock: state.commandBlock,
@@ -2363,6 +2432,8 @@ export const useAppStore = create<AppStore>()(
         state.attribute = payload.attribute
         state.automation = payload.automation
         state.itemCommand = payload.itemCommand
+        state.dataCommand = payload.dataCommand
+        state.loot = payload.loot
         state.datapack = payload.datapack
         state.generic = payload.generic
         state.commandBlock = payload.commandBlock
@@ -2704,4 +2775,12 @@ export function selectScheduleOutput(schedule: ScheduleOptions): BuildResult {
 
 export function selectItemCommandOutput(itemCommand: ItemOptions): BuildResult {
   return buildItemCommand(itemCommand)
+}
+
+export function selectDataCommandOutput(dataCommand: DataOptions): BuildResult {
+  return buildDataCommand(dataCommand)
+}
+
+export function selectLootOutput(loot: LootOptions): BuildResult {
+  return buildLootCommand(loot)
 }

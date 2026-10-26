@@ -1,0 +1,56 @@
+import { error } from './diagnostics'
+import { isValidResourceLocation } from './units'
+import { serializePosition, type Position } from './position'
+import { serializeSelector, type Selector } from './selector'
+import type { BuildResult, Diagnostic } from './types'
+
+export type LootAction = 'give' | 'insert' | 'spawn'
+
+export interface LootOptions {
+  action: LootAction
+  target: Selector
+  position: Position
+  lootTable: string
+  slot: string
+}
+
+export function createDefaultLootOptions(): LootOptions {
+  return {
+    action: 'give',
+    target: { base: '@s' },
+    position: { x: '~', y: '~', z: '~' },
+    lootTable: 'minecraft:chests/simple_dungeon',
+    slot: 'container.0'
+  }
+}
+
+export function buildLootCommand(options: LootOptions): BuildResult {
+  const diagnostics: Diagnostic[] = []
+  if (!isValidResourceLocation(options.lootTable)) {
+    diagnostics.push(error('loot.table', '战利品表 ID 必须是 namespace:path', 'lootTable'))
+  }
+  if (options.action === 'give') {
+    const target = serializeSelector(options.target)
+    diagnostics.push(...target.diagnostics)
+    return {
+      text: `loot give ${target.text} loot ${options.lootTable.trim()}`,
+      diagnostics
+    }
+  }
+
+  const position = serializePosition(options.position)
+  diagnostics.push(...position.diagnostics)
+  if (options.action === 'insert') {
+    if (!options.slot.trim()) {
+      diagnostics.push(error('loot.slot', '插入槽位不能为空', 'slot'))
+    }
+    return {
+      text: `loot insert ${position.text} loot ${options.lootTable.trim()} ${options.slot.trim()}`,
+      diagnostics
+    }
+  }
+  return {
+    text: `loot spawn ${position.text} loot ${options.lootTable.trim()}`,
+    diagnostics
+  }
+}
