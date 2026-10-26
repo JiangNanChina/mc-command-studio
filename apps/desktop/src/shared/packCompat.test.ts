@@ -1,4 +1,4 @@
-﻿import { describe, expect, it } from 'vitest'
+import { describe, expect, it } from 'vitest'
 import { supportsLegacyForm } from '../renderer/src/lib/packCompat'
 
 describe('legacy pack compatibility', () => {
@@ -12,10 +12,13 @@ describe('legacy pack compatibility', () => {
   })
 
   it('routes version-sensitive commands to the command tree', () => {
-    expect(supportsLegacyForm('loot')).toBe(false)
     expect(supportsLegacyForm('gamerule')).toBe(false)
     expect(supportsLegacyForm('particle')).toBe(false)
     expect(supportsLegacyForm('attribute')).toBe(false)
+  })
+
+  it('enables loot now that 1.20.4 syntax is adapted', () => {
+    expect(supportsLegacyForm('loot')).toBe(true)
   })
 })
 

@@ -29,6 +29,7 @@ export const LEGACY_SAFE_FORMS = new Set([
   'forceload',
   'item',
   'data',
+  'loot',
   'advancement',
   'function',
   'schedule',

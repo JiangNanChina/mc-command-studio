@@ -22,6 +22,36 @@ const REPO = 'https://github.com/JiangNanChina/mc-command-studio'
  */
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: '0.1.38',
+    date: '2026-10-27',
+    title: '1.20.4 loot 可视化',
+    highlights: [
+      '1.20.4 loot insert 语法适配。',
+      '1.20.4 兼容表单增至 32 个。'
+    ],
+    sections: [
+      {
+        type: 'added',
+        items: [
+          '1.20.4 loot give/spawn/insert。',
+          'insert 自动省略槽位。'
+        ]
+      },
+      {
+        type: 'improved',
+        items: [
+          'loot 构建器引擎参数。',
+          '单元测试 203 → 205；冒烟覆盖 loot insert。'
+        ]
+      },
+      {
+        type: 'fixed',
+        items: ['无。']
+      }
+    ],
+    releaseUrl: `${REPO}/releases/tag/v0.1.38`
+  },
+  {
     version: '0.1.37',
     date: '2026-10-27',
     title: '1.20.4 NBT 槽位物品与召唤预设',

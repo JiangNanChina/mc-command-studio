@@ -994,6 +994,14 @@ async function main() {
   if (!/item replace (entity|block).* with minecraft:[a-z0-9_]+{display:{Name:/.test(itemNbtOutput)) {
     throw new Error(`1.20.4 item NBT 输出不符合预期：${itemNbtOutput}`)
   }
+  await page.locator('.command-item', { hasText: '战利品' }).first().click()
+  await page.waitForSelector('#loot-table', { timeout: 10_000 })
+  await page.getByRole('button', { name: '插入容器', exact: true }).click()
+  await page.waitForTimeout(300)
+  const lootInsert1204 = await page.locator('.output-code .cm-content').innerText()
+  if (!/loot insert .* loot minecraft:chests\/simple_dungeon$/.test(lootInsert1204)) {
+    throw new Error(`1.20.4 loot insert 输出不符合预期：${lootInsert1204}`)
+  }
   await page.screenshot({ path: join(ARTIFACTS, 'pack-1.20.4.png') })
   await page.selectOption('#pack-select', '26.3')
   await page.waitForSelector('.version-notice', { state: 'detached', timeout: 15_000 })

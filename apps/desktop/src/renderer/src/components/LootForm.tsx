@@ -26,6 +26,7 @@ const COMMON_LOOT_TABLES = [
 export function LootForm() {
   const state = useAppStore()
   const loot = state.loot
+  const nbtEngine = state.pack?.manifest.engine === 'nbt'
   const dataLootTables = state.datapack.dataFiles
     .filter((file) => file.type === 'loot_table')
     .map((file) => `${state.datapack.namespace}:${file.name}`)
@@ -113,19 +114,26 @@ export function LootForm() {
                 />
               </div>
               {loot.action === 'insert' ? (
-                <div className="field" style={{ marginTop: 12 }}>
-                  <label className="field-label" htmlFor="loot-slot">
-                    槽位
-                  </label>
-                  <input
-                    id="loot-slot"
-                    className="input"
-                    value={loot.slot}
-                    spellCheck={false}
-                    onChange={(event) => state.updateLoot({ slot: event.target.value })}
-                  />
-                  <div className="hint">例如 container.0 或 container.3。</div>
-                </div>
+                nbtEngine ? (
+                  <div className="hint" style={{ marginTop: 8 }}>
+                    1.20.4 的 insert 不支持槽位参数，会生成
+                    <code className="code-inline">loot insert &lt;pos&gt; loot &lt;table&gt;</code>。
+                  </div>
+                ) : (
+                  <div className="field" style={{ marginTop: 12 }}>
+                    <label className="field-label" htmlFor="loot-slot">
+                      槽位
+                    </label>
+                    <input
+                      id="loot-slot"
+                      className="input"
+                      value={loot.slot}
+                      spellCheck={false}
+                      onChange={(event) => state.updateLoot({ slot: event.target.value })}
+                    />
+                    <div className="hint">例如 container.0 或 container.3。</div>
+                  </div>
+                )
               ) : null}
             </>
           )}

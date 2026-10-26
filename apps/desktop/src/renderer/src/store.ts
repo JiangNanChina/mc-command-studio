@@ -2892,6 +2892,9 @@ export function selectDataCommandOutput(dataCommand: DataOptions): BuildResult {
   return buildDataCommand(dataCommand)
 }
 
-export function selectLootOutput(loot: LootOptions): BuildResult {
-  return buildLootCommand(loot)
+export function selectLootOutput(
+  loot: LootOptions,
+  engine: 'components' | 'nbt' | 'legacy' = 'components'
+): BuildResult {
+  return buildLootCommand(loot, engine)
 }

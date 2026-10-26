@@ -24,7 +24,10 @@ export function createDefaultLootOptions(): LootOptions {
   }
 }
 
-export function buildLootCommand(options: LootOptions): BuildResult {
+export function buildLootCommand(
+  options: LootOptions,
+  engine: 'components' | 'nbt' | 'legacy' = 'components'
+): BuildResult {
   const diagnostics: Diagnostic[] = []
   if (!isValidResourceLocation(options.lootTable)) {
     diagnostics.push(error('loot.table', '战利品表 ID 必须是 namespace:path', 'lootTable'))
@@ -41,6 +44,12 @@ export function buildLootCommand(options: LootOptions): BuildResult {
   const position = serializePosition(options.position)
   diagnostics.push(...position.diagnostics)
   if (options.action === 'insert') {
+    if (engine === 'nbt') {
+      return {
+        text: `loot insert ${position.text} loot ${options.lootTable.trim()}`,
+        diagnostics
+      }
+    }
     if (!options.slot.trim()) {
       diagnostics.push(error('loot.slot', '插入槽位不能为空', 'slot'))
     }

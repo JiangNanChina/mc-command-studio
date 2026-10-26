@@ -164,7 +164,9 @@ export function getCommandOutput(
     return selectItemCommandOutput(itemCommand, pack?.manifest.engine ?? 'components')
   }
   if (activeCommandId === 'data') return selectDataCommandOutput(dataCommand)
-  if (activeCommandId === 'loot') return selectLootOutput(loot)
+  if (activeCommandId === 'loot') {
+    return selectLootOutput(loot, pack?.manifest.engine ?? 'components')
+  }
   if (activeCommandId === 'playsound' || activeCommandId === 'stopsound') {
     return selectSoundOutput(sound)
   }

@@ -27,6 +27,19 @@ describe('loot', () => {
     ).toBe('loot insert 10 64 -5 loot minecraft:chests/simple_dungeon container.3')
   })
 
+  it('builds 1.20.4 insert without a slot', () => {
+    expect(
+      buildLootCommand(
+        {
+          ...createDefaultLootOptions(),
+          action: 'insert',
+          position: { x: '10', y: '64', z: '-5' }
+        },
+        'nbt'
+      ).text
+    ).toBe('loot insert 10 64 -5 loot minecraft:chests/simple_dungeon')
+  })
+
   it('validates loot table and slot', () => {
     const result = buildLootCommand({
       ...createDefaultLootOptions(),
