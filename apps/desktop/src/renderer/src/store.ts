@@ -27,6 +27,8 @@ import {
   buildScheduleCommand,
   buildItemCommand,
   buildDataCommand,
+  buildNbtGiveCommand,
+  createDefaultNbtGiveOptions,
   buildLootCommand,
   buildSoundCommand,
   buildSummonCommand,
@@ -107,6 +109,7 @@ import {
   type FunctionOptions,
   type ScheduleOptions,
   type ItemOptions,
+  type NbtGiveOptions,
   type DataOptions,
   type LootOptions,
   type TimeOptions,
@@ -237,6 +240,7 @@ function defaultDatapackDraft(): DatapackDraft {
 export interface ProjectPayload {
   activeCommandId: string | null
   give: GiveOptions
+  nbtGive: NbtGiveOptions
   summon: SummonOptions
   setblock: SetblockOptions
   execute: ExecuteOptions
@@ -292,6 +296,7 @@ interface AppStore {
   update: UpdateState
   activeCommandId: string | null
   give: GiveOptions
+  nbtGive: NbtGiveOptions
   summon: SummonOptions
   setblock: SetblockOptions
   execute: ExecuteOptions
@@ -365,6 +370,7 @@ interface AppStore {
   setExecuteClauses: (clauses: ExecuteClause[]) => void
   updateTeleport: (patch: Partial<TeleportOptions>) => void
   updateEffect: (patch: Partial<EffectOptions>) => void
+  updateNbtGive: (patch: Partial<NbtGiveOptions>) => void
   updateFill: (patch: Partial<FillOptions>) => void
   updateClone: (patch: Partial<CloneOptions>) => void
   updateEnchant: (patch: Partial<EnchantOptions>) => void
@@ -1394,6 +1400,27 @@ function normalizeLoot(input: Partial<LootOptions> | undefined): LootOptions {
   }
 }
 
+function normalizeNbtGive(input: Partial<NbtGiveOptions> | undefined): NbtGiveOptions {
+  const fallback = createDefaultNbtGiveOptions()
+  if (!input) return fallback
+  return {
+    target: input.target?.base ? input.target : fallback.target,
+    item: typeof input.item === 'string' ? input.item : fallback.item,
+    count: typeof input.count === 'string' ? input.count : fallback.count,
+    name: typeof input.name === 'string' ? input.name : '',
+    lore: typeof input.lore === 'string' ? input.lore : '',
+    enchantments: Array.isArray(input.enchantments)
+      ? input.enchantments
+          .filter((entry) => entry && typeof entry.id === 'string')
+          .map((entry) => ({
+            id: entry.id,
+            level: typeof entry.level === 'string' ? entry.level : '1'
+          }))
+      : [],
+    unbreakable: Boolean(input.unbreakable)
+  }
+}
+
 function normalizeGive(input: Partial<GiveOptions> | undefined): GiveOptions {
   const fallback = createDefaultGiveOptions()
   if (!input) return fallback
@@ -1418,6 +1445,7 @@ function normalizePayload(input: unknown): ProjectPayload {
   return {
     activeCommandId: typeof data.activeCommandId === 'string' ? data.activeCommandId : null,
     give: normalizeGive(data.give),
+    nbtGive: normalizeNbtGive(data.nbtGive),
     summon: normalizeSummon(data.summon),
     setblock: normalizeSetblock(data.setblock),
     execute: normalizeExecute(data.execute),
@@ -1470,6 +1498,7 @@ function documentSnapshot(state: AppStore): string {
   return JSON.stringify({
     projectName: state.projectName,
     give: state.give,
+    nbtGive: state.nbtGive,
     summon: state.summon,
     setblock: state.setblock,
     execute: state.execute,
@@ -1536,6 +1565,7 @@ export const useAppStore = create<AppStore>()(
     update: { status: 'idle' },
     activeCommandId: null,
     give: createDefaultGiveOptions(),
+    nbtGive: createDefaultNbtGiveOptions(),
     summon: createDefaultSummonOptions(),
     setblock: createDefaultSetblockOptions(),
     execute: createDefaultExecuteOptions(),
@@ -1832,6 +1862,13 @@ export const useAppStore = create<AppStore>()(
     updateEffect: (patch) => {
       set((state) => {
         state.effect = { ...state.effect, ...patch }
+        state.dirty = true
+      })
+    },
+
+    updateNbtGive: (patch) => {
+      set((state) => {
+        state.nbtGive = { ...state.nbtGive, ...patch }
         state.dirty = true
       })
     },
@@ -2354,6 +2391,7 @@ export const useAppStore = create<AppStore>()(
       set((state) => {
         state.activeCommandId = null
         state.give = createDefaultGiveOptions()
+        state.nbtGive = createDefaultNbtGiveOptions()
         state.summon = createDefaultSummonOptions()
         state.setblock = createDefaultSetblockOptions()
         state.execute = createDefaultExecuteOptions()
@@ -2414,6 +2452,7 @@ export const useAppStore = create<AppStore>()(
       const payload: ProjectPayload = {
         activeCommandId: state.activeCommandId,
         give: state.give,
+        nbtGive: state.nbtGive,
         summon: state.summon,
         setblock: state.setblock,
         execute: state.execute,
@@ -2466,6 +2505,7 @@ export const useAppStore = create<AppStore>()(
       set((state) => {
         state.activeCommandId = payload.activeCommandId
         state.give = payload.give
+        state.nbtGive = payload.nbtGive
         state.summon = payload.summon
         state.setblock = payload.setblock
         state.execute = payload.execute
@@ -2707,6 +2747,10 @@ export function selectGenericOutput(pack: VersionPack | null, draft: GenericDraf
 
 export function selectGiveOutput(give: GiveOptions): BuildResult {
   return buildGiveCommand(give)
+}
+
+export function selectNbtGiveOutput(nbtGive: NbtGiveOptions): BuildResult {
+  return buildNbtGiveCommand(nbtGive)
 }
 
 export function selectSummonOutput(summon: SummonOptions): BuildResult {

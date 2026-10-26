@@ -12,6 +12,7 @@ import {
   type ExecuteOptions,
   type FillOptions,
   type GiveOptions,
+  type NbtGiveOptions,
   type SetblockOptions,
   type ScoreboardOptions,
   type ParticleOptions,
@@ -38,6 +39,7 @@ import {
 } from '@mcstudio/core'
 import type { AutomationOptions } from '../store'
 import {
+  selectNbtGiveOutput,
   selectChainOutput,
   selectCloneOutput,
   selectBossbarOutput,
@@ -89,6 +91,7 @@ export function getCommandOutput(
   pack: VersionPack | null,
   activeCommandId: string | null,
   give: GiveOptions,
+  nbtGive: NbtGiveOptions,
   summon: SummonOptions,
   setblock: SetblockOptions,
   execute: ExecuteOptions,
@@ -122,7 +125,11 @@ export function getCommandOutput(
   generic: GenericDraft
 ): BuildResult {
   if (!activeCommandId) return { text: '', diagnostics: [] }
-  if (activeCommandId === 'give') return selectGiveOutput(give)
+  if (activeCommandId === 'give') {
+    return pack?.manifest.engine === 'nbt'
+      ? selectNbtGiveOutput(nbtGive)
+      : selectGiveOutput(give)
+  }
   if (activeCommandId === 'summon') return selectSummonOutput(summon)
   if (activeCommandId === 'setblock') return selectSetblockOutput(setblock)
   if (activeCommandId === 'execute') return selectExecuteOutput(execute)
@@ -167,6 +174,7 @@ export function getCurrentOutput(
   pack: VersionPack | null,
   activeCommandId: string | null,
   give: GiveOptions,
+  nbtGive: NbtGiveOptions,
   summon: SummonOptions,
   setblock: SetblockOptions,
   execute: ExecuteOptions,
@@ -205,6 +213,7 @@ export function getCurrentOutput(
     pack,
     activeCommandId,
     give,
+    nbtGive,
     summon,
     setblock,
     execute,

@@ -29,6 +29,7 @@ export function StatusBar() {
     state.pack,
     state.activeCommandId,
     state.give,
+    state.nbtGive,
     state.summon,
     state.setblock,
     state.execute,

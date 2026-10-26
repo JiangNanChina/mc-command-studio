@@ -22,6 +22,36 @@ const REPO = 'https://github.com/JiangNanChina/mc-command-studio'
  */
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: '0.1.35',
+    date: '2026-10-27',
+    title: '1.20.4 NBT 物品编辑器',
+    highlights: [
+      '1.20.4 give 使用 NBT 表单。',
+      '名称、Lore、附魔、无法破坏。'
+    ],
+    sections: [
+      {
+        type: 'added',
+        items: [
+          'NBT give：目标/物品/数量/名称/Lore/附魔/Unbreakable。',
+          '1.20.4 自动启用 NBT give 表单。'
+        ]
+      },
+      {
+        type: 'improved',
+        items: [
+          'NBT 物品构建器独立。',
+          '单元测试 197 → 200；冒烟测试覆盖 NBT。'
+        ]
+      },
+      {
+        type: 'fixed',
+        items: ['无。']
+      }
+    ],
+    releaseUrl: `${REPO}/releases/tag/v0.1.35`
+  },
+  {
     version: '0.1.34',
     date: '2026-10-27',
     title: '一键模板库',

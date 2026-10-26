@@ -180,6 +180,7 @@ export function OutputPanel() {
     state.pack,
     state.activeCommandId,
     state.give,
+    state.nbtGive,
     state.summon,
     state.setblock,
     state.execute,

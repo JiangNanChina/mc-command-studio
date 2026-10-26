@@ -952,10 +952,21 @@ async function main() {
   if (!notice1204.includes('NBT')) {
     throw new Error(`1.20.4 树模式提示不符合预期：${notice1204}`)
   }
+  await page.locator('.tab').filter({ hasText: /^\s*命令\s*$/ }).click()
   await page.locator('.command-item', { hasText: '给予物品' }).first().click()
-  await page.waitForTimeout(500)
+  await page.waitForSelector('#nbt-give-count', { timeout: 10_000 })
+  await page.fill('#nbt-give-name', '旧版剑')
+  await page.getByRole('button', { name: '添加附魔', exact: true }).click()
+  await page.waitForTimeout(400)
+  const nbtGiveOutput = await page.locator('.output-code .cm-content').innerText()
+  if (
+    !nbtGiveOutput.includes('display:{Name:') ||
+    !nbtGiveOutput.includes('Enchantments:[{id:"minecraft:sharpness",lvl:1}]')
+  ) {
+    throw new Error(`1.20.4 NBT give 输出不符合预期：${nbtGiveOutput}`)
+  }
   if ((await page.locator('#give-count').count()) !== 0) {
-    throw new Error('1.20.4 树模式不应显示 give 表单')
+    throw new Error('1.20.4 不应显示 26.3 give 表单')
   }
   await page.screenshot({ path: join(ARTIFACTS, 'pack-1.20.4.png') })
   await page.selectOption('#pack-select', '26.3')

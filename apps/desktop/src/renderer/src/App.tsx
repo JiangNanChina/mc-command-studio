@@ -7,6 +7,7 @@ import { Header } from './components/Header'
 import { Sidebar } from './components/Sidebar'
 import { Welcome } from './components/Welcome'
 import { GiveForm } from './components/GiveForm'
+import { NbtGiveForm } from './components/NbtGiveForm'
 import { SummonForm } from './components/SummonForm'
 import { SetblockForm } from './components/SetblockForm'
 import { ExecuteForm } from './components/ExecuteForm'
@@ -121,6 +122,7 @@ export default function App() {
   const pack = state.pack
   const dirty = state.dirty
   const give = state.give
+  const nbtGive = state.nbtGive
   const summon = state.summon
   const setblock = state.setblock
   const execute = state.execute
@@ -252,6 +254,7 @@ export default function App() {
           store.pack,
           store.activeCommandId,
           store.give,
+          store.nbtGive,
           store.summon,
           store.setblock,
           store.execute,
@@ -310,7 +313,7 @@ export default function App() {
       void useAppStore.getState().autosave()
     }, 4000)
     return () => clearTimeout(timer)
-  }, [dirty, give, summon, setblock, execute, teleport, effect, fill, clone, chain, enchant, xp, tellraw, title, sound, bossbar, scoreboard, particle, world, tag, clear, gamerule, worldborder, team, spawnpoint, worldSpawn, forceload, attribute, automation, itemCommand, dataCommand, loot, generic, commandBlock, outputMode, activeCommandId, projectName])
+  }, [dirty, give, nbtGive, summon, setblock, execute, teleport, effect, fill, clone, chain, enchant, xp, tellraw, title, sound, bossbar, scoreboard, particle, world, tag, clear, gamerule, worldborder, team, spawnpoint, worldSpawn, forceload, attribute, automation, itemCommand, dataCommand, loot, generic, commandBlock, outputMode, activeCommandId, projectName])
 
   useEffect(() => {
     if (!toast) return
@@ -340,7 +343,7 @@ export default function App() {
         <div className="version-notice">
           <Info size={14} />
           {treeOnly
-            ? `当前使用 ${pack.manifest.gameVersion}（NBT 引擎）：命令树与通用构建器可用，可视化表单已禁用。`
+            ? `当前使用 ${pack.manifest.gameVersion}（NBT 引擎）：give 使用 NBT 可视化，其余命令使用命令树/通用构建器。`
             : `当前使用 ${pack.manifest.gameVersion} 数据包：命令树与通用构建器来自该版本；可视化表单按 26.3 语法生成，跨版本使用前请核对。`}
         </div>
       ) : null}
@@ -362,10 +365,14 @@ export default function App() {
             <DatapackWorkspace />
           ) : activeCommandId === 'chain' ? (
             <ChainBuilder />
-          ) : treeOnly ? (
+          ) : treeOnly && activeCommandId !== 'give' ? (
             <GenericBuilder />
           ) : activeCommandId === 'give' ? (
-            <GiveForm />
+            pack?.manifest.engine === 'nbt' ? (
+              <NbtGiveForm />
+            ) : (
+              <GiveForm />
+            )
           ) : activeCommandId === 'summon' ? (
             <SummonForm />
           ) : activeCommandId === 'setblock' ? (
