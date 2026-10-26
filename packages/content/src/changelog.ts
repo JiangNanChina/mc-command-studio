@@ -22,6 +22,37 @@ const REPO = 'https://github.com/JiangNanChina/mc-command-studio'
  */
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: '0.1.29',
+    date: '2026-10-27',
+    title: '进度文件结构化编辑器',
+    highlights: [
+      '进度显示、图标、框架与触发器可视化。',
+      '复杂结构自动回退 JSON。'
+    ],
+    sections: [
+      {
+        type: 'added',
+        items: [
+          '进度父级、图标、标题、描述、框架与显示开关。',
+          '触发条件名称、18 个常用触发器建议、增删。',
+          '简单结构自动写回 JSON。'
+        ]
+      },
+      {
+        type: 'improved',
+        items: [
+          '复杂显示组件/条件/requirements 回退 JSON。',
+          '单元测试 186 → 190。'
+        ]
+      },
+      {
+        type: 'fixed',
+        items: ['无。']
+      }
+    ],
+    releaseUrl: `${REPO}/releases/tag/v0.1.29`
+  },
+  {
     version: '0.1.28',
     date: '2026-10-27',
     title: '战利品表结构化编辑器',

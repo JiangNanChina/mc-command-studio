@@ -818,6 +818,14 @@ async function main() {
   await page.getByRole('button', { name: '谓词', exact: true }).click()
   await page.waitForSelector('#datapack-data-content', { timeout: 10_000 })
   await page.getByRole('button', { name: '进度', exact: true }).click()
+  await page.waitForSelector('#advancement-structured-title', { timeout: 10_000 })
+  await page.fill('#advancement-structured-title', '测试进度')
+  await page.waitForTimeout(300)
+  const advancementContent = await page.inputValue('#datapack-data-content')
+  if (!advancementContent.includes('测试进度')) {
+    throw new Error('进度结构化编辑未写回标题')
+  }
+  await page.screenshot({ path: join(ARTIFACTS, 'datapack-advancement.png') })
   await page.getByRole('button', { name: '战利品表', exact: true }).click()
   await page.waitForSelector('#loot-structured-type', { timeout: 10_000 })
   const lootType = await page.inputValue('#loot-structured-type')
