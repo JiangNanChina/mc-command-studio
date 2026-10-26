@@ -166,7 +166,11 @@ export function getCommandOutput(
     activeCommandId === 'msg' ||
     activeCommandId === 'kill' ||
     activeCommandId === 'list' ||
-    activeCommandId === 'seed'
+    activeCommandId === 'seed' ||
+    activeCommandId === 'me' ||
+    activeCommandId === 'kick' ||
+    activeCommandId === 'op' ||
+    activeCommandId === 'deop'
   ) {
     return selectSocialOutput(social, activeCommandId)
   }

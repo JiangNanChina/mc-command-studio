@@ -22,6 +22,27 @@ const REPO = 'https://github.com/JiangNanChina/mc-command-studio'
  */
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: '0.1.44',
+    date: '2026-10-27',
+    title: '服务器管理命令可视化',
+    highlights: ['me/kick/op/deop 表单。', '1.20.4 同步可用。'],
+    sections: [
+      {
+        type: 'added',
+        items: ['动作消息、踢出、授予/撤销管理员。']
+      },
+      {
+        type: 'improved',
+        items: ['可视化根命令 47 → 51。', '单元测试 229 → 230。']
+      },
+      {
+        type: 'fixed',
+        items: ['无。']
+      }
+    ],
+    releaseUrl: `${REPO}/releases/tag/v0.1.44`
+  },
+  {
     version: '0.1.43',
     date: '2026-10-27',
     title: '跨版本模板：1.20.4 NBT 剑',

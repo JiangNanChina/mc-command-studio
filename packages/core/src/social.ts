@@ -7,10 +7,16 @@ export interface SocialOptions {
   message: string
   target: Selector
   uuids: boolean
+  reason: string
 }
 
 export function createDefaultSocialOptions(): SocialOptions {
-  return { message: '你好，MC 指令工坊', target: { base: '@a' }, uuids: false }
+  return {
+    message: '你好，MC 指令工坊',
+    target: { base: '@a' },
+    uuids: false,
+    reason: '违反服务器规则'
+  }
 }
 
 function validateMessage(message: string, field: string, diagnostics: Diagnostic[]): void {
@@ -55,4 +61,31 @@ export function buildListCommand(uuids: boolean): BuildResult {
 
 export function buildSeedCommand(): BuildResult {
   return { text: 'seed', diagnostics: [] }
+}
+
+export function buildMeCommand(action: string): BuildResult {
+  const diagnostics: Diagnostic[] = []
+  validateMessage(action, 'action', diagnostics)
+  return { text: `me ${action}`, diagnostics }
+}
+
+export function buildKickCommand(target: Selector, reason: string): BuildResult {
+  const diagnostics: Diagnostic[] = []
+  const selector = serializeSelector(target)
+  diagnostics.push(...selector.diagnostics)
+  if (!selector.text.trim()) {
+    diagnostics.push(error('social.target', '目标不能为空', 'target'))
+  }
+  const trimmed = reason.trim()
+  return { text: `kick ${selector.text}${trimmed ? ` ${trimmed}` : ''}`, diagnostics }
+}
+
+export function buildOpCommand(target: Selector, op: boolean): BuildResult {
+  const diagnostics: Diagnostic[] = []
+  const selector = serializeSelector(target)
+  diagnostics.push(...selector.diagnostics)
+  if (!selector.text.trim()) {
+    diagnostics.push(error('social.target', '目标不能为空', 'target'))
+  }
+  return { text: `${op ? 'op' : 'deop'} ${selector.text}`, diagnostics }
 }

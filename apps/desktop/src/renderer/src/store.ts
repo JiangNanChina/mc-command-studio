@@ -40,6 +40,9 @@ import {
   buildKillCommand,
   buildListCommand,
   buildSeedCommand,
+  buildMeCommand,
+  buildKickCommand,
+  buildOpCommand,
   createDefaultNbtGiveOptions,
   createDefaultGamemodeOptions,
   createDefaultDamageOptions,
@@ -1563,7 +1566,8 @@ function normalizeSocial(input: Partial<SocialOptions> | undefined): SocialOptio
   return {
     message: typeof input.message === 'string' ? input.message : fallback.message,
     target: input.target?.base ? input.target : fallback.target,
-    uuids: Boolean(input.uuids)
+    uuids: Boolean(input.uuids),
+    reason: typeof input.reason === 'string' ? input.reason : fallback.reason
   }
 }
 
@@ -3057,6 +3061,10 @@ export function selectSocialOutput(social: SocialOptions, id: string): BuildResu
   if (id === 'kill') return buildKillCommand(social.target)
   if (id === 'list') return buildListCommand(social.uuids)
   if (id === 'seed') return buildSeedCommand()
+  if (id === 'me') return buildMeCommand(social.message)
+  if (id === 'kick') return buildKickCommand(social.target, social.reason)
+  if (id === 'op') return buildOpCommand(social.target, true)
+  if (id === 'deop') return buildOpCommand(social.target, false)
   return buildSayCommand(social.message)
 }
 

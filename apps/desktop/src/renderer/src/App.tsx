@@ -412,7 +412,7 @@ export default function App() {
             <RandomForm />
           ) : activeCommandId === 'tick' ? (
             <TickForm />
-          ) : ['say', 'msg', 'kill', 'list', 'seed'].includes(activeCommandId ?? '') ? (
+          ) : ['say', 'msg', 'kill', 'list', 'seed', 'me', 'kick', 'op', 'deop'].includes(activeCommandId ?? '') ? (
             <SocialForm />
           ) : activeCommandId === 'summon' ? (
             <SummonForm />

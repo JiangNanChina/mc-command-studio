@@ -807,7 +807,7 @@ async function main() {
   await page.waitForTimeout(300)
   const forcedClone = await page.locator('.output-code .cm-content').innerText()
   if (!forcedClone.includes(' force')) throw new Error(`clone force 输出不符合预期：${forcedClone}`)
-  await page.getByRole('button', { name: '撤销' }).click()
+  await page.getByRole('button', { name: '撤销', exact: true }).click()
   await page.waitForTimeout(300)
   const undoneClone = await page.locator('.output-code .cm-content').innerText()
   if (undoneClone.includes(' force')) throw new Error(`撤销后仍包含 force：${undoneClone}`)
@@ -988,6 +988,28 @@ async function main() {
   const seedOutput = await page.locator('.output-code .cm-content').innerText()
   if (!seedOutput.trim().endsWith('seed')) {
     throw new Error(`seed 输出不符合预期：${seedOutput}`)
+  }
+  await page.locator('.command-item', { hasText: '动作消息' }).first().click()
+  await page.waitForSelector('#social-message', { timeout: 10_000 })
+  await page.fill('#social-message', '正在建造')
+  await page.waitForTimeout(300)
+  const meOutput = await page.locator('.output-code .cm-content').innerText()
+  if (!meOutput.includes('me 正在建造')) {
+    throw new Error(`me 输出不符合预期：${meOutput}`)
+  }
+  await page.locator('.command-item', { hasText: '踢出玩家' }).first().click()
+  await page.waitForSelector('#social-reason', { timeout: 10_000 })
+  await page.fill('#social-reason', '请遵守规则')
+  await page.waitForTimeout(300)
+  const kickOutput = await page.locator('.output-code .cm-content').innerText()
+  if (!kickOutput.includes('kick @a 请遵守规则')) {
+    throw new Error(`kick 输出不符合预期：${kickOutput}`)
+  }
+  await page.locator('.command-item', { hasText: '授予管理员' }).first().click()
+  await page.waitForTimeout(300)
+  const opOutput = await page.locator('.output-code .cm-content').innerText()
+  if (!opOutput.includes('op @a')) {
+    throw new Error(`op 输出不符合预期：${opOutput}`)
   }
   await page.screenshot({ path: join(ARTIFACTS, 'social-commands.png') })
 

@@ -1,8 +1,11 @@
 import { describe, expect, it } from 'vitest'
 import {
   buildKillCommand,
+  buildKickCommand,
   buildListCommand,
+  buildMeCommand,
   buildMsgCommand,
+  buildOpCommand,
   buildSayCommand,
   buildSeedCommand,
   createDefaultSocialOptions
@@ -36,5 +39,13 @@ describe('social commands', () => {
 
   it('has stable defaults', () => {
     expect(createDefaultSocialOptions().target.base).toBe('@a')
+  })
+
+  it('builds me, kick and op commands', () => {
+    expect(buildMeCommand('正在建造').text).toBe('me 正在建造')
+    expect(buildKickCommand({ base: '@a' }, '请勿刷屏').text).toBe('kick @a 请勿刷屏')
+    expect(buildKickCommand({ base: '@a' }, '').text).toBe('kick @a')
+    expect(buildOpCommand({ base: '@p' }, true).text).toBe('op @p')
+    expect(buildOpCommand({ base: '@p' }, false).text).toBe('deop @p')
   })
 })

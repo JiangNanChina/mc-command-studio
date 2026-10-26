@@ -39,10 +39,10 @@ export function SocialForm() {
           </div>
         </div>
         <div className="card-body">
-          {id === 'msg' ? (
+          {id === 'msg' || id === 'kick' || id === 'op' || id === 'deop' ? (
             <SelectorField
               value={options.target}
-              label="接收玩家"
+              label={id === 'kick' ? '要踢出的玩家' : id === 'op' || id === 'deop' ? '玩家' : '接收玩家'}
               onChange={(target) => state.updateSocial({ target })}
             />
           ) : null}
@@ -55,10 +55,10 @@ export function SocialForm() {
             />
           ) : null}
 
-          {id === 'say' || id === 'msg' ? (
-            <div className="field" style={{ marginTop: id === 'msg' ? 12 : 0 }}>
+          {id === 'say' || id === 'msg' || id === 'me' ? (
+            <div className="field" style={{ marginTop: id === 'say' ? 0 : 12 }}>
               <label className="field-label" htmlFor="social-message">
-                消息内容
+                {id === 'me' ? '动作内容' : '消息内容'}
               </label>
               <textarea
                 id="social-message"
@@ -66,7 +66,23 @@ export function SocialForm() {
                 value={options.message}
                 onChange={(event) => state.updateSocial({ message: event.target.value })}
               />
-              <div className="hint">支持 @p、@a 等选择器变量，由服务器替换。</div>
+              <div className="hint">
+                {id === 'me' ? '以 * 玩家名 的形式显示动作。' : '支持 @p、@a 等选择器变量，由服务器替换。'}
+              </div>
+            </div>
+          ) : null}
+
+          {id === 'kick' ? (
+            <div className="field" style={{ marginTop: 12 }}>
+              <label className="field-label" htmlFor="social-reason">
+                踢出原因（可选）
+              </label>
+              <input
+                id="social-reason"
+                className="input"
+                value={options.reason}
+                onChange={(event) => state.updateSocial({ reason: event.target.value })}
+              />
             </div>
           ) : null}
 

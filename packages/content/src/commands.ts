@@ -66,6 +66,10 @@ export const COMMANDS: CommandMeta[] = [
   { id: 'advancement', name: '进度', category: '玩家', description: '给予或收回玩家的进度与配方。', example: 'advancement grant @s only minecraft:story/root' },
   { id: 'trigger', name: '触发器', category: '玩家', description: '让玩家触发计分板触发器，常用于菜单与商店。', example: 'trigger menu set 1' },
   { id: 'msg', name: '私聊', category: '玩家', description: '向指定玩家发送私聊消息。', example: 'msg @s 你好' },
+  { id: 'me', name: '动作消息', category: '玩家', description: '以 * 玩家名 的形式广播动作。', example: 'me 正在建造' },
+  { id: 'kick', name: '踢出玩家', category: '系统', description: '把玩家踢出服务器，可附原因。', example: 'kick @a 请勿刷屏' },
+  { id: 'op', name: '授予管理员', category: '系统', description: '给予玩家管理员权限。', example: 'op @p' },
+  { id: 'deop', name: '撤销管理员', category: '系统', description: '撤销玩家的管理员权限。', example: 'deop @p' },
   { id: 'say', name: '广播消息', category: '玩家', description: '向所有玩家发送一条服务器消息。', example: 'say 服务器将在 5 分钟后重启' },
 
   { id: 'scoreboard', name: '记分板', category: '数据', description: '管理目标、分数、显示位置与运算，是地图逻辑的核心。', example: 'scoreboard objectives add kills dummy "击杀数"' },
