@@ -1,8 +1,14 @@
 # MC 指令工坊
 
+[![CI](https://github.com/JiangNanChina/mc-command-studio/actions/workflows/ci.yml/badge.svg)](https://github.com/JiangNanChina/mc-command-studio/actions/workflows/ci.yml)
+[![Release](https://img.shields.io/github/v/release/JiangNanChina/mc-command-studio)](https://github.com/JiangNanChina/mc-command-studio/releases/latest)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+
 > Windows 桌面版 Minecraft Java 命令编辑器。用表单拼命令，实时复制，或生成放置命令方块的 `/setblock`。
 >
 > **不是网页**：安装包双击即用，不需要浏览器、服务器或账号，断网可编辑。
+>
+> **[下载最新版](https://github.com/JiangNanChina/mc-command-studio/releases/latest)**
 
 ![give 表单](docs/assets/give-form.png)
 
