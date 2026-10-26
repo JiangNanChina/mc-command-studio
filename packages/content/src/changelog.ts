@@ -22,6 +22,42 @@ const REPO = 'https://github.com/JiangNanChina/mc-command-studio'
  */
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: '0.1.9',
+    date: '2026-10-26',
+    title: '可视化富文本 tellraw / title',
+    highlights: [
+      'tellraw/title 改为可视化文本编辑器，支持颜色、样式、点击/悬停。',
+      'title 支持淡入/停留/淡出 tick 与实时预览。'
+    ],
+    sections: [
+      {
+        type: 'added',
+        items: [
+          'tellraw：多段文本、16 色、粗体/斜体/下划线/删除线/随机字符。',
+          '点击事件（链接/命令/填入/复制）与悬停文本。',
+          'title：主标题/副标题/动作栏，times 时序。',
+          '实时富文本预览。'
+        ]
+      },
+      {
+        type: 'improved',
+        items: [
+          '多行 title 自动禁用单命令方块模式。',
+          '单元测试 103 → 108；冒烟测试覆盖 tellraw 与 title times。'
+        ]
+      },
+      {
+        type: 'fixed',
+        items: ['无。']
+      },
+      {
+        type: 'known',
+        items: ['复杂 JSON 文本（translate/score/nbt）仍可通过高级命令树输入。', '安装包尚未配置代码签名。']
+      }
+    ],
+    releaseUrl: `${REPO}/releases/tag/v0.1.9`
+  },
+  {
     version: '0.1.8',
     date: '2026-10-26',
     title: '可视化资源选择器',

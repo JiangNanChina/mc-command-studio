@@ -39,6 +39,8 @@ export function StatusBar() {
     state.chain,
     state.enchant,
     state.xp,
+    state.tellraw,
+    state.title,
     state.generic,
     state.outputMode,
     state.commandBlock

@@ -193,12 +193,15 @@ export function OutputPanel() {
     state.chain,
     state.enchant,
     state.xp,
+    state.tellraw,
+    state.title,
     state.generic,
     state.outputMode,
     state.commandBlock
   )
   const commandMode = state.outputMode === 'command'
   const chainMode = state.activeCommandId === 'chain'
+  const multiLineMode = chainMode || (state.activeCommandId === 'title' && state.title.times)
   const permission = state.activeCommandId
     ? permissionLabel(
         state.pack?.commands.children?.[state.activeCommandId] ??
@@ -238,8 +241,8 @@ export function OutputPanel() {
             role="tab"
             aria-selected={!commandMode}
             className={`tab${!commandMode ? ' active' : ''}`}
-            disabled={chainMode}
-            title={chainMode ? '命令方块链本身已经是多条 setblock 命令' : undefined}
+            disabled={multiLineMode}
+            title={multiLineMode ? '当前输出是多行命令，不能包进单个命令方块' : undefined}
             onClick={() => state.setOutputMode('command-block')}
           >
             命令方块
@@ -281,7 +284,7 @@ export function OutputPanel() {
             type="button"
             className="btn"
             title="把命令放进命令方块视图"
-            disabled={chainMode}
+            disabled={multiLineMode}
             onClick={() => state.setOutputMode(commandMode ? 'command-block' : 'command')}
           >
             <Boxes size={15} />

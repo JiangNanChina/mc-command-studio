@@ -220,6 +220,32 @@ async function main() {
   }
   await page.screenshot({ path: join(ARTIFACTS, 'xp-form.png') })
 
+  // tellraw / title 可视化文本
+  await page.locator('.command-item', { hasText: '富文本消息' }).first().click()
+  await page.waitForSelector('.text-segment', { timeout: 10_000 })
+  await page.waitForTimeout(300)
+  const tellrawOutput = await page.locator('.output-code .cm-content').innerText()
+  if (!tellrawOutput.includes('tellraw @a {"text":"文本"}')) {
+    throw new Error(`tellraw 输出不符合预期：${tellrawOutput}`)
+  }
+  await page.screenshot({ path: join(ARTIFACTS, 'tellraw-form.png') })
+
+  await page.locator('.command-item', { hasText: '标题' }).first().click()
+  await page.waitForSelector('.text-segment', { timeout: 10_000 })
+  await page.waitForTimeout(300)
+  const titleOutput = await page.locator('.output-code .cm-content').innerText()
+  if (!titleOutput.includes('title @a title {"text":"文本"}')) {
+    throw new Error(`title 输出不符合预期：${titleOutput}`)
+  }
+  await page.locator('.checkline', { hasText: '同时设置淡入' }).locator('input').check()
+  await page.waitForSelector('#title-stay', { timeout: 10_000 })
+  await page.waitForTimeout(300)
+  const titleTimes = await page.locator('.output-code .cm-content').innerText()
+  if (!titleTimes.includes('title @a times 10 70 20')) {
+    throw new Error(`title times 输出不符合预期：${titleTimes}`)
+  }
+  await page.screenshot({ path: join(ARTIFACTS, 'title-form.png') })
+
   // clone 专用表单 + 撤销/重做
   await page.locator('.command-item', { hasText: '复制区域' }).first().click()
   await page.waitForSelector('#clone-mode', { timeout: 10_000 })

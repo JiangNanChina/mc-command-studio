@@ -1854,6 +1854,44 @@ a {
   margin-top: 3px;
 }
 
+/* ---------- Text components ---------- */
+.text-segment {
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg-elev);
+}
+
+.text-segment + .text-segment {
+  margin-top: 10px;
+}
+
+.text-segment-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.color-swatch {
+  width: 18px;
+  height: 18px;
+  flex: 0 0 auto;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+}
+
+.text-preview {
+  min-height: 54px;
+  padding: 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: #0b1219;
+  font-size: 20px;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
 /* ---------- Command block chain ---------- */
 .chain-block {
   padding: 12px;

@@ -9,6 +9,8 @@ import {
   buildSetblockCommand,
   buildSummonCommand,
   buildTeleportCommand,
+  buildTellrawCommand,
+  buildTitleCommand,
   buildXpCommand,
   createChainBlock,
   createDefaultChainOptions,
@@ -22,7 +24,10 @@ import {
   createDefaultSetblockOptions,
   createDefaultSummonOptions,
   createDefaultTeleportOptions,
+  createDefaultTellrawOptions,
+  createDefaultTitleOptions,
   createDefaultXpOptions,
+  createTextSegment,
   createProjectFile,
   parseProjectFile,
   serializeGeneric,
@@ -48,6 +53,9 @@ import {
   type SummonOptions,
   type TeleportDestination,
   type TeleportOptions,
+  type TellrawOptions,
+  type TextSegment,
+  type TitleOptions,
   type VersionPack,
   type XpOptions
 } from '@mcstudio/core'
@@ -83,6 +91,8 @@ export interface ProjectPayload {
   chain: ChainOptions
   enchant: EnchantOptions
   xp: XpOptions
+  tellraw: TellrawOptions
+  title: TitleOptions
   generic: GenericDraft
   commandBlock: CommandBlockOptions
   outputMode: OutputMode
@@ -117,6 +127,8 @@ interface AppStore {
   chain: ChainOptions
   enchant: EnchantOptions
   xp: XpOptions
+  tellraw: TellrawOptions
+  title: TitleOptions
   generic: GenericDraft
   commandBlock: CommandBlockOptions
   outputMode: OutputMode
@@ -163,6 +175,8 @@ interface AppStore {
   updateClone: (patch: Partial<CloneOptions>) => void
   updateEnchant: (patch: Partial<EnchantOptions>) => void
   updateXp: (patch: Partial<XpOptions>) => void
+  updateTellraw: (patch: Partial<TellrawOptions>) => void
+  updateTitle: (patch: Partial<TitleOptions>) => void
   openChain: () => void
   updateChain: (patch: Partial<ChainOptions>) => void
   addChainBlock: () => void
@@ -468,6 +482,58 @@ function normalizeXp(input: Partial<XpOptions> | undefined): XpOptions {
   }
 }
 
+function normalizeTextSegment(input: Partial<TextSegment> | undefined): TextSegment {
+  const fallback = createTextSegment()
+  if (!input) return fallback
+  const click =
+    input.click &&
+    ['open_url', 'run_command', 'suggest_command', 'copy_to_clipboard'].includes(input.click.action) &&
+    typeof input.click.value === 'string'
+      ? { action: input.click.action, value: input.click.value }
+      : null
+  return {
+    text: typeof input.text === 'string' ? input.text : '',
+    color: typeof input.color === 'string' ? input.color : 'white',
+    bold: Boolean(input.bold),
+    italic: Boolean(input.italic),
+    underlined: Boolean(input.underlined),
+    strikethrough: Boolean(input.strikethrough),
+    obfuscated: Boolean(input.obfuscated),
+    click,
+    hover: typeof input.hover === 'string' ? input.hover : ''
+  }
+}
+
+function normalizeTellraw(input: Partial<TellrawOptions> | undefined): TellrawOptions {
+  const fallback = createDefaultTellrawOptions()
+  if (!input) return fallback
+  return {
+    target: input.target?.base ? input.target : fallback.target,
+    segments:
+      Array.isArray(input.segments) && input.segments.length > 0
+        ? input.segments.map(normalizeTextSegment)
+        : fallback.segments
+  }
+}
+
+function normalizeTitle(input: Partial<TitleOptions> | undefined): TitleOptions {
+  const fallback = createDefaultTitleOptions()
+  if (!input) return fallback
+  return {
+    target: input.target?.base ? input.target : fallback.target,
+    action:
+      input.action === 'subtitle' || input.action === 'actionbar' ? input.action : 'title',
+    segments:
+      Array.isArray(input.segments) && input.segments.length > 0
+        ? input.segments.map(normalizeTextSegment)
+        : fallback.segments,
+    times: Boolean(input.times),
+    fadeIn: typeof input.fadeIn === 'string' ? input.fadeIn : fallback.fadeIn,
+    stay: typeof input.stay === 'string' ? input.stay : fallback.stay,
+    fadeOut: typeof input.fadeOut === 'string' ? input.fadeOut : fallback.fadeOut
+  }
+}
+
 function normalizeGive(input: Partial<GiveOptions> | undefined): GiveOptions {
   const fallback = createDefaultGiveOptions()
   if (!input) return fallback
@@ -502,6 +568,8 @@ function normalizePayload(input: unknown): ProjectPayload {
     chain: normalizeChain(data.chain),
     enchant: normalizeEnchant(data.enchant),
     xp: normalizeXp(data.xp),
+    tellraw: normalizeTellraw(data.tellraw),
+    title: normalizeTitle(data.title),
     generic:
       data.generic && Array.isArray(data.generic.steps)
         ? {
@@ -533,6 +601,8 @@ function documentSnapshot(state: AppStore): string {
     chain: state.chain,
     enchant: state.enchant,
     xp: state.xp,
+    tellraw: state.tellraw,
+    title: state.title,
     generic: state.generic,
     commandBlock: state.commandBlock
   })
@@ -578,6 +648,8 @@ export const useAppStore = create<AppStore>()(
     chain: createDefaultChainOptions(),
     enchant: createDefaultEnchantOptions(),
     xp: createDefaultXpOptions(),
+    tellraw: createDefaultTellrawOptions(),
+    title: createDefaultTitleOptions(),
     generic: emptyGeneric(),
     commandBlock: createDefaultCommandBlockOptions(),
     outputMode: 'command',
@@ -871,6 +943,20 @@ export const useAppStore = create<AppStore>()(
       })
     },
 
+    updateTellraw: (patch) => {
+      set((state) => {
+        state.tellraw = { ...state.tellraw, ...patch }
+        state.dirty = true
+      })
+    },
+
+    updateTitle: (patch) => {
+      set((state) => {
+        state.title = { ...state.title, ...patch }
+        state.dirty = true
+      })
+    },
+
     openChain: () => {
       set((state) => {
         state.activeCommandId = 'chain'
@@ -1070,6 +1156,8 @@ export const useAppStore = create<AppStore>()(
         state.chain = createDefaultChainOptions()
         state.enchant = createDefaultEnchantOptions()
         state.xp = createDefaultXpOptions()
+        state.tellraw = createDefaultTellrawOptions()
+        state.title = createDefaultTitleOptions()
         state.generic = emptyGeneric()
         state.commandBlock = createDefaultCommandBlockOptions()
         state.outputMode = 'command'
@@ -1105,6 +1193,8 @@ export const useAppStore = create<AppStore>()(
         chain: state.chain,
         enchant: state.enchant,
         xp: state.xp,
+        tellraw: state.tellraw,
+        title: state.title,
         generic: state.generic,
         commandBlock: state.commandBlock,
         outputMode: state.outputMode
@@ -1136,6 +1226,8 @@ export const useAppStore = create<AppStore>()(
         state.chain = payload.chain
         state.enchant = payload.enchant
         state.xp = payload.xp
+        state.tellraw = payload.tellraw
+        state.title = payload.title
         state.generic = payload.generic
         state.commandBlock = payload.commandBlock
         state.outputMode = payload.outputMode
@@ -1386,4 +1478,12 @@ export function selectEnchantOutput(enchant: EnchantOptions): BuildResult {
 
 export function selectXpOutput(xp: XpOptions): BuildResult {
   return buildXpCommand(xp)
+}
+
+export function selectTellrawOutput(tellraw: TellrawOptions): BuildResult {
+  return buildTellrawCommand(tellraw)
+}
+
+export function selectTitleOutput(title: TitleOptions): BuildResult {
+  return buildTitleCommand(title)
 }

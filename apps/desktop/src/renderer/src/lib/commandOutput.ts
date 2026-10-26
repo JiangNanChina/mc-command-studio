@@ -14,6 +14,8 @@ import {
   type SetblockOptions,
   type SummonOptions,
   type TeleportOptions,
+  type TellrawOptions,
+  type TitleOptions,
   type VersionPack,
   type XpOptions
 } from '@mcstudio/core'
@@ -28,7 +30,9 @@ import {
   selectGiveOutput,
   selectSetblockOutput,
   selectSummonOutput,
+  selectTellrawOutput,
   selectTeleportOutput,
+  selectTitleOutput,
   selectXpOutput,
   type GenericDraft,
   type OutputMode
@@ -55,6 +59,8 @@ export function getCommandOutput(
   chain: ChainOptions,
   enchant: EnchantOptions,
   xp: XpOptions,
+  tellraw: TellrawOptions,
+  title: TitleOptions,
   generic: GenericDraft
 ): BuildResult {
   if (!activeCommandId) return { text: '', diagnostics: [] }
@@ -69,6 +75,8 @@ export function getCommandOutput(
   if (activeCommandId === 'chain') return selectChainOutput(chain)
   if (activeCommandId === 'enchant') return selectEnchantOutput(enchant)
   if (activeCommandId === 'xp') return selectXpOutput(xp)
+  if (activeCommandId === 'tellraw') return selectTellrawOutput(tellraw)
+  if (activeCommandId === 'title') return selectTitleOutput(title)
   if (!pack) return { text: '', diagnostics: [] }
   return selectGenericOutput(pack, { ...generic, root: generic.root ?? activeCommandId })
 }
@@ -87,6 +95,8 @@ export function getCurrentOutput(
   chain: ChainOptions,
   enchant: EnchantOptions,
   xp: XpOptions,
+  tellraw: TellrawOptions,
+  title: TitleOptions,
   generic: GenericDraft,
   outputMode: OutputMode,
   commandBlock: CommandBlockOptions
@@ -105,6 +115,8 @@ export function getCurrentOutput(
     chain,
     enchant,
     xp,
+    tellraw,
+    title,
     generic
   )
   if (outputMode === 'command') {

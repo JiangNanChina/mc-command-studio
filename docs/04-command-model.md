@@ -195,7 +195,46 @@ interface XpOptions {
 
 `add`/`set` 生成 `xp add|set <target> <amount> [levels]`；`query` 生成 `xp query <target> [levels]`，不需要数量。数量为 0–2,147,483,647 的整数。
 
-### 1.13 通用构建器：所有 94 个根命令
+### 1.13 专用表单：`tellraw`
+
+```ts
+interface TextSegment {
+  text: string
+  color: string
+  bold: boolean
+  italic: boolean
+  underlined: boolean
+  strikethrough: boolean
+  obfuscated: boolean
+  click: { action: 'open_url' | 'run_command' | 'suggest_command' | 'copy_to_clipboard'; value: string } | null
+  hover: string
+}
+
+interface TellrawOptions {
+  target: Selector
+  segments: TextSegment[]
+}
+```
+
+单段文本输出 `{"text":"..."}`；多段输出 `{"text":"","extra":[...]}`。颜色为 16 色之一，点击/悬停使用 `clickEvent` / `hoverEvent`。
+
+### 1.14 专用表单：`title`
+
+```ts
+interface TitleOptions {
+  target: Selector
+  action: 'title' | 'subtitle' | 'actionbar'
+  segments: TextSegment[]
+  times: boolean
+  fadeIn: string
+  stay: string
+  fadeOut: string
+}
+```
+
+times 开启时输出两行：`title <target> times <in> <stay> <out>` 与 `title <target> <action> <json>`；否则只输出内容行。
+
+### 1.15 通用构建器：所有 94 个根命令
 
 ```ts
 interface GenericStep {
@@ -328,7 +367,7 @@ type Unit =
 
 ## 7. 测试
 
-`packages/core/src/*.test.ts` 与 `apps/desktop/src/shared/*.test.ts` 共 103 个用例，覆盖：
+`packages/core/src/*.test.ts` 与 `apps/desktop/src/shared/*.test.ts` 共 108 个用例，覆盖：
 
 - SNBT / 命令方块字符串转义。
 - 选择器排序、引号、范围、NBT 括号、分数。
@@ -344,6 +383,8 @@ type Unit =
 - 命令方块链方向偏移、方块类型、条件/自动、引号转义、`^` 坐标报错。
 - `/enchant` 附魔命名空间、等级范围、空 ID。
 - `/xp` add/set/query、points/levels、数量范围。
+- 文本组件：单段/extra、颜色/样式、点击/悬停、JSON 转义。
+- `/tellraw` 目标与 JSON；`/title` 三种位置、times 时序、非法 tick。
 - 数据包文件树、load/tick 标签、多行函数、非法命名空间/函数名/空命令。
 - `/give` 文本导入：选择器、组件、数量、未知组件 raw。
 - 命令树遍历、通用路径、参数范围。
