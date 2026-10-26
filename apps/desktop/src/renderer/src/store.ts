@@ -18,6 +18,9 @@ import {
   buildGameruleCommand,
   buildWorldborderCommand,
   buildTeamCommands,
+  buildSpawnpointCommand,
+  buildWorldSpawnCommand,
+  buildForceloadCommand,
   buildSoundCommand,
   buildSummonCommand,
   buildTeleportCommand,
@@ -42,6 +45,9 @@ import {
   createDefaultGameruleOptions,
   createDefaultWorldborderOptions,
   createDefaultTeamOptions,
+  createDefaultSpawnpointOptions,
+  createDefaultWorldSpawnOptions,
+  createDefaultForceloadOptions,
   createDefaultSetblockOptions,
   createDefaultSoundOptions,
   createDefaultSummonOptions,
@@ -79,6 +85,9 @@ import {
   type GameruleOptions,
   type WorldborderOptions,
   type TeamOptions,
+  type SpawnpointOptions,
+  type WorldSpawnOptions,
+  type ForceloadOptions,
   type TimeOptions,
   type SetblockMode,
   type SetblockOptions,
@@ -162,6 +171,9 @@ export interface ProjectPayload {
   gamerule: GameruleOptions
   worldborder: WorldborderOptions
   team: TeamOptions
+  spawnpoint: SpawnpointOptions
+  worldSpawn: WorldSpawnOptions
+  forceload: ForceloadOptions
   datapack: DatapackDraft
   generic: GenericDraft
   commandBlock: CommandBlockOptions
@@ -209,6 +221,9 @@ interface AppStore {
   gamerule: GameruleOptions
   worldborder: WorldborderOptions
   team: TeamOptions
+  spawnpoint: SpawnpointOptions
+  worldSpawn: WorldSpawnOptions
+  forceload: ForceloadOptions
   datapack: DatapackDraft
   generic: GenericDraft
   commandBlock: CommandBlockOptions
@@ -270,6 +285,9 @@ interface AppStore {
   updateGamerule: (patch: Partial<GameruleOptions>) => void
   updateWorldborder: (patch: Partial<WorldborderOptions>) => void
   updateTeam: (patch: Partial<TeamOptions>) => void
+  updateSpawnpoint: (patch: Partial<SpawnpointOptions>) => void
+  updateWorldSpawn: (patch: Partial<WorldSpawnOptions>) => void
+  updateForceload: (patch: Partial<ForceloadOptions>) => void
   openDatapack: () => void
   updateDatapackMeta: (patch: Partial<Pick<DatapackDraft, 'namespace' | 'description'>>) => void
   addDatapackFunction: () => void
@@ -1011,6 +1029,45 @@ function normalizeTeam(input: Partial<TeamOptions> | undefined): TeamOptions {
   }
 }
 
+function normalizeSpawnpoint(input: Partial<SpawnpointOptions> | undefined): SpawnpointOptions {
+  const fallback = createDefaultSpawnpointOptions()
+  if (!input) return fallback
+  return {
+    target: input.target?.base ? input.target : fallback.target,
+    position: normalizePosition(input.position),
+    angleEnabled: Boolean(input.angleEnabled),
+    yaw: typeof input.yaw === 'string' ? input.yaw : fallback.yaw,
+    pitch: typeof input.pitch === 'string' ? input.pitch : fallback.pitch
+  }
+}
+
+function normalizeWorldSpawn(input: Partial<WorldSpawnOptions> | undefined): WorldSpawnOptions {
+  const fallback = createDefaultWorldSpawnOptions()
+  if (!input) return fallback
+  return {
+    position: normalizePosition(input.position),
+    angleEnabled: Boolean(input.angleEnabled),
+    yaw: typeof input.yaw === 'string' ? input.yaw : fallback.yaw,
+    pitch: typeof input.pitch === 'string' ? input.pitch : fallback.pitch
+  }
+}
+
+function normalizeForceload(input: Partial<ForceloadOptions> | undefined): ForceloadOptions {
+  const fallback = createDefaultForceloadOptions()
+  if (!input) return fallback
+  const actions: ForceloadOptions['action'][] = ['add', 'remove', 'remove-all', 'query']
+  return {
+    action: actions.includes(input.action as ForceloadOptions['action'])
+      ? (input.action as ForceloadOptions['action'])
+      : 'add',
+    fromX: typeof input.fromX === 'string' ? input.fromX : fallback.fromX,
+    fromZ: typeof input.fromZ === 'string' ? input.fromZ : fallback.fromZ,
+    toEnabled: Boolean(input.toEnabled),
+    toX: typeof input.toX === 'string' ? input.toX : fallback.toX,
+    toZ: typeof input.toZ === 'string' ? input.toZ : fallback.toZ
+  }
+}
+
 function normalizeGive(input: Partial<GiveOptions> | undefined): GiveOptions {
   const fallback = createDefaultGiveOptions()
   if (!input) return fallback
@@ -1057,6 +1114,9 @@ function normalizePayload(input: unknown): ProjectPayload {
     gamerule: normalizeGamerule(data.gamerule),
     worldborder: normalizeWorldborder(data.worldborder),
     team: normalizeTeam(data.team),
+    spawnpoint: normalizeSpawnpoint(data.spawnpoint),
+    worldSpawn: normalizeWorldSpawn(data.worldSpawn),
+    forceload: normalizeForceload(data.forceload),
     datapack: normalizeDatapack(data.datapack),
     generic:
       data.generic && Array.isArray(data.generic.steps)
@@ -1101,6 +1161,9 @@ function documentSnapshot(state: AppStore): string {
     gamerule: state.gamerule,
     worldborder: state.worldborder,
     team: state.team,
+    spawnpoint: state.spawnpoint,
+    worldSpawn: state.worldSpawn,
+    forceload: state.forceload,
     datapack: state.datapack,
     generic: state.generic,
     commandBlock: state.commandBlock
@@ -1159,6 +1222,9 @@ export const useAppStore = create<AppStore>()(
     gamerule: createDefaultGameruleOptions(),
     worldborder: createDefaultWorldborderOptions(),
     team: createDefaultTeamOptions(),
+    spawnpoint: createDefaultSpawnpointOptions(),
+    worldSpawn: createDefaultWorldSpawnOptions(),
+    forceload: createDefaultForceloadOptions(),
     datapack: defaultDatapackDraft(),
     generic: emptyGeneric(),
     commandBlock: createDefaultCommandBlockOptions(),
@@ -1551,6 +1617,27 @@ export const useAppStore = create<AppStore>()(
       })
     },
 
+    updateSpawnpoint: (patch) => {
+      set((state) => {
+        state.spawnpoint = { ...state.spawnpoint, ...patch }
+        state.dirty = true
+      })
+    },
+
+    updateWorldSpawn: (patch) => {
+      set((state) => {
+        state.worldSpawn = { ...state.worldSpawn, ...patch }
+        state.dirty = true
+      })
+    },
+
+    updateForceload: (patch) => {
+      set((state) => {
+        state.forceload = { ...state.forceload, ...patch }
+        state.dirty = true
+      })
+    },
+
     openDatapack: () => {
       set((state) => {
         state.activeCommandId = 'datapack'
@@ -1844,6 +1931,9 @@ export const useAppStore = create<AppStore>()(
         state.gamerule = createDefaultGameruleOptions()
         state.worldborder = createDefaultWorldborderOptions()
         state.team = createDefaultTeamOptions()
+        state.spawnpoint = createDefaultSpawnpointOptions()
+        state.worldSpawn = createDefaultWorldSpawnOptions()
+        state.forceload = createDefaultForceloadOptions()
         state.datapack = defaultDatapackDraft()
         state.generic = emptyGeneric()
         state.commandBlock = createDefaultCommandBlockOptions()
@@ -1892,6 +1982,9 @@ export const useAppStore = create<AppStore>()(
         gamerule: state.gamerule,
         worldborder: state.worldborder,
         team: state.team,
+        spawnpoint: state.spawnpoint,
+        worldSpawn: state.worldSpawn,
+        forceload: state.forceload,
         datapack: state.datapack,
         generic: state.generic,
         commandBlock: state.commandBlock,
@@ -1936,6 +2029,9 @@ export const useAppStore = create<AppStore>()(
         state.gamerule = payload.gamerule
         state.worldborder = payload.worldborder
         state.team = payload.team
+        state.spawnpoint = payload.spawnpoint
+        state.worldSpawn = payload.worldSpawn
+        state.forceload = payload.forceload
         state.datapack = payload.datapack
         state.generic = payload.generic
         state.commandBlock = payload.commandBlock
@@ -2245,4 +2341,16 @@ export function selectWorldborderOutput(worldborder: WorldborderOptions): BuildR
 
 export function selectTeamOutput(team: TeamOptions): BuildResult {
   return buildTeamCommands(team)
+}
+
+export function selectSpawnpointOutput(spawnpoint: SpawnpointOptions): BuildResult {
+  return buildSpawnpointCommand(spawnpoint)
+}
+
+export function selectWorldSpawnOutput(worldSpawn: WorldSpawnOptions): BuildResult {
+  return buildWorldSpawnCommand(worldSpawn)
+}
+
+export function selectForceloadOutput(forceload: ForceloadOptions): BuildResult {
+  return buildForceloadCommand(forceload)
 }

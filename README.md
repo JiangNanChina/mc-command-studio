@@ -12,7 +12,7 @@
 
 ![give 表单](docs/assets/give-form.png)
 
-## 功能（0.1.19）
+## 功能（0.1.20）
 
 - **数据包工作区**：侧栏“工具”独立打开，多函数管理、load/tick 标签、文件预览与 zip 导出；与命令编辑彻底分开。
 - **可视化选择**：物品、方块、状态效果、附魔、实体、声音统一为中文名 + 图标网格；支持中文名 / ID 搜索。
@@ -27,8 +27,9 @@
 - **游戏规则**：`gamerule` 59 条规则，中文名/说明搜索、布尔开关/整数范围/查询。
 - **世界边界**：`worldborder` 尺寸/扩展/中心/伤害/警告/查询，支持过渡时间与示意预览。
 - **队伍**：`team` 创建/修改/加入/离开/删除/查询，16 色、友伤、隐身队友、名字标签与碰撞规则。
+- **出生点与加载**：`spawnpoint` / `setworldspawn` 坐标与朝向；`forceload` 矩形区块加载。
 - **26.3 数据包**：94 个根命令、1,197 个字面量、59 种参数类型。
-- **专用表单**：`give`、`summon`、`setblock`、`execute`、`tp`、`effect`、`fill`、`clone`、`enchant`、`xp`、`tellraw`、`title`、`playsound`、`stopsound`、`bossbar`、`scoreboard`、`particle`、`time`、`weather`、`difficulty`、`tag`、`clear`、`gamerule`、`worldborder`、`team`。
+- **专用表单**：`give`、`summon`、`setblock`、`execute`、`tp`、`effect`、`fill`、`clone`、`enchant`、`xp`、`tellraw`、`title`、`playsound`、`stopsound`、`bossbar`、`scoreboard`、`particle`、`time`、`weather`、`difficulty`、`tag`、`clear`、`gamerule`、`worldborder`、`team`、`spawnpoint`、`setworldspawn`、`forceload`。
 - **命令方块链**：按方向排布最多 64 个脉冲/连锁/循环方块，自动偏移坐标，生成整链 `/setblock`。
 - **execute 执行链**：as/at/positioned/align/anchored/facing/rotated/in/if/unless/store/raw 可排序积木 + run。
 - **状态效果**：可视化选择效果，支持自定义秒数或永久（infinite）、等级、隐藏粒子。
@@ -39,7 +40,7 @@
 - **通用构建器**：未覆盖命令仍保留官方命令树作为高级兜底。
 - **本地项目**：`.mcstudio` JSON、最近打开、4 秒防抖自动保存、异常退出恢复。
 - **桌面体验**：深色/浅色主题、中文界面、原生菜单、文件关联、单实例、高 DPI。
-- **分发与更新**：NSIS 安装包 + 便携版 + `latest.yml`；electron-updater 自动检查/下载/重启安装；GitHub Actions 发布流水线。已在本机验证 0.1.18 → 0.1.19 静默升级；便携版会禁用自动更新并提示手动下载。
+- **分发与更新**：NSIS 安装包 + 便携版 + `latest.yml`；electron-updater 自动检查/下载/重启安装；GitHub Actions 发布流水线。已在本机验证 0.1.19 → 0.1.20 静默升级；便携版会禁用自动更新并提示手动下载。
 
 ## 下载与安装
 
@@ -69,8 +70,8 @@ pnpm build:win          # 安装包 + 便携版 + latest.yml
 
 产物在 `release/`：
 
-- `MC-Command-Studio-Setup-0.1.19.exe`
-- `MC-Command-Studio-0.1.19-portable.exe`
+- `MC-Command-Studio-Setup-0.1.20.exe`
+- `MC-Command-Studio-0.1.20-portable.exe`
 - `latest.yml`、`.blockmap`
 
 如果 `pnpm install` 后没有 Electron 二进制，运行 `pnpm setup:electron`；国内网络可设置：
@@ -94,7 +95,7 @@ pnpm data:verify
 ## 测试
 
 ```bash
-pnpm test        # 145 个核心逻辑用例
+pnpm test        # 149 个核心逻辑用例
 pnpm e2e         # Playwright 启动 Electron，覆盖 give/导入/summon/setblock/命令方块
 ```
 

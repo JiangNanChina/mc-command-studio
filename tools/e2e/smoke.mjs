@@ -483,6 +483,50 @@ async function main() {
   }
   await page.getByRole('button', { name: '创建队伍', exact: true }).click()
 
+  // spawnpoint / setworldspawn / forceload
+  await page.locator('.command-item', { hasText: 'spawnpoint' }).first().click()
+  await page.waitForSelector('#spawn-tab-spawnpoint', { timeout: 10_000 })
+  await page.waitForTimeout(300)
+  const spawnOutput = await page.locator('.output-code .cm-content').innerText()
+  if (!spawnOutput.includes('spawnpoint @s ~ ~ ~')) {
+    throw new Error(`spawnpoint 输出不符合预期：${spawnOutput}`)
+  }
+  await page.getByLabel('指定重生朝向').check()
+  await page.fill('#spawn-yaw', '90')
+  await page.waitForTimeout(300)
+  const spawnAngle = await page.locator('.output-code .cm-content').innerText()
+  if (!spawnAngle.includes('spawnpoint @s ~ ~ ~ 90 0')) {
+    throw new Error(`spawnpoint 朝向输出不符合预期：${spawnAngle}`)
+  }
+  await page.locator('#spawn-tab-setworldspawn').click()
+  await page.waitForTimeout(300)
+  const worldSpawnOutput = await page.locator('.output-code .cm-content').innerText()
+  if (!worldSpawnOutput.includes('setworldspawn 0 64 0')) {
+    throw new Error(`setworldspawn 输出不符合预期：${worldSpawnOutput}`)
+  }
+  await page.locator('#spawn-tab-forceload').click()
+  await page.waitForSelector('#forceload-from-x', { timeout: 10_000 })
+  await page.waitForTimeout(300)
+  const forceloadOutput = await page.locator('.output-code .cm-content').innerText()
+  if (!forceloadOutput.includes('forceload add 0 0')) {
+    throw new Error(`forceload 输出不符合预期：${forceloadOutput}`)
+  }
+  await page.getByLabel('指定结束坐标（矩形区域）').check()
+  await page.fill('#forceload-to-x', '2')
+  await page.fill('#forceload-to-z', '3')
+  await page.waitForTimeout(300)
+  const forceloadArea = await page.locator('.output-code .cm-content').innerText()
+  if (!forceloadArea.includes('forceload add 0 0 2 3')) {
+    throw new Error(`forceload 区域输出不符合预期：${forceloadArea}`)
+  }
+  await page.screenshot({ path: join(ARTIFACTS, 'worldsettings-form.png') })
+  await page.getByRole('button', { name: '移除全部', exact: true }).click()
+  await page.waitForTimeout(200)
+  const forceloadAll = await page.locator('.output-code .cm-content').innerText()
+  if (!forceloadAll.includes('forceload remove all')) {
+    throw new Error(`forceload 移除全部输出不符合预期：${forceloadAll}`)
+  }
+
   // scoreboard 可视化
   await page.locator('.command-item', { hasText: '记分板' }).first().click()
   await page.waitForSelector('#scoreboard-objective', { timeout: 10_000 })

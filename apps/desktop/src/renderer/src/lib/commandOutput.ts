@@ -21,6 +21,9 @@ import {
   type GameruleOptions,
   type WorldborderOptions,
   type TeamOptions,
+  type SpawnpointOptions,
+  type WorldSpawnOptions,
+  type ForceloadOptions,
   type SoundOptions,
   type SummonOptions,
   type TeleportOptions,
@@ -50,6 +53,9 @@ import {
   selectGameruleOutput,
   selectWorldborderOutput,
   selectTeamOutput,
+  selectSpawnpointOutput,
+  selectWorldSpawnOutput,
+  selectForceloadOutput,
   selectSoundOutput,
   selectSummonOutput,
   selectTellrawOutput,
@@ -93,6 +99,9 @@ export function getCommandOutput(
   gamerule: GameruleOptions,
   worldborder: WorldborderOptions,
   team: TeamOptions,
+  spawnpoint: SpawnpointOptions,
+  worldSpawn: WorldSpawnOptions,
+  forceload: ForceloadOptions,
   generic: GenericDraft
 ): BuildResult {
   if (!activeCommandId) return { text: '', diagnostics: [] }
@@ -120,6 +129,9 @@ export function getCommandOutput(
   if (activeCommandId === 'gamerule') return selectGameruleOutput(gamerule)
   if (activeCommandId === 'worldborder') return selectWorldborderOutput(worldborder)
   if (activeCommandId === 'team') return selectTeamOutput(team)
+  if (activeCommandId === 'spawnpoint') return selectSpawnpointOutput(spawnpoint)
+  if (activeCommandId === 'setworldspawn') return selectWorldSpawnOutput(worldSpawn)
+  if (activeCommandId === 'forceload') return selectForceloadOutput(forceload)
   if (activeCommandId === 'playsound' || activeCommandId === 'stopsound') {
     return selectSoundOutput(sound)
   }
@@ -153,6 +165,9 @@ export function getCurrentOutput(
   gamerule: GameruleOptions,
   worldborder: WorldborderOptions,
   team: TeamOptions,
+  spawnpoint: SpawnpointOptions,
+  worldSpawn: WorldSpawnOptions,
+  forceload: ForceloadOptions,
   generic: GenericDraft,
   outputMode: OutputMode,
   commandBlock: CommandBlockOptions
@@ -183,6 +198,9 @@ export function getCurrentOutput(
     gamerule,
     worldborder,
     team,
+    spawnpoint,
+    worldSpawn,
+    forceload,
     generic
   )
   if (outputMode === 'command') {

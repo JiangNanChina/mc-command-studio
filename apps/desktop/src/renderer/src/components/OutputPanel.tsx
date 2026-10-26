@@ -202,6 +202,9 @@ export function OutputPanel() {
     state.gamerule,
     state.worldborder,
     state.team,
+    state.spawnpoint,
+    state.worldSpawn,
+    state.forceload,
     state.generic,
     state.outputMode,
     state.commandBlock

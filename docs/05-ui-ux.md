@@ -273,6 +273,16 @@
 - 名字标签可见性、碰撞规则下拉。
 - 创建生成 add + 5 条 modify，多行输出禁用单命令方块。
 
+## 3.24 spawnpoint / setworldspawn / forceload
+
+![出生点与加载](assets/worldsettings-form.png)
+
+- 三个标签：玩家出生点、世界出生点、强制加载。
+- 玩家出生点：目标选择器、坐标、可选 yaw/pitch。
+- 世界出生点：坐标、可选朝向。
+- 强制加载：添加/移除/移除全部/查询；支持单区块或矩形区域。
+- 区块坐标整数校验，加载区域随世界保存。
+
 ## 4. 通用构建器
 
 ![通用构建器进入方式](assets/command-block.png)

@@ -22,6 +22,41 @@ const REPO = 'https://github.com/JiangNanChina/mc-command-studio'
  */
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: '0.1.20',
+    date: '2026-10-26',
+    title: '出生点与区块加载',
+    highlights: [
+      'spawnpoint / setworldspawn / forceload 共用页面。',
+      '出生朝向、矩形区块加载区域。'
+    ],
+    sections: [
+      {
+        type: 'added',
+        items: [
+          'spawnpoint：玩家目标、坐标、可选 yaw/pitch。',
+          'setworldspawn：世界出生坐标、可选朝向。',
+          'forceload：add/remove/remove all/query，支持矩形区域。'
+        ]
+      },
+      {
+        type: 'improved',
+        items: [
+          '整数区块坐标与朝向校验。',
+          '单元测试 145 → 149；冒烟测试覆盖三项。'
+        ]
+      },
+      {
+        type: 'fixed',
+        items: ['无。']
+      },
+      {
+        type: 'known',
+        items: ['item/attribute 等命令仍在高级命令树。', '安装包尚未配置代码签名。']
+      }
+    ],
+    releaseUrl: `${REPO}/releases/tag/v0.1.20`
+  },
+  {
     version: '0.1.19',
     date: '2026-10-26',
     title: '可视化队伍 team',

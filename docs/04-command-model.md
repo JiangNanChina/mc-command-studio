@@ -411,7 +411,21 @@ interface TeamOptions {
 
 创建生成 `team add` + 5 条 `team modify`；修改只生成 modify；加入/离开/删除/查询分别生成单条命令。队伍名 1–16 位。
 
-### 1.24 通用构建器：所有 94 个根命令
+### 1.24 出生点与加载：`spawnpoint` / `setworldspawn` / `forceload`
+
+```ts
+interface SpawnpointOptions { target: Selector; position: Position; angleEnabled: boolean; yaw: string; pitch: string }
+interface WorldSpawnOptions { position: Position; angleEnabled: boolean; yaw: string; pitch: string }
+interface ForceloadOptions {
+  action: 'add' | 'remove' | 'remove-all' | 'query'
+  fromX: string; fromZ: string
+  toEnabled: boolean; toX: string; toZ: string
+}
+```
+
+出生点坐标使用 block_pos，朝向可选 yaw/pitch；forceload 使用整数区块坐标，支持单区块与矩形区域，`remove all` 单独生成。三个命令共用页面，标签切换。
+
+### 1.25 通用构建器：所有 94 个根命令
 
 ```ts
 interface GenericStep {
@@ -544,7 +558,7 @@ type Unit =
 
 ## 7. 测试
 
-`packages/core/src/*.test.ts` 与 `apps/desktop/src/shared/*.test.ts` 共 145 个用例，覆盖：
+`packages/core/src/*.test.ts` 与 `apps/desktop/src/shared/*.test.ts` 共 149 个用例，覆盖：
 
 - SNBT / 命令方块字符串转义。
 - 选择器排序、引号、范围、NBT 括号、分数。
@@ -571,6 +585,7 @@ type Unit =
 - `/gamerule` 布尔/整数设置与查询、规则名和值类型校验。
 - `/worldborder` 尺寸/过渡/中心/伤害/警告/查询、数值与时间校验。
 - `/team` 创建/修改/加入/离开/删除/查询、颜色/友伤/可见性/碰撞、队伍名校验。
+- `/spawnpoint`/`/setworldspawn` 坐标与朝向；`/forceload` 单区块/矩形/全部移除/查询。
 - 数据包文件树、load/tick 标签、多行函数、非法命名空间/函数名/空命令。
 - `/give` 文本导入：选择器、组件、数量、未知组件 raw。
 - 命令树遍历、通用路径、参数范围。
