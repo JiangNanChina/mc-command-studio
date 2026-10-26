@@ -84,6 +84,32 @@ export interface GenericDraft {
   steps: { name: string; value?: string }[]
 }
 
+export interface DatapackFunctionDraft {
+  id: string
+  name: string
+  commands: string
+}
+
+export interface DatapackDraft {
+  namespace: string
+  description: string
+  functions: DatapackFunctionDraft[]
+  activeFunctionId: string
+  loadFunction: string
+  tickFunction: string
+}
+
+function defaultDatapackDraft(): DatapackDraft {
+  return {
+    namespace: 'mcstudio',
+    description: 'MC 指令工坊数据包',
+    functions: [{ id: 'main', name: 'main', commands: 'say 你好' }],
+    activeFunctionId: 'main',
+    loadFunction: '',
+    tickFunction: ''
+  }
+}
+
 export interface ProjectPayload {
   activeCommandId: string | null
   give: GiveOptions
@@ -101,6 +127,7 @@ export interface ProjectPayload {
   title: TitleOptions
   sound: SoundOptions
   bossbar: BossbarOptions
+  datapack: DatapackDraft
   generic: GenericDraft
   commandBlock: CommandBlockOptions
   outputMode: OutputMode
@@ -139,6 +166,7 @@ interface AppStore {
   title: TitleOptions
   sound: SoundOptions
   bossbar: BossbarOptions
+  datapack: DatapackDraft
   generic: GenericDraft
   commandBlock: CommandBlockOptions
   outputMode: OutputMode
@@ -189,6 +217,14 @@ interface AppStore {
   updateTitle: (patch: Partial<TitleOptions>) => void
   updateSound: (patch: Partial<SoundOptions>) => void
   updateBossbar: (patch: Partial<BossbarOptions>) => void
+  openDatapack: () => void
+  updateDatapackMeta: (patch: Partial<Pick<DatapackDraft, 'namespace' | 'description'>>) => void
+  addDatapackFunction: () => void
+  removeDatapackFunction: (id: string) => void
+  selectDatapackFunction: (id: string) => void
+  updateDatapackFunction: (id: string, patch: Partial<Pick<DatapackFunctionDraft, 'name' | 'commands'>>) => void
+  setDatapackLoadFunction: (name: string) => void
+  setDatapackTickFunction: (name: string) => void
   openChain: () => void
   updateChain: (patch: Partial<ChainOptions>) => void
   addChainBlock: () => void
@@ -615,6 +651,41 @@ function normalizeBossbar(input: Partial<BossbarOptions> | undefined): BossbarOp
   }
 }
 
+function normalizeDatapack(input: Partial<DatapackDraft> | undefined): DatapackDraft {
+  const fallback = defaultDatapackDraft()
+  if (!input) return fallback
+  const functions = Array.isArray(input.functions)
+    ? input.functions
+        .filter((item) => item && typeof item.id === 'string' && typeof item.name === 'string')
+        .map((item, index) => ({
+          id: item.id,
+          name: item.name,
+          commands: typeof item.commands === 'string' ? item.commands : ''
+        }))
+        .filter((item) => item.name.trim().length > 0)
+    : fallback.functions
+  const list = functions.length > 0 ? functions : fallback.functions
+  const activeFunctionId = list.some((item) => item.id === input.activeFunctionId)
+    ? (input.activeFunctionId as string)
+    : list[0].id
+  const names = new Set(list.map((item) => item.name))
+  return {
+    namespace: typeof input.namespace === 'string' ? input.namespace : fallback.namespace,
+    description:
+      typeof input.description === 'string' ? input.description : fallback.description,
+    functions: list,
+    activeFunctionId,
+    loadFunction:
+      typeof input.loadFunction === 'string' && names.has(input.loadFunction)
+        ? input.loadFunction
+        : '',
+    tickFunction:
+      typeof input.tickFunction === 'string' && names.has(input.tickFunction)
+        ? input.tickFunction
+        : ''
+  }
+}
+
 function normalizeGive(input: Partial<GiveOptions> | undefined): GiveOptions {
   const fallback = createDefaultGiveOptions()
   if (!input) return fallback
@@ -653,6 +724,7 @@ function normalizePayload(input: unknown): ProjectPayload {
     title: normalizeTitle(data.title),
     sound: normalizeSound(data.sound),
     bossbar: normalizeBossbar(data.bossbar),
+    datapack: normalizeDatapack(data.datapack),
     generic:
       data.generic && Array.isArray(data.generic.steps)
         ? {
@@ -688,6 +760,7 @@ function documentSnapshot(state: AppStore): string {
     title: state.title,
     sound: state.sound,
     bossbar: state.bossbar,
+    datapack: state.datapack,
     generic: state.generic,
     commandBlock: state.commandBlock
   })
@@ -737,6 +810,7 @@ export const useAppStore = create<AppStore>()(
     title: createDefaultTitleOptions(),
     sound: createDefaultSoundOptions(),
     bossbar: createDefaultBossbarOptions(),
+    datapack: defaultDatapackDraft(),
     generic: emptyGeneric(),
     commandBlock: createDefaultCommandBlockOptions(),
     outputMode: 'command',
@@ -1058,6 +1132,88 @@ export const useAppStore = create<AppStore>()(
       })
     },
 
+    openDatapack: () => {
+      set((state) => {
+        state.activeCommandId = 'datapack'
+        state.outputMode = 'command'
+      })
+    },
+
+    updateDatapackMeta: (patch) => {
+      set((state) => {
+        state.datapack = { ...state.datapack, ...patch }
+        state.dirty = true
+      })
+    },
+
+    addDatapackFunction: () => {
+      set((state) => {
+        const names = new Set(state.datapack.functions.map((item) => item.name))
+        let index = 1
+        let name = 'function'
+        while (names.has(name)) {
+          index += 1
+          name = `function_${index}`
+        }
+        const id = newClauseId()
+        state.datapack.functions.push({ id, name, commands: '' })
+        state.datapack.activeFunctionId = id
+        state.dirty = true
+      })
+    },
+
+    removeDatapackFunction: (id) => {
+      set((state) => {
+        if (state.datapack.functions.length <= 1) return
+        const target = state.datapack.functions.find((item) => item.id === id)
+        if (!target) return
+        state.datapack.functions = state.datapack.functions.filter((item) => item.id !== id)
+        if (state.datapack.loadFunction === target.name) state.datapack.loadFunction = ''
+        if (state.datapack.tickFunction === target.name) state.datapack.tickFunction = ''
+        if (state.datapack.activeFunctionId === id) {
+          state.datapack.activeFunctionId = state.datapack.functions[0].id
+        }
+        state.dirty = true
+      })
+    },
+
+    selectDatapackFunction: (id) => {
+      set((state) => {
+        if (state.datapack.functions.some((item) => item.id === id)) {
+          state.datapack.activeFunctionId = id
+        }
+      })
+    },
+
+    updateDatapackFunction: (id, patch) => {
+      set((state) => {
+        const target = state.datapack.functions.find((item) => item.id === id)
+        if (!target) return
+        const oldName = target.name
+        if (typeof patch.name === 'string') target.name = patch.name
+        if (typeof patch.commands === 'string') target.commands = patch.commands
+        if (patch.name && patch.name !== oldName) {
+          if (state.datapack.loadFunction === oldName) state.datapack.loadFunction = patch.name
+          if (state.datapack.tickFunction === oldName) state.datapack.tickFunction = patch.name
+        }
+        state.dirty = true
+      })
+    },
+
+    setDatapackLoadFunction: (name) => {
+      set((state) => {
+        state.datapack.loadFunction = name
+        state.dirty = true
+      })
+    },
+
+    setDatapackTickFunction: (name) => {
+      set((state) => {
+        state.datapack.tickFunction = name
+        state.dirty = true
+      })
+    },
+
     openChain: () => {
       set((state) => {
         state.activeCommandId = 'chain'
@@ -1261,6 +1417,7 @@ export const useAppStore = create<AppStore>()(
         state.title = createDefaultTitleOptions()
         state.sound = createDefaultSoundOptions()
         state.bossbar = createDefaultBossbarOptions()
+        state.datapack = defaultDatapackDraft()
         state.generic = emptyGeneric()
         state.commandBlock = createDefaultCommandBlockOptions()
         state.outputMode = 'command'
@@ -1300,6 +1457,7 @@ export const useAppStore = create<AppStore>()(
         title: state.title,
         sound: state.sound,
         bossbar: state.bossbar,
+        datapack: state.datapack,
         generic: state.generic,
         commandBlock: state.commandBlock,
         outputMode: state.outputMode
@@ -1335,6 +1493,7 @@ export const useAppStore = create<AppStore>()(
         state.title = payload.title
         state.sound = payload.sound
         state.bossbar = payload.bossbar
+        state.datapack = payload.datapack
         state.generic = payload.generic
         state.commandBlock = payload.commandBlock
         state.outputMode = payload.outputMode

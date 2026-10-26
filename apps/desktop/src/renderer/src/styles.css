@@ -1854,6 +1854,76 @@ a {
   margin-top: 3px;
 }
 
+/* ---------- Datapack workspace ---------- */
+.workspace.no-output {
+  grid-template-columns: 300px minmax(0, 1fr);
+}
+
+.datapack-workspace {
+  max-width: 1180px;
+}
+
+.datapack-layout {
+  display: grid;
+  grid-template-columns: 240px minmax(0, 1fr);
+  gap: 12px;
+  align-items: start;
+}
+
+.function-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-height: 360px;
+  overflow-y: auto;
+}
+
+.function-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text);
+  text-align: left;
+}
+
+.function-item:hover {
+  background: var(--panel);
+  border-color: var(--border);
+}
+
+.function-item.active {
+  background: var(--accent-soft);
+  border-color: color-mix(in srgb, var(--accent) 40%, var(--border));
+  color: var(--accent);
+}
+
+.function-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: var(--mono);
+  font-size: 12px;
+}
+
+.function-meta {
+  flex: 0 0 auto;
+  color: var(--faint);
+  font-size: 10.5px;
+}
+
+.datapack-command-input {
+  min-height: 220px;
+  font-family: var(--mono);
+  font-size: 12px;
+  line-height: 1.6;
+}
+
 /* ---------- Bossbar ---------- */
 .bossbar-name {
   margin-bottom: 6px;

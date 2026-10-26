@@ -22,6 +22,42 @@ const REPO = 'https://github.com/JiangNanChina/mc-command-studio'
  */
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: '0.1.12',
+    date: '2026-10-26',
+    title: '数据包工作区独立',
+    highlights: [
+      '数据包制作从命令编辑器拆出，侧栏“工具”单独打开。',
+      '支持多函数、load/tick 标签、文件预览与独立导出。'
+    ],
+    sections: [
+      {
+        type: 'added',
+        items: [
+          '数据包工作区：命名空间、描述、多函数管理、函数命令编辑。',
+          'load/tick 标签选择；支持 lib/init 子目录函数名。',
+          '导出前文件树预览与校验。'
+        ]
+      },
+      {
+        type: 'improved',
+        items: [
+          '命令编辑器输出面板移除数据包导出按钮。',
+          '数据包草稿写入项目文件，撤销/重做覆盖。',
+          '导出 API 支持多函数；重复函数名/缺失标签目标会报错。'
+        ]
+      },
+      {
+        type: 'fixed',
+        items: ['无。']
+      },
+      {
+        type: 'known',
+        items: ['数据包暂不支持递归函数标签、谓词/进度/战利品表等高级内容。', '安装包尚未配置代码签名。']
+      }
+    ],
+    releaseUrl: `${REPO}/releases/tag/v0.1.12`
+  },
+  {
     version: '0.1.11',
     date: '2026-10-26',
     title: '可视化 BOSS 栏 bossbar',

@@ -74,18 +74,31 @@ type ExecuteClause =
 
 `buildExecuteCommand(options)` 输出 `execute <clauses…> run <command>`，子命令按数组顺序拼接；缺少 `run`、坐标/选择器非法、`score` 条件不完整都会产生诊断。`store` 目前只提供 `score`，其他目标用 `raw` 子命令。`run` 前的 `/` 会自动去掉。
 
-### 1.5 数据包导出
+### 1.5 数据包工作区
 
-当前命令通过 `buildDatapackFiles(options)` 生成文件树（`apps/desktop/src/shared/datapack.ts`）：
+数据包制作独立于命令编辑，通过侧栏“工具 → 数据包工作区”打开。草稿结构：
+
+```ts
+interface DatapackDraft {
+  namespace: string
+  description: string
+  functions: { id: string; name: string; commands: string }[]
+  activeFunctionId: string
+  loadFunction: string
+  tickFunction: string
+}
+```
+
+`buildDatapackFiles(options)`（`apps/desktop/src/shared/datapack.ts`）生成文件树：
 
 ```
 pack.mcmeta
-data/<namespace>/function/<name>.mcfunction
-data/minecraft/tags/function/load.json   # 可选
-data/minecraft/tags/function/tick.json   # 可选
+data/<namespace>/function/<name>.mcfunction   # 可多个函数
+data/minecraft/tags/function/load.json        # 可选
+data/minecraft/tags/function/tick.json        # 可选
 ```
 
-`pack_format` 直接取自数据包 manifest（26.3 为 121）。命名空间/函数名做小写资源名校验；命令按行写入函数，每行会去掉前导 `/`，支持命令方块链这类多行输出。主进程用 JSZip 打包，默认保存到“文档”目录。
+`pack_format` 取自数据包 manifest（26.3 为 121）。命名空间/函数名做小写资源名校验；函数名不可重复，load/tick 必须指向现有函数。命令按行写入，每行去掉前导 `/`。主进程用 JSZip 打包，默认保存到“文档”目录。
 
 ### 1.6 专用表单：`tp`
 

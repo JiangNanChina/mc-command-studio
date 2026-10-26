@@ -1,5 +1,5 @@
 import { useMemo } from 'react'
-import { Search, X, Boxes, Link2 } from 'lucide-react'
+import { Search, X, Boxes, Link2, PackageOpen } from 'lucide-react'
 import {
   CATEGORY_ORDER,
   COMMAND_MAP,
@@ -99,6 +99,22 @@ export function Sidebar() {
                   <span className="command-id">chain</span>
                 </span>
                 <span className="command-desc">排布多个命令方块，生成整链 setblock。</span>
+              </span>
+            </button>
+            <button
+              type="button"
+              className={`command-item${state.activeCommandId === 'datapack' ? ' active' : ''}`}
+              onClick={() => state.openDatapack()}
+            >
+              <span className="command-glyph">
+                <PackageOpen size={15} />
+              </span>
+              <span className="command-text">
+                <span className="command-name">
+                  数据包工作区
+                  <span className="command-id">datapack</span>
+                </span>
+                <span className="command-desc">独立创建多函数数据包，配置 load/tick 并导出。</span>
               </span>
             </button>
           </>

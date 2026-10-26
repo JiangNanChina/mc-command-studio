@@ -338,14 +338,20 @@ async function main() {
   }
   await page.screenshot({ path: join(ARTIFACTS, 'chain-form.png') })
 
-  // 多行命令导出数据包
-  await page.getByRole('button', { name: '导出数据包' }).click()
+  // 独立数据包工作区
+  await page.locator('.command-item', { hasText: '数据包工作区' }).first().click()
   await page.waitForSelector('#datapack-namespace', { timeout: 10_000 })
-  await page.fill('#datapack-function', 'chain_main')
-  await page.getByRole('button', { name: '导出 .zip' }).click()
+  await page.locator('.datapack-functions').getByRole('button', { name: '新建' }).click()
+  await page.fill('#datapack-function-name', 'lib/init')
+  await page.fill('#datapack-commands', 'scoreboard objectives add kills dummy')
+  await page.selectOption('#datapack-load', 'lib/init')
+  await page.selectOption('#datapack-tick', 'main')
+  await page.waitForTimeout(300)
+  await page.screenshot({ path: join(ARTIFACTS, 'datapack.png') })
+  await page.getByRole('button', { name: '导出数据包 .zip' }).click()
   await page.waitForSelector('text=数据包已导出', { timeout: 20_000 })
-  if (!existsSync(join(DATAPACK_DIR, 'mcstudio-chain_main.zip'))) {
-    throw new Error('多行数据包 zip 未生成')
+  if (!existsSync(join(DATAPACK_DIR, 'mcstudio-datapack.zip'))) {
+    throw new Error('数据包工作区 zip 未生成')
   }
 
   // execute 执行链
@@ -361,17 +367,6 @@ async function main() {
     element.scrollTop = 0
   })
   await page.screenshot({ path: join(ARTIFACTS, 'execute-form.png') })
-
-  // 数据包导出（测试环境跳过系统保存对话框）
-  await page.getByRole('button', { name: '导出数据包' }).click()
-  await page.waitForSelector('#datapack-namespace', { timeout: 10_000 })
-  await page.waitForTimeout(300)
-  await page.screenshot({ path: join(ARTIFACTS, 'datapack.png') })
-  await page.getByRole('button', { name: '导出 .zip' }).click()
-  await page.waitForSelector('text=数据包已导出', { timeout: 20_000 })
-  if (!existsSync(join(DATAPACK_DIR, 'mcstudio-main.zip'))) {
-    throw new Error('数据包 zip 未生成')
-  }
 
   // 回到 give，切换命令方块
   await page.locator('.command-item', { hasText: '给予物品' }).first().click()

@@ -55,13 +55,20 @@ const saveSchema = z.object({
 })
 const datapackSchema = z
   .object({
-    command: z.string().min(1).max(32_000),
     namespace: z.string().min(1).max(64),
-    functionName: z.string().min(1).max(128),
     description: z.string().max(200),
     packFormat: z.number().int().positive(),
-    load: z.boolean(),
-    tick: z.boolean()
+    functions: z
+      .array(
+        z.object({
+          name: z.string().min(1).max(128),
+          commands: z.string().max(500_000)
+        })
+      )
+      .min(1)
+      .max(64),
+    loadFunction: z.string().max(128),
+    tickFunction: z.string().max(128)
   })
   .strict()
 
@@ -287,14 +294,11 @@ export function registerIpc(): void {
   ipcMain.handle('datapack:export', async (_event, payload: unknown): Promise<DatapackExportResult | null> => {
     const parsed = datapackSchema.safeParse(payload)
     if (!parsed.success) throw new Error('数据包参数不正确')
-    const { files, functionId } = buildDatapackFiles(parsed.data)
+    const { files, functionIds } = buildDatapackFiles(parsed.data)
 
     const opts = {
       title: '导出数据包',
-      defaultPath: join(
-        app.getPath('documents'),
-        `${parsed.data.namespace}-${parsed.data.functionName.replace(/\//g, '-')}.zip`
-      ),
+      defaultPath: join(app.getPath('documents'), `${parsed.data.namespace}-datapack.zip`),
       filters: [{ name: 'Minecraft 数据包', extensions: ['zip'] }]
     }
     let filePath: string
@@ -302,7 +306,7 @@ export function registerIpc(): void {
       await mkdir(process.env.MCSTUDIO_TEST_SAVE_DIR, { recursive: true })
       filePath = join(
         process.env.MCSTUDIO_TEST_SAVE_DIR,
-        `${parsed.data.namespace}-${parsed.data.functionName.replace(/\//g, '-')}.zip`
+        `${parsed.data.namespace}-datapack.zip`
       )
     } else {
       const window = focusedWindow()
@@ -324,7 +328,7 @@ export function registerIpc(): void {
     return {
       path: filePath,
       files: files.map((file) => file.path),
-      functionId
+      functionIds
     }
   })
 

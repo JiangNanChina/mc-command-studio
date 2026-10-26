@@ -1,11 +1,15 @@
+export interface DatapackFunctionInput {
+  name: string
+  commands: string
+}
+
 export interface DatapackExportOptions {
-  command: string
   namespace: string
-  functionName: string
   description: string
   packFormat: number
-  load: boolean
-  tick: boolean
+  functions: DatapackFunctionInput[]
+  loadFunction: string
+  tickFunction: string
 }
 
 export interface DatapackFile {
@@ -15,37 +19,52 @@ export interface DatapackFile {
 
 export interface DatapackBuildResult {
   files: DatapackFile[]
-  functionId: string
+  functionIds: string[]
 }
 
 const NAMESPACE = /^[a-z0-9_.-]+$/
 const FUNCTION = /^[a-z0-9_.-]+(?:\/[a-z0-9_.-]+)*$/ // 允许子目录，禁止空段
 
-export function buildDatapackFiles(options: DatapackExportOptions): DatapackBuildResult {
-  const namespace = options.namespace.trim()
-  const functionName = options.functionName.trim().replace(/\.mcfunction$/i, '')
-  const description = options.description.trim() || 'MC 指令工坊导出'
-  const commands = options.command
+function normalizeCommands(source: string): string {
+  const lines = source
     .replace(/\r\n?/g, '\n')
     .split('\n')
     .map((line) => line.trim().replace(/^\/+/, ''))
     .filter((line) => line.length > 0)
-  const command = commands.join('\n')
+  return lines.length > 0 ? `${lines.join('\n')}\n` : ''
+}
+
+export function buildDatapackFiles(options: DatapackExportOptions): DatapackBuildResult {
+  const namespace = options.namespace.trim()
+  const description = options.description.trim() || 'MC 指令工坊导出'
 
   if (!NAMESPACE.test(namespace)) {
     throw new Error('命名空间只能包含小写字母、数字、下划线、点和连字符')
   }
-  if (!FUNCTION.test(functionName)) {
-    throw new Error('函数名只能包含小写字母、数字、下划线、点、连字符和 /')
-  }
-  if (!command) {
-    throw new Error('当前没有可导出的命令')
-  }
   if (!Number.isInteger(options.packFormat) || options.packFormat <= 0) {
     throw new Error('数据包格式版本不合法')
   }
+  if (options.functions.length === 0) {
+    throw new Error('至少需要一个函数')
+  }
+  if (options.functions.length > 64) {
+    throw new Error('单个数据包最多 64 个函数')
+  }
 
-  const functionId = `${namespace}:${functionName}`
+  const functions = options.functions.map((item) => {
+    const name = item.name.trim().replace(/\.mcfunction$/i, '')
+    if (!FUNCTION.test(name)) {
+      throw new Error(`函数名不合法：${item.name || '(空)'}`)
+    }
+    return { name, content: normalizeCommands(item.commands) }
+  })
+
+  const names = functions.map((item) => item.name)
+  if (new Set(names).size !== names.length) {
+    throw new Error('函数名不能重复')
+  }
+
+  const functionId = (name: string): string => `${namespace}:${name}`
   const files: DatapackFile[] = [
     {
       path: 'pack.mcmeta',
@@ -60,24 +79,28 @@ export function buildDatapackFiles(options: DatapackExportOptions): DatapackBuil
         2
       )}\n`
     },
-    {
-      path: `data/${namespace}/function/${functionName}.mcfunction`,
-      content: `${command}\n`
-    }
+    ...functions.map((item) => ({
+      path: `data/${namespace}/function/${item.name}.mcfunction`,
+      content: item.content
+    }))
   ]
 
-  if (options.load) {
+  const loadFunction = options.loadFunction.trim()
+  if (loadFunction) {
+    if (!names.includes(loadFunction)) throw new Error('load 函数不存在')
     files.push({
       path: 'data/minecraft/tags/function/load.json',
-      content: `${JSON.stringify({ values: [functionId] }, null, 2)}\n`
+      content: `${JSON.stringify({ values: [functionId(loadFunction)] }, null, 2)}\n`
     })
   }
-  if (options.tick) {
+  const tickFunction = options.tickFunction.trim()
+  if (tickFunction) {
+    if (!names.includes(tickFunction)) throw new Error('tick 函数不存在')
     files.push({
       path: 'data/minecraft/tags/function/tick.json',
-      content: `${JSON.stringify({ values: [functionId] }, null, 2)}\n`
+      content: `${JSON.stringify({ values: [functionId(tickFunction)] }, null, 2)}\n`
     })
   }
 
-  return { files, functionId }
+  return { files, functionIds: functions.map((item) => functionId(item.name)) }
 }

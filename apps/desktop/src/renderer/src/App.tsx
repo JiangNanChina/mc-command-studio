@@ -15,6 +15,7 @@ import { EffectForm } from './components/EffectForm'
 import { FillForm } from './components/FillForm'
 import { CloneForm } from './components/CloneForm'
 import { ChainBuilder } from './components/ChainBuilder'
+import { DatapackWorkspace } from './components/DatapackWorkspace'
 import { EnchantForm } from './components/EnchantForm'
 import { XpForm } from './components/XpForm'
 import { TellrawForm } from './components/TellrawForm'
@@ -286,7 +287,7 @@ export default function App() {
       <AnnouncementBanner />
       <UpdateBanner />
       <AutosaveBanner />
-      <div className="workspace">
+      <div className={`workspace${activeCommandId === 'datapack' ? ' no-output' : ''}`}>
         <Sidebar />
         <main className="main">
           {!pack ? (
@@ -318,6 +319,8 @@ export default function App() {
             <CloneForm />
           ) : activeCommandId === 'chain' ? (
             <ChainBuilder />
+          ) : activeCommandId === 'datapack' ? (
+            <DatapackWorkspace />
           ) : activeCommandId === 'enchant' ? (
             <EnchantForm />
           ) : activeCommandId === 'xp' ? (
@@ -334,7 +337,7 @@ export default function App() {
             <GenericBuilder />
           )}
         </main>
-        <OutputPanel />
+        {activeCommandId === 'datapack' ? null : <OutputPanel />}
       </div>
       <StatusBar />
 

@@ -87,7 +87,7 @@ export interface AutosaveResult {
 export interface DatapackExportResult {
   path: string
   files: string[]
-  functionId: string
+  functionIds: string[]
 }
 
 export type UpdateStatus =

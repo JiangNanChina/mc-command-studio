@@ -2,52 +2,62 @@ import { describe, expect, it } from 'vitest'
 import { buildDatapackFiles } from './datapack'
 
 const base = {
-  command: '/give @s minecraft:stone',
   namespace: 'mcstudio',
-  functionName: 'main',
   description: 'test pack',
   packFormat: 121,
-  load: false,
-  tick: false
+  functions: [{ name: 'main', commands: '/give @s minecraft:stone' }],
+  loadFunction: '',
+  tickFunction: ''
 }
 
 describe('datapack export', () => {
-  it('builds pack.mcmeta and a function', () => {
+  it('builds pack.mcmeta and functions', () => {
     const result = buildDatapackFiles(base)
-    expect(result.functionId).toBe('mcstudio:main')
+    expect(result.functionIds).toEqual(['mcstudio:main'])
     expect(result.files.map((file) => file.path)).toEqual([
       'pack.mcmeta',
       'data/mcstudio/function/main.mcfunction'
     ])
-    const functionFile = result.files[1]
-    expect(functionFile.content).toBe('give @s minecraft:stone\n')
+    expect(result.files[1].content).toBe('give @s minecraft:stone\n')
     const meta = JSON.parse(result.files[0].content)
     expect(meta.pack.pack_format).toBe(121)
   })
 
-  it('adds load and tick tags', () => {
-    const result = buildDatapackFiles({ ...base, load: true, tick: true, functionName: 'lib/main' })
-    expect(result.functionId).toBe('mcstudio:lib/main')
-    expect(result.files.some((file) => file.path.endsWith('tags/function/load.json'))).toBe(true)
-    expect(result.files.some((file) => file.path.endsWith('tags/function/tick.json'))).toBe(true)
-    expect(result.files.some((file) => file.path.endsWith('lib/main.mcfunction'))).toBe(true)
-  })
-
-  it('supports multiple commands from a chain', () => {
+  it('builds multiple functions with load and tick tags', () => {
     const result = buildDatapackFiles({
       ...base,
-      command: 'setblock 0 64 0 minecraft:command_block\nsetblock 1 64 0 minecraft:chain_command_block'
+      functions: [
+        { name: 'main', commands: 'say hi' },
+        { name: 'lib/init', commands: 'scoreboard objectives add kills dummy\n' }
+      ],
+      loadFunction: 'lib/init',
+      tickFunction: 'main'
     })
-    const functionFile = result.files[1]
-    expect(functionFile.content).toBe(
-      'setblock 0 64 0 minecraft:command_block\nsetblock 1 64 0 minecraft:chain_command_block\n'
-    )
+    expect(result.functionIds).toEqual(['mcstudio:main', 'mcstudio:lib/init'])
+    expect(result.files.some((file) => file.path.endsWith('lib/init.mcfunction'))).toBe(true)
+    const load = result.files.find((file) => file.path.endsWith('load.json'))
+    const tick = result.files.find((file) => file.path.endsWith('tick.json'))
+    expect(JSON.parse(load!.content).values).toEqual(['mcstudio:lib/init'])
+    expect(JSON.parse(tick!.content).values).toEqual(['mcstudio:main'])
   })
 
-  it('rejects invalid names and empty commands', () => {
+  it('allows empty function bodies', () => {
+    const result = buildDatapackFiles({ ...base, functions: [{ name: 'empty', commands: '' }] })
+    expect(result.files[1].content).toBe('')
+  })
+
+  it('rejects invalid names, duplicates and missing tag functions', () => {
     expect(() => buildDatapackFiles({ ...base, namespace: 'Bad Namespace' })).toThrow()
-    expect(() => buildDatapackFiles({ ...base, functionName: 'a//b' })).toThrow()
-    expect(() => buildDatapackFiles({ ...base, command: '  ' })).toThrow()
-    expect(() => buildDatapackFiles({ ...base, command: '\n\n' })).toThrow()
+    expect(() => buildDatapackFiles({ ...base, functions: [] })).toThrow()
+    expect(() =>
+      buildDatapackFiles({
+        ...base,
+        functions: [
+          { name: 'main', commands: '' },
+          { name: 'main', commands: '' }
+        ]
+      })
+    ).toThrow()
+    expect(() => buildDatapackFiles({ ...base, loadFunction: 'missing' })).toThrow()
   })
 })
