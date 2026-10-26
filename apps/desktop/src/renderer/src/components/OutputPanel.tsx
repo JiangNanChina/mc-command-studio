@@ -196,13 +196,17 @@ export function OutputPanel() {
     state.tellraw,
     state.title,
     state.sound,
+    state.bossbar,
     state.generic,
     state.outputMode,
     state.commandBlock
   )
   const commandMode = state.outputMode === 'command'
   const chainMode = state.activeCommandId === 'chain'
-  const multiLineMode = chainMode || (state.activeCommandId === 'title' && state.title.times)
+  const multiLineMode =
+    chainMode ||
+    state.activeCommandId === 'bossbar' ||
+    (state.activeCommandId === 'title' && state.title.times)
   const permission = state.activeCommandId
     ? permissionLabel(
         state.pack?.commands.children?.[state.activeCommandId] ??

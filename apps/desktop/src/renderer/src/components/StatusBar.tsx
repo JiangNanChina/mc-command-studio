@@ -42,6 +42,7 @@ export function StatusBar() {
     state.tellraw,
     state.title,
     state.sound,
+    state.bossbar,
     state.generic,
     state.outputMode,
     state.commandBlock

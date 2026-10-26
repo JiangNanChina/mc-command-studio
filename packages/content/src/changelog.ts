@@ -22,6 +22,41 @@ const REPO = 'https://github.com/JiangNanChina/mc-command-studio'
  */
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: '0.1.11',
+    date: '2026-10-26',
+    title: '可视化 BOSS 栏 bossbar',
+    highlights: [
+      'bossbar 创建/更新/移除全部可视化，颜色、样式、数值、玩家列表。',
+      '实时 BOSS 栏预览，创建时自动生成完整命令序列。'
+    ],
+    sections: [
+      {
+        type: 'added',
+        items: [
+          'bossbar 三种操作：创建并配置、更新现有、移除。',
+          '7 种颜色、5 种样式、最大值/当前值/可见性、玩家列表。',
+          '可视化 BOSS 栏预览。'
+        ]
+      },
+      {
+        type: 'improved',
+        items: [
+          '多行 bossbar 输出自动禁用单命令方块模式。',
+          '单元测试 111 → 114；冒烟测试覆盖创建与移除。'
+        ]
+      },
+      {
+        type: 'fixed',
+        items: ['无。']
+      },
+      {
+        type: 'known',
+        items: ['复杂 BOSS 栏操作（get/list/players 清空）仍可用高级命令树。', '安装包尚未配置代码签名。']
+      }
+    ],
+    releaseUrl: `${REPO}/releases/tag/v0.1.11`
+  },
+  {
     version: '0.1.10',
     date: '2026-10-26',
     title: '可视化声音 playsound / stopsound',

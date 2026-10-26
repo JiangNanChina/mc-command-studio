@@ -282,6 +282,26 @@ async function main() {
     throw new Error(`stopsound 来源输出不符合预期：${stopSource}`)
   }
 
+  // bossbar 可视化
+  await page.locator('.command-item', { hasText: 'BOSS 栏' }).first().click()
+  await page.waitForSelector('#bossbar-id', { timeout: 10_000 })
+  await page.waitForTimeout(300)
+  const bossbarOutput = await page.locator('.output-code .cm-content').innerText()
+  if (!bossbarOutput.includes('bossbar add mcstudio:boss "BOSS"')) {
+    throw new Error(`bossbar 输出不符合预期：${bossbarOutput}`)
+  }
+  if (!bossbarOutput.includes('bossbar set mcstudio:boss color red')) {
+    throw new Error(`bossbar 颜色输出不符合预期：${bossbarOutput}`)
+  }
+  await page.screenshot({ path: join(ARTIFACTS, 'bossbar-form.png') })
+  await page.getByRole('button', { name: '移除', exact: true }).click()
+  await page.waitForTimeout(300)
+  const bossbarRemove = await page.locator('.output-code .cm-content').innerText()
+  if (!bossbarRemove.includes('bossbar remove mcstudio:boss')) {
+    throw new Error(`bossbar 移除输出不符合预期：${bossbarRemove}`)
+  }
+  await page.getByRole('button', { name: '创建并配置' }).click()
+
   // clone 专用表单 + 撤销/重做
   await page.locator('.command-item', { hasText: '复制区域' }).first().click()
   await page.waitForSelector('#clone-mode', { timeout: 10_000 })

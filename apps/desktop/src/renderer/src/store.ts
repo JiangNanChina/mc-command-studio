@@ -1,4 +1,5 @@
 import {
+  buildBossbarCommands,
   buildChainCommands,
   buildCloneCommand,
   buildEffectCommand,
@@ -14,6 +15,7 @@ import {
   buildTitleCommand,
   buildXpCommand,
   createChainBlock,
+  createDefaultBossbarOptions,
   createDefaultChainOptions,
   createDefaultCloneOptions,
   createDefaultCommandBlockOptions,
@@ -34,6 +36,7 @@ import {
   parseProjectFile,
   serializeGeneric,
   type BlockStateValue,
+  type BossbarOptions,
   type BuildResult,
   type ChainBlock,
   type ChainOptions,
@@ -97,6 +100,7 @@ export interface ProjectPayload {
   tellraw: TellrawOptions
   title: TitleOptions
   sound: SoundOptions
+  bossbar: BossbarOptions
   generic: GenericDraft
   commandBlock: CommandBlockOptions
   outputMode: OutputMode
@@ -134,6 +138,7 @@ interface AppStore {
   tellraw: TellrawOptions
   title: TitleOptions
   sound: SoundOptions
+  bossbar: BossbarOptions
   generic: GenericDraft
   commandBlock: CommandBlockOptions
   outputMode: OutputMode
@@ -183,6 +188,7 @@ interface AppStore {
   updateTellraw: (patch: Partial<TellrawOptions>) => void
   updateTitle: (patch: Partial<TitleOptions>) => void
   updateSound: (patch: Partial<SoundOptions>) => void
+  updateBossbar: (patch: Partial<BossbarOptions>) => void
   openChain: () => void
   updateChain: (patch: Partial<ChainOptions>) => void
   addChainBlock: () => void
@@ -571,6 +577,44 @@ function normalizeSound(input: Partial<SoundOptions> | undefined): SoundOptions 
   }
 }
 
+function normalizeBossbar(input: Partial<BossbarOptions> | undefined): BossbarOptions {
+  const fallback = createDefaultBossbarOptions()
+  if (!input) return fallback
+  const colors: BossbarOptions['color'][] = [
+    'blue',
+    'green',
+    'pink',
+    'purple',
+    'red',
+    'white',
+    'yellow'
+  ]
+  const styles: BossbarOptions['style'][] = [
+    'progress',
+    'notched_6',
+    'notched_10',
+    'notched_12',
+    'notched_20'
+  ]
+  return {
+    action:
+      input.action === 'update' || input.action === 'remove' ? input.action : 'create',
+    id: typeof input.id === 'string' ? input.id : fallback.id,
+    name: typeof input.name === 'string' ? input.name : fallback.name,
+    color: colors.includes(input.color as BossbarOptions['color'])
+      ? (input.color as BossbarOptions['color'])
+      : 'red',
+    style: styles.includes(input.style as BossbarOptions['style'])
+      ? (input.style as BossbarOptions['style'])
+      : 'progress',
+    max: typeof input.max === 'string' ? input.max : fallback.max,
+    value: typeof input.value === 'string' ? input.value : fallback.value,
+    visible: Boolean(input.visible),
+    playersEnabled: Boolean(input.playersEnabled),
+    players: input.players?.base ? input.players : fallback.players
+  }
+}
+
 function normalizeGive(input: Partial<GiveOptions> | undefined): GiveOptions {
   const fallback = createDefaultGiveOptions()
   if (!input) return fallback
@@ -608,6 +652,7 @@ function normalizePayload(input: unknown): ProjectPayload {
     tellraw: normalizeTellraw(data.tellraw),
     title: normalizeTitle(data.title),
     sound: normalizeSound(data.sound),
+    bossbar: normalizeBossbar(data.bossbar),
     generic:
       data.generic && Array.isArray(data.generic.steps)
         ? {
@@ -642,6 +687,7 @@ function documentSnapshot(state: AppStore): string {
     tellraw: state.tellraw,
     title: state.title,
     sound: state.sound,
+    bossbar: state.bossbar,
     generic: state.generic,
     commandBlock: state.commandBlock
   })
@@ -690,6 +736,7 @@ export const useAppStore = create<AppStore>()(
     tellraw: createDefaultTellrawOptions(),
     title: createDefaultTitleOptions(),
     sound: createDefaultSoundOptions(),
+    bossbar: createDefaultBossbarOptions(),
     generic: emptyGeneric(),
     commandBlock: createDefaultCommandBlockOptions(),
     outputMode: 'command',
@@ -1004,6 +1051,13 @@ export const useAppStore = create<AppStore>()(
       })
     },
 
+    updateBossbar: (patch) => {
+      set((state) => {
+        state.bossbar = { ...state.bossbar, ...patch }
+        state.dirty = true
+      })
+    },
+
     openChain: () => {
       set((state) => {
         state.activeCommandId = 'chain'
@@ -1206,6 +1260,7 @@ export const useAppStore = create<AppStore>()(
         state.tellraw = createDefaultTellrawOptions()
         state.title = createDefaultTitleOptions()
         state.sound = createDefaultSoundOptions()
+        state.bossbar = createDefaultBossbarOptions()
         state.generic = emptyGeneric()
         state.commandBlock = createDefaultCommandBlockOptions()
         state.outputMode = 'command'
@@ -1244,6 +1299,7 @@ export const useAppStore = create<AppStore>()(
         tellraw: state.tellraw,
         title: state.title,
         sound: state.sound,
+        bossbar: state.bossbar,
         generic: state.generic,
         commandBlock: state.commandBlock,
         outputMode: state.outputMode
@@ -1278,6 +1334,7 @@ export const useAppStore = create<AppStore>()(
         state.tellraw = payload.tellraw
         state.title = payload.title
         state.sound = payload.sound
+        state.bossbar = payload.bossbar
         state.generic = payload.generic
         state.commandBlock = payload.commandBlock
         state.outputMode = payload.outputMode
@@ -1540,4 +1597,8 @@ export function selectTitleOutput(title: TitleOptions): BuildResult {
 
 export function selectSoundOutput(sound: SoundOptions): BuildResult {
   return buildSoundCommand(sound)
+}
+
+export function selectBossbarOutput(bossbar: BossbarOptions): BuildResult {
+  return buildBossbarCommands(bossbar)
 }

@@ -2,6 +2,7 @@ import {
   buildCommandBlockSetblock,
   hasErrors,
   type BuildResult,
+  type BossbarOptions,
   type ChainOptions,
   type CloneOptions,
   type CommandBlockOptions,
@@ -23,6 +24,7 @@ import {
 import {
   selectChainOutput,
   selectCloneOutput,
+  selectBossbarOutput,
   selectEffectOutput,
   selectEnchantOutput,
   selectExecuteOutput,
@@ -64,6 +66,7 @@ export function getCommandOutput(
   tellraw: TellrawOptions,
   title: TitleOptions,
   sound: SoundOptions,
+  bossbar: BossbarOptions,
   generic: GenericDraft
 ): BuildResult {
   if (!activeCommandId) return { text: '', diagnostics: [] }
@@ -80,6 +83,7 @@ export function getCommandOutput(
   if (activeCommandId === 'xp') return selectXpOutput(xp)
   if (activeCommandId === 'tellraw') return selectTellrawOutput(tellraw)
   if (activeCommandId === 'title') return selectTitleOutput(title)
+  if (activeCommandId === 'bossbar') return selectBossbarOutput(bossbar)
   if (activeCommandId === 'playsound' || activeCommandId === 'stopsound') {
     return selectSoundOutput(sound)
   }
@@ -104,6 +108,7 @@ export function getCurrentOutput(
   tellraw: TellrawOptions,
   title: TitleOptions,
   sound: SoundOptions,
+  bossbar: BossbarOptions,
   generic: GenericDraft,
   outputMode: OutputMode,
   commandBlock: CommandBlockOptions
@@ -125,6 +130,7 @@ export function getCurrentOutput(
     tellraw,
     title,
     sound,
+    bossbar,
     generic
   )
   if (outputMode === 'command') {

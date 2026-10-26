@@ -12,14 +12,15 @@
 
 ![give 表单](docs/assets/give-form.png)
 
-## 功能（0.1.10）
+## 功能（0.1.11）
 
 - **可视化选择**：物品、方块、状态效果、附魔、实体、声音统一为中文名 + 图标网格；支持中文名 / ID 搜索。
 - **中文资源库**：26.3 官方中文名称（1,658 物品、1,286 方块、40 效果、43 附魔、161 实体、1,991 声音）+ 图标图集。
 - **富文本可视化**：`tellraw` / `title` 支持多段文本、16 色、样式、点击/悬停、标题时序与实时预览。
 - **声音可视化**：`playsound` / `stopsound` 支持 1,991 个声音、来源、坐标、音量/音调/最小音量。
+- **BOSS 栏可视化**：`bossbar` 创建/更新/移除、颜色/样式/数值/可见性/玩家列表、实时预览。
 - **26.3 数据包**：94 个根命令、1,197 个字面量、59 种参数类型。
-- **专用表单**：`give`、`summon`、`setblock`、`execute`、`tp`、`effect`、`fill`、`clone`、`enchant`、`xp`、`tellraw`、`title`、`playsound`、`stopsound`。
+- **专用表单**：`give`、`summon`、`setblock`、`execute`、`tp`、`effect`、`fill`、`clone`、`enchant`、`xp`、`tellraw`、`title`、`playsound`、`stopsound`、`bossbar`。
 - **命令方块链**：按方向排布最多 64 个脉冲/连锁/循环方块，自动偏移坐标，生成整链 `/setblock`。
 - **execute 执行链**：as/at/positioned/align/anchored/facing/rotated/in/if/unless/store/raw 可排序积木 + run。
 - **状态效果**：可视化选择效果，支持自定义秒数或永久（infinite）、等级、隐藏粒子。
@@ -31,7 +32,7 @@
 - **通用构建器**：未覆盖命令仍保留官方命令树作为高级兜底。
 - **本地项目**：`.mcstudio` JSON、最近打开、4 秒防抖自动保存、异常退出恢复。
 - **桌面体验**：深色/浅色主题、中文界面、原生菜单、文件关联、单实例、高 DPI。
-- **分发与更新**：NSIS 安装包 + 便携版 + `latest.yml`；electron-updater 自动检查/下载/重启安装；GitHub Actions 发布流水线。已在本机验证 0.1.9 → 0.1.10 静默升级；便携版会禁用自动更新并提示手动下载。
+- **分发与更新**：NSIS 安装包 + 便携版 + `latest.yml`；electron-updater 自动检查/下载/重启安装；GitHub Actions 发布流水线。已在本机验证 0.1.10 → 0.1.11 静默升级；便携版会禁用自动更新并提示手动下载。
 
 ## 下载与安装
 
@@ -61,8 +62,8 @@ pnpm build:win          # 安装包 + 便携版 + latest.yml
 
 产物在 `release/`：
 
-- `MC-Command-Studio-Setup-0.1.10.exe`
-- `MC-Command-Studio-0.1.10-portable.exe`
+- `MC-Command-Studio-Setup-0.1.11.exe`
+- `MC-Command-Studio-0.1.11-portable.exe`
 - `latest.yml`、`.blockmap`
 
 如果 `pnpm install` 后没有 Electron 二进制，运行 `pnpm setup:electron`；国内网络可设置：
@@ -86,7 +87,7 @@ pnpm data:verify
 ## 测试
 
 ```bash
-pnpm test        # 111 个核心逻辑用例
+pnpm test        # 114 个核心逻辑用例
 pnpm e2e         # Playwright 启动 Electron，覆盖 give/导入/summon/setblock/命令方块
 ```
 

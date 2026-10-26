@@ -252,7 +252,26 @@ interface SoundOptions {
 
 播放生成 `playsound <sound> <source> <target> <pos> <volume> <pitch> <minVolume>`；停止按 stopMode 生成 `stopsound <target> [source] [sound]`。
 
-### 1.16 通用构建器：所有 94 个根命令
+### 1.16 专用表单：`bossbar`
+
+```ts
+interface BossbarOptions {
+  action: 'create' | 'update' | 'remove'
+  id: string
+  name: string
+  color: 'blue' | 'green' | 'pink' | 'purple' | 'red' | 'white' | 'yellow'
+  style: 'progress' | 'notched_6' | 'notched_10' | 'notched_12' | 'notched_20'
+  max: string
+  value: string
+  visible: boolean
+  playersEnabled: boolean
+  players: Selector
+}
+```
+
+创建先生成 `bossbar add <id> "<name>"`，再生成 name/color/style/max/value/visible/players 系列 `bossbar set`；更新跳过 add；移除只生成 `bossbar remove`。最大值 ≥1，当前值 0..max。
+
+### 1.17 通用构建器：所有 94 个根命令
 
 ```ts
 interface GenericStep {
@@ -385,7 +404,7 @@ type Unit =
 
 ## 7. 测试
 
-`packages/core/src/*.test.ts` 与 `apps/desktop/src/shared/*.test.ts` 共 111 个用例，覆盖：
+`packages/core/src/*.test.ts` 与 `apps/desktop/src/shared/*.test.ts` 共 114 个用例，覆盖：
 
 - SNBT / 命令方块字符串转义。
 - 选择器排序、引号、范围、NBT 括号、分数。
@@ -404,6 +423,7 @@ type Unit =
 - 文本组件：单段/extra、颜色/样式、点击/悬停、JSON 转义。
 - `/tellraw` 目标与 JSON；`/title` 三种位置、times 时序、非法 tick。
 - `/playsound` 声音/来源/坐标/音量/音调；`/stopsound` 全部/来源/指定声音。
+- `/bossbar` 创建序列、更新跳过 add、移除、ID/最大值/当前值校验。
 - 数据包文件树、load/tick 标签、多行函数、非法命名空间/函数名/空命令。
 - `/give` 文本导入：选择器、组件、数量、未知组件 raw。
 - 命令树遍历、通用路径、参数范围。
