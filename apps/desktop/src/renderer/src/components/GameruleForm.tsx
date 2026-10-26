@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Settings2, ShieldCheck } from 'lucide-react'
 import { COMMAND_MAP } from '@mcstudio/content'
 import rulesJson from '../data/gamerules.json'
@@ -6,12 +6,19 @@ import { GamerulePickerDialog, type GameruleRule } from './GamerulePickerDialog'
 import { useAppStore } from '../store'
 
 const meta = COMMAND_MAP.get('gamerule')
-const rules = rulesJson as GameruleRule[]
+const allRules = rulesJson as GameruleRule[]
 
 export function GameruleForm() {
   const state = useAppStore()
   const gamerule = state.gamerule
   const [pickerOpen, setPickerOpen] = useState(false)
+  const rules = useMemo(() => {
+    const tree = state.pack?.commands.children?.gamerule?.children
+    if (!tree) return allRules
+    const names = new Set(Object.keys(tree))
+    const filtered = allRules.filter((rule) => names.has(rule.id))
+    return filtered.length > 0 ? filtered : allRules
+  }, [state.pack])
   const selected = useMemo(
     () => rules.find((rule) => rule.id === gamerule.rule) ?? rules[0],
     [gamerule.rule]
@@ -24,6 +31,12 @@ export function GameruleForm() {
       value: rule.type === 'boolean' ? 'false' : String(rule.min ?? 0)
     })
   }
+
+  useEffect(() => {
+    if (!rules.some((rule) => rule.id === gamerule.rule)) {
+      chooseRule(rules[0])
+    }
+  }, [rules, gamerule.rule])
 
   return (
     <div className="content">

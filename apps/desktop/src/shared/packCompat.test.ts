@@ -12,13 +12,13 @@ describe('legacy pack compatibility', () => {
   })
 
   it('routes version-sensitive commands to the command tree', () => {
-    expect(supportsLegacyForm('gamerule')).toBe(false)
     expect(supportsLegacyForm('particle')).toBe(false)
     expect(supportsLegacyForm('attribute')).toBe(false)
   })
 
-  it('enables loot now that 1.20.4 syntax is adapted', () => {
+  it('enables loot and gamerule once syntax is adapted', () => {
     expect(supportsLegacyForm('loot')).toBe(true)
+    expect(supportsLegacyForm('gamerule')).toBe(true)
   })
 })
 

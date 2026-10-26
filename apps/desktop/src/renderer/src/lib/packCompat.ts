@@ -46,6 +46,7 @@ export const LEGACY_SAFE_FORMS = new Set([
   'item',
   'data',
   'loot',
+  'gamerule',
   'advancement',
   'function',
   'schedule',

@@ -1120,6 +1120,13 @@ async function main() {
   if (!/loot insert .* loot minecraft:chests\/simple_dungeon$/.test(lootInsert1204)) {
     throw new Error(`1.20.4 loot insert 输出不符合预期：${lootInsert1204}`)
   }
+  await page.locator('.command-item', { hasText: '游戏规则' }).first().click()
+  await page.waitForSelector('.gamerule-selected', { timeout: 10_000 })
+  await page.waitForTimeout(300)
+  const gamerule1204 = await page.locator('.output-code .cm-content').innerText()
+  if (!/gamerule [a-z0-9_]+ (true|false|-?\d+)/.test(gamerule1204)) {
+    throw new Error(`1.20.4 gamerule 输出不符合预期：${gamerule1204}`)
+  }
   await page.screenshot({ path: join(ARTIFACTS, 'pack-1.20.4.png') })
   await page.selectOption('#pack-select', '26.3')
   await page.waitForSelector('.version-notice', { state: 'detached', timeout: 15_000 })

@@ -22,6 +22,27 @@ const REPO = 'https://github.com/JiangNanChina/mc-command-studio'
  */
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: '0.1.46',
+    date: '2026-10-27',
+    title: '1.20.4 gamerule 兼容',
+    highlights: ['gamerule 规则按版本过滤。', '1.20.4 兼容表单再扩展。'],
+    sections: [
+      {
+        type: 'added',
+        items: ['动态读取数据包 gamerule 命令树。']
+      },
+      {
+        type: 'improved',
+        items: ['版本切换自动校正规则。', '冒烟覆盖 1.20.4 gamerule。']
+      },
+      {
+        type: 'fixed',
+        items: ['无。']
+      }
+    ],
+    releaseUrl: `${REPO}/releases/tag/v0.1.46`
+  },
+  {
     version: '0.1.45',
     date: '2026-10-27',
     title: '启动性能：数据包编辑器按需加载',
