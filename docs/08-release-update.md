@@ -17,9 +17,9 @@
 
 | 文件 | 大小 |
 |---|---:|
-| `MC-Command-Studio-Setup-0.1.32.exe` | 129,634,261 B ≈ 123.6 MiB |
-| `MC-Command-Studio-0.1.32-portable.exe` | 117,156,859 B ≈ 111.7 MiB |
-| `MC-Command-Studio-Setup-0.1.32.exe.blockmap` | 136,468 B |
+| `MC-Command-Studio-Setup-0.1.32.exe` | 129,633,572 B ≈ 123.6 MiB |
+| `MC-Command-Studio-0.1.32-portable.exe` | 117,156,327 B ≈ 111.7 MiB |
+| `MC-Command-Studio-Setup-0.1.32.exe.blockmap` | 136,418 B |
 | `latest.yml` | 366 B |
 
 安装目录为 `%LOCALAPPDATA%\Programs\MC Command Studio`（per-user），卸载器保留用户项目与设置，可选择手动删除。
@@ -282,8 +282,9 @@ GitHub Actions 的 Release 工作流已在本仓库成功执行：
 - v0.1.29：run 40364014503 → [Release](https://github.com/JiangNanChina/mc-command-studio/releases/tag/v0.1.29)
 - v0.1.30：run 40367335174 → [Release](https://github.com/JiangNanChina/mc-command-studio/releases/tag/v0.1.30)
 - v0.1.31：run 40370267829 → [Release](https://github.com/JiangNanChina/mc-command-studio/releases/tag/v0.1.31)
+- v0.1.32：run 40372987342 → [Release](https://github.com/JiangNanChina/mc-command-studio/releases/tag/v0.1.32)
 
-公开的 `releases/latest/download/latest.yml` 返回 200，内容版本 `0.1.31`，指向 `MC-Command-Studio-Setup-0.1.31.exe`，大小 129,546,129 字节，与 Release 资产一致。
+公开的 `releases/latest/download/latest.yml` 返回 200，内容版本 `0.1.32`，指向 `MC-Command-Studio-Setup-0.1.32.exe`，大小 129,633,572 字节，与 Release 资产一致。
 
 便携版模式通过 `PORTABLE_EXECUTABLE_DIR` 启动验证：自动更新被禁用，设置中显示“便携版不支持自动更新，请手动下载新版”（截图 `docs/assets/portable.png`）。
 
