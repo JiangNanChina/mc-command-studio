@@ -1,5 +1,6 @@
 import { error } from './diagnostics'
 import { resourceId } from './escape'
+import { isValidResourceLocation } from './units'
 import type { BuildResult, Diagnostic } from './types'
 
 export type ScheduleAction = 'function' | 'clear'
@@ -24,7 +25,7 @@ export function createDefaultScheduleOptions(): ScheduleOptions {
 export function buildScheduleCommand(options: ScheduleOptions): BuildResult {
   const diagnostics: Diagnostic[] = []
   const name = resourceId(options.functionName.trim())
-  if (!/^[a-z0-9_.-]+:[a-z0-9_./-]+$/.test(name)) {
+  if (!isValidResourceLocation(name)) {
     diagnostics.push(error('schedule.function', '函数名必须是 namespace:path 格式', 'functionName'))
   }
 

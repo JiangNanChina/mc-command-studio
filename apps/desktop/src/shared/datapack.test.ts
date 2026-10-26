@@ -60,4 +60,40 @@ describe('datapack export', () => {
     ).toThrow()
     expect(() => buildDatapackFiles({ ...base, loadFunction: 'missing' })).toThrow()
   })
+
+  it('adds advancement, predicate and loot table JSON files', () => {
+    const result = buildDatapackFiles({
+      ...base,
+      files: [
+        { type: 'predicate', name: 'is_sneaking', content: '{"condition":"minecraft:entity_properties"}' },
+        { type: 'loot_table', name: 'chest/reward', content: '{"type":"minecraft:chest","pools":[]}' },
+        { type: 'advancement', name: 'root', content: '{"criteria":{"tick":{"trigger":"minecraft:tick"}}}' }
+      ]
+    })
+    expect(result.files.map((file) => file.path)).toEqual(
+      expect.arrayContaining([
+        'data/mcstudio/predicate/is_sneaking.json',
+        'data/mcstudio/loot_table/chest/reward.json',
+        'data/mcstudio/advancement/root.json'
+      ])
+    )
+  })
+
+  it('rejects invalid JSON and duplicate data paths', () => {
+    expect(() =>
+      buildDatapackFiles({
+        ...base,
+        files: [{ type: 'predicate', name: 'bad', content: 'not json' }]
+      })
+    ).toThrow()
+    expect(() =>
+      buildDatapackFiles({
+        ...base,
+        files: [
+          { type: 'predicate', name: 'same', content: '{}' },
+          { type: 'predicate', name: 'same', content: '{}' }
+        ]
+      })
+    ).toThrow()
+  })
 })

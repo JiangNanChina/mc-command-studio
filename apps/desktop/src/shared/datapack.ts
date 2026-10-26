@@ -3,6 +3,14 @@ export interface DatapackFunctionInput {
   commands: string
 }
 
+export type DatapackDataFileType = 'advancement' | 'predicate' | 'loot_table'
+
+export interface DatapackDataFileInput {
+  type: DatapackDataFileType
+  name: string
+  content: string
+}
+
 export interface DatapackExportOptions {
   namespace: string
   description: string
@@ -10,6 +18,7 @@ export interface DatapackExportOptions {
   functions: DatapackFunctionInput[]
   loadFunction: string
   tickFunction: string
+  files?: DatapackDataFileInput[]
 }
 
 export interface DatapackFile {
@@ -24,6 +33,12 @@ export interface DatapackBuildResult {
 
 const NAMESPACE = /^[a-z0-9_.-]+$/
 const FUNCTION = /^[a-z0-9_.-]+(?:\/[a-z0-9_.-]+)*$/ // 允许子目录，禁止空段
+const DATA_FILE = /^[a-z0-9_.-]+(?:\/[a-z0-9_.-]+)*$/
+const DATA_FOLDER: Record<DatapackDataFileType, string> = {
+  advancement: 'advancement',
+  predicate: 'predicate',
+  loot_table: 'loot_table'
+}
 
 function normalizeCommands(source: string): string {
   const lines = source
@@ -100,6 +115,27 @@ export function buildDatapackFiles(options: DatapackExportOptions): DatapackBuil
       path: 'data/minecraft/tags/function/tick.json',
       content: `${JSON.stringify({ values: [functionId(tickFunction)] }, null, 2)}\n`
     })
+  }
+
+  const dataFiles = options.files ?? []
+  if (dataFiles.length > 128) throw new Error('高级数据文件最多 128 个')
+  const dataPaths = new Set<string>()
+  for (const file of dataFiles) {
+    const name = file.name.trim().replace(/\.json$/i, '')
+    if (!DATA_FILE.test(name)) throw new Error(`数据文件名不合法：${file.name || '(空)'}`)
+    const path = `data/${namespace}/${DATA_FOLDER[file.type]}/${name}.json`
+    if (dataPaths.has(path)) throw new Error(`数据文件重复：${path}`)
+    dataPaths.add(path)
+    let parsed: unknown
+    try {
+      parsed = JSON.parse(file.content)
+    } catch {
+      throw new Error(`JSON 格式错误：${path}`)
+    }
+    if (typeof parsed !== 'object' || parsed === null || Array.isArray(parsed)) {
+      throw new Error(`JSON 根节点必须是对象：${path}`)
+    }
+    files.push({ path, content: `${JSON.stringify(parsed, null, 2)}\n` })
   }
 
   return { files, functionIds: functions.map((item) => functionId(item.name)) }

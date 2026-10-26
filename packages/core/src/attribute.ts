@@ -1,6 +1,7 @@
 import { error } from './diagnostics'
 import { resourceId } from './escape'
 import { serializeSelector, type Selector } from './selector'
+import { isValidResourceLocation, parseNumberUnit } from './units'
 import type { BuildResult, Diagnostic } from './types'
 
 export type AttributeAction =
@@ -47,11 +48,11 @@ export function createDefaultAttributeOptions(): AttributeOptions {
 }
 
 function isNumber(value: string): boolean {
-  return /^-?(?:\d+\.?\d*|\.\d+)$/.test(value.trim())
+  return parseNumberUnit(value) !== null
 }
 
 function isResource(value: string): boolean {
-  return /^[a-z0-9_.-]+:[a-z0-9_./-]+$/.test(value.trim())
+  return isValidResourceLocation(value)
 }
 
 export function buildAttributeCommand(options: AttributeOptions): BuildResult {

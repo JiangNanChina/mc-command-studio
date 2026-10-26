@@ -68,7 +68,17 @@ const datapackSchema = z
       .min(1)
       .max(64),
     loadFunction: z.string().max(128),
-    tickFunction: z.string().max(128)
+    tickFunction: z.string().max(128),
+    files: z
+      .array(
+        z.object({
+          type: z.enum(['advancement', 'predicate', 'loot_table']),
+          name: z.string().min(1).max(128),
+          content: z.string().max(500_000)
+        })
+      )
+      .max(128)
+      .optional()
   })
   .strict()
 

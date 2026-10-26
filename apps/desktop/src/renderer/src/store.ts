@@ -25,6 +25,7 @@ import {
   buildAdvancementCommand,
   buildFunctionCommand,
   buildScheduleCommand,
+  buildItemCommand,
   buildSoundCommand,
   buildSummonCommand,
   buildTeleportCommand,
@@ -56,6 +57,7 @@ import {
   createDefaultAdvancementOptions,
   createDefaultFunctionOptions,
   createDefaultScheduleOptions,
+  createDefaultItemOptions,
   createDefaultSetblockOptions,
   createDefaultSoundOptions,
   createDefaultSummonOptions,
@@ -100,6 +102,7 @@ import {
   type AdvancementOptions,
   type FunctionOptions,
   type ScheduleOptions,
+  type ItemOptions,
   type TimeOptions,
   type SetblockMode,
   type SetblockOptions,
@@ -138,6 +141,13 @@ export interface DatapackFunctionDraft {
   commands: string
 }
 
+export interface DatapackDataFileDraft {
+  id: string
+  type: 'advancement' | 'predicate' | 'loot_table'
+  name: string
+  content: string
+}
+
 export interface DatapackDraft {
   namespace: string
   description: string
@@ -145,12 +155,64 @@ export interface DatapackDraft {
   activeFunctionId: string
   loadFunction: string
   tickFunction: string
+  dataFiles: DatapackDataFileDraft[]
+  activeDataFileId: string
 }
 
 export interface AutomationOptions {
   advancement: AdvancementOptions
   function: FunctionOptions
   schedule: ScheduleOptions
+}
+
+const DATAPACK_FILE_TEMPLATES: Record<DatapackDataFileDraft['type'], { name: string; content: string }> = {
+  predicate: {
+    name: 'is_sneaking',
+    content: JSON.stringify(
+      {
+        condition: 'minecraft:entity_properties',
+        entity: 'this',
+        predicate: { flags: { is_sneaking: true } }
+      },
+      null,
+      2
+    )
+  },
+  loot_table: {
+    name: 'reward',
+    content: JSON.stringify(
+      {
+        type: 'minecraft:chest',
+        pools: [
+          {
+            rolls: 1,
+            entries: [{ type: 'minecraft:item', name: 'minecraft:diamond' }]
+          }
+        ]
+      },
+      null,
+      2
+    )
+  },
+  advancement: {
+    name: 'root',
+    content: JSON.stringify(
+      {
+        display: {
+          icon: { id: 'minecraft:stone' },
+          title: { text: '示例进度' },
+          description: { text: '在数据包工作区中编辑。' },
+          frame: 'task',
+          show_toast: true,
+          announce_to_chat: true,
+          hidden: false
+        },
+        criteria: { requirement: { trigger: 'minecraft:impossible' } }
+      },
+      null,
+      2
+    )
+  }
 }
 
 function defaultDatapackDraft(): DatapackDraft {
@@ -160,7 +222,9 @@ function defaultDatapackDraft(): DatapackDraft {
     functions: [{ id: 'main', name: 'main', commands: 'say 你好' }],
     activeFunctionId: 'main',
     loadFunction: '',
-    tickFunction: ''
+    tickFunction: '',
+    dataFiles: [],
+    activeDataFileId: ''
   }
 }
 
@@ -194,6 +258,7 @@ export interface ProjectPayload {
   forceload: ForceloadOptions
   attribute: AttributeOptions
   automation: AutomationOptions
+  itemCommand: ItemOptions
   datapack: DatapackDraft
   generic: GenericDraft
   commandBlock: CommandBlockOptions
@@ -246,6 +311,7 @@ interface AppStore {
   forceload: ForceloadOptions
   attribute: AttributeOptions
   automation: AutomationOptions
+  itemCommand: ItemOptions
   datapack: DatapackDraft
   generic: GenericDraft
   commandBlock: CommandBlockOptions
@@ -314,12 +380,17 @@ interface AppStore {
   updateAdvancement: (patch: Partial<AdvancementOptions>) => void
   updateFunction: (patch: Partial<FunctionOptions>) => void
   updateSchedule: (patch: Partial<ScheduleOptions>) => void
+  updateItemCommand: (patch: Partial<ItemOptions>) => void
   openDatapack: () => void
   updateDatapackMeta: (patch: Partial<Pick<DatapackDraft, 'namespace' | 'description'>>) => void
   addDatapackFunction: () => void
   removeDatapackFunction: (id: string) => void
   selectDatapackFunction: (id: string) => void
   updateDatapackFunction: (id: string, patch: Partial<Pick<DatapackFunctionDraft, 'name' | 'commands'>>) => void
+  addDatapackDataFile: (type: DatapackDataFileDraft['type']) => void
+  removeDatapackDataFile: (id: string) => void
+  selectDatapackDataFile: (id: string) => void
+  updateDatapackDataFile: (id: string, patch: Partial<Pick<DatapackDataFileDraft, 'type' | 'name' | 'content'>>) => void
   setDatapackLoadFunction: (name: string) => void
   setDatapackTickFunction: (name: string) => void
   openChain: () => void
@@ -766,6 +837,18 @@ function normalizeDatapack(input: Partial<DatapackDraft> | undefined): DatapackD
     ? (input.activeFunctionId as string)
     : list[0].id
   const names = new Set(list.map((item) => item.name))
+  const dataFiles = Array.isArray(input.dataFiles)
+    ? input.dataFiles
+        .filter((item) => item && typeof item.id === 'string' && typeof item.type === 'string')
+        .map((item) => ({
+          id: item.id,
+          type: (['advancement', 'predicate', 'loot_table'].includes(item.type)
+            ? item.type
+            : 'predicate') as DatapackDataFileDraft['type'],
+          name: typeof item.name === 'string' ? item.name : 'file',
+          content: typeof item.content === 'string' ? item.content : '{}'
+        }))
+    : []
   return {
     namespace: typeof input.namespace === 'string' ? input.namespace : fallback.namespace,
     description:
@@ -779,7 +862,11 @@ function normalizeDatapack(input: Partial<DatapackDraft> | undefined): DatapackD
     tickFunction:
       typeof input.tickFunction === 'string' && names.has(input.tickFunction)
         ? input.tickFunction
-        : ''
+        : '',
+    dataFiles,
+    activeDataFileId: dataFiles.some((item) => item.id === input.activeDataFileId)
+      ? (input.activeDataFileId as string)
+      : (dataFiles[0]?.id ?? '')
   }
 }
 
@@ -1185,6 +1272,21 @@ function normalizeAutomation(input: Partial<AutomationOptions> | undefined): Aut
   }
 }
 
+function normalizeItemCommand(input: Partial<ItemOptions> | undefined): ItemOptions {
+  const fallback = createDefaultItemOptions()
+  if (!input) return fallback
+  return {
+    action: input.action === 'modify' ? 'modify' : 'replace',
+    targetType: input.targetType === 'block' ? 'block' : 'entity',
+    target: input.target?.base ? input.target : fallback.target,
+    position: normalizePosition(input.position),
+    slot: typeof input.slot === 'string' ? input.slot : fallback.slot,
+    item: typeof input.item === 'string' ? input.item : fallback.item,
+    count: typeof input.count === 'string' ? input.count : fallback.count,
+    modifier: typeof input.modifier === 'string' ? input.modifier : fallback.modifier
+  }
+}
+
 function normalizeGive(input: Partial<GiveOptions> | undefined): GiveOptions {
   const fallback = createDefaultGiveOptions()
   if (!input) return fallback
@@ -1236,6 +1338,7 @@ function normalizePayload(input: unknown): ProjectPayload {
     forceload: normalizeForceload(data.forceload),
     attribute: normalizeAttribute(data.attribute),
     automation: normalizeAutomation(data.automation),
+    itemCommand: normalizeItemCommand(data.itemCommand),
     datapack: normalizeDatapack(data.datapack),
     generic:
       data.generic && Array.isArray(data.generic.steps)
@@ -1285,6 +1388,7 @@ function documentSnapshot(state: AppStore): string {
     forceload: state.forceload,
     attribute: state.attribute,
     automation: state.automation,
+    itemCommand: state.itemCommand,
     datapack: state.datapack,
     generic: state.generic,
     commandBlock: state.commandBlock
@@ -1352,6 +1456,7 @@ export const useAppStore = create<AppStore>()(
       function: createDefaultFunctionOptions(),
       schedule: createDefaultScheduleOptions()
     },
+    itemCommand: createDefaultItemOptions(),
     datapack: defaultDatapackDraft(),
     generic: emptyGeneric(),
     commandBlock: createDefaultCommandBlockOptions(),
@@ -1793,6 +1898,13 @@ export const useAppStore = create<AppStore>()(
       })
     },
 
+    updateItemCommand: (patch) => {
+      set((state) => {
+        state.itemCommand = { ...state.itemCommand, ...patch }
+        state.dirty = true
+      })
+    },
+
     openDatapack: () => {
       set((state) => {
         state.activeCommandId = 'datapack'
@@ -1857,6 +1969,57 @@ export const useAppStore = create<AppStore>()(
           if (state.datapack.loadFunction === oldName) state.datapack.loadFunction = patch.name
           if (state.datapack.tickFunction === oldName) state.datapack.tickFunction = patch.name
         }
+        state.dirty = true
+      })
+    },
+
+    addDatapackDataFile: (type) => {
+      set((state) => {
+        const template = DATAPACK_FILE_TEMPLATES[type]
+        const names = new Set(state.datapack.dataFiles.map((item) => item.name))
+        let name = template.name
+        let index = 1
+        while (names.has(name)) {
+          index += 1
+          name = `${template.name}_${index}`
+        }
+        const id = newClauseId()
+        state.datapack.dataFiles.push({
+          id,
+          type,
+          name,
+          content: template.content
+        })
+        state.datapack.activeDataFileId = id
+        state.dirty = true
+      })
+    },
+
+    removeDatapackDataFile: (id) => {
+      set((state) => {
+        state.datapack.dataFiles = state.datapack.dataFiles.filter((item) => item.id !== id)
+        if (state.datapack.activeDataFileId === id) {
+          state.datapack.activeDataFileId = state.datapack.dataFiles[0]?.id ?? ''
+        }
+        state.dirty = true
+      })
+    },
+
+    selectDatapackDataFile: (id) => {
+      set((state) => {
+        if (state.datapack.dataFiles.some((item) => item.id === id)) {
+          state.datapack.activeDataFileId = id
+        }
+      })
+    },
+
+    updateDatapackDataFile: (id, patch) => {
+      set((state) => {
+        const target = state.datapack.dataFiles.find((item) => item.id === id)
+        if (!target) return
+        if (typeof patch.name === 'string') target.name = patch.name
+        if (typeof patch.type === 'string') target.type = patch.type
+        if (typeof patch.content === 'string') target.content = patch.content
         state.dirty = true
       })
     },
@@ -2095,6 +2258,7 @@ export const useAppStore = create<AppStore>()(
           function: createDefaultFunctionOptions(),
           schedule: createDefaultScheduleOptions()
         }
+        state.itemCommand = createDefaultItemOptions()
         state.datapack = defaultDatapackDraft()
         state.generic = emptyGeneric()
         state.commandBlock = createDefaultCommandBlockOptions()
@@ -2148,6 +2312,7 @@ export const useAppStore = create<AppStore>()(
         forceload: state.forceload,
         attribute: state.attribute,
         automation: state.automation,
+        itemCommand: state.itemCommand,
         datapack: state.datapack,
         generic: state.generic,
         commandBlock: state.commandBlock,
@@ -2197,6 +2362,7 @@ export const useAppStore = create<AppStore>()(
         state.forceload = payload.forceload
         state.attribute = payload.attribute
         state.automation = payload.automation
+        state.itemCommand = payload.itemCommand
         state.datapack = payload.datapack
         state.generic = payload.generic
         state.commandBlock = payload.commandBlock
@@ -2534,4 +2700,8 @@ export function selectFunctionOutput(fn: FunctionOptions): BuildResult {
 
 export function selectScheduleOutput(schedule: ScheduleOptions): BuildResult {
   return buildScheduleCommand(schedule)
+}
+
+export function selectItemCommandOutput(itemCommand: ItemOptions): BuildResult {
+  return buildItemCommand(itemCommand)
 }

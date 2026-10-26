@@ -35,6 +35,7 @@ import { AttributeForm } from './components/AttributeForm'
 import { AdvancementForm } from './components/AdvancementForm'
 import { FunctionForm } from './components/FunctionForm'
 import { ScheduleForm } from './components/ScheduleForm'
+import { ItemCommandForm } from './components/ItemCommandForm'
 import { GenericBuilder } from './components/GenericBuilder'
 import { OutputPanel } from './components/OutputPanel'
 import { StatusBar } from './components/StatusBar'
@@ -145,6 +146,7 @@ export default function App() {
   const forceload = state.forceload
   const attribute = state.attribute
   const automation = state.automation
+  const itemCommand = state.itemCommand
   const generic = state.generic
   const commandBlock = state.commandBlock
   const outputMode = state.outputMode
@@ -272,6 +274,7 @@ export default function App() {
           store.forceload,
           store.attribute,
           store.automation,
+          store.itemCommand,
           store.generic,
           store.outputMode,
           store.commandBlock
@@ -300,7 +303,7 @@ export default function App() {
       void useAppStore.getState().autosave()
     }, 4000)
     return () => clearTimeout(timer)
-  }, [dirty, give, summon, setblock, execute, teleport, effect, fill, clone, chain, enchant, xp, tellraw, title, sound, bossbar, scoreboard, particle, world, tag, clear, gamerule, worldborder, team, spawnpoint, worldSpawn, forceload, attribute, automation, generic, commandBlock, outputMode, activeCommandId, projectName])
+  }, [dirty, give, summon, setblock, execute, teleport, effect, fill, clone, chain, enchant, xp, tellraw, title, sound, bossbar, scoreboard, particle, world, tag, clear, gamerule, worldborder, team, spawnpoint, worldSpawn, forceload, attribute, automation, itemCommand, generic, commandBlock, outputMode, activeCommandId, projectName])
 
   useEffect(() => {
     if (!toast) return
@@ -402,6 +405,8 @@ export default function App() {
             <FunctionForm />
           ) : activeCommandId === 'schedule' ? (
             <ScheduleForm />
+          ) : activeCommandId === 'item' ? (
+            <ItemCommandForm />
           ) : (
             <GenericBuilder />
           )}

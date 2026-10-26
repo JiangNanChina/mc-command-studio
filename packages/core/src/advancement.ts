@@ -1,6 +1,7 @@
 import { error } from './diagnostics'
 import { resourceId } from './escape'
 import { serializeSelector, type Selector } from './selector'
+import { isValidResourceLocation } from './units'
 import type { BuildResult, Diagnostic } from './types'
 
 export type AdvancementAction = 'grant' | 'revoke'
@@ -32,7 +33,7 @@ export function buildAdvancementCommand(options: AdvancementOptions): BuildResul
 
   if (options.mode !== 'everything') {
     const advancement = resourceId(options.advancement.trim())
-    if (!/^[a-z0-9_.-]+:[a-z0-9_./-]+$/.test(advancement)) {
+    if (!isValidResourceLocation(advancement)) {
       diagnostics.push(
         error('advancement.id', '进度 ID 必须是 namespace:path 格式', 'advancement')
       )

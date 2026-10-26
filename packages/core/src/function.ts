@@ -1,5 +1,6 @@
 import { error } from './diagnostics'
 import { resourceId } from './escape'
+import { isValidResourceLocation } from './units'
 import type { BuildResult, Diagnostic } from './types'
 
 export interface FunctionOptions {
@@ -19,7 +20,7 @@ export function createDefaultFunctionOptions(): FunctionOptions {
 export function buildFunctionCommand(options: FunctionOptions): BuildResult {
   const diagnostics: Diagnostic[] = []
   const name = resourceId(options.name.trim())
-  if (!/^[a-z0-9_.-]+:[a-z0-9_./-]+$/.test(name)) {
+  if (!isValidResourceLocation(name)) {
     diagnostics.push(error('function.name', '函数名必须是 namespace:path 格式', 'name'))
   }
   const parts = ['function', name]

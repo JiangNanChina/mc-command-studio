@@ -207,6 +207,7 @@ export function OutputPanel() {
     state.forceload,
     state.attribute,
     state.automation,
+    state.itemCommand,
     state.generic,
     state.outputMode,
     state.commandBlock

@@ -456,7 +456,34 @@ interface AutomationOptions {
 
 advancement 支持五种范围；function 可选 SNBT 宏参数；schedule 支持延迟与清除。函数名可从数据包工作区自动补全。资源名与时间格式均做校验。
 
-### 1.27 通用构建器：所有 94 个根命令
+### 1.27 物品槽位：`item`
+
+```ts
+interface ItemOptions {
+  action: 'replace' | 'modify'
+  targetType: 'entity' | 'block'
+  target: Selector
+  position: Position
+  slot: string
+  item: string
+  count: string
+  modifier: string
+}
+```
+
+支持实体/方块容器槽位替换（1–99 数量）与物品修饰符；槽位、资源 ID 使用单元体系校验。
+
+### 1.28 数据包高级文件
+
+数据包工作区可添加：
+
+- `predicate` → `data/<ns>/predicate/<name>.json`
+- `advancement` → `data/<ns>/advancement/<name>.json`
+- `loot_table` → `data/<ns>/loot_table/<name>.json`
+
+提供模板、路径预览、JSON 校验；重复路径或非法 JSON 会在导出前报错。构建器位于 `apps/desktop/src/shared/datapack.ts`。
+
+### 1.29 通用构建器：所有 94 个根命令
 
 ```ts
 interface GenericStep {
@@ -589,7 +616,7 @@ type Unit =
 
 ## 7. 测试
 
-`packages/core/src/*.test.ts` 与 `apps/desktop/src/shared/*.test.ts` 共 162 个用例，覆盖：
+`packages/core/src/*.test.ts` 与 `apps/desktop/src/shared/*.test.ts` 共 171 个用例，覆盖：
 
 - SNBT / 命令方块字符串转义。
 - 选择器排序、引号、范围、NBT 括号、分数。
@@ -619,6 +646,9 @@ type Unit =
 - `/spawnpoint`/`/setworldspawn` 坐标与朝向；`/forceload` 单区块/矩形/全部移除/查询。
 - `/attribute` 总值/基础值/修饰符增删与查询、ID/数值校验。
 - `/advancement` 五种范围、criterion；`/function` 宏参数；`/schedule` 延迟/清除。
+- `/item` 实体/方块槽位替换、物品修饰符、数量/槽位校验。
+- 数据包高级文件：谓词/进度/战利品表、JSON 校验、重复路径。
+- 单元体系：资源 ID、数值、物品栈、槽位。
 - 数据包文件树、load/tick 标签、多行函数、非法命名空间/函数名/空命令。
 - `/give` 文本导入：选择器、组件、数量、未知组件 raw。
 - 命令树遍历、通用路径、参数范围。

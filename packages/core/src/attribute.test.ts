@@ -63,7 +63,7 @@ describe('attribute', () => {
       ...createDefaultAttributeOptions(),
       action: 'modifier-add',
       attribute: 'bad id',
-      modifierId: 'bad',
+      modifierId: 'bad modifier',
       modifierValue: 'x'
     })
     expect(result.diagnostics.some((item) => item.code === 'attribute.id')).toBe(true)

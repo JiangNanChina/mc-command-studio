@@ -631,6 +631,39 @@ async function main() {
   }
   await page.screenshot({ path: join(ARTIFACTS, 'schedule-form.png') })
 
+  // item 槽位替换/修饰符
+  await page.locator('.command-item', { hasText: '物品操作' }).first().click()
+  await page.waitForSelector('#item-slot', { timeout: 10_000 })
+  await page.waitForTimeout(300)
+  const itemReplace = await page.locator('.output-code .cm-content').innerText()
+  if (!itemReplace.includes('item replace entity @s weapon.mainhand with minecraft:diamond_sword 1')) {
+    throw new Error(`item 替换输出不符合预期：${itemReplace}`)
+  }
+  await page.getByRole('button', { name: '方块容器', exact: true }).click()
+  await page.fill('#item-slot', 'container.0')
+  await page.getByRole('button', { name: '选择物品', exact: true }).click()
+  await page.waitForSelector('.mc-grid', { timeout: 10_000 })
+  await page.locator('.modal input[placeholder*="搜索中文名"]').fill('苹果')
+  await page.waitForTimeout(300)
+  await page
+    .locator('.mc-tile')
+    .filter({ has: page.locator('.mc-tile-name', { hasText: /^苹果$/ }) })
+    .first()
+    .click()
+  await page.fill('#item-count', '5')
+  await page.waitForTimeout(300)
+  const itemBlock = await page.locator('.output-code .cm-content').innerText()
+  if (!itemBlock.includes('item replace block 0 64 0 container.0 with minecraft:apple 5')) {
+    throw new Error(`item 方块容器输出不符合预期：${itemBlock}`)
+  }
+  await page.getByRole('button', { name: '应用修饰符', exact: true }).click()
+  await page.waitForTimeout(300)
+  const itemModify = await page.locator('.output-code .cm-content').innerText()
+  if (!itemModify.includes('item modify block 0 64 0 container.0 mcstudio:bonus')) {
+    throw new Error(`item 修饰符输出不符合预期：${itemModify}`)
+  }
+  await page.screenshot({ path: join(ARTIFACTS, 'item-form.png') })
+
   // scoreboard 可视化
   await page.locator('.command-item', { hasText: '记分板' }).first().click()
   await page.waitForSelector('#scoreboard-objective', { timeout: 10_000 })
@@ -699,7 +732,12 @@ async function main() {
   await page.fill('#datapack-commands', 'scoreboard objectives add kills dummy')
   await page.selectOption('#datapack-load', 'lib/init')
   await page.selectOption('#datapack-tick', 'main')
+  await page.getByRole('button', { name: '谓词', exact: true }).click()
+  await page.waitForSelector('#datapack-data-content', { timeout: 10_000 })
+  await page.getByRole('button', { name: '进度', exact: true }).click()
+  await page.getByRole('button', { name: '战利品表', exact: true }).click()
   await page.waitForTimeout(300)
+  await page.locator('#datapack-data-content').scrollIntoViewIfNeeded()
   await page.screenshot({ path: join(ARTIFACTS, 'datapack.png') })
   await page.getByRole('button', { name: '导出数据包 .zip' }).click()
   await page.waitForSelector('text=数据包已导出', { timeout: 20_000 })

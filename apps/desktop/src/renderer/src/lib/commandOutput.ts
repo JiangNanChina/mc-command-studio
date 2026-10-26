@@ -25,6 +25,7 @@ import {
   type WorldSpawnOptions,
   type ForceloadOptions,
   type AttributeOptions,
+  type ItemOptions,
   type SoundOptions,
   type SummonOptions,
   type TeleportOptions,
@@ -62,6 +63,7 @@ import {
   selectAdvancementOutput,
   selectFunctionOutput,
   selectScheduleOutput,
+  selectItemCommandOutput,
   selectSoundOutput,
   selectSummonOutput,
   selectTellrawOutput,
@@ -110,6 +112,7 @@ export function getCommandOutput(
   forceload: ForceloadOptions,
   attribute: AttributeOptions,
   automation: AutomationOptions,
+  itemCommand: ItemOptions,
   generic: GenericDraft
 ): BuildResult {
   if (!activeCommandId) return { text: '', diagnostics: [] }
@@ -144,6 +147,7 @@ export function getCommandOutput(
   if (activeCommandId === 'advancement') return selectAdvancementOutput(automation.advancement)
   if (activeCommandId === 'function') return selectFunctionOutput(automation.function)
   if (activeCommandId === 'schedule') return selectScheduleOutput(automation.schedule)
+  if (activeCommandId === 'item') return selectItemCommandOutput(itemCommand)
   if (activeCommandId === 'playsound' || activeCommandId === 'stopsound') {
     return selectSoundOutput(sound)
   }
@@ -182,6 +186,7 @@ export function getCurrentOutput(
   forceload: ForceloadOptions,
   attribute: AttributeOptions,
   automation: AutomationOptions,
+  itemCommand: ItemOptions,
   generic: GenericDraft,
   outputMode: OutputMode,
   commandBlock: CommandBlockOptions
@@ -217,6 +222,7 @@ export function getCurrentOutput(
     forceload,
     attribute,
     automation,
+    itemCommand,
     generic
   )
   if (outputMode === 'command') {

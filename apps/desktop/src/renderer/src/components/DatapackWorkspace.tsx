@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react'
 import {
   FileArchive,
   FileCode2,
+  FileJson,
   FolderTree,
   PackageOpen,
   Plus,
@@ -10,7 +11,7 @@ import {
 } from 'lucide-react'
 import { buildDatapackFiles } from '../../../shared/datapack'
 import { getApi } from '../lib/api'
-import { useAppStore } from '../store'
+import { useAppStore, type DatapackDataFileDraft } from '../store'
 
 export function DatapackWorkspace() {
   const state = useAppStore()
@@ -21,6 +22,9 @@ export function DatapackWorkspace() {
   const active =
     datapack.functions.find((item) => item.id === datapack.activeFunctionId) ??
     datapack.functions[0]
+  const activeData =
+    datapack.dataFiles.find((item) => item.id === datapack.activeDataFileId) ??
+    datapack.dataFiles[0]
 
   const preview = useMemo(() => {
     try {
@@ -34,7 +38,12 @@ export function DatapackWorkspace() {
             commands: item.commands
           })),
           loadFunction: datapack.loadFunction,
-          tickFunction: datapack.tickFunction
+          tickFunction: datapack.tickFunction,
+          files: datapack.dataFiles.map((item) => ({
+            type: item.type,
+            name: item.name,
+            content: item.content
+          }))
         }),
         error: null as string | null
       }
@@ -59,7 +68,12 @@ export function DatapackWorkspace() {
           commands: item.commands
         })),
         loadFunction: datapack.loadFunction,
-        tickFunction: datapack.tickFunction
+        tickFunction: datapack.tickFunction,
+        files: datapack.dataFiles.map((item) => ({
+          type: item.type,
+          name: item.name,
+          content: item.content
+        }))
       })
       if (!result) return
       state.showToast(`数据包已导出：${result.path}`, 'success')
@@ -261,6 +275,147 @@ export function DatapackWorkspace() {
               </div>
             </div>
           ) : null}
+        </div>
+      </div>
+
+      <div className="card">
+        <div className="card-head">
+          <div className="card-title">
+            <FileJson size={15} />
+            高级数据文件
+            <span className="badge">{datapack.dataFiles.length}</span>
+          </div>
+          <div className="row" style={{ flexWrap: 'wrap' }}>
+            <button
+              type="button"
+              className="btn btn-sm"
+              onClick={() => state.addDatapackDataFile('predicate')}
+            >
+              <Plus size={13} />
+              谓词
+            </button>
+            <button
+              type="button"
+              className="btn btn-sm"
+              onClick={() => state.addDatapackDataFile('advancement')}
+            >
+              <Plus size={13} />
+              进度
+            </button>
+            <button
+              type="button"
+              className="btn btn-sm"
+              onClick={() => state.addDatapackDataFile('loot_table')}
+            >
+              <Plus size={13} />
+              战利品表
+            </button>
+          </div>
+        </div>
+        <div className="card-body">
+          {datapack.dataFiles.length === 0 ? (
+            <div className="hint">
+              可选：添加谓词、进度或战利品表 JSON；导出时会写入 data/&lt;namespace&gt;/ 对应目录。
+            </div>
+          ) : (
+            <>
+              <div className="row" style={{ flexWrap: 'wrap', gap: 6 }}>
+                {datapack.dataFiles.map((item) => (
+                  <button
+                    key={item.id}
+                    type="button"
+                    className={`chip${item.id === activeData?.id ? ' active' : ''}`}
+                    onClick={() => state.selectDatapackDataFile(item.id)}
+                  >
+                    {item.type === 'advancement'
+                      ? '进度'
+                      : item.type === 'predicate'
+                        ? '谓词'
+                        : '战利品表'}
+                    {' · '}
+                    {item.name}
+                  </button>
+                ))}
+              </div>
+
+              {activeData ? (
+                <div style={{ marginTop: 12 }}>
+                  <div className="grid-2">
+                    <div className="field">
+                      <label className="field-label" htmlFor="datapack-data-type">
+                        类型
+                      </label>
+                      <select
+                        id="datapack-data-type"
+                        className="select"
+                        value={activeData.type}
+                        onChange={(event) =>
+                          state.updateDatapackDataFile(activeData.id, {
+                            type: event.target.value as DatapackDataFileDraft['type']
+                          })
+                        }
+                      >
+                        <option value="predicate">谓词 Predicate</option>
+                        <option value="advancement">进度 Advancement</option>
+                        <option value="loot_table">战利品表 Loot table</option>
+                      </select>
+                    </div>
+                    <div className="field">
+                      <label className="field-label" htmlFor="datapack-data-name">
+                        文件名
+                      </label>
+                      <input
+                        id="datapack-data-name"
+                        className="input"
+                        value={activeData.name}
+                        spellCheck={false}
+                        onChange={(event) =>
+                          state.updateDatapackDataFile(activeData.id, {
+                            name: event.target.value
+                          })
+                        }
+                      />
+                    </div>
+                  </div>
+                  <div className="field" style={{ marginTop: 10 }}>
+                    <label className="field-label" htmlFor="datapack-data-content">
+                      JSON 内容
+                    </label>
+                    <textarea
+                      id="datapack-data-content"
+                      className="textarea datapack-command-input"
+                      value={activeData.content}
+                      spellCheck={false}
+                      onChange={(event) =>
+                        state.updateDatapackDataFile(activeData.id, {
+                          content: event.target.value
+                        })
+                      }
+                    />
+                  </div>
+                  <div className="row" style={{ marginTop: 8, justifyContent: 'space-between' }}>
+                    <div className="hint">
+                      data/{datapack.namespace}/
+                      {activeData.type === 'advancement'
+                        ? 'advancement'
+                        : activeData.type === 'predicate'
+                          ? 'predicate'
+                          : 'loot_table'}
+                      /{activeData.name || 'file'}.json
+                    </div>
+                    <button
+                      type="button"
+                      className="btn btn-sm"
+                      onClick={() => state.removeDatapackDataFile(activeData.id)}
+                    >
+                      <Trash2 size={13} />
+                      删除文件
+                    </button>
+                  </div>
+                </div>
+              ) : null}
+            </>
+          )}
         </div>
       </div>
 

@@ -22,6 +22,39 @@ const REPO = 'https://github.com/JiangNanChina/mc-command-studio'
  */
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: '0.1.24',
+    date: '2026-10-26',
+    title: '物品、高级数据文件与单元体系',
+    highlights: [
+      'item 槽位替换与物品修饰符。',
+      '数据包支持谓词、进度、战利品表 JSON。',
+      '资源 ID/数值/物品栈/槽位统一校验。'
+    ],
+    sections: [
+      {
+        type: 'added',
+        items: [
+          'item：实体/方块容器槽位替换、数量 1–99、修饰符。',
+          '数据包高级文件：谓词、进度、战利品表，模板与 JSON 校验。',
+          '单元体系 units.ts：资源 ID、数值、物品栈、槽位。'
+        ]
+      },
+      {
+        type: 'improved',
+        items: [
+          '重复文件路径与非法 JSON 明确报错。',
+          '相关命令模块改用统一单元校验。',
+          '单元测试 162 → 171。'
+        ]
+      },
+      {
+        type: 'fixed',
+        items: ['无。']
+      }
+    ],
+    releaseUrl: `${REPO}/releases/tag/v0.1.24`
+  },
+  {
     version: '0.1.23',
     date: '2026-10-26',
     title: '可视化进度、函数与计划任务',
