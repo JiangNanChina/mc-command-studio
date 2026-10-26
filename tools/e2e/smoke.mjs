@@ -816,7 +816,15 @@ async function main() {
   await page.selectOption('#datapack-load', 'lib/init')
   await page.selectOption('#datapack-tick', 'main')
   await page.getByRole('button', { name: '谓词', exact: true }).click()
-  await page.waitForSelector('#datapack-data-content', { timeout: 10_000 })
+  await page.waitForSelector('#predicate-type-0', { timeout: 10_000 })
+  await page.selectOption('#predicate-type-0', 'random_chance')
+  await page.fill('#predicate-chance-0', '0.25')
+  await page.waitForTimeout(300)
+  const predicateContent = await page.inputValue('#datapack-data-content')
+  if (!predicateContent.includes('0.25')) {
+    throw new Error('谓词结构化编辑未写回概率')
+  }
+  await page.screenshot({ path: join(ARTIFACTS, 'datapack-predicate.png') })
   await page.getByRole('button', { name: '进度', exact: true }).click()
   await page.waitForSelector('#advancement-structured-title', { timeout: 10_000 })
   await page.fill('#advancement-structured-title', '测试进度')

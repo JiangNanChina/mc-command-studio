@@ -22,6 +22,37 @@ const REPO = 'https://github.com/JiangNanChina/mc-command-studio'
  */
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: '0.1.30',
+    date: '2026-10-27',
+    title: '谓词结构化编辑器',
+    highlights: [
+      '谓词条件可视化：概率、天气、时间、实体状态。',
+      'all_of / any_of 组合。'
+    ],
+    sections: [
+      {
+        type: 'added',
+        items: [
+          '随机概率、天气检查、时间检查、实体状态条件。',
+          'all_of/any_of 多条件组合与增删。',
+          '实体角色与 5 种状态 flags。'
+        ]
+      },
+      {
+        type: 'improved',
+        items: [
+          '不支持的条件回退 JSON。',
+          '单元测试 190 → 194；冒烟测试覆盖概率写回。'
+        ]
+      },
+      {
+        type: 'fixed',
+        items: ['无。']
+      }
+    ],
+    releaseUrl: `${REPO}/releases/tag/v0.1.30`
+  },
+  {
     version: '0.1.29',
     date: '2026-10-27',
     title: '进度文件结构化编辑器',

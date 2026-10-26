@@ -14,6 +14,7 @@ import { getApi } from '../lib/api'
 import { useAppStore, type DatapackDataFileDraft } from '../store'
 import { LootTableEditor } from './LootTableEditor'
 import { AdvancementEditor } from './AdvancementEditor'
+import { PredicateEditor } from './PredicateEditor'
 
 export function DatapackWorkspace() {
   const state = useAppStore()
@@ -405,6 +406,14 @@ export function DatapackWorkspace() {
                   ) : null}
                   {activeData.type === 'advancement' ? (
                     <AdvancementEditor
+                      content={activeData.content}
+                      onChange={(content) =>
+                        state.updateDatapackDataFile(activeData.id, { content })
+                      }
+                    />
+                  ) : null}
+                  {activeData.type === 'predicate' ? (
+                    <PredicateEditor
                       content={activeData.content}
                       onChange={(content) =>
                         state.updateDatapackDataFile(activeData.id, { content })

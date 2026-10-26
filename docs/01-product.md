@@ -51,7 +51,7 @@
 - 项目保存 / 打开 / 自动保存 / 崩溃恢复；最近项目。
 - 深色/浅色主题、设置、诊断导出、本地日志。
 - NSIS 安装包 + 便携版；electron-updater 自动更新与发布流水线。
-- 单元测试 190 个；Electron 冒烟测试覆盖公告、give/导入/summon/setblock/tp/effect/fill/clone/enchant/xp/tellraw/title/playsound/stopsound/bossbar/particle/time/weather/difficulty/tag/clear/gamerule/worldborder/team（含前缀/高级显示名）/spawnpoint/setworldspawn/forceload/attribute/advancement/function/schedule/item/data（含 modify/from）/loot/scoreboard/execute/命令方块链/数据包工作区（含进度/战利品表结构化）/撤销重做/命令方块。
+- 单元测试 194 个；Electron 冒烟测试覆盖公告、give/导入/summon/setblock/tp/effect/fill/clone/enchant/xp/tellraw/title/playsound/stopsound/bossbar/particle/time/weather/difficulty/tag/clear/gamerule/worldborder/team（含前缀/高级显示名）/spawnpoint/setworldspawn/forceload/attribute/advancement/function/schedule/item/data（含 modify/from）/loot/scoreboard/execute/命令方块链/数据包工作区（含谓词/进度/战利品表结构化）/撤销重做/命令方块。
 
 ### P1（现代版 MVP）
 
@@ -107,7 +107,7 @@
 | 实体属性 | ✅ attribute 查询/设置/修饰符 |
 | 进度/自动化 | ✅ advancement/function/schedule |
 | 物品槽位 | ✅ item 替换/修饰符 |
-| 高级数据包 | ✅ 谓词/进度（含结构化）/战利品表（含结构化） |
+| 高级数据包 | ✅ 谓词（含结构化）/进度（含结构化）/战利品表（含结构化） |
 | NBT/战利品 | ✅ data（含 modify/from）/loot |
 | 队伍文本 | ✅ team 前缀/后缀/高级显示名 |
 | 单元体系 | ✅ 资源 ID/数值/物品栈/槽位 |
@@ -119,7 +119,7 @@
 | 命令方块 setblock | ✅ 单块 + 命令方块链 |
 | 项目保存 / 自动保存 | ✅ JSON 文件 |
 | 安装包 / 便携版 | ✅ 未签名（见 08） |
-| 自动更新 | ✅ 0.1.28 → 0.1.29 静默升级已实测；GitHub v0.1.29 Release 已发布 |
+| 自动更新 | ✅ 0.1.29 → 0.1.30 静默升级已实测；GitHub v0.1.30 Release 已发布 |
 | 1.12.2 / 1.13–1.20.4 | ❌ 仅设计 |
 | 单元体系 | ❌ P1 后续 |
 

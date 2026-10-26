@@ -1960,6 +1960,17 @@ a {
   gap: 8px;
 }
 
+.predicate-condition {
+  padding: 10px;
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  background: var(--panel);
+}
+
+.predicate-condition .checkline {
+  font-size: 11.5px;
+}
+
 .loot-entry {
   display: flex;
   align-items: center;

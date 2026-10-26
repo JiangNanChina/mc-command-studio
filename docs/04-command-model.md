@@ -481,7 +481,7 @@ interface ItemOptions {
 - `advancement` → `data/<ns>/advancement/<name>.json`
 - `loot_table` → `data/<ns>/loot_table/<name>.json`
 
-提供模板、路径预览、JSON 校验；重复路径或非法 JSON 会在导出前报错。战利品表与进度还支持简单结构化编辑（战利品表：类型/rolls/权重/数量；进度：显示/图标/框架/触发器），复杂结构自动回退 JSON。构建器位于 `apps/desktop/src/shared/datapack.ts`，模型位于 `apps/desktop/src/shared/lootTable.ts` 与 `advancement.ts`。
+提供模板、路径预览、JSON 校验；重复路径或非法 JSON 会在导出前报错。战利品表、进度与谓词还支持常用结构化编辑（战利品表：类型/rolls/权重/数量；进度：显示/图标/框架/触发器；谓词：概率/天气/时间/实体状态与 all_of/any_of），复杂结构自动回退 JSON。构建器位于 `apps/desktop/src/shared/datapack.ts`，模型位于 `lootTable.ts`、`advancement.ts`、`predicate.ts`。
 
 ### 1.29 NBT 与战利品：`data` / `loot`
 
@@ -641,7 +641,7 @@ type Unit =
 
 ## 7. 测试
 
-`packages/core/src/*.test.ts` 与 `apps/desktop/src/shared/*.test.ts` 共 190 个用例，覆盖：
+`packages/core/src/*.test.ts` 与 `apps/desktop/src/shared/*.test.ts` 共 194 个用例，覆盖：
 
 - SNBT / 命令方块字符串转义。
 - 选择器排序、引号、范围、NBT 括号、分数。
@@ -672,7 +672,7 @@ type Unit =
 - `/attribute` 总值/基础值/修饰符增删与查询、ID/数值校验。
 - `/advancement` 五种范围、criterion；`/function` 宏参数；`/schedule` 延迟/清除。
 - `/item` 实体/方块槽位替换、物品修饰符、数量/槽位校验。
-- 数据包高级文件：谓词/进度/战利品表、JSON 校验、重复路径、进度与战利品表结构化模型。
+- 数据包高级文件：谓词/进度/战利品表、JSON 校验、重复路径、三者结构化模型。
 - 单元体系：资源 ID、数值、物品栈、槽位。
 - `/data` 实体/方块/存储的 get/merge/remove/modify、路径/scale；`/loot` give/spawn/insert。
 - `/team` 前缀/后缀/高级显示名文本组件。
