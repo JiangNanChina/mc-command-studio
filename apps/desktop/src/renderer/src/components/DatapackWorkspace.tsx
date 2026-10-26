@@ -12,6 +12,7 @@ import {
 import { buildDatapackFiles } from '../../../shared/datapack'
 import { getApi } from '../lib/api'
 import { useAppStore, type DatapackDataFileDraft } from '../store'
+import { LootTableEditor } from './LootTableEditor'
 
 export function DatapackWorkspace() {
   const state = useAppStore()
@@ -393,6 +394,14 @@ export function DatapackWorkspace() {
                       }
                     />
                   </div>
+                  {activeData.type === 'loot_table' ? (
+                    <LootTableEditor
+                      content={activeData.content}
+                      onChange={(content) =>
+                        state.updateDatapackDataFile(activeData.id, { content })
+                      }
+                    />
+                  ) : null}
                   <div className="row" style={{ marginTop: 8, justifyContent: 'space-between' }}>
                     <div className="hint">
                       data/{datapack.namespace}/

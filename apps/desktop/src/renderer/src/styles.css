@@ -1945,6 +1945,86 @@ a {
   font-size: 11px;
 }
 
+/* ---------- Loot table structured editor ---------- */
+.loot-structured-editor {
+  margin-top: 12px;
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--panel-2);
+}
+
+.loot-entry-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.loot-entry {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px;
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  background: var(--panel);
+}
+
+.loot-entry-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 190px;
+  flex: 1;
+  padding: 4px 6px;
+  border: 0;
+  border-radius: 5px;
+  background: transparent;
+  color: var(--text);
+  text-align: left;
+}
+
+.loot-entry-item:hover {
+  background: var(--panel-2);
+}
+
+.loot-entry-main {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.loot-entry-name {
+  font-size: 12.5px;
+  font-weight: 600;
+}
+
+.loot-entry-id {
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: 10px;
+}
+
+.loot-entry-field {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  width: 72px;
+  color: var(--muted);
+  font-size: 10px;
+}
+
+.loot-entry-field .input {
+  padding: 5px 7px;
+  font-size: 11.5px;
+}
+
+@media (max-width: 1100px) {
+  .loot-entry {
+    flex-wrap: wrap;
+  }
+}
+
 /* ---------- Team ---------- */
 .team-colors {
   display: flex;

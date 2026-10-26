@@ -12,7 +12,7 @@
 
 ![give 表单](docs/assets/give-form.png)
 
-## 功能（0.1.27）
+## 功能（0.1.28）
 
 - **品牌图标**：命令方块主题的应用图标、安装包图标与界面 Logo。
 - **更新公告**：只展示当前版本更新，历史版本跳转 GitHub Releases；不再显示已知问题。
@@ -33,7 +33,7 @@
 - **实体属性**：`attribute` 总属性/基础值查询设置、修饰符增删、40 个中文属性名。
 - **进度与自动化**：`advancement` 授予/收回、`function` 宏参数、`schedule` 延迟/清除。
 - **物品槽位**：`item` 实体/方块容器替换、1–99 数量、物品修饰符。
-- **高级数据包**：谓词、进度、战利品表 JSON 模板与校验。
+- **高级数据包**：谓词、进度、战利品表 JSON 模板与校验；战利品表支持结构化编辑。
 - **NBT 与战利品**：`data` 查询/修改/合并/删除（含 from 来源），`loot` 给予/生成/插入。
 - **队伍文本**：`team` 前缀/后缀与高级显示名可视化文本组件。
 - **单元体系**：资源 ID、数值、物品栈、槽位统一校验。
@@ -49,7 +49,7 @@
 - **通用构建器**：未覆盖命令仍保留官方命令树作为高级兜底。
 - **本地项目**：`.mcstudio` JSON、最近打开、4 秒防抖自动保存、异常退出恢复。
 - **桌面体验**：深色/浅色主题、中文界面、原生菜单、文件关联、单实例、高 DPI。
-- **分发与更新**：NSIS 安装包 + 便携版 + `latest.yml`；electron-updater 自动检查/下载/重启安装；GitHub Actions 发布流水线。已在本机验证 0.1.26 → 0.1.27 静默升级；便携版会禁用自动更新并提示手动下载。
+- **分发与更新**：NSIS 安装包 + 便携版 + `latest.yml`；electron-updater 自动检查/下载/重启安装；GitHub Actions 发布流水线。已在本机验证 0.1.27 → 0.1.28 静默升级；便携版会禁用自动更新并提示手动下载。
 
 ## 下载与安装
 
@@ -79,8 +79,8 @@ pnpm build:win          # 安装包 + 便携版 + latest.yml
 
 产物在 `release/`：
 
-- `MC-Command-Studio-Setup-0.1.27.exe`
-- `MC-Command-Studio-0.1.27-portable.exe`
+- `MC-Command-Studio-Setup-0.1.28.exe`
+- `MC-Command-Studio-0.1.28-portable.exe`
 - `latest.yml`、`.blockmap`
 
 如果 `pnpm install` 后没有 Electron 二进制，运行 `pnpm setup:electron`；国内网络可设置：
@@ -104,7 +104,7 @@ pnpm data:verify
 ## 测试
 
 ```bash
-pnpm test        # 182 个核心逻辑用例
+pnpm test        # 186 个核心逻辑用例
 pnpm e2e         # Playwright 启动 Electron，覆盖 give/导入/summon/setblock/命令方块
 ```
 

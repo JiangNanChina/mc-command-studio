@@ -819,8 +819,27 @@ async function main() {
   await page.waitForSelector('#datapack-data-content', { timeout: 10_000 })
   await page.getByRole('button', { name: '进度', exact: true }).click()
   await page.getByRole('button', { name: '战利品表', exact: true }).click()
+  await page.waitForSelector('#loot-structured-type', { timeout: 10_000 })
+  const lootType = await page.inputValue('#loot-structured-type')
+  if (lootType !== 'minecraft:chest') {
+    throw new Error(`战利品表结构化类型不符合预期：${lootType}`)
+  }
+  await page.getByRole('button', { name: '添加掉落物', exact: true }).click()
+  await page.waitForSelector('.mc-grid', { timeout: 10_000 })
+  await page.locator('.modal input[placeholder*="搜索中文名"]').fill('苹果')
   await page.waitForTimeout(300)
-  await page.locator('#datapack-data-content').scrollIntoViewIfNeeded()
+  await page
+    .locator('.mc-tile')
+    .filter({ has: page.locator('.mc-tile-name', { hasText: /^苹果$/ }) })
+    .first()
+    .click()
+  await page.waitForTimeout(300)
+  const lootContent = await page.inputValue('#datapack-data-content')
+  if (!lootContent.includes('minecraft:apple')) {
+    throw new Error('战利品表结构化编辑未写回 apple')
+  }
+  await page.locator('#loot-structured-type').scrollIntoViewIfNeeded()
+  await page.waitForTimeout(300)
   await page.screenshot({ path: join(ARTIFACTS, 'datapack.png') })
   await page.getByRole('button', { name: '导出数据包 .zip' }).click()
   await page.waitForSelector('text=数据包已导出', { timeout: 20_000 })

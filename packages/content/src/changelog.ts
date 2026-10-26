@@ -22,6 +22,37 @@ const REPO = 'https://github.com/JiangNanChina/mc-command-studio'
  */
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: '0.1.28',
+    date: '2026-10-27',
+    title: '战利品表结构化编辑器',
+    highlights: [
+      '战利品表可视化编辑抽取次数、权重与数量。',
+      '复杂结构自动回退 JSON。'
+    ],
+    sections: [
+      {
+        type: 'added',
+        items: [
+          '战利品表类型、rolls、bonus rolls。',
+          '掉落物物品选择器、权重、数量区间、增删。',
+          '简单结构自动写回 JSON。'
+        ]
+      },
+      {
+        type: 'improved',
+        items: [
+          '多池/条件/非物品结构回退 JSON，避免丢字段。',
+          '单元测试 182 → 186；冒烟测试覆盖物品选择。'
+        ]
+      },
+      {
+        type: 'fixed',
+        items: ['无。']
+      }
+    ],
+    releaseUrl: `${REPO}/releases/tag/v0.1.28`
+  },
+  {
     version: '0.1.27',
     date: '2026-10-27',
     title: 'data from 与队伍高级显示名',
