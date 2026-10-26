@@ -302,6 +302,30 @@ async function main() {
   }
   await page.getByRole('button', { name: '创建并配置' }).click()
 
+  // scoreboard 可视化
+  await page.locator('.command-item', { hasText: '记分板' }).first().click()
+  await page.waitForSelector('#scoreboard-objective', { timeout: 10_000 })
+  await page.waitForTimeout(300)
+  const scoreboardOutput = await page.locator('.output-code .cm-content').innerText()
+  if (!scoreboardOutput.includes('scoreboard objectives add kills dummy "击杀数"')) {
+    throw new Error(`scoreboard 输出不符合预期：${scoreboardOutput}`)
+  }
+  await page.screenshot({ path: join(ARTIFACTS, 'scoreboard-form.png') })
+  await page.getByRole('button', { name: '设置分数' }).click()
+  await page.waitForSelector('#scoreboard-score', { timeout: 10_000 })
+  await page.waitForTimeout(300)
+  const scoreboardSet = await page.locator('.output-code .cm-content').innerText()
+  if (!scoreboardSet.includes('scoreboard players set @s kills 0')) {
+    throw new Error(`scoreboard 设置分数输出不符合预期：${scoreboardSet}`)
+  }
+  await page.getByRole('button', { name: '分数运算' }).click()
+  await page.waitForSelector('#scoreboard-operation', { timeout: 10_000 })
+  await page.waitForTimeout(300)
+  const scoreboardOp = await page.locator('.output-code .cm-content').innerText()
+  if (!scoreboardOp.includes('scoreboard players operation @s kills =')) {
+    throw new Error(`scoreboard 运算输出不符合预期：${scoreboardOp}`)
+  }
+
   // clone 专用表单 + 撤销/重做
   await page.locator('.command-item', { hasText: '复制区域' }).first().click()
   await page.waitForSelector('#clone-mode', { timeout: 10_000 })

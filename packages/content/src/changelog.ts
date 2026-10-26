@@ -22,6 +22,42 @@ const REPO = 'https://github.com/JiangNanChina/mc-command-studio'
  */
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: '0.1.13',
+    date: '2026-10-26',
+    title: '可视化计分板 scoreboard',
+    highlights: [
+      '计分目标、显示位置、玩家加减/设置/查询/运算全部可视化。',
+      '目标名、计分项、分数与显示位置带校验和建议。'
+    ],
+    sections: [
+      {
+        type: 'added',
+        items: [
+          'scoreboard 目标：创建、删除、setdisplay。',
+          '玩家分数：set/add/remove/reset/get/operation。',
+          '计分项与显示位置建议，支持自定义。',
+          '侧边栏分数预览。'
+        ]
+      },
+      {
+        type: 'improved',
+        items: [
+          '操作按目标/玩家分组。',
+          '单元测试 114 → 119；冒烟测试覆盖创建目标、设置分数和运算。'
+        ]
+      },
+      {
+        type: 'fixed',
+        items: ['无。']
+      },
+      {
+        type: 'known',
+        items: ['scoreboard objectives modify、players list 等高级操作仍可用高级命令树。', '安装包尚未配置代码签名。']
+      }
+    ],
+    releaseUrl: `${REPO}/releases/tag/v0.1.13`
+  },
+  {
     version: '0.1.12',
     date: '2026-10-26',
     title: '数据包工作区独立',

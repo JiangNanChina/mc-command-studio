@@ -194,6 +194,7 @@ export function OutputPanel() {
     state.title,
     state.sound,
     state.bossbar,
+    state.scoreboard,
     state.generic,
     state.outputMode,
     state.commandBlock

@@ -284,7 +284,28 @@ interface BossbarOptions {
 
 创建先生成 `bossbar add <id> "<name>"`，再生成 name/color/style/max/value/visible/players 系列 `bossbar set`；更新跳过 add；移除只生成 `bossbar remove`。最大值 ≥1，当前值 0..max。
 
-### 1.17 通用构建器：所有 94 个根命令
+### 1.17 专用表单：`scoreboard`
+
+```ts
+interface ScoreboardOptions {
+  action: 'objective-add' | 'objective-remove' | 'objective-display'
+    | 'players-set' | 'players-add' | 'players-remove'
+    | 'players-reset' | 'players-get' | 'players-operation'
+  objective: string
+  criteria: string
+  displayName: string
+  slot: string
+  target: Selector
+  score: string
+  operation: '=' | '+=' | '-=' | '*=' | '/=' | '%=' | '<' | '>' | '><'
+  source: Selector
+  sourceObjective: string
+}
+```
+
+目标名限制 1–16 位字母/数字/下划线/点/连字符；分数必须是整数。`objective-display` 允许目标名为空以清除显示。`players-operation` 生成 `<op>` 及来源玩家/来源目标。
+
+### 1.18 通用构建器：所有 94 个根命令
 
 ```ts
 interface GenericStep {
@@ -417,7 +438,7 @@ type Unit =
 
 ## 7. 测试
 
-`packages/core/src/*.test.ts` 与 `apps/desktop/src/shared/*.test.ts` 共 114 个用例，覆盖：
+`packages/core/src/*.test.ts` 与 `apps/desktop/src/shared/*.test.ts` 共 119 个用例，覆盖：
 
 - SNBT / 命令方块字符串转义。
 - 选择器排序、引号、范围、NBT 括号、分数。
@@ -437,6 +458,7 @@ type Unit =
 - `/tellraw` 目标与 JSON；`/title` 三种位置、times 时序、非法 tick。
 - `/playsound` 声音/来源/坐标/音量/音调；`/stopsound` 全部/来源/指定声音。
 - `/bossbar` 创建序列、更新跳过 add、移除、ID/最大值/当前值校验。
+- `/scoreboard` 目标增删/显示位置、玩家分数、查询、运算、目标名/分数校验。
 - 数据包文件树、load/tick 标签、多行函数、非法命名空间/函数名/空命令。
 - `/give` 文本导入：选择器、组件、数量、未知组件 raw。
 - 命令树遍历、通用路径、参数范围。

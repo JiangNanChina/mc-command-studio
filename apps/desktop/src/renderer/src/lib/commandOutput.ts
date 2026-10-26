@@ -13,6 +13,7 @@ import {
   type FillOptions,
   type GiveOptions,
   type SetblockOptions,
+  type ScoreboardOptions,
   type SoundOptions,
   type SummonOptions,
   type TeleportOptions,
@@ -32,6 +33,7 @@ import {
   selectGenericOutput,
   selectGiveOutput,
   selectSetblockOutput,
+  selectScoreboardOutput,
   selectSoundOutput,
   selectSummonOutput,
   selectTellrawOutput,
@@ -67,6 +69,7 @@ export function getCommandOutput(
   title: TitleOptions,
   sound: SoundOptions,
   bossbar: BossbarOptions,
+  scoreboard: ScoreboardOptions,
   generic: GenericDraft
 ): BuildResult {
   if (!activeCommandId) return { text: '', diagnostics: [] }
@@ -84,6 +87,7 @@ export function getCommandOutput(
   if (activeCommandId === 'tellraw') return selectTellrawOutput(tellraw)
   if (activeCommandId === 'title') return selectTitleOutput(title)
   if (activeCommandId === 'bossbar') return selectBossbarOutput(bossbar)
+  if (activeCommandId === 'scoreboard') return selectScoreboardOutput(scoreboard)
   if (activeCommandId === 'playsound' || activeCommandId === 'stopsound') {
     return selectSoundOutput(sound)
   }
@@ -109,6 +113,7 @@ export function getCurrentOutput(
   title: TitleOptions,
   sound: SoundOptions,
   bossbar: BossbarOptions,
+  scoreboard: ScoreboardOptions,
   generic: GenericDraft,
   outputMode: OutputMode,
   commandBlock: CommandBlockOptions
@@ -131,6 +136,7 @@ export function getCurrentOutput(
     title,
     sound,
     bossbar,
+    scoreboard,
     generic
   )
   if (outputMode === 'command') {

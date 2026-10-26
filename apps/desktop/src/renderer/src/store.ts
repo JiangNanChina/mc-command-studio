@@ -8,6 +8,7 @@ import {
   buildFillCommand,
   buildGiveCommand,
   buildSetblockCommand,
+  buildScoreboardCommand,
   buildSoundCommand,
   buildSummonCommand,
   buildTeleportCommand,
@@ -24,6 +25,7 @@ import {
   createDefaultExecuteOptions,
   createDefaultFillOptions,
   createDefaultGiveOptions,
+  createDefaultScoreboardOptions,
   createDefaultSetblockOptions,
   createDefaultSoundOptions,
   createDefaultSummonOptions,
@@ -53,6 +55,7 @@ import {
   type ItemComponent,
   type Position,
   type Selector,
+  type ScoreboardOptions,
   type SetblockMode,
   type SetblockOptions,
   type SoundOptions,
@@ -127,6 +130,7 @@ export interface ProjectPayload {
   title: TitleOptions
   sound: SoundOptions
   bossbar: BossbarOptions
+  scoreboard: ScoreboardOptions
   datapack: DatapackDraft
   generic: GenericDraft
   commandBlock: CommandBlockOptions
@@ -166,6 +170,7 @@ interface AppStore {
   title: TitleOptions
   sound: SoundOptions
   bossbar: BossbarOptions
+  scoreboard: ScoreboardOptions
   datapack: DatapackDraft
   generic: GenericDraft
   commandBlock: CommandBlockOptions
@@ -217,6 +222,7 @@ interface AppStore {
   updateTitle: (patch: Partial<TitleOptions>) => void
   updateSound: (patch: Partial<SoundOptions>) => void
   updateBossbar: (patch: Partial<BossbarOptions>) => void
+  updateScoreboard: (patch: Partial<ScoreboardOptions>) => void
   openDatapack: () => void
   updateDatapackMeta: (patch: Partial<Pick<DatapackDraft, 'namespace' | 'description'>>) => void
   addDatapackFunction: () => void
@@ -686,6 +692,53 @@ function normalizeDatapack(input: Partial<DatapackDraft> | undefined): DatapackD
   }
 }
 
+function normalizeScoreboard(input: Partial<ScoreboardOptions> | undefined): ScoreboardOptions {
+  const fallback = createDefaultScoreboardOptions()
+  if (!input) return fallback
+  const actions: ScoreboardOptions['action'][] = [
+    'objective-add',
+    'objective-remove',
+    'objective-display',
+    'players-set',
+    'players-add',
+    'players-remove',
+    'players-reset',
+    'players-get',
+    'players-operation'
+  ]
+  const operations: ScoreboardOptions['operation'][] = [
+    '=',
+    '+=',
+    '-=',
+    '*=',
+    '/=',
+    '%=',
+    '<',
+    '>',
+    '><'
+  ]
+  return {
+    action: actions.includes(input.action as ScoreboardOptions['action'])
+      ? (input.action as ScoreboardOptions['action'])
+      : 'objective-add',
+    objective: typeof input.objective === 'string' ? input.objective : fallback.objective,
+    criteria: typeof input.criteria === 'string' ? input.criteria : fallback.criteria,
+    displayName:
+      typeof input.displayName === 'string' ? input.displayName : fallback.displayName,
+    slot: typeof input.slot === 'string' ? input.slot : fallback.slot,
+    target: input.target?.base ? input.target : fallback.target,
+    score: typeof input.score === 'string' ? input.score : fallback.score,
+    operation: operations.includes(input.operation as ScoreboardOptions['operation'])
+      ? (input.operation as ScoreboardOptions['operation'])
+      : '=',
+    source: input.source?.base ? input.source : fallback.source,
+    sourceObjective:
+      typeof input.sourceObjective === 'string'
+        ? input.sourceObjective
+        : fallback.sourceObjective
+  }
+}
+
 function normalizeGive(input: Partial<GiveOptions> | undefined): GiveOptions {
   const fallback = createDefaultGiveOptions()
   if (!input) return fallback
@@ -724,6 +777,7 @@ function normalizePayload(input: unknown): ProjectPayload {
     title: normalizeTitle(data.title),
     sound: normalizeSound(data.sound),
     bossbar: normalizeBossbar(data.bossbar),
+    scoreboard: normalizeScoreboard(data.scoreboard),
     datapack: normalizeDatapack(data.datapack),
     generic:
       data.generic && Array.isArray(data.generic.steps)
@@ -760,6 +814,7 @@ function documentSnapshot(state: AppStore): string {
     title: state.title,
     sound: state.sound,
     bossbar: state.bossbar,
+    scoreboard: state.scoreboard,
     datapack: state.datapack,
     generic: state.generic,
     commandBlock: state.commandBlock
@@ -810,6 +865,7 @@ export const useAppStore = create<AppStore>()(
     title: createDefaultTitleOptions(),
     sound: createDefaultSoundOptions(),
     bossbar: createDefaultBossbarOptions(),
+    scoreboard: createDefaultScoreboardOptions(),
     datapack: defaultDatapackDraft(),
     generic: emptyGeneric(),
     commandBlock: createDefaultCommandBlockOptions(),
@@ -1132,6 +1188,13 @@ export const useAppStore = create<AppStore>()(
       })
     },
 
+    updateScoreboard: (patch) => {
+      set((state) => {
+        state.scoreboard = { ...state.scoreboard, ...patch }
+        state.dirty = true
+      })
+    },
+
     openDatapack: () => {
       set((state) => {
         state.activeCommandId = 'datapack'
@@ -1417,6 +1480,7 @@ export const useAppStore = create<AppStore>()(
         state.title = createDefaultTitleOptions()
         state.sound = createDefaultSoundOptions()
         state.bossbar = createDefaultBossbarOptions()
+        state.scoreboard = createDefaultScoreboardOptions()
         state.datapack = defaultDatapackDraft()
         state.generic = emptyGeneric()
         state.commandBlock = createDefaultCommandBlockOptions()
@@ -1457,6 +1521,7 @@ export const useAppStore = create<AppStore>()(
         title: state.title,
         sound: state.sound,
         bossbar: state.bossbar,
+        scoreboard: state.scoreboard,
         datapack: state.datapack,
         generic: state.generic,
         commandBlock: state.commandBlock,
@@ -1493,6 +1558,7 @@ export const useAppStore = create<AppStore>()(
         state.title = payload.title
         state.sound = payload.sound
         state.bossbar = payload.bossbar
+        state.scoreboard = payload.scoreboard
         state.datapack = payload.datapack
         state.generic = payload.generic
         state.commandBlock = payload.commandBlock
@@ -1760,4 +1826,8 @@ export function selectSoundOutput(sound: SoundOptions): BuildResult {
 
 export function selectBossbarOutput(bossbar: BossbarOptions): BuildResult {
   return buildBossbarCommands(bossbar)
+}
+
+export function selectScoreboardOutput(scoreboard: ScoreboardOptions): BuildResult {
+  return buildScoreboardCommand(scoreboard)
 }

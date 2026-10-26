@@ -1924,6 +1924,43 @@ a {
   line-height: 1.6;
 }
 
+/* ---------- Scoreboard ---------- */
+.seg-label {
+  margin-bottom: 6px;
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+
+.score-preview {
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: #10161d;
+  font-family: var(--mono);
+}
+
+.score-preview-title {
+  margin-bottom: 8px;
+  color: #ffd866;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.score-preview-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 3px 0;
+  color: #dbe9f6;
+  font-size: 12px;
+}
+
+.score-preview-row span:last-child {
+  color: #7ee787;
+}
+
 /* ---------- Bossbar ---------- */
 .bossbar-name {
   margin-bottom: 6px;

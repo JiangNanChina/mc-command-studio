@@ -198,6 +198,16 @@
 - 可视化预览：颜色、填充比例、分段刻度。
 - 创建时自动生成 add + 7 条 set 命令；多行输出禁用单命令方块模式。
 
+## 3.16 scoreboard 计分板
+
+![scoreboard 表单](assets/scoreboard-form.png)
+
+- 操作分两组：计分目标（创建/删除/显示位置）、玩家分数（设置/增加/减少/重置/查询/运算）。
+- 计分项建议：dummy、trigger、deathCount、playerKillCount、health 等，也支持自定义。
+- 显示位置建议：sidebar、list、belowName；队伍位置可直接输入。
+- 运算支持 `= += -= *= /= %= < > ><`。
+- 侧边栏预览：目标名、玩家、分数或运算表达式。
+
 ## 4. 通用构建器
 
 ![通用构建器进入方式](assets/command-block.png)

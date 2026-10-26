@@ -22,6 +22,7 @@ import { TellrawForm } from './components/TellrawForm'
 import { TitleForm } from './components/TitleForm'
 import { SoundForm } from './components/SoundForm'
 import { BossbarForm } from './components/BossbarForm'
+import { ScoreboardForm } from './components/ScoreboardForm'
 import { GenericBuilder } from './components/GenericBuilder'
 import { OutputPanel } from './components/OutputPanel'
 import { StatusBar } from './components/StatusBar'
@@ -119,6 +120,7 @@ export default function App() {
   const title = state.title
   const sound = state.sound
   const bossbar = state.bossbar
+  const scoreboard = state.scoreboard
   const generic = state.generic
   const commandBlock = state.commandBlock
   const outputMode = state.outputMode
@@ -233,6 +235,7 @@ export default function App() {
           store.title,
           store.sound,
           store.bossbar,
+          store.scoreboard,
           store.generic,
           store.outputMode,
           store.commandBlock
@@ -261,7 +264,7 @@ export default function App() {
       void useAppStore.getState().autosave()
     }, 4000)
     return () => clearTimeout(timer)
-  }, [dirty, give, summon, setblock, execute, teleport, effect, fill, clone, chain, enchant, xp, tellraw, title, sound, bossbar, generic, commandBlock, outputMode, activeCommandId, projectName])
+  }, [dirty, give, summon, setblock, execute, teleport, effect, fill, clone, chain, enchant, xp, tellraw, title, sound, bossbar, scoreboard, generic, commandBlock, outputMode, activeCommandId, projectName])
 
   useEffect(() => {
     if (!toast) return
@@ -333,6 +336,8 @@ export default function App() {
             <SoundForm />
           ) : activeCommandId === 'bossbar' ? (
             <BossbarForm />
+          ) : activeCommandId === 'scoreboard' ? (
+            <ScoreboardForm />
           ) : (
             <GenericBuilder />
           )}
