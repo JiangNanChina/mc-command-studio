@@ -1,8 +1,10 @@
 import {
+  buildExecuteCommand,
   buildGiveCommand,
   buildSetblockCommand,
   buildSummonCommand,
   createDefaultCommandBlockOptions,
+  createDefaultExecuteOptions,
   createDefaultGiveOptions,
   createDefaultSetblockOptions,
   createDefaultSummonOptions,
@@ -13,6 +15,8 @@ import {
   type BuildResult,
   type CommandBlockOptions,
   type CommandNodeData,
+  type ExecuteClause,
+  type ExecuteOptions,
   type GenericStep,
   type GiveOptions,
   type ItemComponent,
@@ -47,6 +51,7 @@ export interface ProjectPayload {
   give: GiveOptions
   summon: SummonOptions
   setblock: SetblockOptions
+  execute: ExecuteOptions
   generic: GenericDraft
   commandBlock: CommandBlockOptions
   outputMode: OutputMode
@@ -73,6 +78,7 @@ interface AppStore {
   give: GiveOptions
   summon: SummonOptions
   setblock: SetblockOptions
+  execute: ExecuteOptions
   generic: GenericDraft
   commandBlock: CommandBlockOptions
   outputMode: OutputMode
@@ -105,6 +111,12 @@ interface AppStore {
   setBlockState: (key: string, value: string) => void
   setBlockNbt: (nbt: string) => void
   setBlockMode: (mode: SetblockMode) => void
+  addExecuteClause: (kind: ExecuteClause['kind']) => void
+  updateExecuteClause: (id: string, clause: ExecuteClause) => void
+  removeExecuteClause: (id: string) => void
+  moveExecuteClause: (id: string, direction: -1 | 1) => void
+  setExecuteRun: (run: string) => void
+  setExecuteClauses: (clauses: ExecuteClause[]) => void
   setGenericRoot: (root: string | null) => void
   pushGenericStep: (step: { name: string; value?: string }) => void
   popGenericStep: () => void
@@ -229,6 +241,53 @@ function normalizeSetblock(input: Partial<SetblockOptions> | undefined): Setbloc
   }
 }
 
+function newClauseId(): string {
+  if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+    return crypto.randomUUID()
+  }
+  return `clause-${Date.now()}-${Math.floor(Math.random() * 100000)}`
+}
+
+function defaultExecuteClause(kind: ExecuteClause['kind']): ExecuteClause {
+  const id = newClauseId()
+  switch (kind) {
+    case 'as':
+    case 'at':
+      return { id, kind, selector: { base: '@s' } }
+    case 'positioned':
+    case 'facing':
+      return { id, kind, position: { x: '~', y: '~', z: '~' } }
+    case 'align':
+      return { id, kind, axes: 'xyz' }
+    case 'anchored':
+      return { id, kind, anchor: 'eyes' }
+    case 'rotated':
+      return { id, kind, yaw: '0', pitch: '0' }
+    case 'in':
+      return { id, kind, dimension: 'minecraft:overworld' }
+    case 'if':
+    case 'unless':
+      return { id, kind, condition: { type: 'entity', selector: { base: '@e' } } }
+    case 'store':
+      return { id, kind, mode: 'result', target: '@s', objective: 'result' }
+    case 'raw':
+      return { id, kind, text: '' }
+  }
+}
+
+function normalizeExecute(input: Partial<ExecuteOptions> | undefined): ExecuteOptions {
+  if (!input) return createDefaultExecuteOptions()
+  const clauses = Array.isArray(input.clauses)
+    ? (input.clauses.filter(
+        (clause) => clause && typeof clause.id === 'string' && typeof clause.kind === 'string'
+      ) as ExecuteClause[])
+    : []
+  return {
+    clauses,
+    run: typeof input.run === 'string' ? input.run : ''
+  }
+}
+
 function normalizeGive(input: Partial<GiveOptions> | undefined): GiveOptions {
   const fallback = createDefaultGiveOptions()
   if (!input) return fallback
@@ -255,6 +314,7 @@ function normalizePayload(input: unknown): ProjectPayload {
     give: normalizeGive(data.give),
     summon: normalizeSummon(data.summon),
     setblock: normalizeSetblock(data.setblock),
+    execute: normalizeExecute(data.execute),
     generic:
       data.generic && Array.isArray(data.generic.steps)
         ? {
@@ -286,6 +346,7 @@ export const useAppStore = create<AppStore>()(
     give: createDefaultGiveOptions(),
     summon: createDefaultSummonOptions(),
     setblock: createDefaultSetblockOptions(),
+    execute: createDefaultExecuteOptions(),
     generic: emptyGeneric(),
     commandBlock: createDefaultCommandBlockOptions(),
     outputMode: 'command',
@@ -488,6 +549,53 @@ export const useAppStore = create<AppStore>()(
       })
     },
 
+    addExecuteClause: (kind) => {
+      set((state) => {
+        state.execute.clauses.push(defaultExecuteClause(kind))
+        state.dirty = true
+      })
+    },
+
+    updateExecuteClause: (id, clause) => {
+      set((state) => {
+        const index = state.execute.clauses.findIndex((item) => item.id === id)
+        if (index >= 0) state.execute.clauses[index] = clause
+        state.dirty = true
+      })
+    },
+
+    removeExecuteClause: (id) => {
+      set((state) => {
+        state.execute.clauses = state.execute.clauses.filter((item) => item.id !== id)
+        state.dirty = true
+      })
+    },
+
+    moveExecuteClause: (id, direction) => {
+      set((state) => {
+        const index = state.execute.clauses.findIndex((item) => item.id === id)
+        const target = index + direction
+        if (index < 0 || target < 0 || target >= state.execute.clauses.length) return
+        const [clause] = state.execute.clauses.splice(index, 1)
+        state.execute.clauses.splice(target, 0, clause)
+        state.dirty = true
+      })
+    },
+
+    setExecuteRun: (run) => {
+      set((state) => {
+        state.execute.run = run
+        state.dirty = true
+      })
+    },
+
+    setExecuteClauses: (clauses) => {
+      set((state) => {
+        state.execute.clauses = clauses
+        state.dirty = true
+      })
+    },
+
     setGenericRoot: (root) => {
       set((state) => {
         state.generic = { root, steps: [] }
@@ -631,6 +739,7 @@ export const useAppStore = create<AppStore>()(
         state.give = createDefaultGiveOptions()
         state.summon = createDefaultSummonOptions()
         state.setblock = createDefaultSetblockOptions()
+        state.execute = createDefaultExecuteOptions()
         state.generic = emptyGeneric()
         state.commandBlock = createDefaultCommandBlockOptions()
         state.outputMode = 'command'
@@ -657,6 +766,7 @@ export const useAppStore = create<AppStore>()(
         give: state.give,
         summon: state.summon,
         setblock: state.setblock,
+        execute: state.execute,
         generic: state.generic,
         commandBlock: state.commandBlock,
         outputMode: state.outputMode
@@ -680,6 +790,7 @@ export const useAppStore = create<AppStore>()(
         state.give = payload.give
         state.summon = payload.summon
         state.setblock = payload.setblock
+        state.execute = payload.execute
         state.generic = payload.generic
         state.commandBlock = payload.commandBlock
         state.outputMode = payload.outputMode
@@ -856,4 +967,8 @@ export function selectSummonOutput(summon: SummonOptions): BuildResult {
 
 export function selectSetblockOutput(setblock: SetblockOptions): BuildResult {
   return buildSetblockCommand(setblock)
+}
+
+export function selectExecuteOutput(execute: ExecuteOptions): BuildResult {
+  return buildExecuteCommand(execute)
 }

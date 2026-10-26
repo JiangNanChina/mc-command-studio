@@ -926,6 +926,43 @@ a {
   color: var(--warn);
 }
 
+.execute-clause {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg-elev);
+  overflow: hidden;
+}
+
+.execute-clause + .execute-clause {
+  margin-top: 10px;
+}
+
+.execute-clause-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 12px;
+  border-bottom: 1px solid var(--border);
+  background: color-mix(in srgb, var(--panel-2) 60%, transparent);
+}
+
+.execute-index {
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.execute-clause-body {
+  padding: 12px;
+}
+
 .component-card {
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
@@ -1709,6 +1746,41 @@ a {
 
 .changelog-list li + li {
   margin-top: 3px;
+}
+
+/* ---------- Datapack export ---------- */
+.datapack-files {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg-elev);
+}
+
+.datapack-file {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: 11.5px;
+  word-break: break-all;
+}
+
+.datapack-command {
+  margin: 0;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg-elev);
+  color: var(--accent);
+  font-family: var(--mono);
+  font-size: 12px;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  word-break: break-all;
 }
 
 /* ---------- Toast ---------- */

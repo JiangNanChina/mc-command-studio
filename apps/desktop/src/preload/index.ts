@@ -30,6 +30,9 @@ const api: McStudioApi = {
   clipboard: {
     write: (text) => ipcRenderer.invoke('clipboard:write', text)
   },
+  datapack: {
+    export: (options) => ipcRenderer.invoke('datapack:export', options)
+  },
   updater: {
     getState: () => ipcRenderer.invoke('updater:get-state'),
     check: (manual) => ipcRenderer.invoke('updater:check', manual),

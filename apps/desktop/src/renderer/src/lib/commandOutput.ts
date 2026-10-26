@@ -4,12 +4,14 @@ import {
   type BuildResult,
   type CommandBlockOptions,
   type Diagnostic,
+  type ExecuteOptions,
   type GiveOptions,
   type SetblockOptions,
   type SummonOptions,
   type VersionPack
 } from '@mcstudio/core'
 import {
+  selectExecuteOutput,
   selectGenericOutput,
   selectGiveOutput,
   selectSetblockOutput,
@@ -31,12 +33,14 @@ export function getCommandOutput(
   give: GiveOptions,
   summon: SummonOptions,
   setblock: SetblockOptions,
+  execute: ExecuteOptions,
   generic: GenericDraft
 ): BuildResult {
   if (!activeCommandId) return { text: '', diagnostics: [] }
   if (activeCommandId === 'give') return selectGiveOutput(give)
   if (activeCommandId === 'summon') return selectSummonOutput(summon)
   if (activeCommandId === 'setblock') return selectSetblockOutput(setblock)
+  if (activeCommandId === 'execute') return selectExecuteOutput(execute)
   if (!pack) return { text: '', diagnostics: [] }
   return selectGenericOutput(pack, { ...generic, root: generic.root ?? activeCommandId })
 }
@@ -47,11 +51,12 @@ export function getCurrentOutput(
   give: GiveOptions,
   summon: SummonOptions,
   setblock: SetblockOptions,
+  execute: ExecuteOptions,
   generic: GenericDraft,
   outputMode: OutputMode,
   commandBlock: CommandBlockOptions
 ): CurrentOutput {
-  const command = getCommandOutput(pack, activeCommandId, give, summon, setblock, generic)
+  const command = getCommandOutput(pack, activeCommandId, give, summon, setblock, execute, generic)
   if (outputMode === 'command') {
     return {
       command,

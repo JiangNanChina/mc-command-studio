@@ -61,6 +61,27 @@
 - 方块实体 NBT 文本域，提示 NBT 紧贴方块状态。
 - 放置模式：replace（省略）、destroy、keep、strict。
 
+## 3.3 execute 执行链
+
+![execute 执行链](assets/execute-form.png)
+
+- 顶部“添加子命令”下拉：as / at / positioned / align / anchored / facing / rotated / in / if / unless / store / 原始子命令。
+- 每个子命令是一张可排序卡片：编号、类型、上移/下移/删除；as/at 与 if entity 可直接打开选择器弹窗。
+- positioned/facing 为三坐标；rotated 为偏航/俯仰；in 提供维度补全；align/anchored 用下拉。
+- if/unless 支持实体、方块、计分板比较、原始条件；store 支持 result/success + score 目标。
+- 底部 `run` 文本域填写最终命令，输出实时拼接为 `execute <clauses> run <command>`。
+- 模板按钮：“以执行者身份运行”“条件判断”“坐标 + 朝向”。
+
+## 3.4 数据包导出
+
+![导出数据包](assets/datapack.png)
+
+- 输出面板底部“导出数据包”打开弹窗。
+- 可配置命名空间、函数名（支持 `lib/main` 子目录）、描述、load/tick 标签。
+- 文件预览：`pack.mcmeta`、`data/<ns>/function/<name>.mcfunction`、可选 `tags/function/load.json` / `tick.json`。
+- 用当前 26.3 数据包的 `pack_format=121`；导出为 `.zip`，可直接放进世界 `datapacks/`。
+- 弹窗底部提示 `/reload` 与 `/function <ns>:<name>` 的用法。
+
 ## 4. 通用构建器
 
 ![通用构建器进入方式](assets/command-block.png)

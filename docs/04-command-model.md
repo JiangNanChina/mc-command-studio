@@ -52,7 +52,42 @@ interface SetblockOptions {
 
 `buildSetblockCommand(options)` 生成 `setblock <pos> <block[states]>{nbt} [mode]`。方块状态来自 `blocks.json`，属性按键名排序，NBT 紧贴方块状态（不留空格）。
 
-### 1.4 通用构建器：所有 94 个根命令
+### 1.4 专用表单：`execute`
+
+```ts
+interface ExecuteOptions {
+  clauses: ExecuteClause[]
+  run: string
+}
+
+type ExecuteClause =
+  | { id: string; kind: 'as' | 'at'; selector: Selector }
+  | { id: string; kind: 'positioned' | 'facing'; position: Position }
+  | { id: string; kind: 'align'; axes: string }
+  | { id: string; kind: 'anchored'; anchor: 'eyes' | 'feet' }
+  | { id: string; kind: 'rotated'; yaw: string; pitch: string }
+  | { id: string; kind: 'in'; dimension: string }
+  | { id: string; kind: 'if' | 'unless'; condition: ExecuteCondition }
+  | { id: string; kind: 'store'; mode: 'result' | 'success'; target: string; objective: string }
+  | { id: string; kind: 'raw'; text: string }
+```
+
+`buildExecuteCommand(options)` 输出 `execute <clauses…> run <command>`，子命令按数组顺序拼接；缺少 `run`、坐标/选择器非法、`score` 条件不完整都会产生诊断。`store` 目前只提供 `score`，其他目标用 `raw` 子命令。`run` 前的 `/` 会自动去掉。
+
+### 1.5 数据包导出
+
+当前命令通过 `buildDatapackFiles(options)` 生成文件树（`apps/desktop/src/shared/datapack.ts`）：
+
+```
+pack.mcmeta
+data/<namespace>/function/<name>.mcfunction
+data/minecraft/tags/function/load.json   # 可选
+data/minecraft/tags/function/tick.json   # 可选
+```
+
+`pack_format` 直接取自数据包 manifest（26.3 为 121）。命名空间/函数名做小写资源名校验；函数内容不允许换行。主进程用 JSZip 打包，默认保存到“文档”目录。
+
+### 1.6 通用构建器：所有 94 个根命令
 
 ```ts
 interface GenericStep {
@@ -64,7 +99,7 @@ interface GenericStep {
 
 `serializeGeneric(root, steps)` 把命令名、字面量、参数原文用空格拼接，并对常见参数类型做基础校验。
 
-> P1 后续会把四条路径统一为 `CommandDraft` AST，让撤销/重做、单元引用和更多文本导入共享同一结构。
+> P1 后续会把各条路径统一为 `CommandDraft` AST，让撤销/重做、单元引用和更多文本导入共享同一结构。
 
 ## 2. 序列化规则
 
@@ -185,7 +220,7 @@ type Unit =
 
 ## 7. 测试
 
-`packages/core/src/*.test.ts` 共 65 个用例，覆盖：
+`packages/core/src/*.test.ts` 与 `apps/desktop/src/shared/*.test.ts` 共 77 个用例，覆盖：
 
 - SNBT / 命令方块字符串转义。
 - 选择器排序、引号、范围、NBT 括号、分数。
@@ -193,6 +228,8 @@ type Unit =
 - `/give` 数量、选择器警告。
 - `/summon` 坐标开关、NBT、未启用坐标的警告。
 - `/setblock` 方块状态、NBT 紧贴、模式、坐标/属性校验。
+- `/execute` 子命令顺序、if/unless 条件、score/store、raw 与缺失 run。
+- 数据包文件树、load/tick 标签、非法命名空间/函数名/换行命令。
 - `/give` 文本导入：选择器、组件、数量、未知组件 raw。
 - 命令树遍历、通用路径、参数范围。
 - 数据包 manifest、注册表选择。

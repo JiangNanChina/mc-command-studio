@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { EditorState } from '@codemirror/state'
 import { EditorView } from '@codemirror/view'
 import {
@@ -6,6 +6,7 @@ import {
   Check,
   Clipboard,
   Info,
+  PackagePlus,
   Terminal,
   Boxes
 } from 'lucide-react'
@@ -18,6 +19,7 @@ import {
 } from '@mcstudio/core'
 import { getApi } from '../lib/api'
 import { getCurrentOutput } from '../lib/commandOutput'
+import { DatapackExportDialog } from './DatapackExportDialog'
 import { useAppStore } from '../store'
 
 const outputTheme = EditorView.theme(
@@ -177,12 +179,14 @@ function CommandBlockFields() {
 
 export function OutputPanel() {
   const state = useAppStore()
+  const [exportOpen, setExportOpen] = useState(false)
   const output = getCurrentOutput(
     state.pack,
     state.activeCommandId,
     state.give,
     state.summon,
     state.setblock,
+    state.execute,
     state.generic,
     state.outputMode,
     state.commandBlock
@@ -274,6 +278,17 @@ export function OutputPanel() {
           </button>
         </div>
 
+        <button
+          type="button"
+          className="btn"
+          disabled={!output.command.text || !state.pack}
+          title="把当前命令导出为 Minecraft 数据包"
+          onClick={() => setExportOpen(true)}
+        >
+          <PackagePlus size={15} />
+          导出数据包
+        </button>
+
         {output.diagnostics.length > 0 ? (
           <div className="diagnostics">
             {output.diagnostics.map((diagnostic, index) => (
@@ -310,6 +325,13 @@ export function OutputPanel() {
           {permission ? <div style={{ marginTop: 6 }}>{permission}</div> : null}
         </div>
       </div>
+      {exportOpen && state.pack ? (
+        <DatapackExportDialog
+          command={output.command.text}
+          packFormat={state.pack.manifest.packFormat}
+          onClose={() => setExportOpen(false)}
+        />
+      ) : null}
     </section>
   )
 }

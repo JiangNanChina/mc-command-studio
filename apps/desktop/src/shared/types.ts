@@ -5,6 +5,7 @@ import type {
   PackManifest,
   Registries
 } from '@mcstudio/core'
+import type { DatapackExportOptions } from './datapack'
 
 export interface AppInfo {
   name: string
@@ -83,6 +84,12 @@ export interface AutosaveResult {
   savedAt: string
 }
 
+export interface DatapackExportResult {
+  path: string
+  files: string[]
+  functionId: string
+}
+
 export type UpdateStatus =
   | 'disabled'
   | 'idle'
@@ -144,6 +151,9 @@ export interface McStudioApi {
   }
   clipboard: {
     write: (text: string) => Promise<void>
+  }
+  datapack: {
+    export: (options: DatapackExportOptions) => Promise<DatapackExportResult | null>
   }
   updater: {
     getState: () => Promise<UpdateState>

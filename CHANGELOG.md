@@ -2,6 +2,22 @@
 
 所有版本变更记录在此。版本号遵循 SemVer。
 
+## [0.1.3] - 2026-10-26
+
+execute 执行链与数据包导出。
+
+### 新增
+
+- `execute` 执行链可视化：as / at / positioned / align / anchored / facing / rotated / in / if / unless / store / 原始子命令，可排序、删除。
+- 条件构建：实体、方块、计分板比较、原始条件。
+- 数据包导出：当前命令导出为 `.zip`，包含 `pack.mcmeta`、`data/<namespace>/function/<name>.mcfunction`，可选 `load` / `tick` 标签。
+- 项目文件新增 execute 执行链状态。
+
+### 改进
+
+- 选择器弹窗支持复用（give、execute 子命令和条件共用）。
+- 单元测试 69 → 77；冒烟测试覆盖 execute 与数据包导出。
+
 ## [0.1.2] - 2026-10-26
 
 更新公告与版本历史。

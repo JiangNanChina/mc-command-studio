@@ -4,5 +4,6 @@
     "noEmit": true,
     "types": ["node", "vite/client"]
   },
-  "include": ["src/**/*.ts", "src/**/*.tsx", "electron.vite.config.ts"]
+  "include": ["src/**/*.ts", "src/**/*.tsx", "electron.vite.config.ts"],
+  "exclude": ["src/shared/**/*.test.ts"]
 }

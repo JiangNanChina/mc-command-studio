@@ -6,12 +6,14 @@ import {
   ipcMain,
   shell
 } from 'electron'
-import { readFile, writeFile } from 'node:fs/promises'
+import { mkdir, readFile, writeFile } from 'node:fs/promises'
 import { basename, join } from 'node:path'
+import JSZip from 'jszip'
 import { z } from 'zod'
 import type {
   AppInfo,
   AutosaveResult,
+  DatapackExportResult,
   LoadPackResult,
   OpenProjectResult,
   PackSummary,
@@ -19,6 +21,7 @@ import type {
   UpdateState,
   UserSettings
 } from '../shared/types'
+import { buildDatapackFiles } from '../shared/datapack'
 import { listPacks, loadPack, packsDir } from './packs'
 import {
   addRecentProject,
@@ -50,6 +53,18 @@ const saveSchema = z.object({
   path: pathSchema.nullable().optional(),
   suggestedName: z.string().max(120).optional()
 })
+const datapackSchema = z
+  .object({
+    command: z.string().min(1).max(32_000),
+    namespace: z.string().min(1).max(64),
+    functionName: z.string().min(1).max(128),
+    description: z.string().max(200),
+    packFormat: z.number().int().positive(),
+    load: z.boolean(),
+    tick: z.boolean()
+  })
+  .strict()
+
 const settingsPatchSchema = z
   .object({
     theme: z.enum(['dark', 'light']).optional(),
@@ -267,6 +282,50 @@ export function registerIpc(): void {
     const parsed = z.string().max(100_000).safeParse(text)
     if (!parsed.success) throw new Error('复制内容无效')
     clipboard.writeText(parsed.data)
+  })
+
+  ipcMain.handle('datapack:export', async (_event, payload: unknown): Promise<DatapackExportResult | null> => {
+    const parsed = datapackSchema.safeParse(payload)
+    if (!parsed.success) throw new Error('数据包参数不正确')
+    const { files, functionId } = buildDatapackFiles(parsed.data)
+
+    const opts = {
+      title: '导出数据包',
+      defaultPath: join(
+        app.getPath('documents'),
+        `${parsed.data.namespace}-${parsed.data.functionName.replace(/\//g, '-')}.zip`
+      ),
+      filters: [{ name: 'Minecraft 数据包', extensions: ['zip'] }]
+    }
+    let filePath: string
+    if (process.env.MCSTUDIO_TEST_SAVE_DIR) {
+      await mkdir(process.env.MCSTUDIO_TEST_SAVE_DIR, { recursive: true })
+      filePath = join(
+        process.env.MCSTUDIO_TEST_SAVE_DIR,
+        `${parsed.data.namespace}-${parsed.data.functionName.replace(/\//g, '-')}.zip`
+      )
+    } else {
+      const window = focusedWindow()
+      const result = window
+        ? await dialog.showSaveDialog(window, opts)
+        : await dialog.showSaveDialog(opts)
+      if (result.canceled || !result.filePath) return null
+      filePath = result.filePath
+    }
+
+    const zip = new JSZip()
+    for (const file of files) zip.file(file.path, file.content)
+    const buffer = await zip.generateAsync({
+      type: 'nodebuffer',
+      compression: 'DEFLATE',
+      compressionOptions: { level: 6 }
+    })
+    await writeFile(filePath, buffer)
+    return {
+      path: filePath,
+      files: files.map((file) => file.path),
+      functionId
+    }
   })
 
   ipcMain.handle('updater:get-state', (): UpdateState => getUpdateState())

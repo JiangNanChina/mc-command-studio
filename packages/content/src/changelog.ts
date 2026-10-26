@@ -22,6 +22,45 @@ const REPO = 'https://github.com/JiangNanChina/mc-command-studio'
  */
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: '0.1.3',
+    date: '2026-10-26',
+    title: 'execute 执行链与数据包导出',
+    highlights: [
+      '新增 execute 执行链：as/at/positioned/if… 积木可排序，最后用 run 执行。',
+      '当前命令可一键导出为 Minecraft 数据包（.zip），支持 load / tick 标签。'
+    ],
+    sections: [
+      {
+        type: 'added',
+        items: [
+          'execute 执行链：as、at、positioned、align、anchored、facing、rotated、in、if/unless、store、原始子命令。',
+          '条件构建：实体、方块、计分板比较、原始条件。',
+          '数据包导出：pack.mcmeta + data/<namespace>/function/<name>.mcfunction，可选 load / tick 标签。',
+          '选择器弹窗可复用于 execute 子命令与条件。'
+        ]
+      },
+      {
+        type: 'improved',
+        items: [
+          '项目文件保存 execute 执行链，旧项目自动补默认值。',
+          '单元测试 69 → 77；冒烟测试覆盖 execute 与数据包导出。'
+        ]
+      },
+      {
+        type: 'fixed',
+        items: ['无。']
+      },
+      {
+        type: 'known',
+        items: [
+          'store 目前只提供 score 目标；block/bossbar/entity/storage 请用原始子命令。',
+          '安装包尚未配置代码签名。'
+        ]
+      }
+    ],
+    releaseUrl: `${REPO}/releases/tag/v0.1.3`
+  },
+  {
     version: '0.1.2',
     date: '2026-10-26',
     title: '更新公告与版本历史',

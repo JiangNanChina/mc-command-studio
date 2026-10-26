@@ -4,6 +4,7 @@
  * 需要先运行 pnpm --filter @mcstudio/desktop build。
  */
 import { _electron as electron } from 'playwright'
+import { existsSync, readFileSync } from 'node:fs'
 import { mkdir, rm } from 'node:fs/promises'
 import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -13,6 +14,8 @@ const ROOT = resolve(__dirname, '../..')
 const APP_DIR = join(ROOT, 'apps/desktop')
 const ARTIFACTS = join(ROOT, 'artifacts')
 const USER_DATA = join(ARTIFACTS, 'test-userdata')
+const DATAPACK_DIR = join(ARTIFACTS, 'datapack')
+const APP_VERSION = JSON.parse(readFileSync(join(ROOT, 'package.json'), 'utf8')).version
 
 const errors = []
 let app
@@ -20,20 +23,31 @@ let app
 async function main() {
   await mkdir(ARTIFACTS, { recursive: true })
   await rm(USER_DATA, { recursive: true, force: true })
+  await rm(DATAPACK_DIR, { recursive: true, force: true })
   const env = {
     ...process.env,
     ELECTRON_DISABLE_SECURITY_WARNINGS: 'true',
     MCSTUDIO_PACKS_DIR: join(ROOT, 'packs'),
-    MCSTUDIO_USER_DATA: USER_DATA
+    MCSTUDIO_USER_DATA: USER_DATA,
+    MCSTUDIO_TEST_SAVE_DIR: DATAPACK_DIR
   }
   delete env.ELECTRON_RUN_AS_NODE
 
-  app = await electron.launch({
-    args: ['.'],
-    cwd: APP_DIR,
-    env,
-    timeout: 60_000
-  })
+  app = await electron.launch(
+    process.env.MCSTUDIO_E2E_EXE
+      ? {
+          executablePath: resolve(ROOT, process.env.MCSTUDIO_E2E_EXE),
+          args: [],
+          env,
+          timeout: 60_000
+        }
+      : {
+          args: ['.'],
+          cwd: APP_DIR,
+          env,
+          timeout: 60_000
+        }
+  )
 
   const page = await app.firstWindow()
   page.on('pageerror', (error) => errors.push(`pageerror: ${error.message}`))
@@ -53,7 +67,7 @@ async function main() {
   // 首次启动：更新公告横幅 → 版本历史弹窗
   await page.waitForSelector('.banner.announcement', { timeout: 10_000 })
   const announcementText = await page.locator('.banner.announcement').innerText()
-  if (!announcementText.includes('v0.1.2')) {
+  if (!announcementText.includes(`v${APP_VERSION}`)) {
     throw new Error(`公告横幅版本不正确：${announcementText}`)
   }
   await page.getByRole('button', { name: '查看详情' }).click()
@@ -139,6 +153,31 @@ async function main() {
     element.scrollTop = 0
   })
   await page.screenshot({ path: join(ARTIFACTS, 'setblock-form.png') })
+
+  // execute 执行链
+  await page.locator('.command-item', { hasText: '执行上下文' }).first().click()
+  await page.waitForSelector('#execute-run', { timeout: 10_000 })
+  await page.getByRole('button', { name: '以执行者身份运行' }).click()
+  await page.waitForTimeout(400)
+  const executeText = await page.locator('.output-code .cm-content').innerText()
+  if (!executeText.includes('execute as @s at @s run say 你好')) {
+    throw new Error(`execute 输出不符合预期：${executeText}`)
+  }
+  await page.locator('.main').evaluate((element) => {
+    element.scrollTop = 0
+  })
+  await page.screenshot({ path: join(ARTIFACTS, 'execute-form.png') })
+
+  // 数据包导出（测试环境跳过系统保存对话框）
+  await page.getByRole('button', { name: '导出数据包' }).click()
+  await page.waitForSelector('#datapack-namespace', { timeout: 10_000 })
+  await page.waitForTimeout(300)
+  await page.screenshot({ path: join(ARTIFACTS, 'datapack.png') })
+  await page.getByRole('button', { name: '导出 .zip' }).click()
+  await page.waitForSelector('text=数据包已导出', { timeout: 20_000 })
+  if (!existsSync(join(DATAPACK_DIR, 'mcstudio-main.zip'))) {
+    throw new Error('数据包 zip 未生成')
+  }
 
   // 回到 give，切换命令方块
   await page.locator('.command-item', { hasText: '给予物品' }).first().click()

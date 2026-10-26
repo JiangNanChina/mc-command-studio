@@ -31,7 +31,9 @@
 ### P0（首个可发布版，已实现骨架）
 
 - 26.3 数据包：94 根命令、1,197 字面量、59 参数类型、1,658 物品、1,286 方块。
-- 专用表单：`give`、`summon`、`setblock`；`setblock` 支持方块状态与方块实体 NBT。
+- 专用表单：`give`、`summon`、`setblock`、`execute`；`setblock` 支持方块状态与方块实体 NBT。
+- `execute` 执行链：as/at/positioned/align/anchored/facing/rotated/in/if/unless/store/raw + run，可排序。
+- 数据包导出：当前命令导出为 `.zip`，包含 `pack.mcmeta`、`.mcfunction` 与可选 load/tick 标签。
 - `give` 13 类组件（自定义名称、默认名称、描述、附魔、无法破坏、堆叠、耐久、伤害、稀有度、光效、模型数据、自定义数据、raw）。
 - `give` 文本导入：粘贴命令还原为表单，未知组件保留为 raw。
 - 更新公告：每次版本的新增/改进/修复/已知问题内置在应用，更新后首次启动显示横幅，铃铛查看历史。
@@ -40,7 +42,7 @@
 - 项目保存 / 打开 / 自动保存 / 崩溃恢复；最近项目。
 - 深色/浅色主题、设置、诊断导出、本地日志。
 - NSIS 安装包 + 便携版；electron-updater 自动更新与发布流水线。
-- 单元测试 69 个；Electron 冒烟测试覆盖公告、give/导入/summon/setblock/命令方块。
+- 单元测试 77 个；Electron 冒烟测试覆盖公告、give/导入/summon/setblock/execute/数据包/命令方块。
 
 ### P1（现代版 MVP）
 
@@ -78,9 +80,10 @@
 | 能力 | 状态 |
 |---|---|
 | 26.3 数据包 + 通用构建器 | ✅ |
-| `give` / `summon` / `setblock` 专用表单 | ✅ |
+| `give` / `summon` / `setblock` / `execute` 专用表单 | ✅ |
 | `give` 文本导入 | ✅ 组件无法解析时保留 raw |
 | 更新公告 / 版本历史 | ✅ 更新后首次启动横幅 + 顶栏铃铛 |
+| 数据包导出 | ✅ pack.mcmeta + mcfunction + load/tick |
 | 物品组件 | ✅ 13 类；复杂组件可用 raw |
 | 选择器编辑 | ✅ 常用字段；`scores` 可保留但暂无 UI |
 | 命令方块 setblock | ✅ 单块；链式布局未做 |

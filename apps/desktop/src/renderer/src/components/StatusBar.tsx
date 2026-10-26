@@ -31,6 +31,7 @@ export function StatusBar() {
     state.give,
     state.summon,
     state.setblock,
+    state.execute,
     state.generic,
     state.outputMode,
     state.commandBlock

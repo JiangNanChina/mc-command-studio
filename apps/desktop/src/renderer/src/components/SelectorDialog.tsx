@@ -8,14 +8,25 @@ import {
 import { Modal } from './Modal'
 import { useAppStore } from '../store'
 
-export function SelectorDialog() {
+interface SelectorDialogProps {
+  value?: Selector
+  onApply?: (selector: Selector) => void
+  onClose?: () => void
+}
+
+export function SelectorDialog({ value, onApply, onClose }: SelectorDialogProps = {}) {
   const state = useAppStore()
-  const [draft, setDraft] = useState<Selector>(() => structuredClone(state.give.target))
+  const [draft, setDraft] = useState<Selector>(() => structuredClone(value ?? state.give.target))
   const preview = serializeSelector(draft)
   const entities = useMemo(() => {
     const list = state.pack?.registries.entity_type ?? []
     return list.map((id) => (id.includes(':') ? id : `minecraft:${id}`))
   }, [state.pack])
+
+  const close = (): void => {
+    if (onClose) onClose()
+    else state.setDialog('selector', false)
+  }
 
   const patch = (value: Partial<Selector>): void => setDraft((current) => ({ ...current, ...value }))
 
@@ -24,7 +35,7 @@ export function SelectorDialog() {
       title="编辑目标选择器"
       subtitle="只填写需要的条件，留空的条件不会出现在命令里。"
       icon={<Crosshair size={17} />}
-      onClose={() => state.setDialog('selector', false)}
+      onClose={close}
       wide
       footer={
         <>
@@ -42,7 +53,7 @@ export function SelectorDialog() {
           <button
             type="button"
             className="btn"
-            onClick={() => state.setDialog('selector', false)}
+            onClick={close}
           >
             取消
           </button>
@@ -50,8 +61,9 @@ export function SelectorDialog() {
             type="button"
             className="btn btn-primary"
             onClick={() => {
-              state.setTarget(draft)
-              state.setDialog('selector', false)
+              if (onApply) onApply(draft)
+              else state.setTarget(draft)
+              close()
             }}
           >
             应用
