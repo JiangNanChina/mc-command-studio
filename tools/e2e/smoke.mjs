@@ -397,6 +397,34 @@ async function main() {
   }
   await page.screenshot({ path: join(ARTIFACTS, 'clear-form.png') })
 
+  // gamerule 游戏规则
+  await page.locator('.command-item', { hasText: '游戏规则' }).first().click()
+  await page.waitForSelector('.gamerule-selected', { timeout: 10_000 })
+  await page.waitForTimeout(300)
+  const gameruleOutput = await page.locator('.output-code .cm-content').innerText()
+  if (!gameruleOutput.includes('gamerule keep_inventory false')) {
+    throw new Error(`gamerule 输出不符合预期：${gameruleOutput}`)
+  }
+  await page.getByRole('button', { name: '开启 true' }).click()
+  await page.waitForTimeout(200)
+  const gameruleTrue = await page.locator('.output-code .cm-content').innerText()
+  if (!gameruleTrue.includes('gamerule keep_inventory true')) {
+    throw new Error(`gamerule 开关输出不符合预期：${gameruleTrue}`)
+  }
+  await page.getByRole('button', { name: '选择规则' }).click()
+  await page.waitForSelector('.gamerule-grid', { timeout: 10_000 })
+  await page.locator('.modal input[placeholder*="游戏规则"]').fill('随机刻')
+  await page.waitForTimeout(300)
+  await page.locator('.gamerule-tile', { hasText: '随机刻' }).first().click()
+  await page.waitForSelector('#gamerule-value', { timeout: 10_000 })
+  await page.fill('#gamerule-value', '3')
+  await page.waitForTimeout(300)
+  const gameruleInt = await page.locator('.output-code .cm-content').innerText()
+  if (!gameruleInt.includes('gamerule random_tick_speed 3')) {
+    throw new Error(`gamerule 整数输出不符合预期：${gameruleInt}`)
+  }
+  await page.screenshot({ path: join(ARTIFACTS, 'gamerule-form.png') })
+
   // scoreboard 可视化
   await page.locator('.command-item', { hasText: '记分板' }).first().click()
   await page.waitForSelector('#scoreboard-objective', { timeout: 10_000 })

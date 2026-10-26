@@ -15,6 +15,7 @@ import {
   buildDifficultyCommand,
   buildTagCommand,
   buildClearCommand,
+  buildGameruleCommand,
   buildSoundCommand,
   buildSummonCommand,
   buildTeleportCommand,
@@ -36,6 +37,7 @@ import {
   createDefaultWorldOptions,
   createDefaultTagOptions,
   createDefaultClearOptions,
+  createDefaultGameruleOptions,
   createDefaultSetblockOptions,
   createDefaultSoundOptions,
   createDefaultSummonOptions,
@@ -70,6 +72,7 @@ import {
   type WorldOptions,
   type TagOptions,
   type ClearOptions,
+  type GameruleOptions,
   type TimeOptions,
   type SetblockMode,
   type SetblockOptions,
@@ -150,6 +153,7 @@ export interface ProjectPayload {
   world: WorldOptions
   tag: TagOptions
   clear: ClearOptions
+  gamerule: GameruleOptions
   datapack: DatapackDraft
   generic: GenericDraft
   commandBlock: CommandBlockOptions
@@ -194,6 +198,7 @@ interface AppStore {
   world: WorldOptions
   tag: TagOptions
   clear: ClearOptions
+  gamerule: GameruleOptions
   datapack: DatapackDraft
   generic: GenericDraft
   commandBlock: CommandBlockOptions
@@ -252,6 +257,7 @@ interface AppStore {
   updateDifficulty: (patch: Partial<WorldOptions['difficulty']>) => void
   updateTag: (patch: Partial<TagOptions>) => void
   updateClear: (patch: Partial<ClearOptions>) => void
+  updateGamerule: (patch: Partial<GameruleOptions>) => void
   openDatapack: () => void
   updateDatapackMeta: (patch: Partial<Pick<DatapackDraft, 'namespace' | 'description'>>) => void
   addDatapackFunction: () => void
@@ -889,6 +895,17 @@ function normalizeClear(input: Partial<ClearOptions> | undefined): ClearOptions 
   }
 }
 
+function normalizeGamerule(input: Partial<GameruleOptions> | undefined): GameruleOptions {
+  const fallback = createDefaultGameruleOptions()
+  if (!input) return fallback
+  return {
+    action: input.action === 'query' ? 'query' : 'set',
+    rule: typeof input.rule === 'string' ? input.rule : fallback.rule,
+    type: input.type === 'integer' ? 'integer' : 'boolean',
+    value: typeof input.value === 'string' ? input.value : fallback.value
+  }
+}
+
 function normalizeGive(input: Partial<GiveOptions> | undefined): GiveOptions {
   const fallback = createDefaultGiveOptions()
   if (!input) return fallback
@@ -932,6 +949,7 @@ function normalizePayload(input: unknown): ProjectPayload {
     world: normalizeWorld(data.world),
     tag: normalizeTag(data.tag),
     clear: normalizeClear(data.clear),
+    gamerule: normalizeGamerule(data.gamerule),
     datapack: normalizeDatapack(data.datapack),
     generic:
       data.generic && Array.isArray(data.generic.steps)
@@ -973,6 +991,7 @@ function documentSnapshot(state: AppStore): string {
     world: state.world,
     tag: state.tag,
     clear: state.clear,
+    gamerule: state.gamerule,
     datapack: state.datapack,
     generic: state.generic,
     commandBlock: state.commandBlock
@@ -1028,6 +1047,7 @@ export const useAppStore = create<AppStore>()(
     world: createDefaultWorldOptions(),
     tag: createDefaultTagOptions(),
     clear: createDefaultClearOptions(),
+    gamerule: createDefaultGameruleOptions(),
     datapack: defaultDatapackDraft(),
     generic: emptyGeneric(),
     commandBlock: createDefaultCommandBlockOptions(),
@@ -1399,6 +1419,13 @@ export const useAppStore = create<AppStore>()(
       })
     },
 
+    updateGamerule: (patch) => {
+      set((state) => {
+        state.gamerule = { ...state.gamerule, ...patch }
+        state.dirty = true
+      })
+    },
+
     openDatapack: () => {
       set((state) => {
         state.activeCommandId = 'datapack'
@@ -1689,6 +1716,7 @@ export const useAppStore = create<AppStore>()(
         state.world = createDefaultWorldOptions()
         state.tag = createDefaultTagOptions()
         state.clear = createDefaultClearOptions()
+        state.gamerule = createDefaultGameruleOptions()
         state.datapack = defaultDatapackDraft()
         state.generic = emptyGeneric()
         state.commandBlock = createDefaultCommandBlockOptions()
@@ -1734,6 +1762,7 @@ export const useAppStore = create<AppStore>()(
         world: state.world,
         tag: state.tag,
         clear: state.clear,
+        gamerule: state.gamerule,
         datapack: state.datapack,
         generic: state.generic,
         commandBlock: state.commandBlock,
@@ -1775,6 +1804,7 @@ export const useAppStore = create<AppStore>()(
         state.world = payload.world
         state.tag = payload.tag
         state.clear = payload.clear
+        state.gamerule = payload.gamerule
         state.datapack = payload.datapack
         state.generic = payload.generic
         state.commandBlock = payload.commandBlock
@@ -2072,4 +2102,8 @@ export function selectTagOutput(tag: TagOptions): BuildResult {
 
 export function selectClearOutput(clear: ClearOptions): BuildResult {
   return buildClearCommand(clear)
+}
+
+export function selectGameruleOutput(gamerule: GameruleOptions): BuildResult {
+  return buildGameruleCommand(gamerule)
 }

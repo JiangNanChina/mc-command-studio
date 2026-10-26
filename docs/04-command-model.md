@@ -363,7 +363,20 @@ interface ClearOptions {
 
 `tag <targets> add|remove <name>`、`tag <targets> list`；标签名不能含空格。`clear <targets> [<item>] [<maxCount>]`；全部物品时忽略数量上限，指定物品时可选 0（只统计）。
 
-### 1.21 通用构建器：所有 94 个根命令
+### 1.21 游戏规则：`gamerule`
+
+```ts
+interface GameruleOptions {
+  action: 'set' | 'query'
+  rule: string
+  type: 'boolean' | 'integer'
+  value: string
+}
+```
+
+59 条规则从 26.3 命令树提取，名称/说明来自官方 `zh_cn`；布尔规则 true/false，整数规则做整数校验。`action=query` 生成 `gamerule <rule>`。
+
+### 1.22 通用构建器：所有 94 个根命令
 
 ```ts
 interface GenericStep {
@@ -496,7 +509,7 @@ type Unit =
 
 ## 7. 测试
 
-`packages/core/src/*.test.ts` 与 `apps/desktop/src/shared/*.test.ts` 共 134 个用例，覆盖：
+`packages/core/src/*.test.ts` 与 `apps/desktop/src/shared/*.test.ts` 共 137 个用例，覆盖：
 
 - SNBT / 命令方块字符串转义。
 - 选择器排序、引号、范围、NBT 括号、分数。
@@ -520,6 +533,7 @@ type Unit =
 - `/particle` 无参数/方块/红石尘/渐变/物品/RGBA/原始 SNBT、扩散/速度/数量/观察者。
 - `/time` 设置/推进/查询、自定义 tick；`/weather` 类型与持续时间；`/difficulty`。
 - `/tag` 添加/移除/查询、标签名校验；`/clear` 全部/指定物品/数量/0 统计。
+- `/gamerule` 布尔/整数设置与查询、规则名和值类型校验。
 - 数据包文件树、load/tick 标签、多行函数、非法命名空间/函数名/空命令。
 - `/give` 文本导入：选择器、组件、数量、未知组件 raw。
 - 命令树遍历、通用路径、参数范围。

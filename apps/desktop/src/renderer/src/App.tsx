@@ -27,6 +27,7 @@ import { ParticleForm } from './components/ParticleForm'
 import { WorldControlForm } from './components/WorldControlForm'
 import { TagForm } from './components/TagForm'
 import { ClearForm } from './components/ClearForm'
+import { GameruleForm } from './components/GameruleForm'
 import { GenericBuilder } from './components/GenericBuilder'
 import { OutputPanel } from './components/OutputPanel'
 import { StatusBar } from './components/StatusBar'
@@ -129,6 +130,7 @@ export default function App() {
   const world = state.world
   const tag = state.tag
   const clear = state.clear
+  const gamerule = state.gamerule
   const generic = state.generic
   const commandBlock = state.commandBlock
   const outputMode = state.outputMode
@@ -248,6 +250,7 @@ export default function App() {
           store.world,
           store.tag,
           store.clear,
+          store.gamerule,
           store.generic,
           store.outputMode,
           store.commandBlock
@@ -276,7 +279,7 @@ export default function App() {
       void useAppStore.getState().autosave()
     }, 4000)
     return () => clearTimeout(timer)
-  }, [dirty, give, summon, setblock, execute, teleport, effect, fill, clone, chain, enchant, xp, tellraw, title, sound, bossbar, scoreboard, particle, world, tag, clear, generic, commandBlock, outputMode, activeCommandId, projectName])
+  }, [dirty, give, summon, setblock, execute, teleport, effect, fill, clone, chain, enchant, xp, tellraw, title, sound, bossbar, scoreboard, particle, world, tag, clear, gamerule, generic, commandBlock, outputMode, activeCommandId, projectName])
 
   useEffect(() => {
     if (!toast) return
@@ -360,6 +363,8 @@ export default function App() {
             <TagForm />
           ) : activeCommandId === 'clear' ? (
             <ClearForm />
+          ) : activeCommandId === 'gamerule' ? (
+            <GameruleForm />
           ) : (
             <GenericBuilder />
           )}

@@ -1,0 +1,370 @@
+[
+  {
+    "id": "advance_time",
+    "name": "推进时间",
+    "description": "",
+    "type": "boolean"
+  },
+  {
+    "id": "advance_weather",
+    "name": "推进天气",
+    "description": "",
+    "type": "boolean"
+  },
+  {
+    "id": "allow_entering_nether_using_portals",
+    "name": "允许进入下界",
+    "description": "控制玩家能否进入下界。",
+    "type": "boolean"
+  },
+  {
+    "id": "block_drops",
+    "name": "方块掉落",
+    "description": "",
+    "type": "boolean"
+  },
+  {
+    "id": "block_explosion_drop_decay",
+    "name": "在方块交互爆炸中，一些方块不会掉落战利品",
+    "description": "在与方块交互引起的爆炸中，部分被破坏方块的掉落物会被炸毁。",
+    "type": "boolean"
+  },
+  {
+    "id": "command_block_output",
+    "name": "广播命令方块输出",
+    "description": "",
+    "type": "boolean"
+  },
+  {
+    "id": "command_blocks_work",
+    "name": "命令方块运行",
+    "description": "",
+    "type": "boolean"
+  },
+  {
+    "id": "drowning_damage",
+    "name": "溺水伤害",
+    "description": "",
+    "type": "boolean"
+  },
+  {
+    "id": "elytra_movement_check",
+    "name": "鞘翅移动检查",
+    "description": "",
+    "type": "boolean"
+  },
+  {
+    "id": "ender_pearls_vanish_on_death",
+    "name": "掷出的末影珍珠在死亡时消失",
+    "description": "玩家投掷的末影珍珠是否在玩家死亡时消失。",
+    "type": "boolean"
+  },
+  {
+    "id": "entity_drops",
+    "name": "实体掉落",
+    "description": "",
+    "type": "boolean"
+  },
+  {
+    "id": "fall_damage",
+    "name": "摔落伤害",
+    "description": "",
+    "type": "boolean"
+  },
+  {
+    "id": "fire_damage",
+    "name": "火焰伤害",
+    "description": "",
+    "type": "boolean"
+  },
+  {
+    "id": "fire_spread_radius_around_player",
+    "name": "玩家周围火焰蔓延半径",
+    "description": "",
+    "type": "integer",
+    "min": -1
+  },
+  {
+    "id": "forgive_dead_players",
+    "name": "宽恕死亡玩家",
+    "description": "愤怒的中立生物将在其目标玩家于附近死亡后息怒。",
+    "type": "boolean"
+  },
+  {
+    "id": "freeze_damage",
+    "name": "冰冻伤害",
+    "description": "",
+    "type": "boolean"
+  },
+  {
+    "id": "global_sound_events",
+    "name": "全局声音事件",
+    "description": "特定游戏事件（如Boss生成）发生时，声音可在所有地方听见。",
+    "type": "boolean"
+  },
+  {
+    "id": "immediate_respawn",
+    "name": "立即重生",
+    "description": "",
+    "type": "boolean"
+  },
+  {
+    "id": "keep_inventory",
+    "name": "死亡后保留物品栏",
+    "description": "",
+    "type": "boolean"
+  },
+  {
+    "id": "lava_source_conversion",
+    "name": "允许流动熔岩转化为熔岩源",
+    "description": "相邻两面方块为熔岩源的流动熔岩会转化为熔岩源。",
+    "type": "boolean"
+  },
+  {
+    "id": "limited_crafting",
+    "name": "限制合成",
+    "description": "",
+    "type": "boolean"
+  },
+  {
+    "id": "locator_bar",
+    "name": "启用玩家定位栏",
+    "description": "启用后，屏幕上会显示指示玩家方位的定位栏。",
+    "type": "boolean"
+  },
+  {
+    "id": "log_admin_commands",
+    "name": "通告管理员命令",
+    "description": "",
+    "type": "boolean"
+  },
+  {
+    "id": "max_block_modifications",
+    "name": "最大方块修改数",
+    "description": "",
+    "type": "integer",
+    "min": 1
+  },
+  {
+    "id": "max_command_forks",
+    "name": "最大命令分支数",
+    "description": "",
+    "type": "integer",
+    "min": 0
+  },
+  {
+    "id": "max_command_sequence_length",
+    "name": "最大命令序列长度",
+    "description": "",
+    "type": "integer",
+    "min": 0
+  },
+  {
+    "id": "max_entity_cramming",
+    "name": "实体挤压上限",
+    "description": "",
+    "type": "integer",
+    "min": 0
+  },
+  {
+    "id": "max_minecart_speed",
+    "name": "最大矿车速度",
+    "description": "",
+    "type": "integer",
+    "min": 1,
+    "max": 1000
+  },
+  {
+    "id": "max_snow_accumulation_height",
+    "name": "最大积雪高度",
+    "description": "",
+    "type": "integer",
+    "min": 0,
+    "max": 8
+  },
+  {
+    "id": "mob_drops",
+    "name": "生物掉落",
+    "description": "",
+    "type": "boolean"
+  },
+  {
+    "id": "mob_explosion_drop_decay",
+    "name": "在生物爆炸中，一些方块不会掉落战利品",
+    "description": "在生物引起的爆炸中，部分被破坏方块的掉落物会被炸毁。",
+    "type": "boolean"
+  },
+  {
+    "id": "mob_griefing",
+    "name": "允许破坏性生物行为",
+    "description": "",
+    "type": "boolean"
+  },
+  {
+    "id": "natural_health_regeneration",
+    "name": "自然生命恢复",
+    "description": "",
+    "type": "boolean"
+  },
+  {
+    "id": "player_movement_check",
+    "name": "玩家移动检查",
+    "description": "",
+    "type": "boolean"
+  },
+  {
+    "id": "players_nether_portal_creative_delay",
+    "name": "创造模式下玩家在下界传送门中等待的时间",
+    "description": "创造模式下的玩家通过下界传送门前往其他维度前需要站在其中等待的时间（以刻为单位）。",
+    "type": "integer",
+    "min": 0
+  },
+  {
+    "id": "players_nether_portal_default_delay",
+    "name": "非创造模式下玩家在下界传送门中等待的时间",
+    "description": "非创造模式下的玩家通过下界传送门前往其他维度前需要站在其中等待的时间（以刻为单位）。",
+    "type": "integer",
+    "min": 0
+  },
+  {
+    "id": "players_sleeping_percentage",
+    "name": "入睡占比",
+    "description": "跳过夜晚所需的入睡玩家占比。",
+    "type": "integer",
+    "min": 0
+  },
+  {
+    "id": "projectiles_can_break_blocks",
+    "name": "弹射物能否破坏方块",
+    "description": "控制弹射物能否破坏可被其破坏的方块。",
+    "type": "boolean"
+  },
+  {
+    "id": "pvp",
+    "name": "启用PvP",
+    "description": "控制玩家间能否互相伤害。",
+    "type": "boolean"
+  },
+  {
+    "id": "raids",
+    "name": "袭击",
+    "description": "",
+    "type": "boolean"
+  },
+  {
+    "id": "random_tick_speed",
+    "name": "随机刻速率",
+    "description": "",
+    "type": "integer",
+    "min": 0
+  },
+  {
+    "id": "reduced_debug_info",
+    "name": "简化调试信息",
+    "description": "限制调试屏幕内容。",
+    "type": "boolean"
+  },
+  {
+    "id": "respawn_radius",
+    "name": "重生半径",
+    "description": "",
+    "type": "integer",
+    "min": 0
+  },
+  {
+    "id": "send_command_feedback",
+    "name": "发送命令反馈",
+    "description": "",
+    "type": "boolean"
+  },
+  {
+    "id": "show_advancement_messages",
+    "name": "显示进度消息",
+    "description": "",
+    "type": "boolean"
+  },
+  {
+    "id": "show_death_messages",
+    "name": "显示死亡消息",
+    "description": "",
+    "type": "boolean"
+  },
+  {
+    "id": "spawn_mobs",
+    "name": "生成生物",
+    "description": "",
+    "type": "boolean"
+  },
+  {
+    "id": "spawn_monsters",
+    "name": "生成怪物",
+    "description": "控制怪物能否自然生成。",
+    "type": "boolean"
+  },
+  {
+    "id": "spawn_patrols",
+    "name": "生成巡逻队",
+    "description": "",
+    "type": "boolean"
+  },
+  {
+    "id": "spawn_phantoms",
+    "name": "生成幻翼",
+    "description": "",
+    "type": "boolean"
+  },
+  {
+    "id": "spawn_wandering_traders",
+    "name": "生成流浪商人",
+    "description": "",
+    "type": "boolean"
+  },
+  {
+    "id": "spawn_wardens",
+    "name": "生成监守者",
+    "description": "",
+    "type": "boolean"
+  },
+  {
+    "id": "spawner_blocks_work",
+    "name": "刷怪笼工作",
+    "description": "",
+    "type": "boolean"
+  },
+  {
+    "id": "spectators_generate_chunks",
+    "name": "允许旁观者生成地形",
+    "description": "",
+    "type": "boolean"
+  },
+  {
+    "id": "spread_vines",
+    "name": "藤蔓蔓延",
+    "description": "",
+    "type": "boolean"
+  },
+  {
+    "id": "tnt_explodes",
+    "name": "允许TNT被点燃并爆炸",
+    "description": "",
+    "type": "boolean"
+  },
+  {
+    "id": "tnt_explosion_drop_decay",
+    "name": "在TNT爆炸中，一些方块不会掉落战利品",
+    "description": "在TNT引起的爆炸中，部分被破坏方块的掉落物会被炸毁。",
+    "type": "boolean"
+  },
+  {
+    "id": "universal_anger",
+    "name": "无差别愤怒",
+    "description": "愤怒的中立生物将攻击附近的所有玩家，而不再限于激怒它们的玩家。禁用“宽恕死亡玩家”可达到最佳效果。",
+    "type": "boolean"
+  },
+  {
+    "id": "water_source_conversion",
+    "name": "允许流动水转化为水源",
+    "description": "相邻两面方块为水源的流动水会转化为水源。",
+    "type": "boolean"
+  }
+]

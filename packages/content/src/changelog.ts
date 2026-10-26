@@ -22,6 +22,41 @@ const REPO = 'https://github.com/JiangNanChina/mc-command-studio'
  */
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: '0.1.17',
+    date: '2026-10-26',
+    title: '可视化游戏规则 gamerule',
+    highlights: [
+      '59 条 26.3 游戏规则，中文名/ID/说明搜索。',
+      '布尔开关、整数范围、查询当前值。'
+    ],
+    sections: [
+      {
+        type: 'added',
+        items: [
+          'gamerule 规则选择器（59 条，类型徽标）。',
+          '布尔规则开关、整数规则输入、查询模式。',
+          '规则中文名/说明来自官方语言文件。'
+        ]
+      },
+      {
+        type: 'improved',
+        items: [
+          '规则名与值类型校验。',
+          '单元测试 134 → 137；冒烟测试覆盖布尔/整数。'
+        ]
+      },
+      {
+        type: 'fixed',
+        items: ['无。']
+      },
+      {
+        type: 'known',
+        items: ['部分新规则缺少官方中文名，显示英文 ID 名称。', '安装包尚未配置代码签名。']
+      }
+    ],
+    releaseUrl: `${REPO}/releases/tag/v0.1.17`
+  },
+  {
     version: '0.1.16',
     date: '2026-10-26',
     title: '可视化标签与清除物品',

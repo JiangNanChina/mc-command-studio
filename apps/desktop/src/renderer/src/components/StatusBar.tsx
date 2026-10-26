@@ -48,6 +48,7 @@ export function StatusBar() {
     state.world,
     state.tag,
     state.clear,
+    state.gamerule,
     state.generic,
     state.outputMode,
     state.commandBlock
