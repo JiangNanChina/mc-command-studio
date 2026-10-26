@@ -21,7 +21,7 @@
 | 数据包 1.21.1 | 🚧 试验：83 根命令，构建/切换/打包已接入 |
 | 数据包 1.20.4 | 🚧 树模式：82 根命令，NBT 引擎 |
 | 单元测试 | ✅ 197 个 |
-| Electron 冒烟 | ✅ 公告→give→…→bossbar get/list→scoreboard modify→…→版本切换→execute |
+| Electron 冒烟 | ✅ 公告→give→…→bossbar get/list→scoreboard modify→…→版本切换→execute；Release 工作流已设为门禁 |
 | 安装包 | ✅ NSIS 约 123.5 MiB |
 | 便携版 | ✅ 约 111.7 MiB |
 | 更新公告 | ✅ 只显示当前版本 + GitHub 历史入口 |
