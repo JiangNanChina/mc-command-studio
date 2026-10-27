@@ -70,7 +70,9 @@ function commandLines(source: string): string[] {
 
 function commandBlockNbt(command: string, options: OocOptions): string {
   const pre19 = options.version?.startsWith('1.8') ?? false
-  return `Command:${commandBlockString(command)},auto:${options.auto ? '1b' : '0b'},conditionMet:0b,powered:1b,TrackOutput:${options.trackOutput ? '1b' : '0b'}${pre19 ? '' : ',UpdateLastExecution:0b'}`
+  const condition = pre19 ? '' : 'conditionMet:0b,'
+  const update = pre19 ? '' : ',UpdateLastExecution:0b'
+  return `Command:${commandBlockString(command)},auto:${options.auto ? '1b' : '0b'},${condition}powered:1b,TrackOutput:${options.trackOutput ? '1b' : '0b'}${update}`
 }
 
 function isPre111(version: string | undefined): boolean {

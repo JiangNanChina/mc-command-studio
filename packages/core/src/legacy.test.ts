@@ -5,6 +5,9 @@ import {
   buildReplaceitem,
   buildTestfor,
   buildLegacyGive,
+  buildTestforblock,
+  buildTestforblocks,
+  buildAchievement,
   createDefaultBlockdata,
   createDefaultEntitydata,
   createDefaultGive,
@@ -48,6 +51,23 @@ describe('1.12 legacy commands', () => {
       slot: 'slot.inventory.0'
     })
     expect(block.text).toContain('replaceitem block 1 2 3 slot.inventory.0')
+  })
+
+  it('builds old block and achievement checks', () => {
+    expect(
+      buildTestforblock({ x: '0', y: '64', z: '0', block: 'minecraft:stone', data: '' }).text
+    ).toBe('testforblock 0 64 0 minecraft:stone')
+    expect(
+      buildTestforblocks({
+        fromX: '0', fromY: '0', fromZ: '0',
+        toX: '1', toY: '1', toZ: '1',
+        destX: '5', destY: '5', destZ: '5',
+        mode: 'masked'
+      }).text
+    ).toBe('testforblocks 0 0 0 1 1 1 5 5 5 masked')
+    expect(
+      buildAchievement({ action: 'give', target: '@p', achievement: 'minecraft:story/root' }).text
+    ).toBe('achievement give minecraft:story/root @p')
   })
 
   it('builds legacy give with NBT', () => {

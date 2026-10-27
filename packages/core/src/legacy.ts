@@ -82,6 +82,23 @@ export function createDefaultGive(): LegacyGiveOptions {
   }
 }
 
+export function createDefaultTestforblock(): LegacyTestforblockOptions {
+  return { x: '~', y: '~', z: '~', block: 'minecraft:stone', data: '' }
+}
+
+export function createDefaultTestforblocks(): LegacyTestforblocksOptions {
+  return {
+    fromX: '~', fromY: '~', fromZ: '~',
+    toX: '~', toY: '~', toZ: '~',
+    destX: '~', destY: '~', destZ: '~',
+    mode: 'all'
+  }
+}
+
+export function createDefaultAchievement(): LegacyAchievementOptions {
+  return { action: 'give', target: '@p', achievement: 'minecraft:story/root' }
+}
+
 export function createDefaultReplaceitem(): LegacyReplaceitemOptions {
   return {
     target: 'entity',
@@ -95,6 +112,33 @@ export function createDefaultReplaceitem(): LegacyReplaceitemOptions {
     data: '0',
     nbt: ''
   }
+}
+
+export interface LegacyTestforblockOptions {
+  x: string
+  y: string
+  z: string
+  block: string
+  data: string
+}
+
+export interface LegacyTestforblocksOptions {
+  fromX: string
+  fromY: string
+  fromZ: string
+  toX: string
+  toY: string
+  toZ: string
+  destX: string
+  destY: string
+  destZ: string
+  mode: 'all' | 'masked'
+}
+
+export interface LegacyAchievementOptions {
+  action: 'give' | 'take'
+  target: string
+  achievement: string
 }
 
 export interface LegacyGiveOptions {
@@ -206,6 +250,53 @@ export function buildEntitydata(options: LegacyEntitydataOptions): BuildResult {
     diagnostics.push(error('legacy.nbt', 'entitydata 必须填写 NBT', 'nbt'))
   }
   return finish(['entitydata', options.target.trim(), options.nbt.trim()], diagnostics)
+}
+
+export function buildTestforblock(options: LegacyTestforblockOptions): BuildResult {
+  const diagnostics: Diagnostic[] = []
+  validateCoordinate(options.x, 'X', diagnostics)
+  validateCoordinate(options.y, 'Y', diagnostics)
+  validateCoordinate(options.z, 'Z', diagnostics)
+  if (!options.block.trim()) diagnostics.push(error('legacy.block', '方块不能为空', 'block'))
+  if (options.data.trim() && !/^\d+$/.test(options.data.trim())) {
+    diagnostics.push(error('legacy.data', '数据值必须是非负整数', 'data'))
+  }
+  const parts = ['testforblock', options.x.trim(), options.y.trim(), options.z.trim(), options.block.trim()]
+  if (options.data.trim()) parts.push(options.data.trim())
+  return finish(parts, diagnostics)
+}
+
+export function buildTestforblocks(options: LegacyTestforblocksOptions): BuildResult {
+  const diagnostics: Diagnostic[] = []
+  for (const [axis, value] of [
+    ['X1', options.fromX], ['Y1', options.fromY], ['Z1', options.fromZ],
+    ['X2', options.toX], ['Y2', options.toY], ['Z2', options.toZ],
+    ['DX', options.destX], ['DY', options.destY], ['DZ', options.destZ]
+  ] as const) {
+    validateCoordinate(value, axis, diagnostics)
+  }
+  return finish(
+    [
+      'testforblocks',
+      options.fromX.trim(), options.fromY.trim(), options.fromZ.trim(),
+      options.toX.trim(), options.toY.trim(), options.toZ.trim(),
+      options.destX.trim(), options.destY.trim(), options.destZ.trim(),
+      options.mode
+    ],
+    diagnostics
+  )
+}
+
+export function buildAchievement(options: LegacyAchievementOptions): BuildResult {
+  const diagnostics: Diagnostic[] = []
+  if (!options.target.trim()) diagnostics.push(error('legacy.target', '目标不能为空', 'target'))
+  if (!options.achievement.trim()) {
+    diagnostics.push(error('legacy.achievement', '成就 ID 不能为空', 'achievement'))
+  }
+  return finish(
+    ['achievement', options.action, options.achievement.trim(), options.target.trim()],
+    diagnostics
+  )
 }
 
 export function buildLegacyGive(options: LegacyGiveOptions): BuildResult {

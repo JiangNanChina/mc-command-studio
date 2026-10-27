@@ -12,7 +12,7 @@
 
 ![give 表单](docs/assets/give-form.png)
 
-## 功能（0.1.67）
+## 功能（0.1.68）
 
 - **品牌图标**：命令方块主题的应用图标、安装包图标与界面 Logo。
 - **更新公告**：只展示当前版本更新，历史版本跳转 GitHub Releases；不再显示已知问题。
@@ -116,7 +116,7 @@ pnpm data:verify
 ## 测试
 
 ```bash
-pnpm test        # 252 个核心逻辑用例
+pnpm test        # 254 个核心逻辑用例
 pnpm e2e         # Playwright 启动 Electron，覆盖 give/导入/summon/setblock/命令方块
 ```
 

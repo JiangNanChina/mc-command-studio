@@ -117,6 +117,7 @@ describe('ooc', () => {
     expect(falling.text).toContain('summon FallingSand')
     expect(falling.text).toContain('id:"FallingSand"')
     expect(falling.text).not.toContain('UpdateLastExecution')
+    expect(falling.text).not.toContain('conditionMet')
     const minecart = buildOocCommand({
       ...createDefaultOocOptions(),
       version: '1.10.2',

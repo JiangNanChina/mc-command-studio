@@ -22,6 +22,18 @@ const REPO = 'https://github.com/JiangNanChina/mc-command-studio'
  */
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: '0.1.68',
+    date: '2026-10-27',
+    title: '1.8-1.11 旧版表单',
+    highlights: ['testforblock/testforblocks/achievement。', '1.8 命令方块 NBT 校准。'],
+    sections: [
+      { type: 'added', items: ['旧版工具新增 3 个表单。'] },
+      { type: 'improved', items: ['1.8 移除 conditionMet/UpdateLastExecution。', '单元测试 252 → 254。'] },
+      { type: 'known', items: ['1.8–1.10 注册表尚未按官方语言文件校准。'] }
+    ],
+    releaseUrl: REPO + '/releases/tag/v0.1.68'
+  },
+  {
     version: '0.1.67',
     date: '2026-10-27',
     title: '1.8-1.11 Legacy 包',

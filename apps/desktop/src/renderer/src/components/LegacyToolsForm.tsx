@@ -10,23 +10,32 @@ import {
   buildLegacyGive,
   buildReplaceitem,
   buildTestfor,
+  buildTestforblock,
+  buildTestforblocks,
+  buildAchievement,
   createDefaultBlockdata,
   createDefaultEntitydata,
   createDefaultGive,
   createDefaultReplaceitem,
-  createDefaultTestfor
+  createDefaultTestfor,
+  createDefaultTestforblock,
+  createDefaultTestforblocks,
+  createDefaultAchievement
 } from '@mcstudio/core'
 import { useAppStore } from '../store'
 import { CustomPresetBar } from './CustomPresetBar'
 
-type LegacyTab = 'testfor' | 'blockdata' | 'entitydata' | 'replaceitem' | 'give'
+type LegacyTab = 'testfor' | 'blockdata' | 'entitydata' | 'replaceitem' | 'give' | 'testforblock' | 'testforblocks' | 'achievement'
 
 const TABS: { id: LegacyTab; label: string }[] = [
   { id: 'testfor', label: 'testfor' },
   { id: 'blockdata', label: 'blockdata' },
   { id: 'entitydata', label: 'entitydata' },
   { id: 'replaceitem', label: 'replaceitem' },
-  { id: 'give', label: 'give' }
+  { id: 'give', label: 'give' },
+  { id: 'testforblock', label: 'testforblock' },
+  { id: 'testforblocks', label: 'testforblocks' },
+  { id: 'achievement', label: 'achievement' }
 ]
 
 export function LegacyToolsForm() {
@@ -37,6 +46,9 @@ export function LegacyToolsForm() {
   const [entitydata, setEntitydata] = useState(createDefaultEntitydata)
   const [replaceitem, setReplaceitem] = useState(createDefaultReplaceitem)
   const [give, setGive] = useState(createDefaultGive)
+  const [testforblock, setTestforblock] = useState(createDefaultTestforblock)
+  const [testforblocks, setTestforblocks] = useState(createDefaultTestforblocks)
+  const [achievement, setAchievement] = useState(createDefaultAchievement)
   const [copied, setCopied] = useState(false)
 
   const result = useMemo(() => {
@@ -44,8 +56,11 @@ export function LegacyToolsForm() {
     if (tab === 'blockdata') return buildBlockdata(blockdata)
     if (tab === 'entitydata') return buildEntitydata(entitydata)
     if (tab === 'give') return buildLegacyGive(give)
+    if (tab === 'testforblock') return buildTestforblock(testforblock)
+    if (tab === 'testforblocks') return buildTestforblocks(testforblocks)
+    if (tab === 'achievement') return buildAchievement(achievement)
     return buildReplaceitem(replaceitem)
-  }, [tab, testfor, blockdata, entitydata, replaceitem, give])
+  }, [tab, testfor, blockdata, entitydata, replaceitem, give, testforblock, testforblocks, achievement])
 
   const copy = async () => {
     if (!result.text) return
@@ -464,6 +479,85 @@ export function LegacyToolsForm() {
                   value={replaceitem.nbt}
                   onChange={(event) => setReplaceitem({ ...replaceitem, nbt: event.target.value })}
                 />
+              </div>
+            </>
+          ) : null}
+
+          {tab === 'testforblock' ? (
+            <>
+              <div className="grid-3">
+                {(['x', 'y', 'z'] as const).map((axis) => (
+                  <div className="field" key={axis}>
+                    <label className="field-label" htmlFor={`legacy-tfb-${axis}`}>{axis.toUpperCase()}</label>
+                    <input id={`legacy-tfb-${axis}`} className="input" value={testforblock[axis]}
+                      onChange={(event) => setTestforblock({ ...testforblock, [axis]: event.target.value })} />
+                  </div>
+                ))}
+              </div>
+              <div className="grid-2" style={{ marginTop: 12 }}>
+                <div className="field">
+                  <label className="field-label" htmlFor="legacy-tfb-block">方块</label>
+                  <input id="legacy-tfb-block" className="input" value={testforblock.block}
+                    onChange={(event) => setTestforblock({ ...testforblock, block: event.target.value })} />
+                </div>
+                <div className="field">
+                  <label className="field-label" htmlFor="legacy-tfb-data">数据值（可选）</label>
+                  <input id="legacy-tfb-data" className="input" value={testforblock.data}
+                    onChange={(event) => setTestforblock({ ...testforblock, data: event.target.value })} />
+                </div>
+              </div>
+            </>
+          ) : null}
+
+          {tab === 'testforblocks' ? (
+            <>
+              {([
+                ['起点', ['fromX', 'fromY', 'fromZ']],
+                ['终点', ['toX', 'toY', 'toZ']],
+                ['目标', ['destX', 'destY', 'destZ']]
+              ] as const).map(([label, keys]) => (
+                <div key={label} style={{ marginTop: 8 }}>
+                  <div className="hint">{label}</div>
+                  <div className="grid-3">
+                    {keys.map((key) => (
+                      <input key={key} className="input" value={testforblocks[key]}
+                        onChange={(event) => setTestforblocks({ ...testforblocks, [key]: event.target.value })} />
+                    ))}
+                  </div>
+                </div>
+              ))}
+              <div className="field" style={{ marginTop: 8 }}>
+                <label className="field-label" htmlFor="legacy-tfbs-mode">模式</label>
+                <select id="legacy-tfbs-mode" className="select" value={testforblocks.mode}
+                  onChange={(event) => setTestforblocks({ ...testforblocks, mode: event.target.value as 'all' | 'masked' })}>
+                  <option value="all">all</option>
+                  <option value="masked">masked</option>
+                </select>
+              </div>
+            </>
+          ) : null}
+
+          {tab === 'achievement' ? (
+            <>
+              <div className="grid-2">
+                <div className="field">
+                  <label className="field-label" htmlFor="legacy-ach-action">动作</label>
+                  <select id="legacy-ach-action" className="select" value={achievement.action}
+                    onChange={(event) => setAchievement({ ...achievement, action: event.target.value as 'give' | 'take' })}>
+                    <option value="give">give</option>
+                    <option value="take">take</option>
+                  </select>
+                </div>
+                <div className="field">
+                  <label className="field-label" htmlFor="legacy-ach-target">目标</label>
+                  <input id="legacy-ach-target" className="input" value={achievement.target}
+                    onChange={(event) => setAchievement({ ...achievement, target: event.target.value })} />
+                </div>
+              </div>
+              <div className="field" style={{ marginTop: 12 }}>
+                <label className="field-label" htmlFor="legacy-ach-id">成就 ID</label>
+                <input id="legacy-ach-id" className="input" value={achievement.achievement}
+                  onChange={(event) => setAchievement({ ...achievement, achievement: event.target.value })} />
               </div>
             </>
           ) : null}
