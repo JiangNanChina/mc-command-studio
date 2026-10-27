@@ -126,6 +126,15 @@ async function main() {
 
   await page.screenshot({ path: join(ARTIFACTS, 'welcome.png') })
 
+  // 快捷表单：locate
+  await page.locator('.command-item', { hasText: '定位结构' }).first().click()
+  await page.waitForSelector('#quick-locate-id', { timeout: 10_000 })
+  await page.waitForTimeout(300)
+  const locateOutput = await page.locator('.output-code .cm-content').innerText()
+  if (!locateOutput.includes('locate structure minecraft:village_plains')) {
+    throw new Error(`locate 快捷表单输出不符合预期：${locateOutput}`)
+  }
+
   // 从侧边栏选择 give
   await page.locator('.command-item', { hasText: '给予物品' }).first().click()
   await page.waitForSelector('#give-count', { timeout: 10_000 })

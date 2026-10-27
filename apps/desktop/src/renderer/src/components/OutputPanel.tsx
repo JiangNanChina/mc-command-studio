@@ -176,7 +176,9 @@ function CommandBlockFields() {
 
 export function OutputPanel() {
   const state = useAppStore()
-  const output = getCurrentOutput(
+  const output = state.quickCommand
+    ? { text: state.quickCommand, diagnostics: [], hasErrors: false }
+    : getCurrentOutput(
     state.pack,
     state.activeCommandId,
     state.give,

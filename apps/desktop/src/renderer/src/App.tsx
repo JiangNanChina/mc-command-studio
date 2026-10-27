@@ -66,6 +66,7 @@ import { AnnouncementBanner } from './components/AnnouncementBanner'
 import { AnnouncementDialog } from './components/AnnouncementDialog'
 import { AutosaveBanner } from './components/AutosaveBanner'
 import { Toast } from './components/Toast'
+import { QuickCommandForm, isQuickCommand } from './components/QuickCommandForm'
 
 function LoadingScreen() {
   return (
@@ -501,6 +502,12 @@ export default function App() {
             <DataCommandForm />
           ) : activeCommandId === 'loot' ? (
             <LootForm />
+          ) : activeCommandId ? (
+            isQuickCommand(activeCommandId) ? (
+              <QuickCommandForm id={activeCommandId} />
+            ) : (
+              <GenericBuilder />
+            )
           ) : (
             <GenericBuilder />
           )}

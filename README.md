@@ -12,7 +12,7 @@
 
 ![give 表单](docs/assets/give-form.png)
 
-## 功能（0.2.0）
+## 功能（0.3.0）
 
 - **品牌图标**：命令方块主题的应用图标、安装包图标与界面 Logo。
 - **更新公告**：只展示当前版本更新，历史版本跳转 GitHub Releases；不再显示已知问题。
@@ -61,7 +61,7 @@
 - **通用构建器**：未覆盖命令仍保留官方命令树作为高级兜底。
 - **本地项目**：`.mcstudio` JSON、最近打开、4 秒防抖自动保存、异常退出恢复。
 - **桌面体验**：深色/浅色主题、中文界面、原生菜单、文件关联、单实例、高 DPI。
-- **分发与更新**：NSIS 安装包 + 便携版 + `latest.yml`；electron-updater 自动检查/下载/重启安装；GitHub Actions 发布流水线。已在本机验证 0.1.68 → 0.2.0 静默升级；便携版会禁用自动更新并提示手动下载。
+- **分发与更新**：NSIS 安装包 + 便携版 + `latest.yml`；electron-updater 自动检查/下载/重启安装；GitHub Actions 发布流水线。已在本机验证 0.2.0 → 0.3.0 静默升级；便携版会禁用自动更新并提示手动下载。
 
 ## 下载与安装
 
@@ -91,8 +91,8 @@ pnpm build:win          # 安装包 + 便携版 + latest.yml
 
 产物在 `release/`：
 
-- `MC-Command-Studio-Setup-0.2.0.exe`
-- `MC-Command-Studio-0.2.0-portable.exe`
+- `MC-Command-Studio-Setup-0.3.0.exe`
+- `MC-Command-Studio-0.3.0-portable.exe`
 - `latest.yml`、`.blockmap`
 
 如果 `pnpm install` 后没有 Electron 二进制，运行 `pnpm setup:electron`；国内网络可设置：
@@ -116,7 +116,7 @@ pnpm data:verify
 ## 测试
 
 ```bash
-pnpm test        # 258 个核心逻辑用例
+pnpm test        # 259 个核心逻辑用例
 pnpm e2e         # Playwright 启动 Electron，覆盖 give/导入/summon/setblock/命令方块
 ```
 
@@ -158,7 +158,7 @@ release/             打包产物（不入库）
 
 ## 已知限制
 
-- 当前范围是 1.12–26.3 的 54 个正式版：22 个独立基础包 + 32 个补丁版别名；1.12.2 使用 Legacy 原始构建器 + OOC。
+- 当前范围是 1.12–26.3 的 54 个正式版：25 个独立基础包 + 29 个补丁版别名；1.12.2 使用 Legacy 原始构建器 + OOC。
 - 1.13 以前（1.8–1.11）已移出正式支持范围，相关数据包不再出现在版本选择器。
 - 复杂物品组件暂以原始 SNBT 输入，后续补专用表单。
 - 不连接游戏做语义验证；语法/格式能校验，实际效果需进游戏确认。

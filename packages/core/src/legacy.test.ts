@@ -11,11 +11,13 @@ import {
   buildTrigger,
   buildSetidletimeout,
   buildSave,
+  buildStats,
   createDefaultBlockdata,
   createDefaultEntitydata,
   createDefaultGive,
   createDefaultReplaceitem,
-  createDefaultTestfor
+  createDefaultTestfor,
+  createDefaultStats
 } from './legacy'
 
 describe('1.12 legacy commands', () => {
@@ -79,6 +81,16 @@ describe('1.12 legacy commands', () => {
     )
     expect(buildSetidletimeout({ minutes: '30' }).text).toBe('setidletimeout 30')
     expect(buildSave({ action: 'query' }).text).toBe('save query')
+  })
+
+  it('builds stats set/clear', () => {
+    const base = createDefaultStats()
+    expect(
+      buildStats({ ...base, target: '@p', stat: 'SuccessCount', objective: 'kills' }).text
+    ).toBe('stats entity @p set SuccessCount kills')
+    expect(buildStats({ ...base, action: 'clear', stat: 'SuccessCount' }).text).toBe(
+      'stats entity @p clear SuccessCount'
+    )
   })
 
   it('builds legacy give with NBT', () => {

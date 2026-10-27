@@ -208,6 +208,7 @@ interface AppStore {
   packs: PackSummary[]
   pack: VersionPack | null
   activePackId: string
+  quickCommand: string
   settings: UserSettings
   update: UpdateState
   activeCommandId: string | null
@@ -271,6 +272,7 @@ interface AppStore {
   boot: () => Promise<void>
   loadPack: (id: string) => Promise<void>
   selectCommand: (id: string | null) => void
+  setQuickCommand: (text: string) => void
   setTarget: (target: Selector) => void
   setItemId: (id: string) => void
   setCount: (count: number) => void
@@ -471,6 +473,7 @@ export const useAppStore = create<AppStore>()(
     packs: [],
     pack: null,
     activePackId: '26.3',
+    quickCommand: '',
     settings: { ...DEFAULT_SETTINGS },
     update: { status: 'idle' },
     activeCommandId: null,
@@ -608,9 +611,17 @@ export const useAppStore = create<AppStore>()(
     selectCommand: (id) => {
       set((state) => {
         state.activeCommandId = id
+        state.quickCommand = ''
         if (id) {
           state.generic = { root: id, steps: [] }
         }
+        state.dirty = true
+      })
+    },
+
+    setQuickCommand: (text) => {
+      set((state) => {
+        state.quickCommand = text
         state.dirty = true
       })
     },

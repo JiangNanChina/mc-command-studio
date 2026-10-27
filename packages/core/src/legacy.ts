@@ -84,6 +84,19 @@ export function createDefaultSave(): LegacySaveOptions {
   return { action: 'hold' }
 }
 
+export function createDefaultStats(): LegacyStatsOptions {
+  return {
+    targetType: 'entity',
+    target: '@p',
+    x: '~',
+    y: '~',
+    z: '~',
+    action: 'set',
+    stat: 'SuccessCount',
+    objective: 'objective'
+  }
+}
+
 export function createDefaultGive(): LegacyGiveOptions {
   return {
     target: '@p',
@@ -165,6 +178,17 @@ export interface LegacyIdleOptions {
 
 export interface LegacySaveOptions {
   action: 'hold' | 'query'
+}
+
+export interface LegacyStatsOptions {
+  targetType: 'entity' | 'block'
+  target: string
+  x: string
+  y: string
+  z: string
+  action: 'set' | 'clear'
+  stat: string
+  objective: string
 }
 
 export interface LegacyGiveOptions {
@@ -349,6 +373,24 @@ export function buildSetidletimeout(options: LegacyIdleOptions): BuildResult {
 
 export function buildSave(options: LegacySaveOptions): BuildResult {
   return finish(['save', options.action], [])
+}
+
+export function buildStats(options: LegacyStatsOptions): BuildResult {
+  const diagnostics: Diagnostic[] = []
+  if (!options.stat.trim()) diagnostics.push(error('legacy.stat', '统计项不能为空', 'stat'))
+  if (options.action === 'set' && !options.objective.trim()) {
+    diagnostics.push(error('legacy.objective', 'set 模式必须填写目标', 'objective'))
+  }
+  const target =
+    options.targetType === 'entity'
+      ? ['entity', options.target.trim()]
+      : ['block', options.x.trim(), options.y.trim(), options.z.trim()]
+  if (options.targetType === 'entity' && !options.target.trim()) {
+    diagnostics.push(error('legacy.target', '目标不能为空', 'target'))
+  }
+  const parts = ['stats', ...target, options.action, options.stat.trim()]
+  if (options.action === 'set') parts.push(options.objective.trim())
+  return finish(parts, diagnostics)
 }
 
 export function buildLegacyGive(options: LegacyGiveOptions): BuildResult {

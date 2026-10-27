@@ -6,11 +6,11 @@
   "packFormat": 81,
   "engine": "components",
   "type": "release",
-  "generatedAt": "2026-10-27T10:47:23.087Z",
+  "generatedAt": "2026-10-27T11:18:14.889Z",
   "sources": [
     {
       "name": "alias",
-      "url": "local://packs/1.21.6",
+      "url": "local://packs/1.21.7",
       "sha256": "81e753e779a285bd95b778ea7d31085c794135bfd737ddd92e80a204573b802e"
     }
   ],
@@ -24,10 +24,10 @@
     "roots": 88,
     "literals": 918,
     "parsers": 54,
-    "items": 1415,
+    "items": 1416,
     "blocks": 1105,
     "enchantments": 42,
     "entities": 151
   },
-  "aliasOf": "1.21.6"
+  "aliasOf": "1.21.7"
 }

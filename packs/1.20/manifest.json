@@ -6,12 +6,12 @@
   "packFormat": 15,
   "engine": "nbt",
   "type": "release",
-  "generatedAt": "2026-10-27T10:47:23.074Z",
+  "generatedAt": "2026-10-27T11:18:14.878Z",
   "sources": [
     {
       "name": "alias",
-      "url": "local://packs/1.20.4",
-      "sha256": "4f5df7df9eed0870aca5733604ff65b494d09b5c06560dc5920c26cb2ba3938f"
+      "url": "local://packs/1.20.2",
+      "sha256": "700fd405da86d45907f042980974937539365a937daf59f6153752a69b2bd1cb"
     }
   ],
   "files": {
@@ -21,13 +21,13 @@
     "itemComponents": "item-components.json"
   },
   "counts": {
-    "roots": 82,
-    "literals": 808,
-    "parsers": 48,
-    "items": 1312,
-    "blocks": 686,
+    "roots": 81,
+    "literals": 780,
+    "parsers": 47,
+    "items": 1255,
+    "blocks": 643,
     "enchantments": 39,
-    "entities": 126
+    "entities": 124
   },
-  "aliasOf": "1.20.4"
+  "aliasOf": "1.20.2"
 }

@@ -16,6 +16,7 @@ import {
   buildTrigger,
   buildSetidletimeout,
   buildSave,
+  buildStats,
   createDefaultBlockdata,
   createDefaultEntitydata,
   createDefaultGive,
@@ -26,12 +27,13 @@ import {
   createDefaultAchievement,
   createDefaultTrigger,
   createDefaultIdle,
-  createDefaultSave
+  createDefaultSave,
+  createDefaultStats
 } from '@mcstudio/core'
 import { useAppStore } from '../store'
 import { CustomPresetBar } from './CustomPresetBar'
 
-type LegacyTab = 'testfor' | 'blockdata' | 'entitydata' | 'replaceitem' | 'give' | 'testforblock' | 'testforblocks' | 'achievement' | 'trigger' | 'setidletimeout' | 'save'
+type LegacyTab = 'testfor' | 'blockdata' | 'entitydata' | 'replaceitem' | 'give' | 'testforblock' | 'testforblocks' | 'achievement' | 'trigger' | 'setidletimeout' | 'save' | 'stats'
 
 const TABS: { id: LegacyTab; label: string }[] = [
   { id: 'testfor', label: 'testfor' },
@@ -44,7 +46,8 @@ const TABS: { id: LegacyTab; label: string }[] = [
   { id: 'achievement', label: 'achievement' },
   { id: 'trigger', label: 'trigger' },
   { id: 'setidletimeout', label: 'setidletimeout' },
-  { id: 'save', label: 'save' }
+  { id: 'save', label: 'save' },
+  { id: 'stats', label: 'stats' }
 ]
 
 export function LegacyToolsForm() {
@@ -61,6 +64,7 @@ export function LegacyToolsForm() {
   const [trigger, setTrigger] = useState(createDefaultTrigger)
   const [idle, setIdle] = useState(createDefaultIdle)
   const [save, setSave] = useState(createDefaultSave)
+  const [stats, setStats] = useState(createDefaultStats)
   const pack = useAppStore((state) => state.pack)
   const itemOptions = pack?.registries.item ?? []
   const blockOptions = pack?.registries.block ?? []
@@ -77,8 +81,9 @@ export function LegacyToolsForm() {
     if (tab === 'trigger') return buildTrigger(trigger)
     if (tab === 'setidletimeout') return buildSetidletimeout(idle)
     if (tab === 'save') return buildSave(save)
+    if (tab === 'stats') return buildStats(stats)
     return buildReplaceitem(replaceitem)
-  }, [tab, testfor, blockdata, entitydata, replaceitem, give, testforblock, testforblocks, achievement, trigger, idle, save])
+  }, [tab, testfor, blockdata, entitydata, replaceitem, give, testforblock, testforblocks, achievement, trigger, idle, save, stats])
 
   const copy = async () => {
     if (!result.text) return
@@ -632,6 +637,58 @@ export function LegacyToolsForm() {
                 <option value="query">query</option>
               </select>
             </div>
+          ) : null}
+
+          {tab === 'stats' ? (
+            <>
+              <div className="grid-3">
+                <div className="field">
+                  <label className="field-label" htmlFor="legacy-stats-type">目标类型</label>
+                  <select id="legacy-stats-type" className="select" value={stats.targetType}
+                    onChange={(event) => setStats({ ...stats, targetType: event.target.value as 'entity' | 'block' })}>
+                    <option value="entity">entity</option>
+                    <option value="block">block</option>
+                  </select>
+                </div>
+                {stats.targetType === 'entity' ? (
+                  <div className="field">
+                    <label className="field-label" htmlFor="legacy-stats-target">目标</label>
+                    <input id="legacy-stats-target" className="input" value={stats.target}
+                      onChange={(event) => setStats({ ...stats, target: event.target.value })} />
+                  </div>
+                ) : (
+                  <>
+                    {(['x', 'y', 'z'] as const).map((axis) => (
+                      <div className="field" key={axis}>
+                        <label className="field-label" htmlFor={`legacy-stats-${axis}`}>{axis.toUpperCase()}</label>
+                        <input id={`legacy-stats-${axis}`} className="input" value={stats[axis]}
+                          onChange={(event) => setStats({ ...stats, [axis]: event.target.value })} />
+                      </div>
+                    ))}
+                  </>
+                )}
+              </div>
+              <div className="grid-3" style={{ marginTop: 12 }}>
+                <div className="field">
+                  <label className="field-label" htmlFor="legacy-stats-action">动作</label>
+                  <select id="legacy-stats-action" className="select" value={stats.action}
+                    onChange={(event) => setStats({ ...stats, action: event.target.value as 'set' | 'clear' })}>
+                    <option value="set">set</option>
+                    <option value="clear">clear</option>
+                  </select>
+                </div>
+                <div className="field">
+                  <label className="field-label" htmlFor="legacy-stats-stat">统计项</label>
+                  <input id="legacy-stats-stat" className="input" value={stats.stat}
+                    onChange={(event) => setStats({ ...stats, stat: event.target.value })} />
+                </div>
+                <div className="field">
+                  <label className="field-label" htmlFor="legacy-stats-objective">目标（set）</label>
+                  <input id="legacy-stats-objective" className="input" value={stats.objective}
+                    onChange={(event) => setStats({ ...stats, objective: event.target.value })} />
+                </div>
+              </div>
+            </>
           ) : null}
 
           {result.diagnostics.length > 0 ? (
