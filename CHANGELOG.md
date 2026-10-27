@@ -20,7 +20,9 @@
 - 1.12.2 新增 sound / teleport / admin 表单。
 - 1.12.2 新增 world / simple / gamemode / block 表单。
 - 1.12.2 新增 misc 分组表单（function/recipe/locate/spawnpoint/kill/debug）。
-- waypoint 支持 list / modify。
+- waypoint 支持 list / modify / color / hex / reset / style。
+- swing 支持 animation / duration。
+- 1.12.2 block 支持 mask / mode 选择，time 支持 query 类型。
 - 单元测试 270 个。
 
 ## [0.5.0] - 2026-10-27

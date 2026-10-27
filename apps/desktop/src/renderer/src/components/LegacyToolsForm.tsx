@@ -1446,6 +1446,17 @@ export function LegacyToolsForm() {
                     <input id="legacy-world-time-value" className="input" value={world.timeValue}
                       onChange={(event) => setWorld({ ...world, timeValue: event.target.value })} />
                   </div>
+                  {world.timeAction === 'query' ? (
+                    <div className="field">
+                      <label className="field-label" htmlFor="legacy-world-time-query">查询类型</label>
+                      <select id="legacy-world-time-query" className="select" value={world.timeQuery}
+                        onChange={(event) => setWorld({ ...world, timeQuery: event.target.value as typeof world.timeQuery })}>
+                        <option value="daytime">daytime</option>
+                        <option value="gametime">gametime</option>
+                        <option value="day">day</option>
+                      </select>
+                    </div>
+                  ) : null}
                 </div>
               ) : null}
               {world.action === 'weather' ? (
@@ -1560,7 +1571,10 @@ export function LegacyToolsForm() {
               <div className="field">
                 <label className="field-label" htmlFor="legacy-block-action">操作</label>
                 <select id="legacy-block-action" className="select" value={block.action}
-                  onChange={(event) => setBlock({ ...block, action: event.target.value as typeof block.action })}>
+                  onChange={(event) => {
+                    const action = event.target.value as typeof block.action
+                    setBlock({ ...block, action, mode: action === 'clone' ? 'normal' : 'replace' })
+                  }}>
                   <option value="setblock">setblock</option>
                   <option value="fill">fill</option>
                   <option value="clone">clone</option>
@@ -1590,19 +1604,35 @@ export function LegacyToolsForm() {
                 </div>
               ) : (
                 <div className="grid-3" style={{ marginTop: 12 }}>
-                  {(['x', 'y', 'z', 'mask'] as const).map((key) => (
+                  {(['x', 'y', 'z'] as const).map((key) => (
                     <div className="field" key={key}>
                       <label className="field-label" htmlFor={`legacy-block-${key}`}>{key}</label>
                       <input id={`legacy-block-${key}`} className="input" value={block[key]}
                         onChange={(event) => setBlock({ ...block, [key]: event.target.value })} />
                     </div>
                   ))}
+                  <div className="field">
+                    <label className="field-label" htmlFor="legacy-block-mask">掩码</label>
+                    <select id="legacy-block-mask" className="select" value={block.mask}
+                      onChange={(event) => setBlock({ ...block, mask: event.target.value })}>
+                      <option value="replace">replace</option>
+                      <option value="masked">masked</option>
+                      <option value="filtered">filtered</option>
+                    </select>
+                  </div>
                 </div>
               )}
               <div className="field" style={{ marginTop: 12 }}>
                 <label className="field-label" htmlFor="legacy-block-mode">模式</label>
-                <input id="legacy-block-mode" className="input" value={block.mode}
-                  onChange={(event) => setBlock({ ...block, mode: event.target.value })} />
+                <select id="legacy-block-mode" className="select" value={block.mode}
+                  onChange={(event) => setBlock({ ...block, mode: event.target.value })}>
+                  {(block.action === 'clone'
+                    ? ['normal', 'force', 'move']
+                    : ['replace', 'destroy', 'keep']
+                  ).map((mode) => (
+                    <option key={mode} value={mode}>{mode}</option>
+                  ))}
+                </select>
               </div>
             </>
           ) : null}

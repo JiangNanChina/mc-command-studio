@@ -100,6 +100,7 @@ export function createDefaultWorld(): LegacyWorldOptions {
     action: 'time',
     timeAction: 'set',
     timeValue: 'day',
+    timeQuery: 'daytime',
     weather: 'clear',
     duration: '',
     difficulty: 'normal'
@@ -424,6 +425,7 @@ export interface LegacyWorldOptions {
   action: 'time' | 'weather' | 'difficulty'
   timeAction: 'set' | 'add' | 'query'
   timeValue: string
+  timeQuery: 'daytime' | 'gametime' | 'day'
   weather: 'clear' | 'rain' | 'thunder'
   duration: string
   difficulty: 'peaceful' | 'easy' | 'normal' | 'hard'
@@ -859,7 +861,7 @@ export function buildMisc(options: LegacyMiscOptions): BuildResult {
 export function buildWorld(options: LegacyWorldOptions): BuildResult {
   const diagnostics: Diagnostic[] = []
   if (options.action === 'time') {
-    if (options.timeAction === 'query') return finish(['time', 'query', 'daytime'], diagnostics)
+    if (options.timeAction === 'query') return finish(['time', 'query', options.timeQuery], diagnostics)
     return finish(['time', options.timeAction, options.timeValue.trim()], diagnostics)
   }
   if (options.action === 'weather') {

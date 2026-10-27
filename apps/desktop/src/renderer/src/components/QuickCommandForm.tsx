@@ -133,9 +133,18 @@ export const QUICK_SCHEMAS: Record<string, QuickSchema> = {
     fields: [
       { key: 'action', label: '动作', kind: 'select', options: ['list', 'modify'], defaultValue: 'list', optionRoot: 'waypoint' },
       { key: 'waypoint', label: '路径点', kind: 'text', defaultValue: '@e[type=waypoint]', visible: (v) => v.action === 'modify' },
-      { key: 'color', label: '颜色', kind: 'text', defaultValue: 'red', visible: (v) => v.action === 'modify' }
+      { key: 'modifyType', label: '修改类型', kind: 'select', options: ['color', 'style'], defaultValue: 'color', visible: (v) => v.action === 'modify' },
+      { key: 'colorMode', label: '颜色模式', kind: 'select', options: ['team', 'hex', 'reset'], defaultValue: 'team', visible: (v) => v.action === 'modify' && v.modifyType === 'color' },
+      { key: 'color', label: '颜色值', kind: 'text', defaultValue: 'red', visible: (v) => v.action === 'modify' && v.modifyType === 'color' && v.colorMode !== 'reset' },
+      { key: 'style', label: '样式 ID', kind: 'text', defaultValue: 'minecraft:default', visible: (v) => v.action === 'modify' && v.modifyType === 'style' }
     ],
-    build: (v) => (v.action === 'list' ? 'waypoint list' : `waypoint modify ${v.waypoint} color ${v.color}`)
+    build: (v) => {
+      if (v.action === 'list') return 'waypoint list'
+      if (v.modifyType === 'style') return `waypoint modify ${v.waypoint} style set ${v.style}`
+      if (v.colorMode === 'reset') return `waypoint modify ${v.waypoint} color reset`
+      if (v.colorMode === 'hex') return `waypoint modify ${v.waypoint} color hex ${v.color}`
+      return `waypoint modify ${v.waypoint} color ${v.color}`
+    }
   },
   kill: {
     fields: [{ key: 'target', label: '目标', kind: 'text', defaultValue: '@e[type=item]' }],
@@ -296,9 +305,12 @@ export const QUICK_SCHEMAS: Record<string, QuickSchema> = {
   swing: {
     fields: [
       { key: 'target', label: '目标', kind: 'text', defaultValue: '@s' },
-      { key: 'hand', label: '手', kind: 'select', options: ['mainhand', 'offhand'], defaultValue: 'mainhand' }
+      { key: 'hand', label: '手', kind: 'select', options: ['mainhand', 'offhand'], defaultValue: 'mainhand' },
+      { key: 'animation', label: '动画（可选）', kind: 'text', defaultValue: '' },
+      { key: 'duration', label: '时长（可选）', kind: 'text', defaultValue: '' }
     ],
-    build: (v) => `swing ${v.target} ${v.hand}`
+    build: (v) =>
+      `swing ${v.target} ${v.hand}${v.animation.trim() ? ` ${v.animation.trim()}${v.duration.trim() ? ` ${v.duration.trim()}` : ''}` : ''}`
   },
   fetchprofile: {
     fields: [
