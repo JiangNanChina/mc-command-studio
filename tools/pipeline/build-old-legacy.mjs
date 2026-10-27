@@ -116,6 +116,20 @@ for (const version of VERSIONS) {
       .filter((key) => key.startsWith('effect.') && key !== 'effect.none')
       .map((key) => key.slice('effect.'.length))
       .sort()
+    if (registries.mob_effect.length === 0) {
+      // 1.8 没有 effect.*，效果名在 potion.* 下。
+      registries.mob_effect = keys
+        .filter(
+          (key) =>
+            key.startsWith('potion.') &&
+            !key.endsWith('.postfix') &&
+            !key.includes('.effects.') &&
+            key !== 'potion.empty' &&
+            key !== 'potion.whenDrank'
+        )
+        .map((key) => key.slice('potion.'.length))
+        .sort()
+    }
   }
   await writeFile(join(dir, 'registries.json'), `${JSON.stringify(registries)}\n`)
   await writeFile(
