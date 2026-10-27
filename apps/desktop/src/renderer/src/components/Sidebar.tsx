@@ -1,5 +1,5 @@
 import { useMemo } from 'react'
-import { Search, X, Boxes, Link2, PackageOpen } from 'lucide-react'
+import { Search, X, Boxes, Link2, PackageOpen, TerminalSquare } from 'lucide-react'
 import {
   CATEGORY_ORDER,
   COMMAND_MAP,
@@ -85,6 +85,22 @@ export function Sidebar() {
         {category === ALL && !query ? (
           <>
             <div className="command-group-label">工具</div>
+            <button
+              type="button"
+              className={`command-item${state.activeCommandId === 'ooc' ? ' active' : ''}`}
+              onClick={() => state.selectCommand('ooc')}
+            >
+              <span className="command-glyph">
+                <TerminalSquare size={15} />
+              </span>
+              <span className="command-text">
+                <span className="command-name">
+                  OOC 生成器
+                  <span className="command-id">ooc</span>
+                </span>
+                <span className="command-desc">1.12.2 掉落沙 / 命令方块矿车 / 命令方块 NBT</span>
+              </span>
+            </button>
             <button
               type="button"
               className={`command-item${state.activeCommandId === 'chain' ? ' active' : ''}`}

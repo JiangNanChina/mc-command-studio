@@ -53,6 +53,7 @@ import { ItemCommandForm } from './components/ItemCommandForm'
 import { DataCommandForm } from './components/DataCommandForm'
 import { LootForm } from './components/LootForm'
 import { GenericBuilder } from './components/GenericBuilder'
+import { OocForm } from './components/OocForm'
 import { OutputPanel } from './components/OutputPanel'
 import { StatusBar } from './components/StatusBar'
 import { SettingsDialog } from './components/SettingsDialog'
@@ -180,7 +181,8 @@ export default function App() {
   const activeCommandId = state.activeCommandId
   const projectName = state.projectName
   const toast = state.toast
-  const treeOnly = pack?.manifest.engine === 'nbt'
+  const treeOnly = pack?.manifest.engine !== 'components'
+  const legacyEngine = pack?.manifest.engine === 'legacy'
 
   useEffect(() => {
     void useAppStore.getState().boot()
@@ -396,7 +398,9 @@ export default function App() {
             </Suspense>
           ) : activeCommandId === 'chain' ? (
             <ChainBuilder />
-          ) : treeOnly && !supportsLegacyForm(activeCommandId ?? '') ? (
+          ) : activeCommandId === 'ooc' ? (
+            <OocForm />
+          ) : treeOnly && (legacyEngine || !supportsLegacyForm(activeCommandId ?? '')) ? (
             <GenericBuilder />
           ) : activeCommandId === 'give' ? (
             pack?.manifest.engine === 'nbt' ? (

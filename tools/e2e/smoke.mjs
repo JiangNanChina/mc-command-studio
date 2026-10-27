@@ -1072,6 +1072,7 @@ async function main() {
     !packOptions.includes('1.15.2') ||
     !packOptions.includes('1.14.4') ||
     !packOptions.includes('1.13.2') ||
+    !packOptions.includes('1.12.2') ||
     !packOptions.includes('26.3')
   ) {
     throw new Error(`版本选项不符合预期：${packOptions.join(', ')}`)
@@ -1154,6 +1155,21 @@ async function main() {
   if (!notice1132.includes('NBT')) {
     throw new Error(`1.13.2 NBT 提示不符合预期：${notice1132}`)
   }
+  await page.selectOption('#pack-select', '1.12.2')
+  await page.waitForTimeout(500)
+  const pack1122 = await page.locator('.pack-count').innerText()
+  if (!pack1122.includes('53')) {
+    throw new Error(`1.12.2 命令数量不符合预期：${pack1122}`)
+  }
+  await page.getByRole('button', { name: /OOC 生成器/ }).click()
+  await page.waitForSelector('#ooc-commands', { timeout: 10_000 })
+  await page.fill('#ooc-commands', 'say one\nsay two')
+  await page.waitForTimeout(300)
+  const oocOutput = await page.locator('#ooc-output').innerText()
+  if (!oocOutput.includes('summon minecraft:falling_block') || !oocOutput.includes('say two')) {
+    throw new Error(`OOC 输出不符合预期：${oocOutput}`)
+  }
+  await page.screenshot({ path: join(ARTIFACTS, 'ooc-1.12.2.png') })
   await page.selectOption('#pack-select', '1.20.4')
   await page.waitForTimeout(500)
   const pack1204 = await page.locator('.pack-count').innerText()

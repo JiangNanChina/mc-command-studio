@@ -22,6 +22,34 @@ const REPO = 'https://github.com/JiangNanChina/mc-command-studio'
  */
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: '0.1.54',
+    date: '2026-10-27',
+    title: '1.12.2 Legacy 与 OOC',
+    highlights: ['1.12.2 版本 + OOC 生成器。', '1.13.2 粒子表校准。'],
+    sections: [
+      {
+        type: 'added',
+        items: [
+          '1.12.2 Legacy 数据包（53 根命令）。',
+          '掉落沙 OOC、命令方块矿车、命令方块 NBT。'
+        ]
+      },
+      {
+        type: 'improved',
+        items: [
+          '1.13.2 粒子表校准为 1.13 的 48 种。',
+          '旧版引擎走原始构建器 + OOC。',
+          '单元测试 237 → 240。'
+        ]
+      },
+      {
+        type: 'fixed',
+        items: ['1.13.2 不再显示 1.14 粒子。']
+      }
+    ],
+    releaseUrl: `${REPO}/releases/tag/v0.1.54`
+  },
+  {
     version: '0.1.53',
     date: '2026-10-27',
     title: '补齐 1.13.2 数据包',

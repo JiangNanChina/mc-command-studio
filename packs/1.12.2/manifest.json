@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "id": "1.12.2",
+  "gameVersion": "1.12.2",
+  "dataVersion": 1343,
+  "packFormat": 3,
+  "engine": "legacy",
+  "type": "release",
+  "generatedAt": "2026-10-27T04:12:51.395Z",
+  "sources": [
+    {
+      "name": "legacy_static",
+      "url": "local://legacy-command-list",
+      "sha256": ""
+    }
+  ],
+  "files": {
+    "commands": "commands.json",
+    "registries": "registries.json",
+    "blocks": "blocks.json",
+    "itemComponents": "item-components.json"
+  },
+  "counts": {
+    "roots": 53,
+    "literals": 0,
+    "parsers": 1,
+    "items": 790,
+    "blocks": 598,
+    "enchantments": 0,
+    "entities": 0
+  }
+}

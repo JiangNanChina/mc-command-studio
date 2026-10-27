@@ -79,6 +79,20 @@ const main = async () => {
   registries.entity_type = fromLang('entity.minecraft.')
   registries.enchantment = fromLang('enchantment.minecraft.')
   registries.mob_effect = fromLang('effect.minecraft.')
+  const particle13 = new Set([
+    'ambient_entity_effect', 'angry_villager', 'barrier', 'block', 'bubble',
+    'bubble_column_up', 'bubble_pop', 'cloud', 'crit', 'current_down',
+    'damage_indicator', 'dolphin', 'dragon_breath', 'dripping_lava',
+    'dripping_water', 'dust', 'effect', 'enchant', 'enchanted_hit', 'end_rod',
+    'entity_effect', 'explosion', 'explosion_emitter', 'falling_dust',
+    'firework', 'fishing', 'flame', 'happy_villager', 'heart', 'instant_effect',
+    'item', 'item_slime', 'item_snowball', 'large_smoke', 'lava', 'mycelium',
+    'nautilus', 'note', 'poof', 'portal', 'rain', 'smoke', 'spit', 'splash',
+    'squid_ink', 'sweep_attack', 'totem_of_undying', 'underwater'
+  ])
+  registries.particle_type = (baseRegistries.particle_type ?? []).filter((id) =>
+    particle13.has(id)
+  )
   // 1.13 无属性命令；保留空表避免 UI 误选。
   registries.attribute = []
 
