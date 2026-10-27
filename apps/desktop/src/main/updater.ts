@@ -37,6 +37,17 @@ export function updateFeedDescription(): string {
   return process.env.MCSTUDIO_UPDATE_URL ?? 'GitHub Releases（app-update.yml）'
 }
 
+function isNewerVersion(candidate: string, current: string): boolean {
+  const left = candidate.split('-')[0].split('.').map(Number)
+  const right = current.split('-')[0].split('.').map(Number)
+  for (let i = 0; i < Math.max(left.length, right.length); i += 1) {
+    const a = Number.isFinite(left[i]) ? left[i] : 0
+    const b = Number.isFinite(right[i]) ? right[i] : 0
+    if (a !== b) return a > b
+  }
+  return false
+}
+
 export function initUpdater(window: BrowserWindow, settings: UserSettings): void {
   mainWindow = window
   currentSettings = settings
@@ -73,6 +84,15 @@ export function initUpdater(window: BrowserWindow, settings: UserSettings): void
   })
 
   autoUpdater.on('update-available', (info) => {
+    // GitHub 的 latest 可能落后于本地新版本，禁止把旧版本当更新。
+    if (!isNewerVersion(info.version, app.getVersion())) {
+      setState({
+        status: 'idle',
+        version: info.version,
+        channel: currentSettings?.updateChannel ?? 'stable'
+      })
+      return
+    }
     if (!manualCheck && currentSettings?.skippedVersion === info.version) {
       setState({
         status: 'idle',

@@ -22,6 +22,18 @@ const REPO = 'https://github.com/JiangNanChina/mc-command-studio'
  */
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: '0.2.0',
+    date: '2026-10-27',
+    title: '覆盖 1.12–26.3 全部 54 个正式版',
+    highlights: ['54 个正式版。', '可搜索版本选择器。'],
+    sections: [
+      { type: 'added', items: ['版本搜索/分组/最近使用。', '基础包与别名标记。', '1.21.9–1.21.11 独立包。'] },
+      { type: 'improved', items: ['22 个基础包 + 32 个别名。', '组件引擎提示。', '单元测试 258。'] },
+      { type: 'fixed', items: ['无。'] }
+    ],
+    releaseUrl: REPO + '/releases/tag/v0.2.0'
+  },
+  {
     version: '0.1.68',
     date: '2026-10-27',
     title: '1.8-1.11 旧版表单',
