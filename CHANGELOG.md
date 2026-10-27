@@ -11,7 +11,7 @@
 - 18 个版本矩阵 UI 冒烟。
 - Ctrl+K 聚焦命令搜索。
 - 命令搜索使用 useDeferredValue，输入更顺滑。
-- NBT 版本接入 42 个快捷表单。
+- NBT 版本接入 44 个快捷表单。
 - 10 个版本特定快捷表单接入命令树能力矩阵。
 - place / test 增加逐版本字段与子命令过滤。
 - compute / dialog / test 表单增加条件字段与版本选项过滤。
@@ -23,7 +23,9 @@
 - waypoint 支持 list / modify / color / hex / reset / style。
 - swing 支持 animation / duration。
 - 1.12.2 block 支持 mask / mode 选择，time 支持 query 类型。
-- 单元测试 270 个。
+- NBT 新增 replaceitem / locatebiome 快捷表单。
+- 旧版本图标与中文名别名映射（1.13–1.20.4）。
+- 单元测试 273 个。
 
 ## [0.5.0] - 2026-10-27
 

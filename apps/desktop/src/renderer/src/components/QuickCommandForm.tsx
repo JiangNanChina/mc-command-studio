@@ -42,6 +42,26 @@ export const QUICK_SCHEMAS: Record<string, QuickSchema> = {
     ],
     build: (v) => `fillbiome ${v.x1} ${v.y1} ${v.z1} ${v.x2} ${v.y2} ${v.z2} ${v.biome}`
   },
+  replaceitem: {
+    fields: [
+      { key: 'mode', label: '目标类型', kind: 'select', options: ['block', 'entity'], defaultValue: 'entity' },
+      { key: 'target', label: '实体/坐标', kind: 'text', defaultValue: '@s' },
+      { key: 'x', label: 'X（block）', kind: 'text', defaultValue: '~', visible: (v) => v.mode === 'block' },
+      { key: 'y', label: 'Y（block）', kind: 'text', defaultValue: '~', visible: (v) => v.mode === 'block' },
+      { key: 'z', label: 'Z（block）', kind: 'text', defaultValue: '~', visible: (v) => v.mode === 'block' },
+      { key: 'slot', label: '槽位', kind: 'text', defaultValue: 'weapon.mainhand' },
+      { key: 'item', label: '物品', kind: 'text', defaultValue: 'minecraft:stone' },
+      { key: 'count', label: '数量（可选）', kind: 'text', defaultValue: '' }
+    ],
+    build: (v) => {
+      const place = v.mode === 'block' ? `block ${v.x} ${v.y} ${v.z}` : `entity ${v.target}`
+      return `replaceitem ${place} ${v.slot} ${v.item}${v.count.trim() ? ` ${v.count.trim()}` : ''}`
+    }
+  },
+  locatebiome: {
+    fields: [{ key: 'biome', label: '生物群系', kind: 'text', defaultValue: 'minecraft:plains' }],
+    build: (v) => `locatebiome ${v.biome}`
+  },
   place: {
     fields: [
       { key: 'type', label: '类型', kind: 'select', options: ['structure', 'jigsaw', 'template', 'feature'], defaultValue: 'structure', optionRoot: 'place' },
@@ -410,7 +430,9 @@ const NBT_SAFE_QUICK = new Set([
   'perf',
   'jfr',
   'debug',
-  'place'
+  'place',
+  'replaceitem',
+  'locatebiome'
 ])
 
 /** NBT 版本（1.13–1.20.4）可安全复用的快捷表单。 */

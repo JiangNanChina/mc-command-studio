@@ -49,7 +49,7 @@
 - **1.15.2 数据包**：72 个根命令，NBT 引擎。
 - **1.14.4 数据包**：71 个根命令，NBT 引擎。
 - **1.13.2 数据包**：67 个根命令，官方 server reports + client lang 转换，NBT 引擎。
-- **1.12.2 Legacy**：53 个根命令；OOC 生成器（掉落沙/矿车/命令方块 NBT）。
+- **1.12.2 Legacy**：64 个根命令；OOC 生成器（掉落沙/矿车/命令方块 NBT）。
 - **专用表单**：`give`、`summon`、`setblock`、`execute`、`tp`、`effect`、`fill`、`clone`、`enchant`、`xp`、`tellraw`、`title`、`playsound`、`stopsound`、`bossbar`、`scoreboard`、`particle`、`time`、`weather`、`difficulty`、`tag`、`clear`、`gamerule`、`worldborder`、`team`、`spawnpoint`、`setworldspawn`、`forceload`、`attribute`、`advancement`、`function`、`schedule`、`item`、`data`、`loot`、`gamemode`、`damage`、`rotate`。
 - **命令方块链**：按方向排布最多 64 个脉冲/连锁/循环方块，自动偏移坐标，生成整链 `/setblock`。
 - **execute 执行链**：as/at/positioned/align/anchored/facing/rotated/in/if/unless/store/raw 可排序积木 + run。
@@ -116,7 +116,7 @@ pnpm data:verify
 ## 测试
 
 ```bash
-pnpm test        # 270 个核心逻辑用例
+pnpm test        # 273 个核心逻辑用例
 pnpm e2e         # Playwright 启动 Electron，覆盖 give/导入/summon/setblock/命令方块
 ```
 

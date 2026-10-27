@@ -27,7 +27,7 @@
 
 ### NBT 兼容
 
-1.13–1.20.4 可安全使用 **42 个快捷表单**，包括：
+1.13–1.20.4 可安全使用 **44 个快捷表单**，包括：
 
 ```text
 locate / help / reload / seed / list / version / publish
@@ -37,6 +37,7 @@ ban / ban-ip / banlist / pardon / pardon-ip / whitelist
 tell / msg / tm / teammsg / w
 teleport / experience / defaultgamemode / trigger
 fillbiome / spectate / recipe / return / perf / jfr / debug / place
+replaceitem / locatebiome
 ```
 
 剩余 10 个属于版本特定表单，仅在命令树具备对应子命令时可用。
@@ -54,7 +55,7 @@ node tools/pipeline/verify-quick-matrix.mjs
 ## 当前状态
 
 - 26.3 可视化入口：94 / 94
-- 快捷表单：51
-- NBT 安全快捷表单：42
+- 快捷表单：53
+- NBT 安全快捷表单：44
 - 版本特定快捷表单：10
-- 单元测试：270
+- 单元测试：273

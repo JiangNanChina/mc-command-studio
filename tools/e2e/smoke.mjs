@@ -1187,6 +1187,19 @@ async function main() {
   if (!pack1165.includes('74')) {
     throw new Error(`1.16.5 命令数量不符合预期：${pack1165}`)
   }
+  await page.fill('#command-search', 'replaceitem')
+  await page.waitForTimeout(500)
+  await page.locator('.command-item').filter({ hasText: 'replaceitem' }).first().click()
+  await page.waitForFunction(
+    () => document.querySelector('.hero-id')?.textContent === 'replaceitem',
+    { timeout: 10_000 }
+  )
+  await page.waitForTimeout(300)
+  const nbtReplaceitem = (await page.locator('.output-code .cm-content').innerText()).trim()
+  if (!nbtReplaceitem.startsWith('replaceitem entity @s weapon.mainhand')) {
+    throw new Error(`1.16.5 replaceitem NBT 表单不符合预期：${nbtReplaceitem}`)
+  }
+  await page.fill('#command-search', '')
   await page.screenshot({ path: join(ARTIFACTS, 'pack-1.16.5.png') })
   await selectVersion(page, '1.15.2')
   await page.waitForTimeout(500)
