@@ -29,6 +29,11 @@ for (const entry of index.packs ?? []) {
   if (manifest.packFormat !== entry.packFormat) {
     errors.push(`${entry.id} packFormat 不一致`)
   }
+  if ((manifest.aliasOf ?? null) !== (entry.aliasOf ?? null)) {
+    errors.push(
+      `${entry.id} 别名状态不一致：manifest=${manifest.aliasOf ?? '独立'}，index=${entry.aliasOf ?? '独立'}`
+    )
+  }
   if (!entry.aliasOf) {
     for (const file of ['commands.json', 'registries.json', 'blocks.json', 'item-components.json']) {
       if (!existsSync(join(PACKS, entry.id, file))) errors.push(`${entry.id} 缺少 ${file}`)

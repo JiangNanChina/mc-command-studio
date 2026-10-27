@@ -9,7 +9,7 @@
 - 旧版资源别名抽到 legacy-assets.json。
 - 1.12.2 teleport 支持 tp / teleport 选择。
 - loot replace 动作与 NBT item 预设库。
-- 更新 UI E2E、10 表单截图、1.12 分组冒烟、54 版本加载验证。
+- 更新 UI E2E、完整下载/安装 E2E、10 表单截图、1.12 分组冒烟、54 版本加载验证。
 - 修复 1.13 manifest 仍指向 1.13.2 别名的问题。
 - 单元测试 277 个。
 
