@@ -188,7 +188,9 @@ export function getCommandOutput(
   if (activeCommandId === 'title') return selectTitleOutput(title)
   if (activeCommandId === 'bossbar') return selectBossbarOutput(bossbar)
   if (activeCommandId === 'scoreboard') return selectScoreboardOutput(scoreboard)
-  if (activeCommandId === 'particle') return selectParticleOutput(particle)
+  if (activeCommandId === 'particle') {
+    return selectParticleOutput(particle, pack?.manifest.engine ?? 'components')
+  }
   if (activeCommandId === 'time') return selectTimeOutput(world.time)
   if (activeCommandId === 'weather') return selectWeatherOutput(world.weather)
   if (activeCommandId === 'difficulty') return selectDifficultyOutput(world.difficulty)
@@ -200,7 +202,9 @@ export function getCommandOutput(
   if (activeCommandId === 'spawnpoint') return selectSpawnpointOutput(spawnpoint)
   if (activeCommandId === 'setworldspawn') return selectWorldSpawnOutput(worldSpawn)
   if (activeCommandId === 'forceload') return selectForceloadOutput(forceload)
-  if (activeCommandId === 'attribute') return selectAttributeOutput(attribute)
+  if (activeCommandId === 'attribute') {
+    return selectAttributeOutput(attribute, pack?.manifest.engine ?? 'components')
+  }
   if (activeCommandId === 'advancement') return selectAdvancementOutput(automation.advancement)
   if (activeCommandId === 'function') return selectFunctionOutput(automation.function)
   if (activeCommandId === 'schedule') return selectScheduleOutput(automation.schedule)

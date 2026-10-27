@@ -12,13 +12,14 @@ describe('legacy pack compatibility', () => {
   })
 
   it('routes version-sensitive commands to the command tree', () => {
-    expect(supportsLegacyForm('particle')).toBe(false)
-    expect(supportsLegacyForm('attribute')).toBe(false)
+    expect(supportsLegacyForm('visit')).toBe(false)
   })
 
-  it('enables loot and gamerule once syntax is adapted', () => {
+  it('enables adapted forms', () => {
     expect(supportsLegacyForm('loot')).toBe(true)
     expect(supportsLegacyForm('gamerule')).toBe(true)
+    expect(supportsLegacyForm('attribute')).toBe(true)
+    expect(supportsLegacyForm('particle')).toBe(true)
   })
 })
 

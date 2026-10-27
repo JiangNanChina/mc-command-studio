@@ -2,6 +2,30 @@
 
 所有版本变更记录在此。版本号遵循 SemVer。
 
+## [0.1.50] - 2026-10-27
+
+1.21.1 与 1.20.4 语法适配。
+
+### 新增
+
+- 1.20.4 particle 旧参数语法：
+  - block / dust / dust_color_transition / item / effect / entity_effect
+  - 自动把 SNBT 选项转换为位置参数
+  - 旧版不支持 raw SNBT 时给出诊断
+- 1.20.4 attribute 专用语法：
+  - `modifier add <uuid> <name> <value> <operation>`
+  - `modifier remove <uuid>`
+  - `modifier value get <uuid>`
+  - 新增 UUID/名称输入框
+
+### 改进
+
+- 1.21.1 gamerule 从命令树动态读取，兼容 camelCase 名称并自动推断布尔/整数类型。
+- 1.21.1 隐藏不存在的 `attribute base reset`。
+- 1.21.1 隐藏不存在的 `fill strict` 与 `setblock strict`。
+- 1.20.4 的 attribute / particle 加入兼容表单。
+- 单元测试 234 → 236；冒烟覆盖 1.21.1 gamerule、1.20.4 attribute/particle。
+
 ## [0.1.49] - 2026-10-27
 
 谓词新增记分板数值条件。

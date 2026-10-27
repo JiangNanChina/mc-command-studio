@@ -23,6 +23,8 @@ export interface AttributeOptions {
   scaleEnabled: boolean
   scale: string
   modifierId: string
+  modifierUuid: string
+  modifierName: string
   modifierValue: string
   operation: AttributeOperation
 }
@@ -42,6 +44,8 @@ export function createDefaultAttributeOptions(): AttributeOptions {
     scaleEnabled: false,
     scale: '1',
     modifierId: 'mcstudio:bonus',
+    modifierUuid: '00000000-0000-0000-0000-000000000001',
+    modifierName: 'MC Studio Bonus',
     modifierValue: '2',
     operation: 'add_value'
   }
@@ -55,7 +59,18 @@ function isResource(value: string): boolean {
   return isValidResourceLocation(value)
 }
 
-export function buildAttributeCommand(options: AttributeOptions): BuildResult {
+const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+
+const LEGACY_OPERATIONS: Record<AttributeOperation, string> = {
+  add_value: 'add',
+  add_multiplied_base: 'multiply_base',
+  add_multiplied_total: 'multiply'
+}
+
+export function buildAttributeCommand(
+  options: AttributeOptions,
+  engine: 'components' | 'nbt' | 'legacy' = 'components'
+): BuildResult {
   const diagnostics: Diagnostic[] = []
   const target = serializeSelector(options.target)
   diagnostics.push(...target.diagnostics)
@@ -70,6 +85,54 @@ export function buildAttributeCommand(options: AttributeOptions): BuildResult {
   }
   if (options.scaleEnabled && !isNumber(options.scale)) {
     diagnostics.push(error('attribute.scale', 'scale 必须是数字', 'scale'))
+  }
+
+  if (engine === 'nbt') {
+    const base = ['attribute', target.text, attribute]
+    if (options.action === 'base-reset') {
+      diagnostics.push(
+        error('attribute.reset', '1.20.4 不支持 attribute base reset', 'action')
+      )
+      return { text: base.join(' '), diagnostics }
+    }
+    if (options.action === 'base-set') {
+      base.push('base', 'set', value)
+      return { text: base.join(' '), diagnostics }
+    }
+    if (options.action === 'base-get' || options.action === 'get') {
+      if (options.action === 'base-get') base.push('base')
+      base.push('get')
+      if (options.scaleEnabled) base.push(options.scale.trim())
+      return { text: base.join(' '), diagnostics }
+    }
+
+    if (!UUID.test(options.modifierUuid.trim())) {
+      diagnostics.push(error('attribute.uuid', '1.20.4 修饰符 UUID 格式不正确', 'modifierUuid'))
+    }
+    if (!options.modifierName.trim()) {
+      diagnostics.push(error('attribute.name', '1.20.4 修饰符名称不能为空', 'modifierName'))
+    }
+    if (options.action === 'modifier-value') {
+      base.push('modifier', 'value', 'get', options.modifierUuid.trim())
+      if (options.scaleEnabled) base.push(options.scale.trim())
+      return { text: base.join(' '), diagnostics }
+    }
+    if (options.action === 'modifier-add') {
+      if (!isNumber(options.modifierValue)) {
+        diagnostics.push(error('attribute.modifierValue', '修饰符值必须是数字', 'modifierValue'))
+      }
+      base.push(
+        'modifier',
+        'add',
+        options.modifierUuid.trim(),
+        options.modifierName.trim(),
+        options.modifierValue.trim(),
+        LEGACY_OPERATIONS[options.operation]
+      )
+      return { text: base.join(' '), diagnostics }
+    }
+    base.push('modifier', 'remove', options.modifierUuid.trim())
+    return { text: base.join(' '), diagnostics }
   }
 
   const base = ['attribute', target.text, attribute]

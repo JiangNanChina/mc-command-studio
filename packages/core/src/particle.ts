@@ -118,14 +118,81 @@ function isNumber(value: string, min: number): boolean {
   return /^-?(?:\d+\.?\d*|\.\d+)$/.test(value.trim()) && Number(value) >= min
 }
 
-export function buildParticleCommand(options: ParticleOptions): BuildResult {
+function legacyParticleArgs(
+  options: ParticleOptions,
+  mode: Exclude<ParticleOptionMode, 'auto'>,
+  diagnostics: Diagnostic[]
+): string[] {
+  const args: string[] = []
+  if (mode === 'block') {
+    const block = options.block.trim()
+    if (!block) {
+      diagnostics.push(error('particle.block', '方块参数不能为空', 'block'))
+    } else {
+      args.push(block)
+    }
+  } else if (mode === 'dust' || mode === 'dust_transition') {
+    if (!isNumber(options.scale, 0.01)) {
+      diagnostics.push(error('particle.scale', 'scale 必须是不小于 0.01 的数字', 'scale'))
+    }
+    if (mode === 'dust') {
+      const rgb = hexToRgb(options.dustColor)
+      if (!rgb) {
+        diagnostics.push(error('particle.color', '颜色必须是 #RRGGBB', 'dustColor'))
+      } else {
+        args.push(...rgb.map(String), options.scale.trim())
+      }
+    } else {
+      const from = hexToRgb(options.fromColor)
+      const to = hexToRgb(options.toColor)
+      if (!from) diagnostics.push(error('particle.from', '起始颜色必须是 #RRGGBB', 'fromColor'))
+      if (!to) diagnostics.push(error('particle.to', '结束颜色必须是 #RRGGBB', 'toColor'))
+      if (from && to) {
+        args.push(...from.map(String), options.scale.trim(), ...to.map(String))
+      }
+    }
+  } else if (mode === 'item') {
+    const item = options.item.trim()
+    if (!item) {
+      diagnostics.push(error('particle.item', '物品参数不能为空', 'item'))
+    } else {
+      args.push(item)
+    }
+  } else if (mode === 'color' || mode === 'rgba') {
+    const rgb = hexToRgb(options.effectColor)
+    if (!rgb) {
+      diagnostics.push(error('particle.effectColor', '颜色必须是 #RRGGBB', 'effectColor'))
+    } else if (mode === 'rgba') {
+      if (!isNumber(options.alpha, 0) || Number(options.alpha) > 1) {
+        diagnostics.push(error('particle.alpha', 'alpha 必须在 0–1 之间', 'alpha'))
+      }
+      args.push(...rgb.map(String), options.alpha.trim())
+    } else {
+      args.push(...rgb.map(String))
+    }
+  } else if (mode === 'raw') {
+    diagnostics.push(
+      error('particle.legacy', '1.20.4 的 particle 使用参数语法，不支持 SNBT 原始参数', 'rawOptions')
+    )
+  }
+  return args
+}
+
+export function buildParticleCommand(
+  options: ParticleOptions,
+  engine: 'components' | 'nbt' | 'legacy' = 'components'
+): BuildResult {
   const diagnostics: Diagnostic[] = []
   const mode =
     options.optionMode === 'auto' ? inferredParticleMode(options.particle) : options.optionMode
   const particle = resourceId(options.particle.trim())
+  const legacy = engine === 'nbt'
   let name = particle
+  let optionArgs: string[] = []
 
-  if (mode === 'block') {
+  if (legacy) {
+    optionArgs = legacyParticleArgs(options, mode, diagnostics)
+  } else if (mode === 'block') {
     name += `{block_state:${snbtString(resourceId(options.block))}}`
   } else if (mode === 'dust' || mode === 'dust_transition') {
     if (!isNumber(options.scale, 0.01)) {
@@ -198,6 +265,7 @@ export function buildParticleCommand(options: ParticleOptions): BuildResult {
   const parts = [
     'particle',
     name,
+    ...optionArgs,
     position.text,
     options.deltaX.trim(),
     options.deltaY.trim(),

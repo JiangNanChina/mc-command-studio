@@ -298,8 +298,11 @@ export function selectScoreboardOutput(scoreboard: ScoreboardOptions): BuildResu
   return buildScoreboardCommand(scoreboard)
 }
 
-export function selectParticleOutput(particle: ParticleOptions): BuildResult {
-  return buildParticleCommand(particle)
+export function selectParticleOutput(
+  particle: ParticleOptions,
+  engine: 'components' | 'nbt' | 'legacy' = 'components'
+): BuildResult {
+  return buildParticleCommand(particle, engine)
 }
 
 export function selectTimeOutput(time: TimeOptions): BuildResult {
@@ -348,8 +351,11 @@ export function selectForceloadOutput(forceload: ForceloadOptions): BuildResult 
   return buildForceloadCommand(forceload)
 }
 
-export function selectAttributeOutput(attribute: AttributeOptions): BuildResult {
-  return buildAttributeCommand(attribute)
+export function selectAttributeOutput(
+  attribute: AttributeOptions,
+  engine: 'components' | 'nbt' | 'legacy' = 'components'
+): BuildResult {
+  return buildAttributeCommand(attribute, engine)
 }
 
 export function selectAdvancementOutput(advancement: AdvancementOptions): BuildResult {

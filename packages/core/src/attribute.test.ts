@@ -58,6 +58,43 @@ describe('attribute', () => {
     )
   })
 
+  it('builds legacy 1.20.4 uuid modifiers', () => {
+    const base = createDefaultAttributeOptions()
+    const uuid = '12345678-1234-1234-1234-123456789abc'
+    expect(
+      buildAttributeCommand(
+        {
+          ...base,
+          action: 'modifier-add',
+          modifierUuid: uuid,
+          modifierName: 'Bonus',
+          modifierValue: '5',
+          operation: 'add_multiplied_base'
+        },
+        'nbt'
+      ).text
+    ).toBe(
+      `attribute @s minecraft:max_health modifier add ${uuid} Bonus 5 multiply_base`
+    )
+    expect(
+      buildAttributeCommand(
+        { ...base, action: 'modifier-remove', modifierUuid: uuid },
+        'nbt'
+      ).text
+    ).toBe(`attribute @s minecraft:max_health modifier remove ${uuid}`)
+    expect(
+      buildAttributeCommand(
+        { ...base, action: 'modifier-value', modifierUuid: uuid },
+        'nbt'
+      ).text
+    ).toBe(`attribute @s minecraft:max_health modifier value get ${uuid}`)
+    expect(
+      buildAttributeCommand({ ...base, action: 'base-reset' }, 'nbt').diagnostics.some(
+        (item) => item.code === 'attribute.reset'
+      )
+    ).toBe(true)
+  })
+
   it('validates numbers and resource ids', () => {
     const result = buildAttributeCommand({
       ...createDefaultAttributeOptions(),

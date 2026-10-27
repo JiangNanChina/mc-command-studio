@@ -78,6 +78,37 @@ describe('particle', () => {
     expect(result.text).toBe('particle minecraft:shriek{delay:20} ~ ~1 ~ 0 0 0 0 1 force @a')
   })
 
+  it('builds legacy 1.20.4 argument syntax', () => {
+    const base = createDefaultParticleOptions()
+    expect(buildParticleCommand(base, 'nbt').text).toBe(
+      'particle minecraft:flame ~ ~1 ~ 0 0 0 0 1 normal'
+    )
+    expect(
+      buildParticleCommand(
+        { ...base, particle: 'minecraft:dust', dustColor: '#ff0000', scale: '2' },
+        'nbt'
+      ).text
+    ).toBe('particle minecraft:dust 1 0 0 2 ~ ~1 ~ 0 0 0 0 1 normal')
+    expect(
+      buildParticleCommand(
+        { ...base, particle: 'minecraft:block', block: 'minecraft:stone' },
+        'nbt'
+      ).text
+    ).toBe('particle minecraft:block minecraft:stone ~ ~1 ~ 0 0 0 0 1 normal')
+    expect(
+      buildParticleCommand(
+        { ...base, particle: 'minecraft:item', item: 'minecraft:diamond' },
+        'nbt'
+      ).text
+    ).toBe('particle minecraft:item minecraft:diamond ~ ~1 ~ 0 0 0 0 1 normal')
+    expect(
+      buildParticleCommand(
+        { ...base, particle: 'minecraft:shriek', rawOptions: '{delay:20}' },
+        'nbt'
+      ).diagnostics.some((item) => item.code === 'particle.legacy')
+    ).toBe(true)
+  })
+
   it('validates numeric fields and raw syntax', () => {
     const result = buildParticleCommand({
       ...createDefaultParticleOptions(),

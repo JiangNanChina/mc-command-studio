@@ -1071,6 +1071,18 @@ async function main() {
   if (!pack121.includes('83')) {
     throw new Error(`1.21.1 命令数量不符合预期：${pack121}`)
   }
+  await page.locator('.command-item', { hasText: '游戏规则' }).first().click()
+  await page.waitForSelector('.gamerule-selected', { timeout: 10_000 })
+  await page.waitForTimeout(300)
+  const gamerule121 = await page.locator('.output-code .cm-content').innerText()
+  if (!/gamerule [A-Za-z0-9_]+ (true|false|-?\d+)/.test(gamerule121)) {
+    throw new Error(`1.21.1 gamerule 输出不符合预期：${gamerule121}`)
+  }
+  await page.locator('.command-item', { hasText: '填充区域' }).first().click()
+  await page.waitForSelector('#fill-mode', { timeout: 10_000 })
+  if ((await page.locator('#fill-mode option[value="strict"]').count()) !== 0) {
+    throw new Error('1.21.1 不应显示 fill strict 选项')
+  }
   await page.screenshot({ path: join(ARTIFACTS, 'pack-1.21.1.png') })
   await page.selectOption('#pack-select', '1.20.4')
   await page.waitForTimeout(500)
@@ -1138,8 +1150,32 @@ async function main() {
   await page.waitForSelector('.gamerule-selected', { timeout: 10_000 })
   await page.waitForTimeout(300)
   const gamerule1204 = await page.locator('.output-code .cm-content').innerText()
-  if (!/gamerule [a-z0-9_]+ (true|false|-?\d+)/.test(gamerule1204)) {
+  if (!/gamerule [A-Za-z0-9_]+ (true|false|-?\d+)/.test(gamerule1204)) {
     throw new Error(`1.20.4 gamerule 输出不符合预期：${gamerule1204}`)
+  }
+  await page.locator('.command-item', { hasText: '实体属性' }).first().click()
+  await page.waitForSelector('.attribute-selected', { timeout: 10_000 })
+  await page.getByRole('button', { name: '添加修饰符', exact: true }).click()
+  await page.waitForSelector('#attribute-modifier-uuid', { timeout: 10_000 })
+  await page.waitForTimeout(300)
+  const attribute1204 = await page.locator('.output-code .cm-content').innerText()
+  if (
+    !attribute1204.includes('modifier add') ||
+    !attribute1204.includes('00000000-0000-0000-0000-000000000001')
+  ) {
+    throw new Error(`1.20.4 attribute 输出不符合预期：${attribute1204}`)
+  }
+  await page.locator('.command-item', { hasText: '粒子效果' }).first().click()
+  await page.waitForSelector('#particle-mode', { timeout: 10_000 })
+  await page.selectOption('#particle-mode', 'dust')
+  await page.waitForTimeout(300)
+  const particle1204 = await page.locator('.output-code .cm-content').innerText()
+  if (
+    !particle1204.startsWith('particle minecraft:') ||
+    !particle1204.includes('~ ~1 ~') ||
+    particle1204.includes('{')
+  ) {
+    throw new Error(`1.20.4 particle 旧语法不符合预期：${particle1204}`)
   }
   await page.screenshot({ path: join(ARTIFACTS, 'pack-1.20.4.png') })
   await page.selectOption('#pack-select', '26.3')

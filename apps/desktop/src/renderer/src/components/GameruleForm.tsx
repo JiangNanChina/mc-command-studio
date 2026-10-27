@@ -15,9 +15,26 @@ export function GameruleForm() {
   const rules = useMemo(() => {
     const tree = state.pack?.commands.children?.gamerule?.children
     if (!tree) return allRules
-    const names = new Set(Object.keys(tree))
-    const filtered = allRules.filter((rule) => names.has(rule.id))
-    return filtered.length > 0 ? filtered : allRules
+    const bySnake = new Map(allRules.map((rule) => [rule.id, rule]))
+    const camelToSnake = (value: string): string =>
+      value.replace(/[A-Z]/g, (char) => `_${char.toLowerCase()}`)
+    const dynamic = Object.entries(tree).map(([id, node]) => {
+      const meta = bySnake.get(id) ?? bySnake.get(camelToSnake(id))
+      const parser = node.children?.value?.parser
+      const type: GameruleRule['type'] =
+        meta?.type ?? (parser === 'brigadier:integer' ? 'integer' : 'boolean')
+      return {
+        id,
+        name: meta?.name ?? id,
+        description:
+          meta?.description ??
+          `来自 ${state.pack?.manifest.gameVersion ?? '当前版本'} 数据包命令树。`,
+        type,
+        min: meta?.min,
+        max: meta?.max
+      }
+    })
+    return dynamic.length > 0 ? dynamic : allRules
   }, [state.pack])
   const selected = useMemo(
     () => rules.find((rule) => rule.id === gamerule.rule) ?? rules[0],

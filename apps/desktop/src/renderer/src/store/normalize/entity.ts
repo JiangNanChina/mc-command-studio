@@ -137,6 +137,10 @@ export function normalizeAttribute(input: Partial<AttributeOptions> | undefined)
     scale: typeof input.scale === 'string' ? input.scale : fallback.scale,
     modifierId:
       typeof input.modifierId === 'string' ? input.modifierId : fallback.modifierId,
+    modifierUuid:
+      typeof input.modifierUuid === 'string' ? input.modifierUuid : fallback.modifierUuid,
+    modifierName:
+      typeof input.modifierName === 'string' ? input.modifierName : fallback.modifierName,
     modifierValue:
       typeof input.modifierValue === 'string' ? input.modifierValue : fallback.modifierValue,
     operation: operations.includes(input.operation as AttributeOptions['operation'])

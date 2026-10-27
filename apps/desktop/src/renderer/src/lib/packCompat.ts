@@ -20,6 +20,8 @@ export const LEGACY_SAFE_FORMS = new Set([
   'kick',
   'op',
   'deop',
+  'attribute',
+  'particle',
   'summon',
   'tp',
   'effect',

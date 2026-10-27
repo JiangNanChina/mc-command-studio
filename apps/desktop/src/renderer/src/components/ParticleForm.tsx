@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import {
   Eye,
   MapPin,
@@ -18,6 +18,7 @@ import { McIcon } from './McIcon'
 import { ParticlePickerDialog } from './ParticlePickerDialog'
 import { PositionInput } from './PositionInput'
 import { SelectorField } from './SelectorField'
+import { isLegacyNbtPack } from '../lib/versionFeatures'
 import { useAppStore } from '../store'
 
 const meta = COMMAND_MAP.get('particle')
@@ -40,6 +41,16 @@ export function ParticleForm() {
   const [pickerOpen, setPickerOpen] = useState(false)
   const [blockOpen, setBlockOpen] = useState(false)
   const [itemOpen, setItemOpen] = useState(false)
+  const legacy = isLegacyNbtPack(state.pack)
+  const optionModes = legacy
+    ? OPTION_MODES.filter((item) => item.value !== 'raw')
+    : OPTION_MODES
+
+  useEffect(() => {
+    if (legacy && particle.optionMode === 'raw') {
+      state.updateParticle({ optionMode: 'auto' })
+    }
+  }, [legacy, particle.optionMode, state])
 
   const ids = useMemo(() => {
     const list = state.pack?.registries.particle_type ?? []
@@ -109,7 +120,7 @@ export function ParticleForm() {
                 })
               }
             >
-              {OPTION_MODES.map((item) => (
+              {optionModes.map((item) => (
                 <option key={item.value} value={item.value}>
                   {item.label}
                 </option>
@@ -117,6 +128,7 @@ export function ParticleForm() {
             </select>
             <div className="hint">
               当前使用：{mode === 'none' ? '无参数' : OPTION_MODES.find((item) => item.value === mode)?.label}
+              {legacy ? '；1.20.4 使用旧参数语法' : ''}
             </div>
           </div>
 

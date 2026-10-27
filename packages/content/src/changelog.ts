@@ -22,6 +22,34 @@ const REPO = 'https://github.com/JiangNanChina/mc-command-studio'
  */
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: '0.1.50',
+    date: '2026-10-27',
+    title: '1.21.1 与 1.20.4 语法适配',
+    highlights: ['1.20.4 particle 旧参数、attribute UUID。', '1.21.1 gamerule/严格模式适配。'],
+    sections: [
+      {
+        type: 'added',
+        items: [
+          '1.20.4 particle 参数语法。',
+          '1.20.4 attribute UUID/name 修饰符。'
+        ]
+      },
+      {
+        type: 'improved',
+        items: [
+          '1.21.1 gamerule 动态名称/类型。',
+          '隐藏 1.21.1 的 base reset、fill/setblock strict。',
+          '单元测试 234 → 236。'
+        ]
+      },
+      {
+        type: 'fixed',
+        items: ['无。']
+      }
+    ],
+    releaseUrl: `${REPO}/releases/tag/v0.1.50`
+  },
+  {
     version: '0.1.49',
     date: '2026-10-27',
     title: '谓词新增记分板数值条件',

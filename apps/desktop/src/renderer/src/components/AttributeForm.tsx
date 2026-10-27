@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Activity, Gauge } from 'lucide-react'
 import {
   ATTRIBUTE_OPERATIONS,
@@ -8,6 +8,7 @@ import {
 import { COMMAND_MAP } from '@mcstudio/content'
 import { AttributePickerDialog, attributeName } from './AttributePickerDialog'
 import { SelectorField } from './SelectorField'
+import { hasCommandPath, isLegacyNbtPack } from '../lib/versionFeatures'
 import { useAppStore } from '../store'
 
 const meta = COMMAND_MAP.get('attribute')
@@ -26,6 +27,18 @@ export function AttributeForm() {
   const state = useAppStore()
   const attribute = state.attribute
   const [pickerOpen, setPickerOpen] = useState(false)
+  const legacy = isLegacyNbtPack(state.pack)
+  const supportsReset = hasCommandPath(
+    state.pack,
+    'attribute',
+    'target',
+    'attribute',
+    'base',
+    'reset'
+  )
+  const actions = ACTIONS.filter(
+    (action) => action.value !== 'base-reset' || supportsReset
+  )
   const showScale =
     attribute.action === 'get' ||
     attribute.action === 'base-get' ||
@@ -34,6 +47,12 @@ export function AttributeForm() {
     attribute.action === 'modifier-add' ||
     attribute.action === 'modifier-remove' ||
     attribute.action === 'modifier-value'
+
+  useEffect(() => {
+    if (!supportsReset && attribute.action === 'base-reset') {
+      state.updateAttribute({ action: 'get' })
+    }
+  }, [attribute.action, supportsReset, state])
 
   return (
     <div className="content">
@@ -88,7 +107,7 @@ export function AttributeForm() {
           </button>
 
           <div className="row" style={{ flexWrap: 'wrap', marginTop: 12 }}>
-            {ACTIONS.map((action) => (
+            {actions.map((action) => (
               <button
                 key={action.value}
                 type="button"
@@ -156,21 +175,56 @@ export function AttributeForm() {
           ) : null}
 
           {showModifier ? (
-            <div className="field" style={{ marginTop: 12 }}>
-              <label className="field-label" htmlFor="attribute-modifier-id">
-                修饰符 ID
-              </label>
-              <input
-                id="attribute-modifier-id"
-                className="input"
-                value={attribute.modifierId}
-                spellCheck={false}
-                onChange={(event) =>
-                  state.updateAttribute({ modifierId: event.target.value })
-                }
-              />
-              <div className="hint">格式 namespace:path，例如 mcstudio:bonus。</div>
-            </div>
+            legacy ? (
+              <>
+                <div className="field" style={{ marginTop: 12 }}>
+                  <label className="field-label" htmlFor="attribute-modifier-uuid">
+                    修饰符 UUID
+                  </label>
+                  <input
+                    id="attribute-modifier-uuid"
+                    className="input"
+                    value={attribute.modifierUuid}
+                    spellCheck={false}
+                    onChange={(event) =>
+                      state.updateAttribute({ modifierUuid: event.target.value })
+                    }
+                  />
+                </div>
+                <div className="field" style={{ marginTop: 12 }}>
+                  <label className="field-label" htmlFor="attribute-modifier-name">
+                    修饰符名称
+                  </label>
+                  <input
+                    id="attribute-modifier-name"
+                    className="input"
+                    value={attribute.modifierName}
+                    onChange={(event) =>
+                      state.updateAttribute({ modifierName: event.target.value })
+                    }
+                  />
+                </div>
+                <div className="hint" style={{ marginTop: 6 }}>
+                  1.20.4 使用 UUID + 名称标识修饰符。
+                </div>
+              </>
+            ) : (
+              <div className="field" style={{ marginTop: 12 }}>
+                <label className="field-label" htmlFor="attribute-modifier-id">
+                  修饰符 ID
+                </label>
+                <input
+                  id="attribute-modifier-id"
+                  className="input"
+                  value={attribute.modifierId}
+                  spellCheck={false}
+                  onChange={(event) =>
+                    state.updateAttribute({ modifierId: event.target.value })
+                  }
+                />
+                <div className="hint">格式 namespace:path，例如 mcstudio:bonus。</div>
+              </div>
+            )
           ) : null}
 
           {attribute.action === 'modifier-add' ? (

@@ -1,10 +1,11 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Boxes, Braces, MapPin, Settings2 } from 'lucide-react'
 import { COMMAND_MAP } from '@mcstudio/content'
 import { shortId, type SetblockMode } from '@mcstudio/core'
 import { BlockPickerDialog } from './BlockPickerDialog'
 import { McIcon } from './McIcon'
 import { mcName } from '../lib/mcAssets'
+import { hasLiteral } from '../lib/versionFeatures'
 import { useAppStore } from '../store'
 
 const meta = COMMAND_MAP.get('setblock')
@@ -20,6 +21,13 @@ export function SetblockForm() {
   const state = useAppStore()
   const options = state.setblock
   const [pickerOpen, setPickerOpen] = useState(false)
+  const supportsStrict = hasLiteral(state.pack, 'setblock', 'strict')
+  const modes = MODES.filter((mode) => mode.value !== 'strict' || supportsStrict)
+  useEffect(() => {
+    if (!supportsStrict && options.mode === 'strict') {
+      state.updateSetblock({ mode: 'replace' })
+    }
+  }, [options.mode, supportsStrict, state])
   const blockId = shortId(options.block.id)
   const definition = state.pack?.blocks[blockId]
   const properties = useMemo(() => {
@@ -189,7 +197,7 @@ export function SetblockForm() {
         </div>
         <div className="card-body">
           <div className="grid-2">
-            {MODES.map((mode) => (
+            {modes.map((mode) => (
               <label key={mode.value} className="checkline" style={{ whiteSpace: 'normal' }}>
                 <input
                   type="radio"

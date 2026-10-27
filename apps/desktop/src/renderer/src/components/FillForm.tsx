@@ -1,8 +1,9 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Boxes, Layers, Maximize2 } from 'lucide-react'
 import { COMMAND_MAP } from '@mcstudio/content'
 import type { FillMode } from '@mcstudio/core'
 import { mcName } from '../lib/mcAssets'
+import { hasLiteral } from '../lib/versionFeatures'
 import { BlockPickerDialog } from './BlockPickerDialog'
 import { McIcon } from './McIcon'
 import { PositionInput } from './PositionInput'
@@ -25,6 +26,14 @@ export function FillForm() {
   const state = useAppStore()
   const fill = state.fill
   const [pickerOpen, setPickerOpen] = useState(false)
+  const supportsStrict = hasLiteral(state.pack, 'fill', 'strict')
+  const modes = MODES.filter((mode) => mode.value !== 'strict' || supportsStrict)
+
+  useEffect(() => {
+    if (!supportsStrict && fill.mode === 'strict') {
+      state.updateFill({ mode: 'replace' })
+    }
+  }, [fill.mode, supportsStrict, state])
 
   return (
     <div className="content">
@@ -130,7 +139,7 @@ export function FillForm() {
                 value={fill.mode}
                 onChange={(event) => state.updateFill({ mode: event.target.value as FillMode })}
               >
-                {MODES.map((mode) => (
+                {modes.map((mode) => (
                   <option key={mode.value} value={mode.value}>
                     {mode.label}
                   </option>
