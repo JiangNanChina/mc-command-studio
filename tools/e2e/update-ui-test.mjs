@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-/** 更新 UI E2E：启动 0.6.0，指向更高的 mock 源，验证更新横幅。 */
+/** 更新 UI E2E：启动当前构建版本，指向更高版本（9.9.9）的 mock 源，验证更新横幅。 */
 import { _electron as electron } from 'playwright'
 import { spawn } from 'node:child_process'
 import { copyFile, mkdir, readFile, rm, writeFile } from 'node:fs/promises'
@@ -17,12 +17,12 @@ await rm(USER_DATA, { recursive: true, force: true })
 await mkdir(FEED, { recursive: true })
 await mkdir(USER_DATA, { recursive: true })
 
-await copyFile(
-  join(ROOT, 'release/MC-Command-Studio-Setup-0.6.0.exe'),
-  join(FEED, 'MC-Command-Studio-Setup-0.6.0.exe')
-)
+const PKG = JSON.parse(await readFile(join(ROOT, 'package.json'), 'utf8'))
+const INSTALLER = `MC-Command-Studio-Setup-${PKG.version}.exe`
+
+await copyFile(join(ROOT, 'release', INSTALLER), join(FEED, INSTALLER))
 const latest = await readFile(join(ROOT, 'release/latest.yml'), 'utf8')
-await writeFile(join(FEED, 'latest.yml'), latest.replace(/^version: 0\.6\.0/m, 'version: 9.9.9'))
+await writeFile(join(FEED, 'latest.yml'), latest.replace(/^version: .+$/m, 'version: 9.9.9'))
 
 const server = spawn(process.execPath, [SERVER, FEED, String(PORT)], {
   cwd: ROOT,

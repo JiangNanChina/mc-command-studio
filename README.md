@@ -12,7 +12,7 @@
 
 ![give 表单](docs/assets/give-form.png)
 
-## 功能（0.6.0）
+## 功能（0.6.1）
 
 - **品牌图标**：命令方块主题的应用图标、安装包图标与界面 Logo。
 - **更新公告**：只展示当前版本更新，历史版本跳转 GitHub Releases；不再显示已知问题。
@@ -34,7 +34,8 @@
 - **进度与自动化**：`advancement` 授予/收回、`function` 宏参数、`schedule` 延迟/清除。
 - **物品槽位**：`item` 实体/方块容器替换、1–99 数量、物品修饰符。
 - **高级数据包**：谓词、进度、战利品表 JSON 模板与校验；三者均支持常用结构可视化。
-- **NBT 与战利品**：`data` 查询/修改/合并/删除（含 from 来源），`loot` 给予/生成/插入。
+- **NBT 与战利品**：`data` 查询/修改/合并/删除（含 from 来源），`loot` 给予/生成/插入/替换。
+- **NBT 版本过滤**：1.13–1.20.4 的 `execute` / `data` 选项按当前版本命令树过滤，不出现越版字段。
 - **队伍文本**：`team` 前缀/后缀与高级显示名可视化文本组件。
 - **单元体系**：资源 ID、数值、物品栈、槽位统一校验。
 - **一键模板库**：8 个模板；支持切换目标版本（含 1.20.4 NBT 剑）。
@@ -91,8 +92,8 @@ pnpm build:win          # 安装包 + 便携版 + latest.yml
 
 产物在 `release/`：
 
-- `MC-Command-Studio-Setup-0.6.0.exe`
-- `MC-Command-Studio-0.6.0-portable.exe`
+- `MC-Command-Studio-Setup-0.6.1.exe`
+- `MC-Command-Studio-0.6.1-portable.exe`
 - `latest.yml`、`.blockmap`
 
 如果 `pnpm install` 后没有 Electron 二进制，运行 `pnpm setup:electron`；国内网络可设置：

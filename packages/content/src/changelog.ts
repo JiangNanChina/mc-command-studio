@@ -22,6 +22,40 @@ const REPO = 'https://github.com/JiangNanChina/mc-command-studio'
  */
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: '0.6.1',
+    date: '2026-10-28',
+    title: 'NBT 版本过滤与战利品替换',
+    highlights: [
+      '1.13–1.20.4 的选项按版本过滤。',
+      'loot replace 与 NBT 预设库。',
+      '单元测试 277。'
+    ],
+    sections: [
+      {
+        type: 'added',
+        items: [
+          'loot replace 动作（方块 / 实体槽位）。',
+          'NBT item / entity 预设库。',
+          '45 个基础包图标与中文名审计脚本。'
+        ]
+      },
+      {
+        type: 'improved',
+        items: [
+          '1.13–1.20.4 的 execute 子命令与条件按命令树过滤。',
+          '同区间 data 动作按版本过滤（1.13 不显示 modify）。',
+          '旧版图标与中文名别名抽到 legacy-assets.json。',
+          '1.12.2 teleport 支持 tp / teleport 切换。'
+        ]
+      },
+      {
+        type: 'fixed',
+        items: ['1.13 manifest 指向 1.13.2 别名的问题，1.13 现为独立数据包。']
+      }
+    ],
+    releaseUrl: REPO + '/releases/tag/v0.6.1'
+  },
+  {
     version: '0.6.0',
     date: '2026-10-27',
     title: '1.12.2 全覆盖与 NBT 表单',
