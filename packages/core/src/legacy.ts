@@ -84,6 +84,44 @@ export function createDefaultSave(): LegacySaveOptions {
   return { action: 'hold' }
 }
 
+export function createDefaultSound(): LegacySoundOptions {
+  return {
+    action: 'play',
+    sound: 'minecraft:entity.player.levelup',
+    source: 'master',
+    target: '@a',
+    x: '~',
+    y: '~',
+    z: '~',
+    volume: '1',
+    pitch: '1',
+    minVolume: ''
+  }
+}
+
+export function createDefaultTeleport(): LegacyTeleportOptions {
+  return {
+    mode: 'coords',
+    target: '@s',
+    destination: '@p',
+    x: '~',
+    y: '~',
+    z: '~',
+    yaw: '',
+    pitch: ''
+  }
+}
+
+export function createDefaultAdmin(): LegacyAdminOptions {
+  return {
+    action: 'kick',
+    target: '@p',
+    reason: '请稍后再试',
+    listType: 'players',
+    whitelistAction: 'add'
+  }
+}
+
 export function createDefaultEffect(): LegacyEffectOptions {
   return {
     action: 'give',
@@ -308,6 +346,47 @@ export interface LegacyIdleOptions {
 
 export interface LegacySaveOptions {
   action: 'hold' | 'query'
+}
+
+export interface LegacySoundOptions {
+  action: 'play' | 'stop'
+  sound: string
+  source: string
+  target: string
+  x: string
+  y: string
+  z: string
+  volume: string
+  pitch: string
+  minVolume: string
+}
+
+export interface LegacyTeleportOptions {
+  mode: 'coords' | 'entity'
+  target: string
+  destination: string
+  x: string
+  y: string
+  z: string
+  yaw: string
+  pitch: string
+}
+
+export interface LegacyAdminOptions {
+  action:
+    | 'ban'
+    | 'ban-ip'
+    | 'banlist'
+    | 'pardon'
+    | 'pardon-ip'
+    | 'whitelist'
+    | 'op'
+    | 'deop'
+    | 'kick'
+  target: string
+  reason: string
+  listType: 'players' | 'ips'
+  whitelistAction: 'add' | 'remove' | 'list'
 }
 
 export interface LegacyEffectOptions {
@@ -625,6 +704,68 @@ export function buildSetidletimeout(options: LegacyIdleOptions): BuildResult {
 
 export function buildSave(options: LegacySaveOptions): BuildResult {
   return finish(['save', options.action], [])
+}
+
+export function buildSound(options: LegacySoundOptions): BuildResult {
+  const diagnostics: Diagnostic[] = []
+  if (!options.target.trim()) diagnostics.push(error('legacy.target', '目标不能为空', 'target'))
+  if (options.action === 'stop') {
+    if (!options.sound.trim() && !options.source.trim()) {
+      return finish(['stopsound', options.target.trim()], diagnostics)
+    }
+    return finish(
+      ['stopsound', options.target.trim(), options.source.trim(), options.sound.trim()].filter(Boolean),
+      diagnostics
+    )
+  }
+  if (!options.sound.trim()) diagnostics.push(error('legacy.sound', '声音不能为空', 'sound'))
+  return finish(
+    [
+      'playsound',
+      options.sound.trim(),
+      options.source.trim() || 'master',
+      options.target.trim(),
+      options.x.trim(),
+      options.y.trim(),
+      options.z.trim(),
+      options.volume.trim() || '1',
+      options.pitch.trim() || '1',
+      options.minVolume.trim()
+    ].filter(Boolean),
+    diagnostics
+  )
+}
+
+export function buildTeleport(options: LegacyTeleportOptions): BuildResult {
+  const diagnostics: Diagnostic[] = []
+  if (!options.target.trim()) diagnostics.push(error('legacy.target', '目标不能为空', 'target'))
+  if (options.mode === 'entity') {
+    if (!options.destination.trim()) {
+      diagnostics.push(error('legacy.destination', '目标实体不能为空', 'destination'))
+    }
+    return finish(['tp', options.target.trim(), options.destination.trim()], diagnostics)
+  }
+  const parts = ['tp', options.target.trim(), options.x.trim(), options.y.trim(), options.z.trim()]
+  if (options.yaw.trim() && options.pitch.trim()) parts.push(options.yaw.trim(), options.pitch.trim())
+  return finish(parts, diagnostics)
+}
+
+export function buildAdmin(options: LegacyAdminOptions): BuildResult {
+  const diagnostics: Diagnostic[] = []
+  if (options.action === 'banlist') return finish(['banlist', options.listType], diagnostics)
+  if (options.action === 'whitelist' && options.whitelistAction === 'list') {
+    return finish(['whitelist', 'list'], diagnostics)
+  }
+  if (!options.target.trim()) diagnostics.push(error('legacy.target', '目标不能为空', 'target'))
+  if (options.action === 'whitelist') {
+    return finish(['whitelist', options.whitelistAction, options.target.trim()], diagnostics)
+  }
+  if (options.action === 'op' || options.action === 'deop' || options.action === 'pardon' || options.action === 'pardon-ip') {
+    return finish([options.action, options.target.trim()], diagnostics)
+  }
+  const parts = [options.action, options.target.trim()]
+  if (options.reason.trim()) parts.push(options.reason.trim())
+  return finish(parts, diagnostics)
 }
 
 export function buildEffect(options: LegacyEffectOptions): BuildResult {

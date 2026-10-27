@@ -31,6 +31,9 @@ import {
   buildTellraw,
   buildEffect,
   buildEnchant,
+  buildSound,
+  buildTeleport,
+  buildAdmin,
   createDefaultBlockdata,
   createDefaultEntitydata,
   createDefaultGive,
@@ -56,12 +59,15 @@ import {
   createDefaultXp,
   createDefaultTellraw,
   createDefaultEffect,
-  createDefaultEnchant
+  createDefaultEnchant,
+  createDefaultSound,
+  createDefaultTeleport,
+  createDefaultAdmin
 } from '@mcstudio/core'
 import { useAppStore } from '../store'
 import { CustomPresetBar } from './CustomPresetBar'
 
-type LegacyTab = 'testfor' | 'blockdata' | 'entitydata' | 'replaceitem' | 'give' | 'testforblock' | 'testforblocks' | 'achievement' | 'trigger' | 'setidletimeout' | 'save' | 'stats' | 'scoreboard' | 'execute' | 'advancement' | 'clear' | 'worldborder' | 'spreadplayers' | 'title' | 'particle' | 'summon' | 'gamerule' | 'xp' | 'tellraw' | 'effect' | 'enchant'
+type LegacyTab = 'testfor' | 'blockdata' | 'entitydata' | 'replaceitem' | 'give' | 'testforblock' | 'testforblocks' | 'achievement' | 'trigger' | 'setidletimeout' | 'save' | 'stats' | 'scoreboard' | 'execute' | 'advancement' | 'clear' | 'worldborder' | 'spreadplayers' | 'title' | 'particle' | 'summon' | 'gamerule' | 'xp' | 'tellraw' | 'effect' | 'enchant' | 'sound' | 'teleport' | 'admin'
 
 const TABS: { id: LegacyTab; label: string }[] = [
   { id: 'testfor', label: 'testfor' },
@@ -89,7 +95,10 @@ const TABS: { id: LegacyTab; label: string }[] = [
   { id: 'xp', label: 'xp' },
   { id: 'tellraw', label: 'tellraw' },
   { id: 'effect', label: 'effect' },
-  { id: 'enchant', label: 'enchant' }
+  { id: 'enchant', label: 'enchant' },
+  { id: 'sound', label: 'sound' },
+  { id: 'teleport', label: 'teleport' },
+  { id: 'admin', label: 'admin' }
 ]
 
 export function LegacyToolsForm() {
@@ -121,6 +130,9 @@ export function LegacyToolsForm() {
   const [tellraw, setTellraw] = useState(createDefaultTellraw)
   const [effect, setEffect] = useState(createDefaultEffect)
   const [enchant, setEnchant] = useState(createDefaultEnchant)
+  const [sound, setSound] = useState(createDefaultSound)
+  const [teleport, setTeleport] = useState(createDefaultTeleport)
+  const [admin, setAdmin] = useState(createDefaultAdmin)
   const pack = useAppStore((state) => state.pack)
   const itemOptions = pack?.registries.item ?? []
   const blockOptions = pack?.registries.block ?? []
@@ -152,8 +164,11 @@ export function LegacyToolsForm() {
     if (tab === 'tellraw') return buildTellraw(tellraw)
     if (tab === 'effect') return buildEffect(effect)
     if (tab === 'enchant') return buildEnchant(enchant)
+    if (tab === 'sound') return buildSound(sound)
+    if (tab === 'teleport') return buildTeleport(teleport)
+    if (tab === 'admin') return buildAdmin(admin)
     return buildReplaceitem(replaceitem)
-  }, [tab, testfor, blockdata, entitydata, replaceitem, give, testforblock, testforblocks, achievement, trigger, idle, save, stats, scoreboard, execute, advancement, clear, worldborder, spreadplayers, title, particle, summon, gamerule, xp, tellraw, effect, enchant])
+  }, [tab, testfor, blockdata, entitydata, replaceitem, give, testforblock, testforblocks, achievement, trigger, idle, save, stats, scoreboard, execute, advancement, clear, worldborder, spreadplayers, title, particle, summon, gamerule, xp, tellraw, effect, enchant, sound, teleport, admin])
 
   const copy = async () => {
     if (!result.text) return
@@ -1237,6 +1252,146 @@ export function LegacyToolsForm() {
                   onChange={(event) => setEnchant({ ...enchant, level: event.target.value })} />
               </div>
             </div>
+          ) : null}
+
+          {tab === 'sound' ? (
+            <>
+              <div className="grid-2">
+                <div className="field">
+                  <label className="field-label" htmlFor="legacy-sound-action">动作</label>
+                  <select id="legacy-sound-action" className="select" value={sound.action}
+                    onChange={(event) => setSound({ ...sound, action: event.target.value as 'play' | 'stop' })}>
+                    <option value="play">playsound</option>
+                    <option value="stop">stopsound</option>
+                  </select>
+                </div>
+                <div className="field">
+                  <label className="field-label" htmlFor="legacy-sound-target">目标</label>
+                  <input id="legacy-sound-target" className="input" value={sound.target}
+                    onChange={(event) => setSound({ ...sound, target: event.target.value })} />
+                </div>
+              </div>
+              <div className="grid-3" style={{ marginTop: 12 }}>
+                <div className="field">
+                  <label className="field-label" htmlFor="legacy-sound-name">声音</label>
+                  <input id="legacy-sound-name" className="input" value={sound.sound}
+                    onChange={(event) => setSound({ ...sound, sound: event.target.value })} />
+                </div>
+                <div className="field">
+                  <label className="field-label" htmlFor="legacy-sound-source">声道</label>
+                  <input id="legacy-sound-source" className="input" value={sound.source}
+                    onChange={(event) => setSound({ ...sound, source: event.target.value })} />
+                </div>
+                <div className="field">
+                  <label className="field-label" htmlFor="legacy-sound-volume">音量</label>
+                  <input id="legacy-sound-volume" className="input" value={sound.volume}
+                    onChange={(event) => setSound({ ...sound, volume: event.target.value })} />
+                </div>
+              </div>
+              {sound.action === 'play' ? (
+                <div className="grid-3" style={{ marginTop: 12 }}>
+                  {(['x', 'y', 'z', 'pitch', 'minVolume'] as const).map((key) => (
+                    <div className="field" key={key}>
+                      <label className="field-label" htmlFor={`legacy-sound-${key}`}>{key}</label>
+                      <input id={`legacy-sound-${key}`} className="input" value={sound[key]}
+                        onChange={(event) => setSound({ ...sound, [key]: event.target.value })} />
+                    </div>
+                  ))}
+                </div>
+              ) : null}
+            </>
+          ) : null}
+
+          {tab === 'teleport' ? (
+            <>
+              <div className="grid-2">
+                <div className="field">
+                  <label className="field-label" htmlFor="legacy-tp-mode">模式</label>
+                  <select id="legacy-tp-mode" className="select" value={teleport.mode}
+                    onChange={(event) => setTeleport({ ...teleport, mode: event.target.value as 'coords' | 'entity' })}>
+                    <option value="coords">坐标</option>
+                    <option value="entity">实体</option>
+                  </select>
+                </div>
+                <div className="field">
+                  <label className="field-label" htmlFor="legacy-tp-target">目标</label>
+                  <input id="legacy-tp-target" className="input" value={teleport.target}
+                    onChange={(event) => setTeleport({ ...teleport, target: event.target.value })} />
+                </div>
+              </div>
+              {teleport.mode === 'entity' ? (
+                <div className="field" style={{ marginTop: 12 }}>
+                  <label className="field-label" htmlFor="legacy-tp-destination">目标实体</label>
+                  <input id="legacy-tp-destination" className="input" value={teleport.destination}
+                    onChange={(event) => setTeleport({ ...teleport, destination: event.target.value })} />
+                </div>
+              ) : (
+                <div className="grid-3" style={{ marginTop: 12 }}>
+                  {(['x', 'y', 'z', 'yaw', 'pitch'] as const).map((key) => (
+                    <div className="field" key={key}>
+                      <label className="field-label" htmlFor={`legacy-tp-${key}`}>{key}</label>
+                      <input id={`legacy-tp-${key}`} className="input" value={teleport[key]}
+                        onChange={(event) => setTeleport({ ...teleport, [key]: event.target.value })} />
+                    </div>
+                  ))}
+                </div>
+              )}
+            </>
+          ) : null}
+
+          {tab === 'admin' ? (
+            <>
+              <div className="grid-2">
+                <div className="field">
+                  <label className="field-label" htmlFor="legacy-admin-action">动作</label>
+                  <select id="legacy-admin-action" className="select" value={admin.action}
+                    onChange={(event) => setAdmin({ ...admin, action: event.target.value as typeof admin.action })}>
+                    <option value="ban">ban</option>
+                    <option value="ban-ip">ban-ip</option>
+                    <option value="banlist">banlist</option>
+                    <option value="pardon">pardon</option>
+                    <option value="pardon-ip">pardon-ip</option>
+                    <option value="whitelist">whitelist</option>
+                    <option value="op">op</option>
+                    <option value="deop">deop</option>
+                    <option value="kick">kick</option>
+                  </select>
+                </div>
+                <div className="field">
+                  <label className="field-label" htmlFor="legacy-admin-target">目标</label>
+                  <input id="legacy-admin-target" className="input" value={admin.target}
+                    onChange={(event) => setAdmin({ ...admin, target: event.target.value })} />
+                </div>
+              </div>
+              {admin.action === 'banlist' ? (
+                <div className="field" style={{ marginTop: 12 }}>
+                  <label className="field-label" htmlFor="legacy-admin-list">列表</label>
+                  <select id="legacy-admin-list" className="select" value={admin.listType}
+                    onChange={(event) => setAdmin({ ...admin, listType: event.target.value as 'players' | 'ips' })}>
+                    <option value="players">players</option>
+                    <option value="ips">ips</option>
+                  </select>
+                </div>
+              ) : null}
+              {admin.action === 'whitelist' ? (
+                <div className="field" style={{ marginTop: 12 }}>
+                  <label className="field-label" htmlFor="legacy-admin-whitelist">白名单动作</label>
+                  <select id="legacy-admin-whitelist" className="select" value={admin.whitelistAction}
+                    onChange={(event) => setAdmin({ ...admin, whitelistAction: event.target.value as typeof admin.whitelistAction })}>
+                    <option value="add">add</option>
+                    <option value="remove">remove</option>
+                    <option value="list">list</option>
+                  </select>
+                </div>
+              ) : null}
+              {['ban', 'ban-ip', 'kick'].includes(admin.action) ? (
+                <div className="field" style={{ marginTop: 12 }}>
+                  <label className="field-label" htmlFor="legacy-admin-reason">原因</label>
+                  <input id="legacy-admin-reason" className="input" value={admin.reason}
+                    onChange={(event) => setAdmin({ ...admin, reason: event.target.value })} />
+                </div>
+              ) : null}
+            </>
           ) : null}
 
           {result.diagnostics.length > 0 ? (

@@ -116,7 +116,7 @@ pnpm data:verify
 ## 测试
 
 ```bash
-pnpm test        # 267 个核心逻辑用例
+pnpm test        # 268 个核心逻辑用例
 pnpm e2e         # Playwright 启动 Electron，覆盖 give/导入/summon/setblock/命令方块
 ```
 

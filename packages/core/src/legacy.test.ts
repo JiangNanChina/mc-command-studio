@@ -26,6 +26,9 @@ import {
   buildTellraw,
   buildEffect,
   buildEnchant,
+  buildSound,
+  buildTeleport,
+  buildAdmin,
   createDefaultBlockdata,
   createDefaultEntitydata,
   createDefaultGive,
@@ -45,7 +48,10 @@ import {
   createDefaultXp,
   createDefaultTellraw,
   createDefaultEffect,
-  createDefaultEnchant
+  createDefaultEnchant,
+  createDefaultSound,
+  createDefaultTeleport,
+  createDefaultAdmin
 } from './legacy'
 
 describe('1.12 legacy commands', () => {
@@ -118,6 +124,29 @@ describe('1.12 legacy commands', () => {
     ).toBe('stats entity @p set SuccessCount kills')
     expect(buildStats({ ...base, action: 'clear', stat: 'SuccessCount' }).text).toBe(
       'stats entity @p clear SuccessCount'
+    )
+  })
+
+  it('builds sound, teleport and admin', () => {
+    expect(
+      buildSound({
+        ...createDefaultSound(),
+        action: 'play',
+        sound: 'minecraft:entity.player.levelup',
+        source: 'master',
+        target: '@a',
+        x: '~',
+        y: '~',
+        z: '~',
+        volume: '1',
+        pitch: '1'
+      }).text
+    ).toBe('playsound minecraft:entity.player.levelup master @a ~ ~ ~ 1 1')
+    expect(buildTeleport({ ...createDefaultTeleport(), mode: 'entity', target: '@s', destination: '@p' }).text).toBe(
+      'tp @s @p'
+    )
+    expect(buildAdmin({ ...createDefaultAdmin(), action: 'whitelist', whitelistAction: 'add', target: 'Steve' }).text).toBe(
+      'whitelist add Steve'
     )
   })
 
