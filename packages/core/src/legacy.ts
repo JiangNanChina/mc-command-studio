@@ -84,6 +84,21 @@ export function createDefaultSave(): LegacySaveOptions {
   return { action: 'hold' }
 }
 
+export function createDefaultEffect(): LegacyEffectOptions {
+  return {
+    action: 'give',
+    target: '@p',
+    effect: 'minecraft:speed',
+    seconds: '30',
+    amplifier: '1',
+    hideParticles: false
+  }
+}
+
+export function createDefaultEnchant(): LegacyEnchantOptions {
+  return { target: '@p', enchantment: 'minecraft:sharpness', level: '5' }
+}
+
 export function createDefaultXp(): LegacyXpOptions {
   return { amount: '100', levels: false, target: '@p' }
 }
@@ -293,6 +308,21 @@ export interface LegacyIdleOptions {
 
 export interface LegacySaveOptions {
   action: 'hold' | 'query'
+}
+
+export interface LegacyEffectOptions {
+  action: 'give' | 'clear'
+  target: string
+  effect: string
+  seconds: string
+  amplifier: string
+  hideParticles: boolean
+}
+
+export interface LegacyEnchantOptions {
+  target: string
+  enchantment: string
+  level: string
 }
 
 export interface LegacyXpOptions {
@@ -595,6 +625,33 @@ export function buildSetidletimeout(options: LegacyIdleOptions): BuildResult {
 
 export function buildSave(options: LegacySaveOptions): BuildResult {
   return finish(['save', options.action], [])
+}
+
+export function buildEffect(options: LegacyEffectOptions): BuildResult {
+  const diagnostics: Diagnostic[] = []
+  if (!options.target.trim()) diagnostics.push(error('legacy.target', '目标不能为空', 'target'))
+  if (options.action === 'clear') return finish(['effect', options.target.trim(), 'clear'], diagnostics)
+  if (!options.effect.trim()) diagnostics.push(error('legacy.effect', '效果不能为空', 'effect'))
+  const parts = ['effect', options.target.trim(), options.effect.trim()]
+  if (options.seconds.trim()) parts.push(options.seconds.trim())
+  if (options.amplifier.trim()) parts.push(options.amplifier.trim())
+  if (options.hideParticles) parts.push('true')
+  return finish(parts, diagnostics)
+}
+
+export function buildEnchant(options: LegacyEnchantOptions): BuildResult {
+  const diagnostics: Diagnostic[] = []
+  if (!options.target.trim()) diagnostics.push(error('legacy.target', '目标不能为空', 'target'))
+  if (!options.enchantment.trim()) {
+    diagnostics.push(error('legacy.enchantment', '附魔不能为空', 'enchantment'))
+  }
+  if (!/^\d+$/.test(options.level.trim())) {
+    diagnostics.push(error('legacy.level', '等级必须是非负整数', 'level'))
+  }
+  return finish(
+    ['enchant', options.target.trim(), options.enchantment.trim(), options.level.trim()],
+    diagnostics
+  )
 }
 
 export function buildXp(options: LegacyXpOptions): BuildResult {

@@ -610,8 +610,8 @@ export const useAppStore = create<AppStore>()(
 
     selectCommand: (id) => {
       set((state) => {
+        if (id !== state.activeCommandId) state.quickCommand = ''
         state.activeCommandId = id
-        state.quickCommand = ''
         if (id) {
           state.generic = { root: id, steps: [] }
         }

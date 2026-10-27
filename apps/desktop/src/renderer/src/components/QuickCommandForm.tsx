@@ -14,6 +14,7 @@ interface QuickField {
   placeholder?: string
   visible?: (values: Record<string, string>) => boolean
   optionRoot?: string
+  optionsRegistry?: string | ((values: Record<string, string>) => string)
 }
 
 interface QuickSchema {
@@ -251,7 +252,7 @@ export const QUICK_SCHEMAS: Record<string, QuickSchema> = {
   },
   test: {
     fields: [
-      { key: 'action', label: '动作', kind: 'select', options: ['run', 'runclosest', 'runfailed', 'runmultiple', 'stop', 'clearall', 'clearthat', 'clearthese', 'verify', 'locate', 'create'], defaultValue: 'run', optionRoot: 'test' },
+      { key: 'action', label: '动作', kind: 'select', options: ['run', 'runclosest', 'runfailed', 'runmultiple', 'stop', 'clearall', 'clearthat', 'clearthese', 'verify', 'locate', 'create', 'pos', 'resetclosest', 'resetthat', 'resetthese'], defaultValue: 'run', optionRoot: 'test' },
       { key: 'tests', label: '测试选择器', kind: 'text', defaultValue: '@e', visible: (v) => ['run', 'runmultiple', 'verify', 'locate'].includes(v.action) },
       { key: 'id', label: '测试实例 ID', kind: 'text', defaultValue: 'minecraft:always_pass', visible: (v) => v.action === 'create' },
       { key: 'width', label: '宽度', kind: 'text', defaultValue: '5', visible: (v) => v.action === 'create' },
@@ -260,7 +261,8 @@ export const QUICK_SCHEMAS: Record<string, QuickSchema> = {
       { key: 'times', label: '执行次数（可选）', kind: 'text', defaultValue: '', visible: (v) => ['run', 'runclosest', 'runfailed'].includes(v.action) },
       { key: 'until', label: '失败即停', kind: 'select', options: ['false', 'true'], defaultValue: 'false', visible: (v) => ['run', 'runclosest', 'runfailed'].includes(v.action) && Boolean(v.times?.trim()) },
       { key: 'amount', label: '数量', kind: 'text', defaultValue: '1', visible: (v) => v.action === 'runmultiple' },
-      { key: 'radius', label: '半径（可选）', kind: 'text', defaultValue: '', visible: (v) => v.action === 'clearall' }
+      { key: 'radius', label: '半径（可选）', kind: 'text', defaultValue: '', visible: (v) => v.action === 'clearall' },
+      { key: 'var', label: '变量名', kind: 'text', defaultValue: 'value', visible: (v) => v.action === 'pos' }
     ],
     build: (v) => {
       const tail = v.times?.trim() ? ` ${v.times.trim()}${v.until === 'true' ? ' true' : ''}` : ''
@@ -271,6 +273,7 @@ export const QUICK_SCHEMAS: Record<string, QuickSchema> = {
       if (v.action === 'verify') return `test verify ${v.tests}`
       if (v.action === 'locate') return `test locate ${v.tests}`
       if (v.action === 'create') return `test create ${v.id} ${v.width} ${v.height} ${v.depth}`
+      if (v.action === 'pos') return `test pos ${v.var}`
       return `test ${v.action}`
     }
   },
@@ -302,9 +305,8 @@ export const QUICK_SCHEMAS: Record<string, QuickSchema> = {
       { key: 'targetType', label: '计算目标', kind: 'select', options: ['default', 'entity', 'block'], defaultValue: 'default', optionRoot: 'compute' },
       { key: 'target', label: '实体/方块坐标', kind: 'text', defaultValue: '@s', visible: (v) => v.targetType !== 'default' },
       { key: 'valueType', label: '数值类型', kind: 'select', options: ['float', 'integer'], defaultValue: 'float' },
-      { key: 'providerPreset', label: 'Provider 类型', kind: 'select', options: ['constant', 'custom'], defaultValue: 'constant' },
-      { key: 'constantValue', label: '常量值', kind: 'text', defaultValue: '1.0', visible: (v) => v.providerPreset === 'constant' },
-      { key: 'provider', label: '自定义 Provider', kind: 'text', defaultValue: 'constant(1.0)', visible: (v) => v.providerPreset === 'custom' },
+      { key: 'floatProvider', label: 'Float Provider', kind: 'select', options: [], defaultValue: 'minecraft:brewing/speed_default', optionsRegistry: 'context_float_provider', visible: (v) => v.valueType === 'float' },
+      { key: 'integerProvider', label: 'Integer Provider', kind: 'select', options: [], defaultValue: 'minecraft:brewing/uses_default', optionsRegistry: 'context_int_provider', visible: (v) => v.valueType === 'integer' },
       { key: 'scale', label: 'float 缩放（可选）', kind: 'text', defaultValue: '', visible: (v) => v.valueType === 'float' }
     ],
     build: (v) => {
@@ -315,7 +317,7 @@ export const QUICK_SCHEMAS: Record<string, QuickSchema> = {
             ? `compute block ${v.target}`
             : 'compute default'
       const provider =
-        v.providerPreset === 'custom' ? v.provider : `constant(${v.constantValue})`
+        v.valueType === 'integer' ? v.integerProvider : v.floatProvider
       if (v.valueType === 'integer') return `${prefix} integer ${provider}`
       return `${prefix} float ${provider}${v.scale.trim() ? ` ${v.scale.trim()}` : ''}`
     }
@@ -388,7 +390,8 @@ const NBT_SAFE_QUICK = new Set([
   'return',
   'perf',
   'jfr',
-  'debug'
+  'debug',
+  'place'
 ])
 
 /** NBT 版本（1.13–1.20.4）可安全复用的快捷表单。 */
@@ -420,6 +423,14 @@ export function QuickCommandForm({ id }: { id: string }) {
   }, [setQuickCommand, text])
 
   const optionsFor = (field: QuickField): string[] => {
+    if (field.optionsRegistry) {
+      const key =
+        typeof field.optionsRegistry === 'function'
+          ? field.optionsRegistry(values)
+          : field.optionsRegistry
+      const registry = pack?.registries[key] ?? []
+      if (registry.length > 0) return registry.map((id) => `minecraft:${id}`)
+    }
     const options = field.options ?? []
     if (!field.optionRoot) return options
     const allowed = options.filter((option) =>

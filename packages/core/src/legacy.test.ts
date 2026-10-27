@@ -24,6 +24,8 @@ import {
   buildGamerule,
   buildXp,
   buildTellraw,
+  buildEffect,
+  buildEnchant,
   createDefaultBlockdata,
   createDefaultEntitydata,
   createDefaultGive,
@@ -41,7 +43,9 @@ import {
   createDefaultSummon,
   createDefaultGamerule,
   createDefaultXp,
-  createDefaultTellraw
+  createDefaultTellraw,
+  createDefaultEffect,
+  createDefaultEnchant
 } from './legacy'
 
 describe('1.12 legacy commands', () => {
@@ -115,6 +119,22 @@ describe('1.12 legacy commands', () => {
     expect(buildStats({ ...base, action: 'clear', stat: 'SuccessCount' }).text).toBe(
       'stats entity @p clear SuccessCount'
     )
+  })
+
+  it('builds effect and enchant', () => {
+    expect(
+      buildEffect({
+        action: 'give',
+        target: '@p',
+        effect: 'minecraft:speed',
+        seconds: '30',
+        amplifier: '1',
+        hideParticles: false
+      }).text
+    ).toBe('effect @p minecraft:speed 30 1')
+    expect(
+      buildEnchant({ target: '@p', enchantment: 'minecraft:sharpness', level: '5' }).text
+    ).toBe('enchant @p minecraft:sharpness 5')
   })
 
   it('builds xp and tellraw', () => {

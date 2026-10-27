@@ -29,6 +29,8 @@ import {
   buildGamerule,
   buildXp,
   buildTellraw,
+  buildEffect,
+  buildEnchant,
   createDefaultBlockdata,
   createDefaultEntitydata,
   createDefaultGive,
@@ -52,12 +54,14 @@ import {
   createDefaultSummon,
   createDefaultGamerule,
   createDefaultXp,
-  createDefaultTellraw
+  createDefaultTellraw,
+  createDefaultEffect,
+  createDefaultEnchant
 } from '@mcstudio/core'
 import { useAppStore } from '../store'
 import { CustomPresetBar } from './CustomPresetBar'
 
-type LegacyTab = 'testfor' | 'blockdata' | 'entitydata' | 'replaceitem' | 'give' | 'testforblock' | 'testforblocks' | 'achievement' | 'trigger' | 'setidletimeout' | 'save' | 'stats' | 'scoreboard' | 'execute' | 'advancement' | 'clear' | 'worldborder' | 'spreadplayers' | 'title' | 'particle' | 'summon' | 'gamerule' | 'xp' | 'tellraw'
+type LegacyTab = 'testfor' | 'blockdata' | 'entitydata' | 'replaceitem' | 'give' | 'testforblock' | 'testforblocks' | 'achievement' | 'trigger' | 'setidletimeout' | 'save' | 'stats' | 'scoreboard' | 'execute' | 'advancement' | 'clear' | 'worldborder' | 'spreadplayers' | 'title' | 'particle' | 'summon' | 'gamerule' | 'xp' | 'tellraw' | 'effect' | 'enchant'
 
 const TABS: { id: LegacyTab; label: string }[] = [
   { id: 'testfor', label: 'testfor' },
@@ -83,7 +87,9 @@ const TABS: { id: LegacyTab; label: string }[] = [
   { id: 'summon', label: 'summon' },
   { id: 'gamerule', label: 'gamerule' },
   { id: 'xp', label: 'xp' },
-  { id: 'tellraw', label: 'tellraw' }
+  { id: 'tellraw', label: 'tellraw' },
+  { id: 'effect', label: 'effect' },
+  { id: 'enchant', label: 'enchant' }
 ]
 
 export function LegacyToolsForm() {
@@ -113,6 +119,8 @@ export function LegacyToolsForm() {
   const [gamerule, setGamerule] = useState(createDefaultGamerule)
   const [xp, setXp] = useState(createDefaultXp)
   const [tellraw, setTellraw] = useState(createDefaultTellraw)
+  const [effect, setEffect] = useState(createDefaultEffect)
+  const [enchant, setEnchant] = useState(createDefaultEnchant)
   const pack = useAppStore((state) => state.pack)
   const itemOptions = pack?.registries.item ?? []
   const blockOptions = pack?.registries.block ?? []
@@ -142,8 +150,10 @@ export function LegacyToolsForm() {
     if (tab === 'gamerule') return buildGamerule(gamerule)
     if (tab === 'xp') return buildXp(xp)
     if (tab === 'tellraw') return buildTellraw(tellraw)
+    if (tab === 'effect') return buildEffect(effect)
+    if (tab === 'enchant') return buildEnchant(enchant)
     return buildReplaceitem(replaceitem)
-  }, [tab, testfor, blockdata, entitydata, replaceitem, give, testforblock, testforblocks, achievement, trigger, idle, save, stats, scoreboard, execute, advancement, clear, worldborder, spreadplayers, title, particle, summon, gamerule, xp, tellraw])
+  }, [tab, testfor, blockdata, entitydata, replaceitem, give, testforblock, testforblocks, achievement, trigger, idle, save, stats, scoreboard, execute, advancement, clear, worldborder, spreadplayers, title, particle, summon, gamerule, xp, tellraw, effect, enchant])
 
   const copy = async () => {
     if (!result.text) return
@@ -1161,6 +1171,72 @@ export function LegacyToolsForm() {
                   onChange={(event) => setTellraw({ ...tellraw, json: event.target.value })} />
               </div>
             </>
+          ) : null}
+
+          {tab === 'effect' ? (
+            <>
+              <div className="grid-2">
+                <div className="field">
+                  <label className="field-label" htmlFor="legacy-effect-action">动作</label>
+                  <select id="legacy-effect-action" className="select" value={effect.action}
+                    onChange={(event) => setEffect({ ...effect, action: event.target.value as 'give' | 'clear' })}>
+                    <option value="give">give</option>
+                    <option value="clear">clear</option>
+                  </select>
+                </div>
+                <div className="field">
+                  <label className="field-label" htmlFor="legacy-effect-target">目标</label>
+                  <input id="legacy-effect-target" className="input" value={effect.target}
+                    onChange={(event) => setEffect({ ...effect, target: event.target.value })} />
+                </div>
+              </div>
+              {effect.action === 'give' ? (
+                <>
+                  <div className="grid-3" style={{ marginTop: 12 }}>
+                    <div className="field">
+                      <label className="field-label" htmlFor="legacy-effect-name">效果</label>
+                      <input id="legacy-effect-name" className="input" value={effect.effect}
+                        onChange={(event) => setEffect({ ...effect, effect: event.target.value })} />
+                    </div>
+                    <div className="field">
+                      <label className="field-label" htmlFor="legacy-effect-seconds">秒数</label>
+                      <input id="legacy-effect-seconds" className="input" value={effect.seconds}
+                        onChange={(event) => setEffect({ ...effect, seconds: event.target.value })} />
+                    </div>
+                    <div className="field">
+                      <label className="field-label" htmlFor="legacy-effect-amplifier">等级</label>
+                      <input id="legacy-effect-amplifier" className="input" value={effect.amplifier}
+                        onChange={(event) => setEffect({ ...effect, amplifier: event.target.value })} />
+                    </div>
+                  </div>
+                  <label className="checkbox-row" style={{ marginTop: 12 }}>
+                    <input type="checkbox" checked={effect.hideParticles}
+                      onChange={(event) => setEffect({ ...effect, hideParticles: event.target.checked })} />
+                    隐藏粒子
+                  </label>
+                </>
+              ) : null}
+            </>
+          ) : null}
+
+          {tab === 'enchant' ? (
+            <div className="grid-3">
+              <div className="field">
+                <label className="field-label" htmlFor="legacy-enchant-target">目标</label>
+                <input id="legacy-enchant-target" className="input" value={enchant.target}
+                  onChange={(event) => setEnchant({ ...enchant, target: event.target.value })} />
+              </div>
+              <div className="field">
+                <label className="field-label" htmlFor="legacy-enchant-name">附魔</label>
+                <input id="legacy-enchant-name" className="input" value={enchant.enchantment}
+                  onChange={(event) => setEnchant({ ...enchant, enchantment: event.target.value })} />
+              </div>
+              <div className="field">
+                <label className="field-label" htmlFor="legacy-enchant-level">等级</label>
+                <input id="legacy-enchant-level" className="input" value={enchant.level}
+                  onChange={(event) => setEnchant({ ...enchant, level: event.target.value })} />
+              </div>
+            </div>
           ) : null}
 
           {result.diagnostics.length > 0 ? (
