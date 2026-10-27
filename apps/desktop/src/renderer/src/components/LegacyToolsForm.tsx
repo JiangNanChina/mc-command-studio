@@ -18,6 +18,7 @@ import {
   buildSave,
   buildStats,
   buildScoreboard,
+  buildLegacyExecute,
   createDefaultBlockdata,
   createDefaultEntitydata,
   createDefaultGive,
@@ -30,12 +31,13 @@ import {
   createDefaultIdle,
   createDefaultSave,
   createDefaultStats,
-  createDefaultScoreboard
+  createDefaultScoreboard,
+  createDefaultLegacyExecute
 } from '@mcstudio/core'
 import { useAppStore } from '../store'
 import { CustomPresetBar } from './CustomPresetBar'
 
-type LegacyTab = 'testfor' | 'blockdata' | 'entitydata' | 'replaceitem' | 'give' | 'testforblock' | 'testforblocks' | 'achievement' | 'trigger' | 'setidletimeout' | 'save' | 'stats' | 'scoreboard'
+type LegacyTab = 'testfor' | 'blockdata' | 'entitydata' | 'replaceitem' | 'give' | 'testforblock' | 'testforblocks' | 'achievement' | 'trigger' | 'setidletimeout' | 'save' | 'stats' | 'scoreboard' | 'execute'
 
 const TABS: { id: LegacyTab; label: string }[] = [
   { id: 'testfor', label: 'testfor' },
@@ -50,7 +52,8 @@ const TABS: { id: LegacyTab; label: string }[] = [
   { id: 'setidletimeout', label: 'setidletimeout' },
   { id: 'save', label: 'save' },
   { id: 'stats', label: 'stats' },
-  { id: 'scoreboard', label: 'scoreboard' }
+  { id: 'scoreboard', label: 'scoreboard' },
+  { id: 'execute', label: 'execute' }
 ]
 
 export function LegacyToolsForm() {
@@ -69,6 +72,7 @@ export function LegacyToolsForm() {
   const [save, setSave] = useState(createDefaultSave)
   const [stats, setStats] = useState(createDefaultStats)
   const [scoreboard, setScoreboard] = useState(createDefaultScoreboard)
+  const [execute, setExecute] = useState(createDefaultLegacyExecute)
   const pack = useAppStore((state) => state.pack)
   const itemOptions = pack?.registries.item ?? []
   const blockOptions = pack?.registries.block ?? []
@@ -87,8 +91,9 @@ export function LegacyToolsForm() {
     if (tab === 'save') return buildSave(save)
     if (tab === 'stats') return buildStats(stats)
     if (tab === 'scoreboard') return buildScoreboard(scoreboard)
+    if (tab === 'execute') return buildLegacyExecute(execute)
     return buildReplaceitem(replaceitem)
-  }, [tab, testfor, blockdata, entitydata, replaceitem, give, testforblock, testforblocks, achievement, trigger, idle, save, stats, scoreboard])
+  }, [tab, testfor, blockdata, entitydata, replaceitem, give, testforblock, testforblocks, achievement, trigger, idle, save, stats, scoreboard, execute])
 
   const copy = async () => {
     if (!result.text) return
@@ -747,6 +752,51 @@ export function LegacyToolsForm() {
                   </div>
                 </div>
               )}
+            </>
+          ) : null}
+
+          {tab === 'execute' ? (
+            <>
+              <div className="grid-2">
+                <div className="field">
+                  <label className="field-label" htmlFor="legacy-exec-target">目标</label>
+                  <input id="legacy-exec-target" className="input" value={execute.target}
+                    onChange={(event) => setExecute({ ...execute, target: event.target.value })} />
+                </div>
+                <div className="field">
+                  <label className="field-label" htmlFor="legacy-exec-command">命令</label>
+                  <input id="legacy-exec-command" className="input" value={execute.command}
+                    onChange={(event) => setExecute({ ...execute, command: event.target.value })} />
+                </div>
+              </div>
+              <div className="grid-3" style={{ marginTop: 12 }}>
+                {(['x', 'y', 'z'] as const).map((axis) => (
+                  <div className="field" key={axis}>
+                    <label className="field-label" htmlFor={`legacy-exec-${axis}`}>{axis.toUpperCase()}</label>
+                    <input id={`legacy-exec-${axis}`} className="input" value={execute[axis]}
+                      onChange={(event) => setExecute({ ...execute, [axis]: event.target.value })} />
+                  </div>
+                ))}
+              </div>
+              <label className="checkbox-row" style={{ marginTop: 12 }}>
+                <input type="checkbox" checked={execute.detect}
+                  onChange={(event) => setExecute({ ...execute, detect: event.target.checked })} />
+                检测方块
+              </label>
+              {execute.detect ? (
+                <div className="grid-2" style={{ marginTop: 8 }}>
+                  <div className="field">
+                    <label className="field-label" htmlFor="legacy-exec-block">方块</label>
+                    <input id="legacy-exec-block" className="input" list="legacy-block-options" value={execute.block}
+                      onChange={(event) => setExecute({ ...execute, block: event.target.value })} />
+                  </div>
+                  <div className="field">
+                    <label className="field-label" htmlFor="legacy-exec-data">数据值</label>
+                    <input id="legacy-exec-data" className="input" value={execute.data}
+                      onChange={(event) => setExecute({ ...execute, data: event.target.value })} />
+                  </div>
+                </div>
+              ) : null}
             </>
           ) : null}
 

@@ -13,13 +13,15 @@ import {
   buildSave,
   buildStats,
   buildScoreboard,
+  buildLegacyExecute,
   createDefaultBlockdata,
   createDefaultEntitydata,
   createDefaultGive,
   createDefaultReplaceitem,
   createDefaultTestfor,
   createDefaultStats,
-  createDefaultScoreboard
+  createDefaultScoreboard,
+  createDefaultLegacyExecute
 } from './legacy'
 
 describe('1.12 legacy commands', () => {
@@ -93,6 +95,22 @@ describe('1.12 legacy commands', () => {
     expect(buildStats({ ...base, action: 'clear', stat: 'SuccessCount' }).text).toBe(
       'stats entity @p clear SuccessCount'
     )
+  })
+
+  it('builds legacy execute with detect', () => {
+    const base = createDefaultLegacyExecute()
+    expect(buildLegacyExecute({ ...base, target: '@p', command: 'say hi' }).text).toBe(
+      'execute @p ~ ~ ~ say hi'
+    )
+    expect(
+      buildLegacyExecute({
+        ...base,
+        detect: true,
+        block: 'minecraft:stone',
+        data: '0',
+        command: 'say found'
+      }).text
+    ).toBe('execute @p ~ ~ ~ detect minecraft:stone 0 say found')
   })
 
   it('builds legacy scoreboard operations', () => {

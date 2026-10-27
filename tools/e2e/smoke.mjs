@@ -126,6 +126,13 @@ async function main() {
 
   await page.screenshot({ path: join(ARTIFACTS, 'welcome.png') })
 
+  // Ctrl+K 聚焦命令搜索
+  await page.keyboard.press('Control+K')
+  const focusedId = await page.evaluate(() => document.activeElement?.id ?? '')
+  if (focusedId !== 'command-search') {
+    throw new Error(`Ctrl+K 未聚焦命令搜索：${focusedId}`)
+  }
+
   // 快捷表单：locate
   await page.locator('.command-item', { hasText: '定位结构' }).first().click()
   await page.waitForSelector('#quick-locate-id', { timeout: 10_000 })

@@ -84,6 +84,19 @@ export function createDefaultSave(): LegacySaveOptions {
   return { action: 'hold' }
 }
 
+export function createDefaultLegacyExecute(): LegacyExecuteOptions {
+  return {
+    target: '@p',
+    x: '~',
+    y: '~',
+    z: '~',
+    detect: false,
+    block: 'minecraft:stone',
+    data: '0',
+    command: 'say hi'
+  }
+}
+
 export function createDefaultScoreboard(): LegacyScoreboardOptions {
   return {
     action: 'players-set',
@@ -190,6 +203,17 @@ export interface LegacyIdleOptions {
 
 export interface LegacySaveOptions {
   action: 'hold' | 'query'
+}
+
+export interface LegacyExecuteOptions {
+  target: string
+  x: string
+  y: string
+  z: string
+  detect: boolean
+  block: string
+  data: string
+  command: string
 }
 
 export interface LegacyScoreboardOptions {
@@ -401,6 +425,19 @@ export function buildSetidletimeout(options: LegacyIdleOptions): BuildResult {
 
 export function buildSave(options: LegacySaveOptions): BuildResult {
   return finish(['save', options.action], [])
+}
+
+export function buildLegacyExecute(options: LegacyExecuteOptions): BuildResult {
+  const diagnostics: Diagnostic[] = []
+  if (!options.target.trim()) diagnostics.push(error('legacy.target', '目标不能为空', 'target'))
+  if (!options.command.trim()) diagnostics.push(error('legacy.command', '命令不能为空', 'command'))
+  const parts = ['execute', options.target.trim(), options.x.trim(), options.y.trim(), options.z.trim()]
+  if (options.detect) {
+    if (!options.block.trim()) diagnostics.push(error('legacy.block', '检测方块不能为空', 'block'))
+    parts.push('detect', options.block.trim(), options.data.trim() || '0')
+  }
+  parts.push(options.command.trim())
+  return finish(parts, diagnostics)
 }
 
 export function buildScoreboard(options: LegacyScoreboardOptions): BuildResult {

@@ -193,6 +193,12 @@ export default function App() {
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent): void => {
       if (!(event.ctrlKey || event.metaKey) || event.altKey) return
+      const key = event.key.toLowerCase()
+      if (key === 'k') {
+        event.preventDefault()
+        document.getElementById('command-search')?.focus()
+        return
+      }
       const target = event.target as HTMLElement | null
       if (
         target &&
@@ -202,7 +208,6 @@ export default function App() {
       ) {
         return
       }
-      const key = event.key.toLowerCase()
       if (key === 'z') {
         event.preventDefault()
         if (event.shiftKey) useAppStore.getState().redo()

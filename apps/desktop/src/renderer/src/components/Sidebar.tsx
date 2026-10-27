@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useDeferredValue, useMemo } from 'react'
 import { Search, X, Boxes, Link2, PackageOpen, TerminalSquare, Wrench } from 'lucide-react'
 import {
   CATEGORY_ORDER,
@@ -18,7 +18,8 @@ export function Sidebar() {
   const roots = useMemo(() => (pack ? getRoots(pack.commands) : []), [pack])
   const rootIds = useMemo(() => new Set(roots.map((root) => root.name)), [roots])
 
-  const query = state.search.trim().toLowerCase()
+  const deferredSearch = useDeferredValue(state.search)
+  const query = deferredSearch.trim().toLowerCase()
   const category = state.category
 
   const curated = useMemo(() => {
