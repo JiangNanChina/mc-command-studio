@@ -420,15 +420,15 @@ a {
 }
 
 .banner.update {
-  background: color-mix(in srgb, var(--accent-soft) 70%, var(--panel));
+  background: color-mix(in srgb, var(--accent) 10%, var(--panel));
 }
 
 .banner.autosave {
-  background: color-mix(in srgb, var(--warn-soft) 70%, var(--panel));
+  background: color-mix(in srgb, var(--warn) 10%, var(--panel));
 }
 
 .banner.announcement {
-  background: color-mix(in srgb, var(--info-soft) 65%, var(--panel));
+  background: color-mix(in srgb, var(--info) 10%, var(--panel));
 }
 
 .banner-icon {
