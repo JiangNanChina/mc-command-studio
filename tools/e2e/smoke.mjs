@@ -1190,6 +1190,13 @@ async function main() {
   if (!oocLayered.includes('~3') || oocLayered.split('\n').length !== 2) {
     throw new Error(`OOC 多层布局不符合预期：${oocLayered}`)
   }
+  await page.selectOption('#ooc-layout-axis', 'x')
+  await page.getByLabel('条件命令方块').check()
+  await page.waitForTimeout(300)
+  const oocChain = await page.locator('#ooc-output').innerText()
+  if (!oocChain.includes('command_block 13') || !oocChain.includes('~1')) {
+    throw new Error(`OOC 条件链不符合预期：${oocChain}`)
+  }
   await page.getByRole('button', { name: /1.12.2 旧版工具/ }).click()
   await page.waitForSelector('#legacy-testfor-target', { timeout: 10_000 })
   await page.fill('#legacy-testfor-nbt', '{Health:10f}')
@@ -1205,6 +1212,20 @@ async function main() {
   const legacyBlockdata = await page.locator('#legacy-output').innerText()
   if (!legacyBlockdata.includes('blockdata') || !legacyBlockdata.includes('Lock:"mcstudio"')) {
     throw new Error(`1.12.2 blockdata 预设不符合预期：${legacyBlockdata}`)
+  }
+  await page.selectOption('#legacy-blockdata-preset', '6')
+  await page.waitForTimeout(300)
+  const legacyBanner = await page.locator('#legacy-output').innerText()
+  if (!legacyBanner.includes('Patterns')) {
+    throw new Error(`1.12.2 旗帜预设不符合预期：${legacyBanner}`)
+  }
+  await page.getByRole('button', { name: 'entitydata', exact: true }).click()
+  await page.waitForSelector('#legacy-entitydata-preset', { timeout: 10_000 })
+  await page.selectOption('#legacy-entitydata-preset', '8')
+  await page.waitForTimeout(300)
+  const legacyTrade = await page.locator('#legacy-output').innerText()
+  if (!legacyTrade.includes('Offers') || !legacyTrade.includes('Recipes')) {
+    throw new Error(`1.12.2 村民交易预设不符合预期：${legacyTrade}`)
   }
   await page.screenshot({ path: join(ARTIFACTS, 'ooc-1.12.2.png') })
   await page.selectOption('#pack-select', '1.20.4')

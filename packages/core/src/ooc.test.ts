@@ -50,6 +50,23 @@ describe('ooc', () => {
     expect(lines[1]).toContain('setblock 0 66 0 command_block')
   })
 
+  it('lays out along X and builds a conditional chain', () => {
+    const result = buildOocCommand({
+      ...createDefaultOocOptions(),
+      mode: 'command-block',
+      x: '0',
+      y: '64',
+      z: '0',
+      layerStep: '1',
+      layoutAxis: 'x',
+      conditional: true,
+      commands: 'say one\nsay two'
+    })
+    const lines = result.text.split('\n')
+    expect(lines[0]).toContain('setblock 0 64 0 command_block 1 ')
+    expect(lines[1]).toContain('setblock 1 64 0 command_block 9 ')
+  })
+
   it('validates empty commands and coordinates', () => {
     const result = buildOocCommand({ ...createDefaultOocOptions(), commands: '', x: 'bad' })
     expect(result.diagnostics.some((item) => item.code === 'ooc.commands')).toBe(true)

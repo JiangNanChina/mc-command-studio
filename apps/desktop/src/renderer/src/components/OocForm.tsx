@@ -6,6 +6,7 @@ import {
   buildOocCommand,
   createDefaultOocOptions,
   type LegacyDirection,
+  type OocLayoutAxis,
   type OocMode
 } from '@mcstudio/core'
 import { useAppStore } from '../store'
@@ -150,8 +151,26 @@ export function OocForm() {
               onChange={(event) => update({ layerStep: event.target.value })}
             />
             <div className="hint">
-              命令方块模式按 Y 轴每层偏移；掉落沙模式按该值递增每层 Time。
+              命令方块模式按所选轴每层偏移；掉落沙模式按该值递增每层 Time。
             </div>
+          </div>
+
+          <div className="field" style={{ marginTop: 12 }}>
+            <label className="field-label" htmlFor="ooc-layout-axis">
+              排布轴
+            </label>
+            <select
+              id="ooc-layout-axis"
+              className="select"
+              value={options.layoutAxis}
+              onChange={(event) =>
+                update({ layoutAxis: event.target.value as OocLayoutAxis })
+              }
+            >
+              <option value="x">X 轴</option>
+              <option value="y">Y 轴</option>
+              <option value="z">Z 轴</option>
+            </select>
           </div>
 
           <div className="field" style={{ marginTop: 12 }}>

@@ -4,6 +4,7 @@ import { LEGACY_DIRECTIONS, type LegacyDirection } from './legacy'
 import type { BuildResult, Diagnostic } from './types'
 
 export type OocMode = 'falling-sand' | 'command-block-minecart' | 'command-block'
+export type OocLayoutAxis = 'x' | 'y' | 'z'
 
 export interface OocOptions {
   mode: OocMode
@@ -15,6 +16,7 @@ export interface OocOptions {
   conditional: boolean
   facing: LegacyDirection
   layerStep: string
+  layoutAxis: OocLayoutAxis
   trackOutput: boolean
 }
 
@@ -35,6 +37,7 @@ export function createDefaultOocOptions(): OocOptions {
     conditional: false,
     facing: 'up',
     layerStep: '1',
+    layoutAxis: 'y',
     trackOutput: false
   }
 }
@@ -108,13 +111,17 @@ export function buildOocCommand(options: OocOptions): BuildResult {
   let text = ''
   if (commands.length > 0) {
     if (options.mode === 'command-block') {
-      const meta =
-        (LEGACY_DIRECTIONS.find((direction) => direction.value === options.facing)?.meta ?? 1) +
-        (options.conditional ? 8 : 0)
+      const baseMeta =
+        LEGACY_DIRECTIONS.find((direction) => direction.value === options.facing)?.meta ?? 1
       text = commands
         .map((command, index) => {
-          const y = offsetCoordinate(options.y, index * layerStep)
-          return `setblock ${options.x.trim()} ${y} ${options.z.trim()} command_block ${meta} replace {${commandBlockNbt(command, options)}}`
+          const offset = index * layerStep
+          const x = options.layoutAxis === 'x' ? offsetCoordinate(options.x, offset) : options.x.trim()
+          const y = options.layoutAxis === 'y' ? offsetCoordinate(options.y, offset) : options.y.trim()
+          const z = options.layoutAxis === 'z' ? offsetCoordinate(options.z, offset) : options.z.trim()
+          // 条件链：第一块保持无条件，后续块加 8 形成 conditional 链。
+          const meta = baseMeta + (options.conditional && index > 0 ? 8 : 0)
+          return `setblock ${x} ${y} ${z} command_block ${meta} replace {${commandBlockNbt(command, options)}}`
         })
         .join('\n')
     } else if (options.mode === 'command-block-minecart') {

@@ -22,6 +22,35 @@ const REPO = 'https://github.com/JiangNanChina/mc-command-studio'
  */
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: '0.1.57',
+    date: '2026-10-27',
+    title: '1.12.2 NBT 模板与 OOC 条件链',
+    highlights: ['旗帜/药水/村民交易模板。', 'OOC X/Z 轴与条件链。'],
+    sections: [
+      {
+        type: 'added',
+        items: [
+          '1.12.2 旗帜/药水/村民交易/持久化预设。',
+          'OOC 排布轴（X/Y/Z）。',
+          'OOC 条件链（首块无条件，后续 +8）。'
+        ]
+      },
+      {
+        type: 'improved',
+        items: [
+          '1.13.2 注册表门禁。',
+          '单元测试 245 → 246。',
+          '冒烟覆盖新增预设与条件链。'
+        ]
+      },
+      {
+        type: 'fixed',
+        items: ['无。']
+      }
+    ],
+    releaseUrl: `${REPO}/releases/tag/v0.1.57`
+  },
+  {
     version: '0.1.56',
     date: '2026-10-27',
     title: '1.12.2 NBT 预设与 OOC 多层布局',

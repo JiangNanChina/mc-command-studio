@@ -93,7 +93,9 @@ export const LEGACY_BLOCK_PRESETS = [
   { label: '箱子物品', nbt: '{Items:[{Slot:0b,id:"minecraft:diamond",Count:1b}]}' },
   { label: '告示牌四行', nbt: '{Text1:"{\\"text\\":\\"第一行\\"}",Text2:"{\\"text\\":\\"第二行\\"}",Text3:"{\\"text\\":\\"第三行\\"}",Text4:"{\\"text\\":\\"第四行\\"}"}' },
   { label: '命令方块', nbt: '{Command:"say hello",auto:1b,powered:1b,TrackOutput:0b}' },
-  { label: '刷怪笼', nbt: '{SpawnCount:4s,SpawnRange:4s,Delay:20s,MinSpawnDelay:200s,MaxSpawnDelay:800s}' }
+  { label: '刷怪笼', nbt: '{SpawnCount:4s,SpawnRange:4s,Delay:20s,MinSpawnDelay:200s,MaxSpawnDelay:800s}' },
+  { label: '旗帜图案', nbt: '{Base:4,Patterns:[{Pattern:"cre",Color:1},{Pattern:"bri",Color:15}]}' },
+  { label: '药水效果', nbt: '{CustomPotionEffects:[{Id:1b,Amplifier:1b,Duration:200}]}' }
 ]
 
 export const LEGACY_ENTITY_PRESETS = [
@@ -104,7 +106,10 @@ export const LEGACY_ENTITY_PRESETS = [
   { label: '自定义名称', nbt: '{CustomName:"MC Studio",CustomNameVisible:1b}' },
   { label: '10 点生命', nbt: '{Health:10f}' },
   { label: '静止', nbt: '{Motion:[0.0,0.0,0.0]}' },
-  { label: '发光', nbt: '{Glowing:1b}' }
+  { label: '发光', nbt: '{Glowing:1b}' },
+  { label: '村民交易', nbt: '{Offers:{Recipes:[{buy:{id:"minecraft:emerald",Count:1b},sell:{id:"minecraft:diamond",Count:1b},maxUses:10}]}}' },
+  { label: '药水效果', nbt: '{ActiveEffects:[{Id:1b,Amplifier:1b,Duration:200}]}' },
+  { label: '持久化', nbt: '{PersistenceRequired:1b}' }
 ]
 
 const COORDINATE = /^[~^]?-?\d*(?:\.\d+)?$/
