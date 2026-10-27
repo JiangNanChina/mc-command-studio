@@ -22,6 +22,18 @@ const REPO = 'https://github.com/JiangNanChina/mc-command-studio'
  */
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: '0.5.0',
+    date: '2026-10-27',
+    title: '26.3 覆盖 94/94',
+    highlights: ['全部根命令有表单入口。', '28 个基础包。'],
+    sections: [
+      { type: 'added', items: ['compute 表单。', '1.20.6 / 1.21.8 / 26.1.2 独立包。', '1.12.2 scoreboard 表单。'] },
+      { type: 'improved', items: ['可视化覆盖 94 / 94。', '28 基础包 + 26 别名。', '单元测试 260。'] },
+      { type: 'fixed', items: ['无。'] }
+    ],
+    releaseUrl: REPO + '/releases/tag/v0.5.0'
+  },
+  {
     version: '0.4.0',
     date: '2026-10-27',
     title: '快捷表单覆盖 93/94',
