@@ -41,7 +41,11 @@ const LAYOUT_PRESETS = [
 export function OocForm() {
   const state = useAppStore()
   const [options, setOptions] = useState(createDefaultOocOptions)
-  const result = useMemo(() => buildOocCommand(options), [options])
+  const version = state.pack?.manifest.gameVersion
+  const result = useMemo(
+    () => buildOocCommand({ ...options, version }),
+    [options, version]
+  )
   const [copied, setCopied] = useState(false)
   const commandsRef = useRef<HTMLTextAreaElement>(null)
   const selectCommandLine = (index: number) => {

@@ -22,6 +22,18 @@ const REPO = 'https://github.com/JiangNanChina/mc-command-studio'
  */
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: '0.1.67',
+    date: '2026-10-27',
+    title: '1.8-1.11 Legacy 包',
+    highlights: ['四个 Legacy 版本。', 'OOC 实体 ID 按版本切换。'],
+    sections: [
+      { type: 'added', items: ['1.8.9 / 1.9.4 / 1.10.2 / 1.11.2 数据包。', 'OOC FallingSand/MinecartCommandBlock 分支。'] },
+      { type: 'improved', items: ['1.8 命令方块 NBT 兼容。', '单元测试 251 → 252。'] },
+      { type: 'fixed', items: ['无。'] }
+    ],
+    releaseUrl: REPO + '/releases/tag/v0.1.67'
+  },
+  {
     version: '0.1.66',
     date: '2026-10-27',
     title: '1.12.2 give 与 OOC 命令行定位',

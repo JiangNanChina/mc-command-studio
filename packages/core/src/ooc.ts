@@ -21,6 +21,7 @@ export interface OocOptions {
   layoutAxis: OocLayoutAxis
   secondaryAxis: OocSecondaryAxis
   rowSize: string
+  version?: string
   trackOutput: boolean
 }
 
@@ -68,7 +69,18 @@ function commandLines(source: string): string[] {
 }
 
 function commandBlockNbt(command: string, options: OocOptions): string {
-  return `Command:${commandBlockString(command)},auto:${options.auto ? '1b' : '0b'},conditionMet:0b,powered:1b,TrackOutput:${options.trackOutput ? '1b' : '0b'},UpdateLastExecution:0b`
+  const pre19 = options.version?.startsWith('1.8') ?? false
+  return `Command:${commandBlockString(command)},auto:${options.auto ? '1b' : '0b'},conditionMet:0b,powered:1b,TrackOutput:${options.trackOutput ? '1b' : '0b'}${pre19 ? '' : ',UpdateLastExecution:0b'}`
+}
+
+function isPre111(version: string | undefined): boolean {
+  if (!version) return false
+  const [major, minor] = version.split('.').map(Number)
+  return major === 1 && minor < 11
+}
+
+function fallingEntityId(version: string | undefined): string {
+  return isPre111(version) ? 'FallingSand' : 'minecraft:falling_block'
 }
 
 export function offsetCoordinate(value: string, offset: number): string {
@@ -88,7 +100,7 @@ function fallingBlock(
   passengers: string,
   time: number
 ): string {
-  return `{id:"minecraft:falling_block",Block:"minecraft:command_block",Time:${1 + time}s,TileEntityData:{${commandBlockNbt(command, options)}}${passengers ? `,Passengers:[${passengers}]` : ''}}`
+  return `{id:"${fallingEntityId(options.version)}",Block:"minecraft:command_block",Time:${1 + time}s,TileEntityData:{${commandBlockNbt(command, options)}}${passengers ? `,Passengers:[${passengers}]` : ''}}`
 }
 
 export function buildOocCommand(options: OocOptions): BuildResult {
@@ -148,7 +160,8 @@ export function buildOocCommand(options: OocOptions): BuildResult {
         })
         .join('\n')
     } else if (options.mode === 'command-block-minecart') {
-      text = `summon commandblock_minecart ${options.x.trim()} ${options.y.trim()} ${options.z.trim()} {Command:${commandBlockString(commands[0])},TrackOutput:${options.trackOutput ? '1b' : '0b'}}`
+      const minecart = isPre111(options.version) ? 'MinecartCommandBlock' : 'commandblock_minecart'
+      text = `summon ${minecart} ${options.x.trim()} ${options.y.trim()} ${options.z.trim()} {Command:${commandBlockString(commands[0])},TrackOutput:${options.trackOutput ? '1b' : '0b'}}`
       if (commands.length > 1) {
         diagnostics.push(warn('ooc.single', '矿车模式只写入第一条命令；多条请用掉落沙 OOC', 'commands'))
       }
@@ -160,7 +173,7 @@ export function buildOocCommand(options: OocOptions): BuildResult {
       for (let index = commands.length - 1; index >= 0; index -= 1) {
         passengers = fallingBlock(commands[index], options, passengers, index * layerStep)
       }
-      text = `summon minecraft:falling_block ${options.x.trim()} ${options.y.trim()} ${options.z.trim()} {Block:"minecraft:redstone_block",Time:1b,Passengers:[${passengers}]}`
+      text = `summon ${fallingEntityId(options.version)} ${options.x.trim()} ${options.y.trim()} ${options.z.trim()} {Block:"minecraft:redstone_block",Time:1b,Passengers:[${passengers}]}`
       if (options.conditional) {
         diagnostics.push(
           warn('ooc.conditional', '掉落沙模式不支持条件链，已自动回退为无条件链', 'conditional')

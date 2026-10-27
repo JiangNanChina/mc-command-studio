@@ -1073,6 +1073,10 @@ async function main() {
     !packOptions.includes('1.14.4') ||
     !packOptions.includes('1.13.2') ||
     !packOptions.includes('1.12.2') ||
+    !packOptions.includes('1.11.2') ||
+    !packOptions.includes('1.10.2') ||
+    !packOptions.includes('1.9.4') ||
+    !packOptions.includes('1.8.9') ||
     !packOptions.includes('26.3')
   ) {
     throw new Error(`版本选项不符合预期：${packOptions.join(', ')}`)
@@ -1273,6 +1277,29 @@ async function main() {
     throw new Error(`1.12.2 give 输出不符合预期：${legacyGive}`)
   }
   await page.screenshot({ path: join(ARTIFACTS, 'ooc-1.12.2.png') })
+  await page.selectOption('#pack-select', '1.11.2')
+  await page.waitForTimeout(500)
+  const pack1112 = await page.locator('.pack-count').innerText()
+  if (!pack1112.includes('47')) {
+    throw new Error(`1.11.2 命令数量不符合预期：${pack1112}`)
+  }
+  await page.getByRole('button', { name: /OOC 生成器/ }).click()
+  await page.waitForSelector('#ooc-commands', { timeout: 10_000 })
+  await page.fill('#ooc-commands', 'say 1.11')
+  await page.waitForTimeout(300)
+  if (!(await page.locator('#ooc-output').innerText()).includes('minecraft:falling_block')) {
+    throw new Error('1.11.2 OOC 实体 ID 不符合预期')
+  }
+  await page.selectOption('#pack-select', '1.8.9')
+  await page.waitForTimeout(500)
+  const pack189 = await page.locator('.pack-count').innerText()
+  if (!pack189.includes('47')) {
+    throw new Error(`1.8.9 命令数量不符合预期：${pack189}`)
+  }
+  await page.waitForTimeout(300)
+  if (!(await page.locator('#ooc-output').innerText()).includes('summon FallingSand')) {
+    throw new Error('1.8.9 OOC 实体 ID 不符合预期')
+  }
   await page.selectOption('#pack-select', '1.20.4')
   await page.waitForTimeout(500)
   const pack1204 = await page.locator('.pack-count').innerText()

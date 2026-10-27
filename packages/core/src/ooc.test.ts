@@ -108,6 +108,24 @@ describe('ooc', () => {
     expect(lines[3]).toContain('setblock 2 67 0')
   })
 
+  it('switches legacy entity ids before 1.11', () => {
+    const falling = buildOocCommand({
+      ...createDefaultOocOptions(),
+      version: '1.8.9',
+      commands: 'say old'
+    })
+    expect(falling.text).toContain('summon FallingSand')
+    expect(falling.text).toContain('id:"FallingSand"')
+    expect(falling.text).not.toContain('UpdateLastExecution')
+    const minecart = buildOocCommand({
+      ...createDefaultOocOptions(),
+      version: '1.10.2',
+      mode: 'command-block-minecart',
+      commands: 'say old'
+    })
+    expect(minecart.text).toContain('summon MinecartCommandBlock')
+  })
+
   it('validates empty commands and coordinates', () => {
     const result = buildOocCommand({ ...createDefaultOocOptions(), commands: '', x: 'bad' })
     expect(result.diagnostics.some((item) => item.code === 'ooc.commands')).toBe(true)
