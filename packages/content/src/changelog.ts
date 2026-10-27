@@ -22,6 +22,27 @@ const REPO = 'https://github.com/JiangNanChina/mc-command-studio'
  */
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: '0.1.47',
+    date: '2026-10-27',
+    title: 'store 拆分',
+    highlights: ['store.ts 3,213 → 约 1,585 行。', '模型/默认值/归一化/选择器分模块。'],
+    sections: [
+      {
+        type: 'improved',
+        items: [
+          '新增 store/model.ts、defaults.ts、normalize.ts、selectors.ts。',
+          '保持 ../store 导入兼容。',
+          '单元测试 230 → 232。'
+        ]
+      },
+      {
+        type: 'fixed',
+        items: ['无。']
+      }
+    ],
+    releaseUrl: `${REPO}/releases/tag/v0.1.47`
+  },
+  {
     version: '0.1.46',
     date: '2026-10-27',
     title: '1.20.4 gamerule 兼容',

@@ -2,6 +2,21 @@
 
 所有版本变更记录在此。版本号遵循 SemVer。
 
+## [0.1.47] - 2026-10-27
+
+store 拆分。
+
+### 改进
+
+- `store.ts` 从 3,213 行降至约 1,585 行，拆为：
+  - `store/model.ts`：项目数据类型与草稿结构
+  - `store/defaults.ts`：默认草稿与组件/execute 子句工厂
+  - `store/normalize.ts`：项目文件与自动保存的容错归一化
+  - `store/selectors.ts`：输出命令选择器
+- 原有 `../store` 导入路径保持兼容，无需改表单。
+- 新增 `normalizeProjectPayload` 单元测试；单元测试 230 → 232。
+- 冒烟测试通过，未发现行为回归。
+
 ## [0.1.46] - 2026-10-27
 
 1.20.4 gamerule 兼容。
