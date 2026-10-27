@@ -31,8 +31,8 @@
 ### P0（首个可发布版，已实现骨架）
 
 - 26.3 数据包：94 根命令、1,197 字面量、59 参数类型、1,658 物品、1,286 方块。
+- 1.14.4–1.20.4 数据包：NBT 引擎，覆盖 71–82 根命令；旧版目录结构；give/item/loot/gamerule/attribute/particle 等兼容表单按版本降级。
 - 1.21.1 试验数据包：83 根命令、1,333 物品、1,060 方块，可在顶栏切换。
-- 1.20.4 数据包：82 根命令、1,312 物品、686 方块，NBT 引擎；NBT give/item、loot、32 个兼容表单与召唤预设。
 - 数据包工作区：独立于命令编辑，多函数管理、load/tick 标签、文件预览与 zip 导出。
 - 专用表单：`give`、`summon`、`setblock`、`execute`、`tp`、`effect`、`fill`、`clone`、`enchant`、`xp`、`tellraw`、`title`、`playsound`、`stopsound`、`bossbar`、`scoreboard`、`particle`、`time`、`weather`、`difficulty`、`tag`、`clear`、`gamerule`、`worldborder`、`team`、`spawnpoint`、`setworldspawn`、`forceload`、`attribute`、`advancement`、`function`、`schedule`、`item`、`data`、`loot`；`setblock` 支持方块状态与方块实体 NBT。
 - 可视化资源库：26.3 官方中文名称与图标，物品/方块/效果/附魔/实体/声音统一为图标网格选择，支持中文名搜索。

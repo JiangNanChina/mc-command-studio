@@ -1,5 +1,7 @@
+import { useEffect } from 'react'
 import { MapPin, MapPinned, ToggleLeft } from 'lucide-react'
 import type { ForceloadAction } from '@mcstudio/core'
+import { hasCommandPath } from '../lib/versionFeatures'
 import { PositionInput } from './PositionInput'
 import { SelectorField } from './SelectorField'
 import { useAppStore } from '../store'
@@ -26,6 +28,24 @@ export function WorldSettingsForm() {
   const spawn = state.spawnpoint
   const worldSpawn = state.worldSpawn
   const forceload = state.forceload
+  const supportsSpawnAngle =
+    hasCommandPath(state.pack, 'spawnpoint', 'targets', 'pos', 'angle') ||
+    hasCommandPath(state.pack, 'spawnpoint', 'targets', 'pos', 'rotation')
+  const supportsWorldAngle =
+    hasCommandPath(state.pack, 'setworldspawn', 'pos', 'angle') ||
+    hasCommandPath(state.pack, 'setworldspawn', 'pos', 'rotation')
+
+  useEffect(() => {
+    if (!supportsSpawnAngle && spawn.angleEnabled) {
+      state.updateSpawnpoint({ angleEnabled: false })
+    }
+  }, [spawn.angleEnabled, supportsSpawnAngle, state])
+
+  useEffect(() => {
+    if (!supportsWorldAngle && worldSpawn.angleEnabled) {
+      state.updateWorldSpawn({ angleEnabled: false })
+    }
+  }, [worldSpawn.angleEnabled, supportsWorldAngle, state])
 
   return (
     <div className="content">
@@ -88,41 +108,45 @@ export function WorldSettingsForm() {
                 onChange={(position) => state.updateSpawnpoint({ position })}
               />
             </div>
-            <label className="checkline" style={{ marginTop: 12 }}>
-              <input
-                type="checkbox"
-                checked={spawn.angleEnabled}
-                onChange={(event) =>
-                  state.updateSpawnpoint({ angleEnabled: event.target.checked })
-                }
-              />
-              指定重生朝向
-            </label>
-            {spawn.angleEnabled ? (
-              <div className="grid-2" style={{ marginTop: 10 }}>
-                <div className="field">
-                  <label className="field-label" htmlFor="spawn-yaw">
-                    yaw（水平角度）
-                  </label>
+            {supportsSpawnAngle ? (
+              <>
+                <label className="checkline" style={{ marginTop: 12 }}>
                   <input
-                    id="spawn-yaw"
-                    className="input"
-                    value={spawn.yaw}
-                    onChange={(event) => state.updateSpawnpoint({ yaw: event.target.value })}
+                    type="checkbox"
+                    checked={spawn.angleEnabled}
+                    onChange={(event) =>
+                      state.updateSpawnpoint({ angleEnabled: event.target.checked })
+                    }
                   />
-                </div>
-                <div className="field">
-                  <label className="field-label" htmlFor="spawn-pitch">
-                    pitch（俯仰）
-                  </label>
-                  <input
-                    id="spawn-pitch"
-                    className="input"
-                    value={spawn.pitch}
-                    onChange={(event) => state.updateSpawnpoint({ pitch: event.target.value })}
-                  />
-                </div>
-              </div>
+                  指定重生朝向
+                </label>
+                {spawn.angleEnabled ? (
+                  <div className="grid-2" style={{ marginTop: 10 }}>
+                    <div className="field">
+                      <label className="field-label" htmlFor="spawn-yaw">
+                        yaw（水平角度）
+                      </label>
+                      <input
+                        id="spawn-yaw"
+                        className="input"
+                        value={spawn.yaw}
+                        onChange={(event) => state.updateSpawnpoint({ yaw: event.target.value })}
+                      />
+                    </div>
+                    <div className="field">
+                      <label className="field-label" htmlFor="spawn-pitch">
+                        pitch（俯仰）
+                      </label>
+                      <input
+                        id="spawn-pitch"
+                        className="input"
+                        value={spawn.pitch}
+                        onChange={(event) => state.updateSpawnpoint({ pitch: event.target.value })}
+                      />
+                    </div>
+                  </div>
+                ) : null}
+              </>
             ) : null}
           </div>
         </div>
@@ -142,45 +166,49 @@ export function WorldSettingsForm() {
               value={worldSpawn.position}
               onChange={(position) => state.updateWorldSpawn({ position })}
             />
-            <label className="checkline" style={{ marginTop: 12 }}>
-              <input
-                type="checkbox"
-                checked={worldSpawn.angleEnabled}
-                onChange={(event) =>
-                  state.updateWorldSpawn({ angleEnabled: event.target.checked })
-                }
-              />
-              指定出生朝向
-            </label>
-            {worldSpawn.angleEnabled ? (
-              <div className="grid-2" style={{ marginTop: 10 }}>
-                <div className="field">
-                  <label className="field-label" htmlFor="worldspawn-yaw">
-                    yaw
-                  </label>
+            {supportsWorldAngle ? (
+              <>
+                <label className="checkline" style={{ marginTop: 12 }}>
                   <input
-                    id="worldspawn-yaw"
-                    className="input"
-                    value={worldSpawn.yaw}
+                    type="checkbox"
+                    checked={worldSpawn.angleEnabled}
                     onChange={(event) =>
-                      state.updateWorldSpawn({ yaw: event.target.value })
+                      state.updateWorldSpawn({ angleEnabled: event.target.checked })
                     }
                   />
-                </div>
-                <div className="field">
-                  <label className="field-label" htmlFor="worldspawn-pitch">
-                    pitch
-                  </label>
-                  <input
-                    id="worldspawn-pitch"
-                    className="input"
-                    value={worldSpawn.pitch}
-                    onChange={(event) =>
-                      state.updateWorldSpawn({ pitch: event.target.value })
-                    }
-                  />
-                </div>
-              </div>
+                  指定出生朝向
+                </label>
+                {worldSpawn.angleEnabled ? (
+                  <div className="grid-2" style={{ marginTop: 10 }}>
+                    <div className="field">
+                      <label className="field-label" htmlFor="worldspawn-yaw">
+                        yaw
+                      </label>
+                      <input
+                        id="worldspawn-yaw"
+                        className="input"
+                        value={worldSpawn.yaw}
+                        onChange={(event) =>
+                          state.updateWorldSpawn({ yaw: event.target.value })
+                        }
+                      />
+                    </div>
+                    <div className="field">
+                      <label className="field-label" htmlFor="worldspawn-pitch">
+                        pitch
+                      </label>
+                      <input
+                        id="worldspawn-pitch"
+                        className="input"
+                        value={worldSpawn.pitch}
+                        onChange={(event) =>
+                          state.updateWorldSpawn({ pitch: event.target.value })
+                        }
+                      />
+                    </div>
+                  </div>
+                ) : null}
+              </>
             ) : null}
             <div className="hint" style={{ marginTop: 8 }}>
               影响所有玩家的初始出生位置；不指定朝向时保持默认。

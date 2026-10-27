@@ -18,8 +18,9 @@
 |---|---|---|---|---|
 | **26.3 / 26.4 快照** | ✅ 当前主版本 | mcmeta summary + 官方 reports | 已完成骨架 | P0 |
 | 26.x 全量编辑器 | ⏳ | 同上 | 3–4 周 | P2 |
-| **1.20.5 – 1.21.x** | 🚧 1.21.1 试验 | mcmeta / 官方 reports | 2–3 周 | P3 |
-| **1.13 – 1.20.4** | 🚧 1.20.4 树模式 | mcmeta | 6–8 周 | P4 |
+| **1.20.5 – 1.21.x** | ✅ 1.21.1 组件版 | mcmeta | 2–3 周 | P3 |
+| **1.14.4 – 1.20.4** | ✅ 9 个数据包，NBT | mcmeta | 6–8 周 | P4 |
+| 1.13.x | 🚧 上游缺 commands/blocks/registries | 官方 server.jar reports | 待接 | P4 |
 | 1.12.2 及更早 | ⏳ | 手工 schema + 社区数据 | 5–7 周 | P5 |
 
 > 结论：全版本支持的总成本约 4–6 个月（1 人、20h/周），其中 1.13–1.20.4 的 NBT 编辑器与 1.12.2 的独立引擎占大头。建议先发现代版，再按版本段扩展。
@@ -28,20 +29,19 @@
 
 ### 数据
 
-- 官方 `--reports` 从 1.13 起可用；mcmeta 历史 tag 覆盖不稳定（实测 1.13.2/1.12.2 取不到 commands）。
-- 需要为每个目标版本保存 server.jar，在 CI 里跑 `--reports`，再经过同一个 pipeline 归一化。
+- 已接入 1.14.4 / 1.15.2 / 1.16.5 / 1.18.2 / 1.19.4 / 1.20.3 / 1.20.4；命令树、注册表、方块状态均来自 mcmeta summary。
+- 1.13.x 的 mcmeta summary 缺少 commands/blocks/registries，需要官方 server.jar `--reports` 生成，暂未接入。
 - 方块状态/注册表结构基本一致，pipeline 可以复用。
 
 ### 代码
 
-- 新增 NBT 物品编辑器：
-  - `display.Name` / `display.Lore`（JSON 字符串）
-  - `Enchantments`（`{id, lvl}` 列表）
-  - `AttributeModifiers`
-  - `Unbreakable`、`CustomModelData`
-  - `BlockEntityTag`、`EntityTag`
-- 旧版 `execute` 有 `as/at/positioned/if/unless/store` 的早期形态；需要按版本数据包描述分支，不能沿用 26.x 的固定假设。
-- `/give` 的 NBT 是可选第 4 参数（`give <target> <item> [count] [nbt]`），序列化路径要切换。
+- 已支持 NBT 物品编辑器（give）：
+  - `display.Name` / `display.Lore`
+  - `Enchantments`
+  - `Unbreakable`
+  - `item` 槽位 NBT
+- 1.20.4 的 `attribute` 使用 UUID/name，`particle` 使用位置参数；已按版本切换。
+- 旧版 `execute` 使用现代 Brigadier 形态；1.13 以前的分支仍待接。
 
 ## 4. 1.12.2
 

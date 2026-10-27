@@ -82,6 +82,16 @@ describe('datapack export', () => {
     expect(datapackDataFolder(26, 'loot_table')).toBe('loot_tables')
   })
 
+  it('maps all legacy pack formats to old folders', () => {
+    for (const format of [4, 5, 6, 9, 12, 26]) {
+      expect(datapackDataFolder(format, 'advancement')).toBe('advancements')
+      expect(datapackDataFolder(format, 'predicate')).toBe('predicates')
+      expect(datapackDataFolder(format, 'loot_table')).toBe('loot_tables')
+    }
+    expect(datapackDataFolder(48, 'advancement')).toBe('advancement')
+    expect(datapackDataFolder(121, 'loot_table')).toBe('loot_table')
+  })
+
   it('adds advancement, predicate and loot table JSON files', () => {
     const result = buildDatapackFiles({
       ...base,

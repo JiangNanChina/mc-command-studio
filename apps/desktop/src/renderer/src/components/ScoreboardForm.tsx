@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { BarChart3, ListOrdered, Target, Trophy, Users } from 'lucide-react'
 import {
   SCOREBOARD_ACTION_LABELS,
@@ -11,6 +12,7 @@ import {
   type ScoreOperation
 } from '@mcstudio/core'
 import { COMMAND_MAP } from '@mcstudio/content'
+import { hasCommandPath } from '../lib/versionFeatures'
 import { SelectorField } from './SelectorField'
 import { useAppStore } from '../store'
 
@@ -34,6 +36,32 @@ const PLAYER_ACTIONS: ScoreboardAction[] = [
 export function ScoreboardForm() {
   const state = useAppStore()
   const scoreboard = state.scoreboard
+  const modifyBase = ['scoreboard', 'objectives', 'modify', 'objective'] as const
+  const supportsAutoUpdate = hasCommandPath(
+    state.pack,
+    ...modifyBase,
+    'displayautoupdate'
+  )
+  const supportsNumberFormat = hasCommandPath(state.pack, ...modifyBase, 'numberformat')
+  const supportsRenderType = hasCommandPath(state.pack, ...modifyBase, 'rendertype')
+
+  useEffect(() => {
+    if (scoreboard.action !== 'objective-modify') return
+    if (
+      (scoreboard.modifyField === 'displayautoupdate' && !supportsAutoUpdate) ||
+      (scoreboard.modifyField === 'numberformat' && !supportsNumberFormat) ||
+      (scoreboard.modifyField === 'rendertype' && !supportsRenderType)
+    ) {
+      state.updateScoreboard({ modifyField: 'displayname' })
+    }
+  }, [
+    scoreboard.action,
+    scoreboard.modifyField,
+    supportsAutoUpdate,
+    supportsNumberFormat,
+    supportsRenderType,
+    state
+  ])
 
   const isObjective = OBJECTIVE_ACTIONS.includes(scoreboard.action)
   const isOperation = scoreboard.action === 'players-operation'
@@ -210,9 +238,15 @@ export function ScoreboardForm() {
                     }
                   >
                     <option value="displayname">显示名称</option>
-                    <option value="displayautoupdate">自动更新显示</option>
-                    <option value="numberformat">数字格式</option>
-                    <option value="rendertype">渲染类型</option>
+                    {supportsAutoUpdate ? (
+                      <option value="displayautoupdate">自动更新显示</option>
+                    ) : null}
+                    {supportsNumberFormat ? (
+                      <option value="numberformat">数字格式</option>
+                    ) : null}
+                    {supportsRenderType ? (
+                      <option value="rendertype">渲染类型</option>
+                    ) : null}
                   </select>
                 </div>
 

@@ -1062,7 +1062,17 @@ async function main() {
 
   // 多版本数据包切换
   const packOptions = await page.locator('#pack-select option').allTextContents()
-  if (!packOptions.includes('1.21.1') || !packOptions.includes('1.20.4') || !packOptions.includes('26.3')) {
+  if (
+    !packOptions.includes('1.21.1') ||
+    !packOptions.includes('1.20.4') ||
+    !packOptions.includes('1.20.3') ||
+    !packOptions.includes('1.19.4') ||
+    !packOptions.includes('1.18.2') ||
+    !packOptions.includes('1.16.5') ||
+    !packOptions.includes('1.15.2') ||
+    !packOptions.includes('1.14.4') ||
+    !packOptions.includes('26.3')
+  ) {
     throw new Error(`版本选项不符合预期：${packOptions.join(', ')}`)
   }
   await page.selectOption('#pack-select', '1.21.1')
@@ -1083,7 +1093,56 @@ async function main() {
   if ((await page.locator('#fill-mode option[value="strict"]').count()) !== 0) {
     throw new Error('1.21.1 不应显示 fill strict 选项')
   }
+  await page.locator('.command-item', { hasText: '粒子效果' }).first().click()
+  await page.waitForSelector('#particle-mode', { timeout: 10_000 })
+  const particleHint = await page.locator('.card-hint', { hasText: '种粒子' }).innerText()
+  if (!particleHint.includes('109')) {
+    throw new Error(`1.21.1 粒子数量不符合预期：${particleHint}`)
+  }
   await page.screenshot({ path: join(ARTIFACTS, 'pack-1.21.1.png') })
+  await page.selectOption('#pack-select', '1.20.3')
+  await page.waitForTimeout(500)
+  const pack1203 = await page.locator('.pack-count').innerText()
+  if (!pack1203.includes('82')) {
+    throw new Error(`1.20.3 命令数量不符合预期：${pack1203}`)
+  }
+  await page.selectOption('#pack-select', '1.19.4')
+  await page.waitForTimeout(500)
+  const pack1194 = await page.locator('.pack-count').innerText()
+  if (!pack1194.includes('79')) {
+    throw new Error(`1.19.4 命令数量不符合预期：${pack1194}`)
+  }
+  const notice1194 = await page.locator('.version-notice').innerText()
+  if (!notice1194.includes('NBT')) {
+    throw new Error(`1.19.4 NBT 提示不符合预期：${notice1194}`)
+  }
+  await page.screenshot({ path: join(ARTIFACTS, 'pack-1.19.4.png') })
+  await page.selectOption('#pack-select', '1.18.2')
+  await page.waitForTimeout(500)
+  const pack1182 = await page.locator('.pack-count').innerText()
+  if (!pack1182.includes('77')) {
+    throw new Error(`1.18.2 命令数量不符合预期：${pack1182}`)
+  }
+  await page.selectOption('#pack-select', '1.16.5')
+  await page.waitForTimeout(500)
+  const pack1165 = await page.locator('.pack-count').innerText()
+  if (!pack1165.includes('74')) {
+    throw new Error(`1.16.5 命令数量不符合预期：${pack1165}`)
+  }
+  await page.screenshot({ path: join(ARTIFACTS, 'pack-1.16.5.png') })
+  await page.selectOption('#pack-select', '1.15.2')
+  await page.waitForTimeout(500)
+  const pack1152 = await page.locator('.pack-count').innerText()
+  if (!pack1152.includes('72')) {
+    throw new Error(`1.15.2 命令数量不符合预期：${pack1152}`)
+  }
+  await page.selectOption('#pack-select', '1.14.4')
+  await page.waitForTimeout(500)
+  const pack1144 = await page.locator('.pack-count').innerText()
+  if (!pack1144.includes('71')) {
+    throw new Error(`1.14.4 命令数量不符合预期：${pack1144}`)
+  }
+  await page.screenshot({ path: join(ARTIFACTS, 'pack-1.14.4.png') })
   await page.selectOption('#pack-select', '1.20.4')
   await page.waitForTimeout(500)
   const pack1204 = await page.locator('.pack-count').innerText()

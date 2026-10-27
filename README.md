@@ -12,7 +12,7 @@
 
 ![give 表单](docs/assets/give-form.png)
 
-## 功能（0.1.50）
+## 功能（0.1.51）
 
 - **品牌图标**：命令方块主题的应用图标、安装包图标与界面 Logo。
 - **更新公告**：只展示当前版本更新，历史版本跳转 GitHub Releases；不再显示已知问题。
@@ -38,10 +38,16 @@
 - **队伍文本**：`team` 前缀/后缀与高级显示名可视化文本组件。
 - **单元体系**：资源 ID、数值、物品栈、槽位统一校验。
 - **一键模板库**：8 个模板；支持切换目标版本（含 1.20.4 NBT 剑）。
-- **多版本**：26.3 主版本 + 1.21.1 组件版 + 1.20.4 命令树版，可在顶栏切换。
+- **多版本**：26.3 主版本 + 1.21.1 组件版 + 1.20.4 / 1.20.3 / 1.19.4 / 1.18.2 / 1.16.5 / 1.15.2 / 1.14.4 NBT 版，可在顶栏切换。
 - **26.3 数据包**：94 个根命令、1,197 个字面量、59 种参数类型。
 - **1.21.1 数据包**：83 个根命令、1,333 物品、1,060 方块。
 - **1.20.4 数据包**：82 个根命令，NBT 引擎；NBT give/item、loot、37+ 兼容表单、旧版 particle/attribute 语法。
+- **1.20.3 数据包**：82 个根命令，NBT 引擎。
+- **1.19.4 数据包**：79 个根命令，NBT 引擎；保留旧版数据包目录结构。
+- **1.18.2 数据包**：77 个根命令，NBT 引擎。
+- **1.16.5 数据包**：74 个根命令，NBT 引擎。
+- **1.15.2 数据包**：72 个根命令，NBT 引擎。
+- **1.14.4 数据包**：71 个根命令，NBT 引擎。
 - **专用表单**：`give`、`summon`、`setblock`、`execute`、`tp`、`effect`、`fill`、`clone`、`enchant`、`xp`、`tellraw`、`title`、`playsound`、`stopsound`、`bossbar`、`scoreboard`、`particle`、`time`、`weather`、`difficulty`、`tag`、`clear`、`gamerule`、`worldborder`、`team`、`spawnpoint`、`setworldspawn`、`forceload`、`attribute`、`advancement`、`function`、`schedule`、`item`、`data`、`loot`、`gamemode`、`damage`、`rotate`。
 - **命令方块链**：按方向排布最多 64 个脉冲/连锁/循环方块，自动偏移坐标，生成整链 `/setblock`。
 - **execute 执行链**：as/at/positioned/align/anchored/facing/rotated/in/if/unless/store/raw 可排序积木 + run。
@@ -53,7 +59,7 @@
 - **通用构建器**：未覆盖命令仍保留官方命令树作为高级兜底。
 - **本地项目**：`.mcstudio` JSON、最近打开、4 秒防抖自动保存、异常退出恢复。
 - **桌面体验**：深色/浅色主题、中文界面、原生菜单、文件关联、单实例、高 DPI。
-- **分发与更新**：NSIS 安装包 + 便携版 + `latest.yml`；electron-updater 自动检查/下载/重启安装；GitHub Actions 发布流水线。已在本机验证 0.1.49 → 0.1.50 静默升级；便携版会禁用自动更新并提示手动下载。
+- **分发与更新**：NSIS 安装包 + 便携版 + `latest.yml`；electron-updater 自动检查/下载/重启安装；GitHub Actions 发布流水线。已在本机验证 0.1.50 → 0.1.51 静默升级；便携版会禁用自动更新并提示手动下载。
 
 ## 下载与安装
 
@@ -83,8 +89,8 @@ pnpm build:win          # 安装包 + 便携版 + latest.yml
 
 产物在 `release/`：
 
-- `MC-Command-Studio-Setup-0.1.50.exe`
-- `MC-Command-Studio-0.1.50-portable.exe`
+- `MC-Command-Studio-Setup-0.1.51.exe`
+- `MC-Command-Studio-0.1.51-portable.exe`
 - `latest.yml`、`.blockmap`
 
 如果 `pnpm install` 后没有 Electron 二进制，运行 `pnpm setup:electron`；国内网络可设置：
@@ -108,7 +114,7 @@ pnpm data:verify
 ## 测试
 
 ```bash
-pnpm test        # 236 个核心逻辑用例
+pnpm test        # 237 个核心逻辑用例
 pnpm e2e         # Playwright 启动 Electron，覆盖 give/导入/summon/setblock/命令方块
 ```
 
@@ -150,7 +156,7 @@ release/             打包产物（不入库）
 
 ## 已知限制
 
-- 当前只实现 26.3 的现代语法；1.13–1.20.4 与 1.12.2 在路线图中。
+- 当前实现了 26.3 / 1.21.1 / 1.20.4 / 1.20.3 / 1.19.4 / 1.18.2 / 1.16.5 / 1.15.2 / 1.14.4；1.13 因上游数据缺失待接，1.12.2 在路线图中。
 - 复杂物品组件暂以原始 SNBT 输入，后续补专用表单。
 - 不连接游戏做语义验证；语法/格式能校验，实际效果需进游戏确认。
 - 便携版不支持自动更新。

@@ -22,6 +22,35 @@ const REPO = 'https://github.com/JiangNanChina/mc-command-studio'
  */
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: '0.1.51',
+    date: '2026-10-27',
+    title: '旧版数据管线扩展到 1.14.4–1.20.3',
+    highlights: ['9 个数据包版本。', '旧版目录/出生点/计分板差异适配。'],
+    sections: [
+      {
+        type: 'added',
+        items: [
+          '1.20.3/1.19.4/1.18.2/1.16.5/1.15.2/1.14.4 数据包。',
+          '版本化升级测试与冒烟。'
+        ]
+      },
+      {
+        type: 'improved',
+        items: [
+          '旧版数据包目录自动切换。',
+          'scoreboard 字段按命令树过滤。',
+          '1.21.1 粒子注册表 109 种验证。',
+          '单元测试 236 → 237。'
+        ]
+      },
+      {
+        type: 'fixed',
+        items: ['1.16.5/1.18.2 不再显示不存在的出生点朝向。']
+      }
+    ],
+    releaseUrl: `${REPO}/releases/tag/v0.1.51`
+  },
+  {
     version: '0.1.50',
     date: '2026-10-27',
     title: '1.21.1 与 1.20.4 语法适配',
