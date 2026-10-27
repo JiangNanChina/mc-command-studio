@@ -18,6 +18,8 @@ describe('particle', () => {
     expect(inferredParticleMode('minecraft:dust_color_transition')).toBe('dust_transition')
     expect(inferredParticleMode('minecraft:item')).toBe('item')
     expect(inferredParticleMode('minecraft:entity_effect')).toBe('rgba')
+    expect(inferredParticleMode('minecraft:effect')).toBe('color')
+    expect(inferredParticleMode('minecraft:instant_effect')).toBe('color')
     expect(inferredParticleMode('minecraft:flame')).toBe('none')
   })
 
@@ -107,6 +109,12 @@ describe('particle', () => {
         'nbt'
       ).diagnostics.some((item) => item.code === 'particle.legacy')
     ).toBe(true)
+    expect(
+      buildParticleCommand(
+        { ...base, particle: 'minecraft:effect', effectColor: '#00ff00' },
+        'nbt'
+      ).text
+    ).toContain('particle minecraft:effect 0 1 0 ~ ~1 ~')
   })
 
   it('validates numeric fields and raw syntax', () => {

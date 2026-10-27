@@ -12,6 +12,7 @@ import {
 } from '@mcstudio/core'
 import { useAppStore } from '../store'
 import { CustomPresetBar } from './CustomPresetBar'
+import { OocLayoutPreview } from './OocLayoutPreview'
 
 const LAYOUT_PRESETS = [
   {
@@ -296,6 +297,11 @@ export function OocForm() {
               ? `预计 ${commandCount} 个命令方块 · ${rows} 行 × ${options.secondaryAxis === 'none' ? 1 : Math.max(1, Number(options.rowSize) || 1)} 列 · ${options.layoutAxis.toUpperCase()}${options.secondaryAxis === 'none' ? '' : ` + ${options.secondaryAxis.toUpperCase()}`}`
               : `预计 ${commandCount} 层掉落沙链`}
           </div>
+          <OocLayoutPreview
+            count={commandCount}
+            rowSize={Math.max(1, Number(options.rowSize) || 1)}
+            secondary={options.secondaryAxis !== 'none'}
+          />
 
           <div className="field" style={{ marginTop: 12 }}>
             <label className="field-label" htmlFor="ooc-commands">

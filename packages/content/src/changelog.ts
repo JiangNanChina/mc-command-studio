@@ -22,6 +22,35 @@ const REPO = 'https://github.com/JiangNanChina/mc-command-studio'
  */
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: '0.1.62',
+    date: '2026-10-27',
+    title: '预设管理与布局缩略图',
+    highlights: ['预设重命名/导入导出。', 'OOC 布局缩略图。'],
+    sections: [
+      {
+        type: 'added',
+        items: [
+          '自定义预设管理面板。',
+          '预设 JSON 导入/导出。',
+          'OOC 布局缩略图。'
+        ]
+      },
+      {
+        type: 'improved',
+        items: [
+          '导入去重并限制 30 条。',
+          'effect/instant_effect 参数测试。',
+          '布局预览同步刷新。'
+        ]
+      },
+      {
+        type: 'fixed',
+        items: ['无。']
+      }
+    ],
+    releaseUrl: `${REPO}/releases/tag/v0.1.62`
+  },
+  {
     version: '0.1.61',
     date: '2026-10-27',
     title: '自定义预设与粒子模式能力表',

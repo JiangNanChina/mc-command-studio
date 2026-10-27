@@ -38,3 +38,38 @@ export function removePreset(key: string, name: string): CustomPreset[] {
   savePresets(key, next)
   return next
 }
+
+export function renamePreset(key: string, from: string, to: string): CustomPreset[] {
+  const name = to.trim()
+  if (!name) return loadPresets(key)
+  const next = loadPresets(key).map((item) =>
+    item.name === from ? { ...item, name } : item
+  )
+  savePresets(key, next)
+  return next
+}
+
+export function exportPresets(key: string): string {
+  return JSON.stringify(loadPresets(key), null, 2)
+}
+
+export function importPresets(key: string, source: string): CustomPreset[] {
+  try {
+    const value = JSON.parse(source)
+    if (!Array.isArray(value)) return loadPresets(key)
+    const imported = value.filter(
+      (item): item is CustomPreset =>
+        item && typeof item.name === 'string' && typeof item.value === 'string'
+    )
+    const next = [...imported, ...loadPresets(key)]
+    const unique = new Map<string, CustomPreset>()
+    for (const preset of next) {
+      if (!unique.has(preset.name)) unique.set(preset.name, preset)
+    }
+    const output = [...unique.values()].slice(0, 30)
+    savePresets(key, output)
+    return output
+  } catch {
+    return loadPresets(key)
+  }
+}
