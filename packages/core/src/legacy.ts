@@ -87,6 +87,26 @@ export function createDefaultReplaceitem(): LegacyReplaceitemOptions {
   }
 }
 
+export const LEGACY_BLOCK_PRESETS = [
+  { label: '上锁容器', nbt: '{Lock:"mcstudio"}' },
+  { label: '自定义名称', nbt: '{CustomName:"MC Studio"}' },
+  { label: '箱子物品', nbt: '{Items:[{Slot:0b,id:"minecraft:diamond",Count:1b}]}' },
+  { label: '告示牌四行', nbt: '{Text1:"{\\"text\\":\\"第一行\\"}",Text2:"{\\"text\\":\\"第二行\\"}",Text3:"{\\"text\\":\\"第三行\\"}",Text4:"{\\"text\\":\\"第四行\\"}"}' },
+  { label: '命令方块', nbt: '{Command:"say hello",auto:1b,powered:1b,TrackOutput:0b}' },
+  { label: '刷怪笼', nbt: '{SpawnCount:4s,SpawnRange:4s,Delay:20s,MinSpawnDelay:200s,MaxSpawnDelay:800s}' }
+]
+
+export const LEGACY_ENTITY_PRESETS = [
+  { label: '无重力', nbt: '{NoGravity:1b}' },
+  { label: '静音', nbt: '{Silent:1b}' },
+  { label: '无敌', nbt: '{Invulnerable:1b}' },
+  { label: '禁用 AI', nbt: '{NoAI:1b}' },
+  { label: '自定义名称', nbt: '{CustomName:"MC Studio",CustomNameVisible:1b}' },
+  { label: '10 点生命', nbt: '{Health:10f}' },
+  { label: '静止', nbt: '{Motion:[0.0,0.0,0.0]}' },
+  { label: '发光', nbt: '{Glowing:1b}' }
+]
+
 const COORDINATE = /^[~^]?-?\d*(?:\.\d+)?$/
 
 function validateCoordinate(value: string, axis: string, diagnostics: Diagnostic[]): void {

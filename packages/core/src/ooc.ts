@@ -14,6 +14,7 @@ export interface OocOptions {
   auto: boolean
   conditional: boolean
   facing: LegacyDirection
+  layerStep: string
   trackOutput: boolean
 }
 
@@ -33,6 +34,7 @@ export function createDefaultOocOptions(): OocOptions {
     auto: true,
     conditional: false,
     facing: 'up',
+    layerStep: '1',
     trackOutput: false
   }
 }
@@ -59,8 +61,24 @@ function commandBlockNbt(command: string, options: OocOptions): string {
   return `Command:${commandBlockString(command)},auto:${options.auto ? '1b' : '0b'},conditionMet:0b,powered:1b,TrackOutput:${options.trackOutput ? '1b' : '0b'},UpdateLastExecution:0b`
 }
 
-function fallingBlock(command: string, options: OocOptions, passengers: string): string {
-  return `{id:"minecraft:falling_block",Block:"minecraft:command_block",Time:1b,TileEntityData:{${commandBlockNbt(command, options)}}${passengers ? `,Passengers:[${passengers}]` : ''}}`
+function offsetCoordinate(value: string, offset: number): string {
+  if (!offset) return value
+  const relative = /^([~^])(-?\d+(?:\.\d+)?)?$/.exec(value.trim())
+  if (relative) {
+    const base = Number(relative[2] ?? 0) + offset
+    return `${relative[1]}${base === 0 ? '' : base}`
+  }
+  const numeric = Number(value)
+  return Number.isFinite(numeric) ? String(numeric + offset) : value
+}
+
+function fallingBlock(
+  command: string,
+  options: OocOptions,
+  passengers: string,
+  time: number
+): string {
+  return `{id:"minecraft:falling_block",Block:"minecraft:command_block",Time:${1 + time}s,TileEntityData:{${commandBlockNbt(command, options)}}${passengers ? `,Passengers:[${passengers}]` : ''}}`
 }
 
 export function buildOocCommand(options: OocOptions): BuildResult {
@@ -76,6 +94,10 @@ export function buildOocCommand(options: OocOptions): BuildResult {
   ] as const) {
     validateCoordinate(value, axis, diagnostics)
   }
+  if (!/^\d+$/.test(options.layerStep.trim())) {
+    diagnostics.push(error('ooc.layerStep', '层间距必须是非负整数', 'layerStep'))
+  }
+  const layerStep = /^\d+$/.test(options.layerStep.trim()) ? Number(options.layerStep) : 0
   for (const command of commands) {
     if (containsControlCharacters(command)) {
       diagnostics.push(warn('ooc.control', '命令中包含不可见控制字符', 'commands'))
@@ -89,19 +111,24 @@ export function buildOocCommand(options: OocOptions): BuildResult {
       const meta =
         (LEGACY_DIRECTIONS.find((direction) => direction.value === options.facing)?.meta ?? 1) +
         (options.conditional ? 8 : 0)
-      text = `setblock ${options.x.trim()} ${options.y.trim()} ${options.z.trim()} command_block ${meta} replace {${commandBlockNbt(commands[0], options)}}`
-      if (commands.length > 1) {
-        diagnostics.push(warn('ooc.single', '命令方块模式只写入第一条命令；多条请用掉落沙 OOC', 'commands'))
-      }
+      text = commands
+        .map((command, index) => {
+          const y = offsetCoordinate(options.y, index * layerStep)
+          return `setblock ${options.x.trim()} ${y} ${options.z.trim()} command_block ${meta} replace {${commandBlockNbt(command, options)}}`
+        })
+        .join('\n')
     } else if (options.mode === 'command-block-minecart') {
       text = `summon commandblock_minecart ${options.x.trim()} ${options.y.trim()} ${options.z.trim()} {Command:${commandBlockString(commands[0])},TrackOutput:${options.trackOutput ? '1b' : '0b'}}`
       if (commands.length > 1) {
         diagnostics.push(warn('ooc.single', '矿车模式只写入第一条命令；多条请用掉落沙 OOC', 'commands'))
       }
+      if (options.conditional) {
+        diagnostics.push(warn('ooc.conditional', '矿车模式不支持条件链', 'conditional'))
+      }
     } else {
       let passengers = ''
       for (let index = commands.length - 1; index >= 0; index -= 1) {
-        passengers = fallingBlock(commands[index], options, passengers)
+        passengers = fallingBlock(commands[index], options, passengers, index * layerStep)
       }
       text = `summon minecraft:falling_block ${options.x.trim()} ${options.y.trim()} ${options.z.trim()} {Block:"minecraft:redstone_block",Time:1b,Passengers:[${passengers}]}`
       if (options.conditional) {

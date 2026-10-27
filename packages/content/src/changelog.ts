@@ -22,6 +22,35 @@ const REPO = 'https://github.com/JiangNanChina/mc-command-studio'
  */
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: '0.1.56',
+    date: '2026-10-27',
+    title: '1.12.2 NBT 预设与 OOC 多层布局',
+    highlights: ['方块/实体 NBT 预设。', 'OOC 自动沿 Y 轴排布多命令。'],
+    sections: [
+      {
+        type: 'added',
+        items: [
+          '1.12.2 方块 NBT 预设（6 个）。',
+          '1.12.2 实体 NBT 预设（8 个）。',
+          'OOC 层间距输入与多层布局。'
+        ]
+      },
+      {
+        type: 'improved',
+        items: [
+          '命令方块模式多命令自动沿 Y 轴排布。',
+          '掉落沙模式按层间距递增 Time。',
+          '单元测试 244 → 245。'
+        ]
+      },
+      {
+        type: 'fixed',
+        items: ['无。']
+      }
+    ],
+    releaseUrl: `${REPO}/releases/tag/v0.1.56`
+  },
+  {
     version: '0.1.55',
     date: '2026-10-27',
     title: '1.12.2 旧版工具与 OOC 增强',

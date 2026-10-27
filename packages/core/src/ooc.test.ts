@@ -34,6 +34,22 @@ describe('ooc', () => {
     expect(minecart.text).toContain('summon commandblock_minecart ~ ~1 ~ {Command:"say hi"')
   })
 
+  it('lays out multiple command blocks along Y', () => {
+    const result = buildOocCommand({
+      ...createDefaultOocOptions(),
+      mode: 'command-block',
+      x: '0',
+      y: '64',
+      z: '0',
+      layerStep: '2',
+      commands: 'say one\nsay two'
+    })
+    const lines = result.text.split('\n')
+    expect(lines).toHaveLength(2)
+    expect(lines[0]).toContain('setblock 0 64 0 command_block')
+    expect(lines[1]).toContain('setblock 0 66 0 command_block')
+  })
+
   it('validates empty commands and coordinates', () => {
     const result = buildOocCommand({ ...createDefaultOocOptions(), commands: '', x: 'bad' })
     expect(result.diagnostics.some((item) => item.code === 'ooc.commands')).toBe(true)

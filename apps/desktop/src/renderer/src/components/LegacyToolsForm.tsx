@@ -1,6 +1,8 @@
 import { useMemo, useState } from 'react'
 import { Copy, Wrench } from 'lucide-react'
 import {
+  LEGACY_BLOCK_PRESETS,
+  LEGACY_ENTITY_PRESETS,
   LEGACY_SLOTS,
   buildBlockdata,
   buildEntitydata,
@@ -144,6 +146,24 @@ export function LegacyToolsForm() {
                 <label className="field-label" htmlFor="legacy-blockdata-nbt">
                   NBT
                 </label>
+                <select
+                  id="legacy-blockdata-preset"
+                  className="select"
+                  defaultValue=""
+                  style={{ marginBottom: 8 }}
+                  onChange={(event) => {
+                    const preset = LEGACY_BLOCK_PRESETS[Number(event.target.value)]
+                    if (preset) setBlockdata({ ...blockdata, nbt: preset.nbt })
+                    event.target.value = ''
+                  }}
+                >
+                  <option value="">选择方块 NBT 预设…</option>
+                  {LEGACY_BLOCK_PRESETS.map((preset, index) => (
+                    <option key={preset.label} value={index}>
+                      {preset.label}
+                    </option>
+                  ))}
+                </select>
                 <textarea
                   id="legacy-blockdata-nbt"
                   className="textarea"
@@ -173,6 +193,24 @@ export function LegacyToolsForm() {
                 <label className="field-label" htmlFor="legacy-entitydata-nbt">
                   NBT
                 </label>
+                <select
+                  id="legacy-entitydata-preset"
+                  className="select"
+                  defaultValue=""
+                  style={{ marginBottom: 8 }}
+                  onChange={(event) => {
+                    const preset = LEGACY_ENTITY_PRESETS[Number(event.target.value)]
+                    if (preset) setEntitydata({ ...entitydata, nbt: preset.nbt })
+                    event.target.value = ''
+                  }}
+                >
+                  <option value="">选择实体 NBT 预设…</option>
+                  {LEGACY_ENTITY_PRESETS.map((preset, index) => (
+                    <option key={preset.label} value={index}>
+                      {preset.label}
+                    </option>
+                  ))}
+                </select>
                 <textarea
                   id="legacy-entitydata-nbt"
                   className="textarea"

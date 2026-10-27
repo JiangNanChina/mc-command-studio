@@ -140,6 +140,21 @@ export function OocForm() {
           ) : null}
 
           <div className="field" style={{ marginTop: 12 }}>
+            <label className="field-label" htmlFor="ooc-layer-step">
+              层间距 / 延迟
+            </label>
+            <input
+              id="ooc-layer-step"
+              className="input"
+              value={options.layerStep}
+              onChange={(event) => update({ layerStep: event.target.value })}
+            />
+            <div className="hint">
+              命令方块模式按 Y 轴每层偏移；掉落沙模式按该值递增每层 Time。
+            </div>
+          </div>
+
+          <div className="field" style={{ marginTop: 12 }}>
             <label className="field-label" htmlFor="ooc-commands">
               命令（每行一条）
             </label>

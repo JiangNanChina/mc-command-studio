@@ -1183,6 +1183,13 @@ async function main() {
   if (!oocDirected.includes('command_block 5 replace') || !oocDirected.includes('say directed')) {
     throw new Error(`OOC 方向输出不符合预期：${oocDirected}`)
   }
+  await page.fill('#ooc-layer-step', '2')
+  await page.fill('#ooc-commands', 'say one\nsay two')
+  await page.waitForTimeout(300)
+  const oocLayered = await page.locator('#ooc-output').innerText()
+  if (!oocLayered.includes('~3') || oocLayered.split('\n').length !== 2) {
+    throw new Error(`OOC 多层布局不符合预期：${oocLayered}`)
+  }
   await page.getByRole('button', { name: /1.12.2 旧版工具/ }).click()
   await page.waitForSelector('#legacy-testfor-target', { timeout: 10_000 })
   await page.fill('#legacy-testfor-nbt', '{Health:10f}')
@@ -1190,6 +1197,14 @@ async function main() {
   const legacyTestfor = await page.locator('#legacy-output').innerText()
   if (!legacyTestfor.includes('testfor @a {Health:10f}')) {
     throw new Error(`1.12.2 testfor 输出不符合预期：${legacyTestfor}`)
+  }
+  await page.getByRole('button', { name: 'blockdata', exact: true }).click()
+  await page.waitForSelector('#legacy-blockdata-preset', { timeout: 10_000 })
+  await page.selectOption('#legacy-blockdata-preset', '0')
+  await page.waitForTimeout(300)
+  const legacyBlockdata = await page.locator('#legacy-output').innerText()
+  if (!legacyBlockdata.includes('blockdata') || !legacyBlockdata.includes('Lock:"mcstudio"')) {
+    throw new Error(`1.12.2 blockdata 预设不符合预期：${legacyBlockdata}`)
   }
   await page.screenshot({ path: join(ARTIFACTS, 'ooc-1.12.2.png') })
   await page.selectOption('#pack-select', '1.20.4')
