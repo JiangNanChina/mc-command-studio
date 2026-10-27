@@ -7,23 +7,26 @@ import {
   LEGACY_SLOTS,
   buildBlockdata,
   buildEntitydata,
+  buildLegacyGive,
   buildReplaceitem,
   buildTestfor,
   createDefaultBlockdata,
   createDefaultEntitydata,
+  createDefaultGive,
   createDefaultReplaceitem,
   createDefaultTestfor
 } from '@mcstudio/core'
 import { useAppStore } from '../store'
 import { CustomPresetBar } from './CustomPresetBar'
 
-type LegacyTab = 'testfor' | 'blockdata' | 'entitydata' | 'replaceitem'
+type LegacyTab = 'testfor' | 'blockdata' | 'entitydata' | 'replaceitem' | 'give'
 
 const TABS: { id: LegacyTab; label: string }[] = [
   { id: 'testfor', label: 'testfor' },
   { id: 'blockdata', label: 'blockdata' },
   { id: 'entitydata', label: 'entitydata' },
-  { id: 'replaceitem', label: 'replaceitem' }
+  { id: 'replaceitem', label: 'replaceitem' },
+  { id: 'give', label: 'give' }
 ]
 
 export function LegacyToolsForm() {
@@ -33,14 +36,16 @@ export function LegacyToolsForm() {
   const [blockdata, setBlockdata] = useState(createDefaultBlockdata)
   const [entitydata, setEntitydata] = useState(createDefaultEntitydata)
   const [replaceitem, setReplaceitem] = useState(createDefaultReplaceitem)
+  const [give, setGive] = useState(createDefaultGive)
   const [copied, setCopied] = useState(false)
 
   const result = useMemo(() => {
     if (tab === 'testfor') return buildTestfor(testfor)
     if (tab === 'blockdata') return buildBlockdata(blockdata)
     if (tab === 'entitydata') return buildEntitydata(entitydata)
+    if (tab === 'give') return buildLegacyGive(give)
     return buildReplaceitem(replaceitem)
-  }, [tab, testfor, blockdata, entitydata, replaceitem])
+  }, [tab, testfor, blockdata, entitydata, replaceitem, give])
 
   const copy = async () => {
     if (!result.text) return
@@ -232,6 +237,77 @@ export function LegacyToolsForm() {
                   placeholder="{NoGravity:1b}"
                   value={entitydata.nbt}
                   onChange={(event) => setEntitydata({ ...entitydata, nbt: event.target.value })}
+                />
+              </div>
+            </>
+          ) : null}
+
+          {tab === 'give' ? (
+            <>
+              <div className="grid-2">
+                <div className="field">
+                  <label className="field-label" htmlFor="legacy-give-target">
+                    目标
+                  </label>
+                  <input
+                    id="legacy-give-target"
+                    className="input"
+                    value={give.target}
+                    onChange={(event) => setGive({ ...give, target: event.target.value })}
+                  />
+                </div>
+                <div className="field">
+                  <label className="field-label" htmlFor="legacy-give-item">
+                    物品
+                  </label>
+                  <input
+                    id="legacy-give-item"
+                    className="input"
+                    value={give.item}
+                    onChange={(event) => setGive({ ...give, item: event.target.value })}
+                  />
+                </div>
+              </div>
+              <div className="grid-2" style={{ marginTop: 12 }}>
+                <div className="field">
+                  <label className="field-label" htmlFor="legacy-give-count">
+                    数量
+                  </label>
+                  <input
+                    id="legacy-give-count"
+                    className="input"
+                    value={give.count}
+                    onChange={(event) => setGive({ ...give, count: event.target.value })}
+                  />
+                </div>
+                <div className="field">
+                  <label className="field-label" htmlFor="legacy-give-data">
+                    数据值
+                  </label>
+                  <input
+                    id="legacy-give-data"
+                    className="input"
+                    value={give.data}
+                    onChange={(event) => setGive({ ...give, data: event.target.value })}
+                  />
+                </div>
+              </div>
+              <div className="field" style={{ marginTop: 12 }}>
+                <label className="field-label" htmlFor="legacy-give-nbt">
+                  NBT（可选）
+                </label>
+                <CustomPresetBar
+                  storageKey="legacy:give"
+                  value={give.nbt}
+                  label="give NBT"
+                  onApply={(nbt) => setGive({ ...give, nbt })}
+                />
+                <textarea
+                  id="legacy-give-nbt"
+                  className="textarea"
+                  rows={3}
+                  value={give.nbt}
+                  onChange={(event) => setGive({ ...give, nbt: event.target.value })}
                 />
               </div>
             </>

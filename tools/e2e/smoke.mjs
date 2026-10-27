@@ -1265,6 +1265,13 @@ async function main() {
   if (!legacyBook.includes('title:"MC Studio"') || !legacyBook.includes('pages')) {
     throw new Error(`1.12.2 成书预设不符合预期：${legacyBook}`)
   }
+  await page.getByRole('button', { name: 'give', exact: true }).click()
+  await page.waitForSelector('#legacy-give-item', { timeout: 10_000 })
+  await page.waitForTimeout(300)
+  const legacyGive = await page.locator('#legacy-output').innerText()
+  if (!legacyGive.startsWith('give @p minecraft:diamond 1 0')) {
+    throw new Error(`1.12.2 give 输出不符合预期：${legacyGive}`)
+  }
   await page.screenshot({ path: join(ARTIFACTS, 'ooc-1.12.2.png') })
   await page.selectOption('#pack-select', '1.20.4')
   await page.waitForTimeout(500)

@@ -4,8 +4,10 @@ import {
   buildEntitydata,
   buildReplaceitem,
   buildTestfor,
+  buildLegacyGive,
   createDefaultBlockdata,
   createDefaultEntitydata,
+  createDefaultGive,
   createDefaultReplaceitem,
   createDefaultTestfor
 } from './legacy'
@@ -46,6 +48,19 @@ describe('1.12 legacy commands', () => {
       slot: 'slot.inventory.0'
     })
     expect(block.text).toContain('replaceitem block 1 2 3 slot.inventory.0')
+  })
+
+  it('builds legacy give with NBT', () => {
+    const result = buildLegacyGive({
+      ...createDefaultGive(),
+      item: 'minecraft:diamond_sword',
+      count: '1',
+      data: '0',
+      nbt: '{display:{Name:"Sword"}}'
+    })
+    expect(result.text).toBe(
+      'give @p minecraft:diamond_sword 1 0 {display:{Name:"Sword"}}'
+    )
   })
 
   it('validates NBT and counts', () => {

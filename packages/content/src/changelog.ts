@@ -22,6 +22,35 @@ const REPO = 'https://github.com/JiangNanChina/mc-command-studio'
  */
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: '0.1.66',
+    date: '2026-10-27',
+    title: '1.12.2 give 与 OOC 命令行定位',
+    highlights: ['give 专用表单。', '缩略图点击定位命令行。'],
+    sections: [
+      {
+        type: 'added',
+        items: [
+          '1.12.2 give 表单。',
+          'OOC 点选定位命令行。',
+          '发射器/盔甲架/烟花模板。'
+        ]
+      },
+      {
+        type: 'improved',
+        items: [
+          '旧版工具页 5 个表单。',
+          'entity_effect 参数测试。',
+          '单元测试 250 → 251。'
+        ]
+      },
+      {
+        type: 'known',
+        items: ['1.8–1.10 Legacy 数据包仍未接入。']
+      }
+    ],
+    releaseUrl: `${REPO}/releases/tag/v0.1.66`
+  },
+  {
     version: '0.1.65',
     date: '2026-10-27',
     title: '预设冲突确认与缩略图坐标联动',

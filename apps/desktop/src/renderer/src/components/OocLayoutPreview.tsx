@@ -12,6 +12,7 @@ interface Props {
   baseX: string
   baseY: string
   baseZ: string
+  onSelect: (index: number) => void
 }
 
 export function OocLayoutPreview({
@@ -24,7 +25,8 @@ export function OocLayoutPreview({
   secondaryStep,
   baseX,
   baseY,
-  baseZ
+  baseZ,
+  onSelect
 }: Props) {
   const [active, setActive] = useState<number | null>(null)
   if (count <= 0) {
@@ -103,7 +105,10 @@ export function OocLayoutPreview({
             style={{ cursor: 'pointer' }}
             onMouseEnter={() => setActive(index)}
             onMouseLeave={() => setActive(null)}
-            onClick={() => setActive(index)}
+            onClick={() => {
+              setActive(index)
+              onSelect(index)
+            }}
           >
             <title>{`#${index + 1} ${coordinateFor(index)}`}</title>
           </circle>

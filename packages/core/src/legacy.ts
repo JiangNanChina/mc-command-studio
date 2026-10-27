@@ -72,6 +72,16 @@ export function createDefaultEntitydata(): LegacyEntitydataOptions {
   return { target: '@e', nbt: '' }
 }
 
+export function createDefaultGive(): LegacyGiveOptions {
+  return {
+    target: '@p',
+    item: 'minecraft:diamond',
+    count: '1',
+    data: '0',
+    nbt: ''
+  }
+}
+
 export function createDefaultReplaceitem(): LegacyReplaceitemOptions {
   return {
     target: 'entity',
@@ -87,6 +97,14 @@ export function createDefaultReplaceitem(): LegacyReplaceitemOptions {
   }
 }
 
+export interface LegacyGiveOptions {
+  target: string
+  item: string
+  count: string
+  data: string
+  nbt: string
+}
+
 export const LEGACY_BLOCK_PRESETS = [
   { label: '上锁容器', nbt: '{Lock:"mcstudio"}' },
   { label: '自定义名称', nbt: '{CustomName:"MC Studio"}' },
@@ -95,6 +113,7 @@ export const LEGACY_BLOCK_PRESETS = [
   { label: '命令方块', nbt: '{Command:"say hello",auto:1b,powered:1b,TrackOutput:0b}' },
   { label: '刷怪笼', nbt: '{SpawnCount:4s,SpawnRange:4s,Delay:20s,MinSpawnDelay:200s,MaxSpawnDelay:800s}' },
   { label: '旗帜图案', nbt: '{Base:4,Patterns:[{Pattern:"cre",Color:1},{Pattern:"bri",Color:15}]}' },
+  { label: '发射器物品', nbt: '{Items:[{Slot:0b,id:"minecraft:diamond",Count:1b}]}' },
   { label: '药水效果', nbt: '{CustomPotionEffects:[{Id:1b,Amplifier:1b,Duration:200}]}' },
   { label: '刷怪笼实体', nbt: '{SpawnData:{id:"minecraft:zombie"},SpawnCount:4s,SpawnRange:4s,Delay:20s,MinSpawnDelay:200s,MaxSpawnDelay:800s}' },
   { label: '刷怪笼实体列表', nbt: '{SpawnPotentials:[{Weight:1,Entity:{id:"minecraft:zombie"}},{Weight:1,Entity:{id:"minecraft:skeleton"}}],SpawnCount:4s,SpawnRange:4s,Delay:20s,MinSpawnDelay:200s,MaxSpawnDelay:800s}' },
@@ -110,6 +129,7 @@ export const LEGACY_ITEM_PRESETS = [
   { label: '八页书', nbt: '{title:"MC Studio 全书",author:"MC Studio",pages:["第 1 页","第 2 页","第 3 页","第 4 页","第 5 页","第 6 页","第 7 页","第 8 页"]}' },
   { label: '附魔剑', nbt: '{display:{Name:"{\\"text\\":\\"Excalibur\\"}"},ench:[{id:16s,lvl:5s}]}' },
   { label: '药水', nbt: '{Potion:"minecraft:strong_healing"}' },
+  { label: '烟花火箭', nbt: '{Fireworks:{Flight:1b,Explosions:[{Type:1,Colors:[11743532]}]}}' },
   { label: '头颅', nbt: '{SkullOwner:"Notch"}' }
 ]
 
@@ -123,6 +143,7 @@ export const LEGACY_ENTITY_PRESETS = [
   { label: '静止', nbt: '{Motion:[0.0,0.0,0.0]}' },
   { label: '发光', nbt: '{Glowing:1b}' },
   { label: '村民交易', nbt: '{Offers:{Recipes:[{buy:{id:"minecraft:emerald",Count:1b},sell:{id:"minecraft:diamond",Count:1b},maxUses:10}]}}' },
+  { label: '盔甲架', nbt: '{ArmorItems:[{},{},{},{id:"minecraft:diamond_helmet",Count:1b}],Pose:{Head:[0f,0f,0f]}}' },
   { label: '药水效果', nbt: '{ActiveEffects:[{Id:1b,Amplifier:1b,Duration:200}]}' },
   { label: '持久化', nbt: '{PersistenceRequired:1b}' }
 ]
@@ -187,8 +208,29 @@ export function buildEntitydata(options: LegacyEntitydataOptions): BuildResult {
   return finish(['entitydata', options.target.trim(), options.nbt.trim()], diagnostics)
 }
 
-export function buildReplaceitem(options: LegacyReplaceitemOptions): BuildResult {
+export function buildLegacyGive(options: LegacyGiveOptions): BuildResult {
   const diagnostics: Diagnostic[] = []
+  if (!options.target.trim()) diagnostics.push(error('legacy.target', '目标不能为空', 'target'))
+  if (!options.item.trim()) diagnostics.push(error('legacy.item', '物品不能为空', 'item'))
+  if (!/^\d+$/.test(options.count.trim()) || Number(options.count) < 1) {
+    diagnostics.push(error('legacy.count', '数量必须是大于 0 的整数', 'count'))
+  }
+  if (!/^\d+$/.test(options.data.trim())) {
+    diagnostics.push(error('legacy.data', '数据值必须是非负整数', 'data'))
+  }
+  validateNbt(options.nbt, diagnostics)
+  const parts = [
+    'give',
+    options.target.trim(),
+    options.item.trim(),
+    options.count.trim(),
+    options.data.trim()
+  ]
+  if (options.nbt.trim()) parts.push(options.nbt.trim())
+  return finish(parts, diagnostics)
+}
+
+export function buildReplaceitem(options: LegacyReplaceitemOptions): BuildResult {  const diagnostics: Diagnostic[] = []
   if (!options.slot.trim()) diagnostics.push(error('legacy.slot', '槽位不能为空', 'slot'))
   if (!options.item.trim()) diagnostics.push(error('legacy.item', '物品不能为空', 'item'))
   if (!/^\d+$/.test(options.count.trim()) || Number(options.count) < 1) {

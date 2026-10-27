@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useMemo, useRef, useState } from 'react'
 import { Copy, TerminalSquare } from 'lucide-react'
 import {
   LEGACY_DIRECTIONS,
@@ -43,6 +43,20 @@ export function OocForm() {
   const [options, setOptions] = useState(createDefaultOocOptions)
   const result = useMemo(() => buildOocCommand(options), [options])
   const [copied, setCopied] = useState(false)
+  const commandsRef = useRef<HTMLTextAreaElement>(null)
+  const selectCommandLine = (index: number) => {
+    const lines = options.commands.replace(/\r\n?/g, '\n').split('\n')
+    const targets = lines
+      .map((line, lineIndex) => ({ lineIndex, text: line }))
+      .filter((item) => item.text.trim())
+    const target = targets[index]
+    if (!target || !commandsRef.current) return
+    const start = lines
+      .slice(0, target.lineIndex)
+      .reduce((total, line) => total + line.length + 1, 0)
+    commandsRef.current.focus()
+    commandsRef.current.setSelectionRange(start, start + target.text.length)
+  }
   const commandCount = options.commands
     .replace(/\r\n?/g, '\n')
     .split('\n')
@@ -327,6 +341,7 @@ export function OocForm() {
             baseX={options.x}
             baseY={options.y}
             baseZ={options.z}
+            onSelect={selectCommandLine}
           />
           {options.mode === 'command-block' && rangeText ? (
             <div className="hint" id="ooc-coordinate-range" style={{ marginTop: 4 }}>
@@ -340,6 +355,7 @@ export function OocForm() {
             </label>
             <textarea
               id="ooc-commands"
+              ref={commandsRef}
               className="textarea"
               rows={7}
               placeholder="say 第一条&#10;give @p minecraft:diamond 1"
