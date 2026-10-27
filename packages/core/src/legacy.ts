@@ -98,13 +98,16 @@ export const LEGACY_BLOCK_PRESETS = [
   { label: '药水效果', nbt: '{CustomPotionEffects:[{Id:1b,Amplifier:1b,Duration:200}]}' },
   { label: '刷怪笼实体', nbt: '{SpawnData:{id:"minecraft:zombie"},SpawnCount:4s,SpawnRange:4s,Delay:20s,MinSpawnDelay:200s,MaxSpawnDelay:800s}' },
   { label: '刷怪笼实体列表', nbt: '{SpawnPotentials:[{Weight:1,Entity:{id:"minecraft:zombie"}},{Weight:1,Entity:{id:"minecraft:skeleton"}}],SpawnCount:4s,SpawnRange:4s,Delay:20s,MinSpawnDelay:200s,MaxSpawnDelay:800s}' },
+  { label: '刷怪笼权重', nbt: '{SpawnPotentials:[{Weight:3,Entity:{id:"minecraft:zombie"}},{Weight:1,Entity:{id:"minecraft:skeleton"}}],SpawnCount:4s,SpawnRange:4s,Delay:20s,MinSpawnDelay:200s,MaxSpawnDelay:800s}' },
   { label: '命令方块链', nbt: '{Command:"say chain",auto:1b,conditionMet:1b,powered:1b,TrackOutput:0b}' },
+  { label: '命令方块链参数', nbt: '{Command:"say chain",auto:1b,conditionMet:1b,powered:1b,TrackOutput:1b,UpdateLastExecution:0b,SuccessCount:1,LastOutput:"chain"}' },
   { label: '循环命令方块', nbt: '{Command:"say loop",auto:1b,conditionMet:0b,powered:1b,TrackOutput:1b,UpdateLastExecution:0b,SuccessCount:0,LastOutput:""}' }
 ]
 
 export const LEGACY_ITEM_PRESETS = [
   { label: '成书', nbt: '{title:"MC Studio",author:"MC Studio",pages:["第一页","第二页","第三页","第四页"]}' },
   { label: '长书', nbt: '{title:"MC Studio 手册",author:"MC Studio",pages:["第一章：入门","第二章：命令","第三章：数据包","第四章：进阶","第五章：附录"]}' },
+  { label: '八页书', nbt: '{title:"MC Studio 全书",author:"MC Studio",pages:["第 1 页","第 2 页","第 3 页","第 4 页","第 5 页","第 6 页","第 7 页","第 8 页"]}' },
   { label: '附魔剑', nbt: '{display:{Name:"{\\"text\\":\\"Excalibur\\"}"},ench:[{id:16s,lvl:5s}]}' },
   { label: '药水', nbt: '{Potion:"minecraft:strong_healing"}' },
   { label: '头颅', nbt: '{SkullOwner:"Notch"}' }

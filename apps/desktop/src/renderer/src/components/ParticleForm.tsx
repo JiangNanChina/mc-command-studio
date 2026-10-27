@@ -42,15 +42,19 @@ export function ParticleForm() {
   const [blockOpen, setBlockOpen] = useState(false)
   const [itemOpen, setItemOpen] = useState(false)
   const legacy = isLegacyNbtPack(state.pack)
-  const optionModes = legacy
+  const is113 = state.pack?.manifest.gameVersion === '1.13.2'
+  const optionModes = (legacy
     ? OPTION_MODES.filter((item) => item.value !== 'raw')
     : OPTION_MODES
+  ).filter((item) => !is113 || item.value !== 'dust_transition')
 
   useEffect(() => {
     if (legacy && particle.optionMode === 'raw') {
       state.updateParticle({ optionMode: 'auto' })
+    } else if (is113 && particle.optionMode === 'dust_transition') {
+      state.updateParticle({ optionMode: 'auto' })
     }
-  }, [legacy, particle.optionMode, state])
+  }, [legacy, is113, particle.optionMode, state])
 
   const ids = useMemo(() => {
     const list = state.pack?.registries.particle_type ?? []

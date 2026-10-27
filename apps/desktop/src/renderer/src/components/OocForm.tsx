@@ -12,11 +12,43 @@ import {
 } from '@mcstudio/core'
 import { useAppStore } from '../store'
 
+const LAYOUT_PRESETS = [
+  {
+    label: 'Y 直线',
+    patch: { layoutAxis: 'y' as const, secondaryAxis: 'none' as const, layerStep: '1', secondaryStep: '1', rowSize: '2' }
+  },
+  {
+    label: 'X 直线',
+    patch: { layoutAxis: 'x' as const, secondaryAxis: 'none' as const, layerStep: '1', secondaryStep: '1', rowSize: '2' }
+  },
+  {
+    label: 'XY 平面',
+    patch: { layoutAxis: 'x' as const, secondaryAxis: 'y' as const, layerStep: '1', secondaryStep: '1', rowSize: '8' }
+  },
+  {
+    label: '3×3 紧凑',
+    patch: { layoutAxis: 'x' as const, secondaryAxis: 'y' as const, layerStep: '1', secondaryStep: '1', rowSize: '3' }
+  },
+  {
+    label: 'Z 阶梯',
+    patch: { layoutAxis: 'z' as const, secondaryAxis: 'y' as const, layerStep: '1', secondaryStep: '1', rowSize: '4' }
+  }
+]
+
 export function OocForm() {
   const state = useAppStore()
   const [options, setOptions] = useState(createDefaultOocOptions)
   const result = useMemo(() => buildOocCommand(options), [options])
   const [copied, setCopied] = useState(false)
+  const commandCount = options.commands
+    .replace(/\r\n?/g, '\n')
+    .split('\n')
+    .map((line) => line.trim())
+    .filter(Boolean).length
+  const rows =
+    options.secondaryAxis === 'none'
+      ? commandCount
+      : Math.ceil(commandCount / Math.max(1, Number(options.rowSize) || 1))
 
   const update = (patch: Partial<typeof options>) => {
     setOptions((current) => ({ ...current, ...patch }))
@@ -174,6 +206,19 @@ export function OocForm() {
             </select>
           </div>
 
+          <div className="row" style={{ marginTop: 8, gap: 8, flexWrap: 'wrap' }}>
+            {LAYOUT_PRESETS.map((preset) => (
+              <button
+                key={preset.label}
+                type="button"
+                className="btn btn-sm"
+                onClick={() => update(preset.patch)}
+              >
+                {preset.label}
+              </button>
+            ))}
+          </div>
+
           <div className="grid-3" style={{ marginTop: 12 }}>
             <div className="field">
               <label className="field-label" htmlFor="ooc-secondary-axis">
@@ -215,6 +260,12 @@ export function OocForm() {
                 onChange={(event) => update({ secondaryStep: event.target.value })}
               />
             </div>
+          </div>
+
+          <div className="hint" id="ooc-layout-preview" style={{ marginTop: 8 }}>
+            {options.mode === 'command-block'
+              ? `预计 ${commandCount} 个命令方块 · ${rows} 行 × ${options.secondaryAxis === 'none' ? 1 : Math.max(1, Number(options.rowSize) || 1)} 列 · ${options.layoutAxis.toUpperCase()}${options.secondaryAxis === 'none' ? '' : ` + ${options.secondaryAxis.toUpperCase()}`}`
+              : `预计 ${commandCount} 层掉落沙链`}
           </div>
 
           <div className="field" style={{ marginTop: 12 }}>

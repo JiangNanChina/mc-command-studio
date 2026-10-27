@@ -1161,6 +1161,9 @@ async function main() {
   if (!particle1132.includes('48')) {
     throw new Error(`1.13.2 粒子数量不符合预期：${particle1132}`)
   }
+  if ((await page.locator('#particle-mode option[value="dust_transition"]').count()) !== 0) {
+    throw new Error('1.13.2 不应显示 dust_transition 参数')
+  }
   await page.selectOption('#pack-select', '1.12.2')
   await page.waitForTimeout(500)
   const pack1122 = await page.locator('.pack-count').innerText()
@@ -1210,6 +1213,12 @@ async function main() {
   const oocStep = await page.locator('#ooc-output').innerText()
   if (!oocStep.includes('~ ~4') || !oocStep.includes('~1 ~1')) {
     throw new Error(`OOC 第二轴间距不符合预期：${oocStep}`)
+  }
+  await page.getByRole('button', { name: '3×3 紧凑', exact: true }).click()
+  await page.waitForTimeout(300)
+  const oocPreset = await page.locator('#ooc-layout-preview').innerText()
+  if (!oocPreset.includes('3 列') || !oocPreset.includes('X + Y')) {
+    throw new Error(`OOC 布局预设预览不符合预期：${oocPreset}`)
   }
   await page.getByRole('button', { name: /1.12.2 旧版工具/ }).click()
   await page.waitForSelector('#legacy-testfor-target', { timeout: 10_000 })

@@ -22,6 +22,35 @@ const REPO = 'https://github.com/JiangNanChina/mc-command-studio'
  */
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: '0.1.60',
+    date: '2026-10-27',
+    title: '1.12.2 模板与 OOC 布局预设',
+    highlights: ['刷怪笼权重/八页书。', 'OOC 布局预设与预览。'],
+    sections: [
+      {
+        type: 'added',
+        items: [
+          '1.12.2 刷怪笼权重/命令方块链参数。',
+          '1.12.2 八页书预设。',
+          'OOC 5 个布局预设与预览。'
+        ]
+      },
+      {
+        type: 'improved',
+        items: [
+          '1.13.2 隐藏 dust_transition。',
+          '冒烟覆盖布局预设与八页书。',
+          '单元测试 248。'
+        ]
+      },
+      {
+        type: 'fixed',
+        items: ['无。']
+      }
+    ],
+    releaseUrl: `${REPO}/releases/tag/v0.1.60`
+  },
+  {
     version: '0.1.59',
     date: '2026-10-27',
     title: '1.12.2 模板扩展与 OOC 独立轴间距',
