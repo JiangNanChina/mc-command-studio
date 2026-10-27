@@ -122,6 +122,8 @@ for (const version of VERSIONS) {
         .filter(
           (key) =>
             key.startsWith('potion.') &&
+            !key.startsWith('potion.prefix.') &&
+            !key.startsWith('potion.potency.') &&
             !key.endsWith('.postfix') &&
             !key.includes('.effects.') &&
             key !== 'potion.empty' &&
