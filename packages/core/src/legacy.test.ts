@@ -33,6 +33,7 @@ import {
   buildSimple,
   buildGamemode,
   buildBlock,
+  buildMisc,
   createDefaultBlockdata,
   createDefaultEntitydata,
   createDefaultGive,
@@ -59,7 +60,8 @@ import {
   createDefaultWorld,
   createDefaultSimple,
   createDefaultGamemode,
-  createDefaultBlock
+  createDefaultBlock,
+  createDefaultMisc
 } from './legacy'
 
 describe('1.12 legacy commands', () => {
@@ -133,6 +135,16 @@ describe('1.12 legacy commands', () => {
     expect(buildStats({ ...base, action: 'clear', stat: 'SuccessCount' }).text).toBe(
       'stats entity @p clear SuccessCount'
     )
+  })
+
+  it('builds misc commands', () => {
+    expect(buildMisc({ ...createDefaultMisc(), action: 'function', id: 'test:run' }).text).toBe(
+      'function test:run'
+    )
+    expect(
+      buildMisc({ ...createDefaultMisc(), action: 'recipe-give', target: '@p', id: 'minecraft:bread' }).text
+    ).toBe('recipe give @p minecraft:bread')
+    expect(buildMisc({ ...createDefaultMisc(), action: 'debug-start' }).text).toBe('debug start')
   })
 
   it('builds world, simple, gamemode and block', () => {

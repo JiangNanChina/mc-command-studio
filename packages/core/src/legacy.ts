@@ -84,6 +84,17 @@ export function createDefaultSave(): LegacySaveOptions {
   return { action: 'hold' }
 }
 
+export function createDefaultMisc(): LegacyMiscOptions {
+  return {
+    action: 'function',
+    id: 'namespace:function',
+    target: '@p',
+    x: '~',
+    y: '~',
+    z: '~'
+  }
+}
+
 export function createDefaultWorld(): LegacyWorldOptions {
   return {
     action: 'time',
@@ -389,6 +400,24 @@ export interface LegacyIdleOptions {
 
 export interface LegacySaveOptions {
   action: 'hold' | 'query'
+}
+
+export interface LegacyMiscOptions {
+  action:
+    | 'function'
+    | 'recipe-give'
+    | 'recipe-take'
+    | 'locate'
+    | 'spawnpoint'
+    | 'setworldspawn'
+    | 'kill'
+    | 'debug-start'
+    | 'debug-stop'
+  id: string
+  target: string
+  x: string
+  y: string
+  z: string
 }
 
 export interface LegacyWorldOptions {
@@ -798,6 +827,33 @@ export function buildSetidletimeout(options: LegacyIdleOptions): BuildResult {
 
 export function buildSave(options: LegacySaveOptions): BuildResult {
   return finish(['save', options.action], [])
+}
+
+export function buildMisc(options: LegacyMiscOptions): BuildResult {
+  const diagnostics: Diagnostic[] = []
+  if (options.action === 'function') {
+    return finish(['function', options.id.trim()], diagnostics)
+  }
+  if (options.action === 'recipe-give' || options.action === 'recipe-take') {
+    return finish(
+      ['recipe', options.action.replace('recipe-', ''), options.target.trim(), options.id.trim()],
+      diagnostics
+    )
+  }
+  if (options.action === 'locate') return finish(['locate', options.id.trim()], diagnostics)
+  if (options.action === 'spawnpoint') {
+    const parts = ['spawnpoint', options.target.trim()]
+    if (options.x.trim()) parts.push(options.x.trim(), options.y.trim(), options.z.trim())
+    return finish(parts, diagnostics)
+  }
+  if (options.action === 'setworldspawn') {
+    return finish(
+      ['setworldspawn', options.x.trim(), options.y.trim(), options.z.trim()].filter(Boolean),
+      diagnostics
+    )
+  }
+  if (options.action === 'kill') return finish(['kill', options.target.trim()], diagnostics)
+  return finish(['debug', options.action === 'debug-start' ? 'start' : 'stop'], diagnostics)
 }
 
 export function buildWorld(options: LegacyWorldOptions): BuildResult {

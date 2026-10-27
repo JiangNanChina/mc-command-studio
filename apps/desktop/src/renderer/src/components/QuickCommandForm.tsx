@@ -129,7 +129,14 @@ export const QUICK_SCHEMAS: Record<string, QuickSchema> = {
   'save-on': { fields: [], build: () => 'save-on' },
   stop: { fields: [], build: () => 'stop' },
   unpublish: { fields: [], build: () => 'unpublish' },
-  waypoint: { fields: [], build: () => 'waypoint list' },
+  waypoint: {
+    fields: [
+      { key: 'action', label: '动作', kind: 'select', options: ['list', 'modify'], defaultValue: 'list', optionRoot: 'waypoint' },
+      { key: 'waypoint', label: '路径点', kind: 'text', defaultValue: '@e[type=waypoint]', visible: (v) => v.action === 'modify' },
+      { key: 'color', label: '颜色', kind: 'text', defaultValue: 'red', visible: (v) => v.action === 'modify' }
+    ],
+    build: (v) => (v.action === 'list' ? 'waypoint list' : `waypoint modify ${v.waypoint} color ${v.color}`)
+  },
   kill: {
     fields: [{ key: 'target', label: '目标', kind: 'text', defaultValue: '@e[type=item]' }],
     build: (v) => `kill ${v.target}`

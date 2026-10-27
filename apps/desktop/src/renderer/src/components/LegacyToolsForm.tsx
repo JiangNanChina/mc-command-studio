@@ -38,6 +38,7 @@ import {
   buildSimple,
   buildGamemode,
   buildBlock,
+  buildMisc,
   createDefaultBlockdata,
   createDefaultEntitydata,
   createDefaultGive,
@@ -70,12 +71,13 @@ import {
   createDefaultWorld,
   createDefaultSimple,
   createDefaultGamemode,
-  createDefaultBlock
+  createDefaultBlock,
+  createDefaultMisc
 } from '@mcstudio/core'
 import { useAppStore } from '../store'
 import { CustomPresetBar } from './CustomPresetBar'
 
-type LegacyTab = 'testfor' | 'blockdata' | 'entitydata' | 'replaceitem' | 'give' | 'testforblock' | 'testforblocks' | 'achievement' | 'trigger' | 'setidletimeout' | 'save' | 'stats' | 'scoreboard' | 'execute' | 'advancement' | 'clear' | 'worldborder' | 'spreadplayers' | 'title' | 'particle' | 'summon' | 'gamerule' | 'xp' | 'tellraw' | 'effect' | 'enchant' | 'sound' | 'teleport' | 'admin' | 'world' | 'simple' | 'gamemode' | 'block'
+type LegacyTab = 'testfor' | 'blockdata' | 'entitydata' | 'replaceitem' | 'give' | 'testforblock' | 'testforblocks' | 'achievement' | 'trigger' | 'setidletimeout' | 'save' | 'stats' | 'scoreboard' | 'execute' | 'advancement' | 'clear' | 'worldborder' | 'spreadplayers' | 'title' | 'particle' | 'summon' | 'gamerule' | 'xp' | 'tellraw' | 'effect' | 'enchant' | 'sound' | 'teleport' | 'admin' | 'world' | 'simple' | 'gamemode' | 'block' | 'misc'
 
 const TABS: { id: LegacyTab; label: string }[] = [
   { id: 'testfor', label: 'testfor' },
@@ -110,7 +112,8 @@ const TABS: { id: LegacyTab; label: string }[] = [
   { id: 'world', label: 'world' },
   { id: 'simple', label: 'simple' },
   { id: 'gamemode', label: 'gamemode' },
-  { id: 'block', label: 'block' }
+  { id: 'block', label: 'block' },
+  { id: 'misc', label: 'misc' }
 ]
 
 export function LegacyToolsForm() {
@@ -149,6 +152,7 @@ export function LegacyToolsForm() {
   const [simple, setSimple] = useState(createDefaultSimple)
   const [gamemode, setGamemode] = useState(createDefaultGamemode)
   const [block, setBlock] = useState(createDefaultBlock)
+  const [misc, setMisc] = useState(createDefaultMisc)
   const pack = useAppStore((state) => state.pack)
   const itemOptions = pack?.registries.item ?? []
   const blockOptions = pack?.registries.block ?? []
@@ -187,8 +191,9 @@ export function LegacyToolsForm() {
     if (tab === 'simple') return buildSimple(simple)
     if (tab === 'gamemode') return buildGamemode(gamemode)
     if (tab === 'block') return buildBlock(block)
+    if (tab === 'misc') return buildMisc(misc)
     return buildReplaceitem(replaceitem)
-  }, [tab, testfor, blockdata, entitydata, replaceitem, give, testforblock, testforblocks, achievement, trigger, idle, save, stats, scoreboard, execute, advancement, clear, worldborder, spreadplayers, title, particle, summon, gamerule, xp, tellraw, effect, enchant, sound, teleport, admin, world, simple, gamemode, block])
+  }, [tab, testfor, blockdata, entitydata, replaceitem, give, testforblock, testforblocks, achievement, trigger, idle, save, stats, scoreboard, execute, advancement, clear, worldborder, spreadplayers, title, particle, summon, gamerule, xp, tellraw, effect, enchant, sound, teleport, admin, world, simple, gamemode, block, misc])
 
   const copy = async () => {
     if (!result.text) return
@@ -1599,6 +1604,51 @@ export function LegacyToolsForm() {
                 <input id="legacy-block-mode" className="input" value={block.mode}
                   onChange={(event) => setBlock({ ...block, mode: event.target.value })} />
               </div>
+            </>
+          ) : null}
+
+          {tab === 'misc' ? (
+            <>
+              <div className="field">
+                <label className="field-label" htmlFor="legacy-misc-action">命令</label>
+                <select id="legacy-misc-action" className="select" value={misc.action}
+                  onChange={(event) => setMisc({ ...misc, action: event.target.value as typeof misc.action })}>
+                  <option value="function">function</option>
+                  <option value="recipe-give">recipe give</option>
+                  <option value="recipe-take">recipe take</option>
+                  <option value="locate">locate</option>
+                  <option value="spawnpoint">spawnpoint</option>
+                  <option value="setworldspawn">setworldspawn</option>
+                  <option value="kill">kill</option>
+                  <option value="debug-start">debug start</option>
+                  <option value="debug-stop">debug stop</option>
+                </select>
+              </div>
+              {['function', 'locate', 'recipe-give', 'recipe-take'].includes(misc.action) ? (
+                <div className="field" style={{ marginTop: 12 }}>
+                  <label className="field-label" htmlFor="legacy-misc-id">函数/配方/结构 ID</label>
+                  <input id="legacy-misc-id" className="input" value={misc.id}
+                    onChange={(event) => setMisc({ ...misc, id: event.target.value })} />
+                </div>
+              ) : null}
+              {['recipe-give', 'recipe-take', 'spawnpoint', 'kill'].includes(misc.action) ? (
+                <div className="field" style={{ marginTop: 12 }}>
+                  <label className="field-label" htmlFor="legacy-misc-target">目标</label>
+                  <input id="legacy-misc-target" className="input" value={misc.target}
+                    onChange={(event) => setMisc({ ...misc, target: event.target.value })} />
+                </div>
+              ) : null}
+              {['spawnpoint', 'setworldspawn'].includes(misc.action) ? (
+                <div className="grid-3" style={{ marginTop: 12 }}>
+                  {(['x', 'y', 'z'] as const).map((key) => (
+                    <div className="field" key={key}>
+                      <label className="field-label" htmlFor={`legacy-misc-${key}`}>{key}</label>
+                      <input id={`legacy-misc-${key}`} className="input" value={misc[key]}
+                        onChange={(event) => setMisc({ ...misc, [key]: event.target.value })} />
+                    </div>
+                  ))}
+                </div>
+              ) : null}
             </>
           ) : null}
 
