@@ -19,6 +19,10 @@ import {
   buildStats,
   buildScoreboard,
   buildLegacyExecute,
+  buildAdvancement,
+  buildClear,
+  buildWorldborder,
+  buildSpreadplayers,
   createDefaultBlockdata,
   createDefaultEntitydata,
   createDefaultGive,
@@ -32,12 +36,16 @@ import {
   createDefaultSave,
   createDefaultStats,
   createDefaultScoreboard,
-  createDefaultLegacyExecute
+  createDefaultLegacyExecute,
+  createDefaultAdvancement,
+  createDefaultClear,
+  createDefaultWorldborder,
+  createDefaultSpreadplayers
 } from '@mcstudio/core'
 import { useAppStore } from '../store'
 import { CustomPresetBar } from './CustomPresetBar'
 
-type LegacyTab = 'testfor' | 'blockdata' | 'entitydata' | 'replaceitem' | 'give' | 'testforblock' | 'testforblocks' | 'achievement' | 'trigger' | 'setidletimeout' | 'save' | 'stats' | 'scoreboard' | 'execute'
+type LegacyTab = 'testfor' | 'blockdata' | 'entitydata' | 'replaceitem' | 'give' | 'testforblock' | 'testforblocks' | 'achievement' | 'trigger' | 'setidletimeout' | 'save' | 'stats' | 'scoreboard' | 'execute' | 'advancement' | 'clear' | 'worldborder' | 'spreadplayers'
 
 const TABS: { id: LegacyTab; label: string }[] = [
   { id: 'testfor', label: 'testfor' },
@@ -53,7 +61,11 @@ const TABS: { id: LegacyTab; label: string }[] = [
   { id: 'save', label: 'save' },
   { id: 'stats', label: 'stats' },
   { id: 'scoreboard', label: 'scoreboard' },
-  { id: 'execute', label: 'execute' }
+  { id: 'execute', label: 'execute' },
+  { id: 'advancement', label: 'advancement' },
+  { id: 'clear', label: 'clear' },
+  { id: 'worldborder', label: 'worldborder' },
+  { id: 'spreadplayers', label: 'spreadplayers' }
 ]
 
 export function LegacyToolsForm() {
@@ -73,6 +85,10 @@ export function LegacyToolsForm() {
   const [stats, setStats] = useState(createDefaultStats)
   const [scoreboard, setScoreboard] = useState(createDefaultScoreboard)
   const [execute, setExecute] = useState(createDefaultLegacyExecute)
+  const [advancement, setAdvancement] = useState(createDefaultAdvancement)
+  const [clear, setClear] = useState(createDefaultClear)
+  const [worldborder, setWorldborder] = useState(createDefaultWorldborder)
+  const [spreadplayers, setSpreadplayers] = useState(createDefaultSpreadplayers)
   const pack = useAppStore((state) => state.pack)
   const itemOptions = pack?.registries.item ?? []
   const blockOptions = pack?.registries.block ?? []
@@ -92,8 +108,12 @@ export function LegacyToolsForm() {
     if (tab === 'stats') return buildStats(stats)
     if (tab === 'scoreboard') return buildScoreboard(scoreboard)
     if (tab === 'execute') return buildLegacyExecute(execute)
+    if (tab === 'advancement') return buildAdvancement(advancement)
+    if (tab === 'clear') return buildClear(clear)
+    if (tab === 'worldborder') return buildWorldborder(worldborder)
+    if (tab === 'spreadplayers') return buildSpreadplayers(spreadplayers)
     return buildReplaceitem(replaceitem)
-  }, [tab, testfor, blockdata, entitydata, replaceitem, give, testforblock, testforblocks, achievement, trigger, idle, save, stats, scoreboard, execute])
+  }, [tab, testfor, blockdata, entitydata, replaceitem, give, testforblock, testforblocks, achievement, trigger, idle, save, stats, scoreboard, execute, advancement, clear, worldborder, spreadplayers])
 
   const copy = async () => {
     if (!result.text) return
@@ -797,6 +817,164 @@ export function LegacyToolsForm() {
                   </div>
                 </div>
               ) : null}
+            </>
+          ) : null}
+
+          {tab === 'advancement' ? (
+            <>
+              <div className="grid-3">
+                <div className="field">
+                  <label className="field-label" htmlFor="legacy-adv-action">动作</label>
+                  <select id="legacy-adv-action" className="select" value={advancement.action}
+                    onChange={(event) => setAdvancement({ ...advancement, action: event.target.value as typeof advancement.action })}>
+                    <option value="grant">grant</option>
+                    <option value="revoke">revoke</option>
+                    <option value="test">test</option>
+                  </select>
+                </div>
+                <div className="field">
+                  <label className="field-label" htmlFor="legacy-adv-target">目标</label>
+                  <input id="legacy-adv-target" className="input" value={advancement.target}
+                    onChange={(event) => setAdvancement({ ...advancement, target: event.target.value })} />
+                </div>
+                <div className="field">
+                  <label className="field-label" htmlFor="legacy-adv-mode">范围</label>
+                  <select id="legacy-adv-mode" className="select" value={advancement.mode}
+                    onChange={(event) => setAdvancement({ ...advancement, mode: event.target.value as typeof advancement.mode })}>
+                    <option value="only">only</option>
+                    <option value="until">until</option>
+                    <option value="from">from</option>
+                    <option value="through">through</option>
+                  </select>
+                </div>
+              </div>
+              <div className="field" style={{ marginTop: 12 }}>
+                <label className="field-label" htmlFor="legacy-adv-id">进度 ID</label>
+                <input id="legacy-adv-id" className="input" value={advancement.advancement}
+                  onChange={(event) => setAdvancement({ ...advancement, advancement: event.target.value })} />
+              </div>
+            </>
+          ) : null}
+
+          {tab === 'clear' ? (
+            <>
+              <div className="grid-3">
+                <div className="field">
+                  <label className="field-label" htmlFor="legacy-clear-target">目标</label>
+                  <input id="legacy-clear-target" className="input" value={clear.target}
+                    onChange={(event) => setClear({ ...clear, target: event.target.value })} />
+                </div>
+                <div className="field">
+                  <label className="field-label" htmlFor="legacy-clear-item">物品</label>
+                  <input id="legacy-clear-item" className="input" list="legacy-item-options" value={clear.item}
+                    onChange={(event) => setClear({ ...clear, item: event.target.value })} />
+                </div>
+                <div className="field">
+                  <label className="field-label" htmlFor="legacy-clear-data">数据值</label>
+                  <input id="legacy-clear-data" className="input" value={clear.data}
+                    onChange={(event) => setClear({ ...clear, data: event.target.value })} />
+                </div>
+              </div>
+              <div className="grid-2" style={{ marginTop: 12 }}>
+                <div className="field">
+                  <label className="field-label" htmlFor="legacy-clear-max">最大数量</label>
+                  <input id="legacy-clear-max" className="input" value={clear.maxCount}
+                    onChange={(event) => setClear({ ...clear, maxCount: event.target.value })} />
+                </div>
+                <div className="field">
+                  <label className="field-label" htmlFor="legacy-clear-nbt">NBT（可选）</label>
+                  <input id="legacy-clear-nbt" className="input" value={clear.nbt}
+                    onChange={(event) => setClear({ ...clear, nbt: event.target.value })} />
+                </div>
+              </div>
+            </>
+          ) : null}
+
+          {tab === 'worldborder' ? (
+            <>
+              <div className="field">
+                <label className="field-label" htmlFor="legacy-wb-action">动作</label>
+                <select id="legacy-wb-action" className="select" value={worldborder.action}
+                  onChange={(event) => setWorldborder({ ...worldborder, action: event.target.value as typeof worldborder.action })}>
+                  <option value="set">set</option>
+                  <option value="center">center</option>
+                  <option value="damage">damage</option>
+                  <option value="warning">warning</option>
+                  <option value="get">get</option>
+                  <option value="add">add</option>
+                </select>
+              </div>
+              <div className="grid-3" style={{ marginTop: 12 }}>
+                <div className="field">
+                  <label className="field-label" htmlFor="legacy-wb-value">直径/值</label>
+                  <input id="legacy-wb-value" className="input" value={worldborder.value}
+                    onChange={(event) => setWorldborder({ ...worldborder, value: event.target.value })} />
+                </div>
+                <div className="field">
+                  <label className="field-label" htmlFor="legacy-wb-x">中心 X</label>
+                  <input id="legacy-wb-x" className="input" value={worldborder.x}
+                    onChange={(event) => setWorldborder({ ...worldborder, x: event.target.value })} />
+                </div>
+                <div className="field">
+                  <label className="field-label" htmlFor="legacy-wb-z">中心 Z</label>
+                  <input id="legacy-wb-z" className="input" value={worldborder.z}
+                    onChange={(event) => setWorldborder({ ...worldborder, z: event.target.value })} />
+                </div>
+                <div className="field">
+                  <label className="field-label" htmlFor="legacy-wb-seconds">秒数</label>
+                  <input id="legacy-wb-seconds" className="input" value={worldborder.seconds}
+                    onChange={(event) => setWorldborder({ ...worldborder, seconds: event.target.value })} />
+                </div>
+                <div className="field">
+                  <label className="field-label" htmlFor="legacy-wb-amount">伤害/距离</label>
+                  <input id="legacy-wb-amount" className="input" value={worldborder.amount}
+                    onChange={(event) => setWorldborder({ ...worldborder, amount: event.target.value })} />
+                </div>
+                <div className="field">
+                  <label className="field-label" htmlFor="legacy-wb-buffer">缓冲</label>
+                  <input id="legacy-wb-buffer" className="input" value={worldborder.buffer}
+                    onChange={(event) => setWorldborder({ ...worldborder, buffer: event.target.value })} />
+                </div>
+              </div>
+            </>
+          ) : null}
+
+          {tab === 'spreadplayers' ? (
+            <>
+              <div className="grid-2">
+                <div className="field">
+                  <label className="field-label" htmlFor="legacy-spread-x">中心 X</label>
+                  <input id="legacy-spread-x" className="input" value={spreadplayers.x}
+                    onChange={(event) => setSpreadplayers({ ...spreadplayers, x: event.target.value })} />
+                </div>
+                <div className="field">
+                  <label className="field-label" htmlFor="legacy-spread-z">中心 Z</label>
+                  <input id="legacy-spread-z" className="input" value={spreadplayers.z}
+                    onChange={(event) => setSpreadplayers({ ...spreadplayers, z: event.target.value })} />
+                </div>
+              </div>
+              <div className="grid-3" style={{ marginTop: 12 }}>
+                <div className="field">
+                  <label className="field-label" htmlFor="legacy-spread-min">最小距离</label>
+                  <input id="legacy-spread-min" className="input" value={spreadplayers.min}
+                    onChange={(event) => setSpreadplayers({ ...spreadplayers, min: event.target.value })} />
+                </div>
+                <div className="field">
+                  <label className="field-label" htmlFor="legacy-spread-max">最大范围</label>
+                  <input id="legacy-spread-max" className="input" value={spreadplayers.max}
+                    onChange={(event) => setSpreadplayers({ ...spreadplayers, max: event.target.value })} />
+                </div>
+                <div className="field">
+                  <label className="field-label" htmlFor="legacy-spread-targets">目标</label>
+                  <input id="legacy-spread-targets" className="input" value={spreadplayers.targets}
+                    onChange={(event) => setSpreadplayers({ ...spreadplayers, targets: event.target.value })} />
+                </div>
+              </div>
+              <label className="checkbox-row" style={{ marginTop: 12 }}>
+                <input type="checkbox" checked={spreadplayers.respectTeams}
+                  onChange={(event) => setSpreadplayers({ ...spreadplayers, respectTeams: event.target.checked })} />
+                按队伍分散
+              </label>
             </>
           ) : null}
 

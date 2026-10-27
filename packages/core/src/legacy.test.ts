@@ -14,6 +14,10 @@ import {
   buildStats,
   buildScoreboard,
   buildLegacyExecute,
+  buildAdvancement,
+  buildClear,
+  buildWorldborder,
+  buildSpreadplayers,
   createDefaultBlockdata,
   createDefaultEntitydata,
   createDefaultGive,
@@ -21,7 +25,11 @@ import {
   createDefaultTestfor,
   createDefaultStats,
   createDefaultScoreboard,
-  createDefaultLegacyExecute
+  createDefaultLegacyExecute,
+  createDefaultAdvancement,
+  createDefaultClear,
+  createDefaultWorldborder,
+  createDefaultSpreadplayers
 } from './legacy'
 
 describe('1.12 legacy commands', () => {
@@ -95,6 +103,44 @@ describe('1.12 legacy commands', () => {
     expect(buildStats({ ...base, action: 'clear', stat: 'SuccessCount' }).text).toBe(
       'stats entity @p clear SuccessCount'
     )
+  })
+
+  it('builds advancement and clear', () => {
+    expect(
+      buildAdvancement({
+        ...createDefaultAdvancement(),
+        action: 'grant',
+        target: '@p',
+        mode: 'only',
+        advancement: 'minecraft:story/root'
+      }).text
+    ).toBe('advancement grant @p only minecraft:story/root')
+    expect(
+      buildClear({
+        ...createDefaultClear(),
+        target: '@p',
+        item: 'minecraft:dirt',
+        data: '0',
+        maxCount: '16'
+      }).text
+    ).toBe('clear @p minecraft:dirt 0 16')
+  })
+
+  it('builds worldborder and spreadplayers', () => {
+    expect(
+      buildWorldborder({ ...createDefaultWorldborder(), action: 'set', value: '200' }).text
+    ).toBe('worldborder set 200')
+    expect(
+      buildSpreadplayers({
+        ...createDefaultSpreadplayers(),
+        x: '0',
+        z: '0',
+        min: '10',
+        max: '50',
+        respectTeams: false,
+        targets: '@a'
+      }).text
+    ).toBe('spreadplayers 0 0 10 50 false @a')
   })
 
   it('builds legacy execute with detect', () => {

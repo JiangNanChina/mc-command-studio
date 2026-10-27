@@ -84,6 +84,49 @@ export function createDefaultSave(): LegacySaveOptions {
   return { action: 'hold' }
 }
 
+export function createDefaultAdvancement(): LegacyAdvancementOptions {
+  return {
+    action: 'grant',
+    target: '@p',
+    mode: 'only',
+    advancement: 'minecraft:story/root'
+  }
+}
+
+export function createDefaultClear(): LegacyClearOptions {
+  return {
+    target: '@p',
+    item: 'minecraft:dirt',
+    data: '',
+    maxCount: '',
+    nbt: ''
+  }
+}
+
+export function createDefaultWorldborder(): LegacyWorldborderOptions {
+  return {
+    action: 'set',
+    value: '200',
+    seconds: '',
+    x: '0',
+    z: '0',
+    amount: '5',
+    buffer: '',
+    distance: '10'
+  }
+}
+
+export function createDefaultSpreadplayers(): LegacySpreadplayersOptions {
+  return {
+    x: '0',
+    z: '0',
+    min: '10',
+    max: '50',
+    respectTeams: false,
+    targets: '@a'
+  }
+}
+
 export function createDefaultLegacyExecute(): LegacyExecuteOptions {
   return {
     target: '@p',
@@ -203,6 +246,41 @@ export interface LegacyIdleOptions {
 
 export interface LegacySaveOptions {
   action: 'hold' | 'query'
+}
+
+export interface LegacyAdvancementOptions {
+  action: 'grant' | 'revoke' | 'test'
+  target: string
+  mode: 'only' | 'until' | 'from' | 'through'
+  advancement: string
+}
+
+export interface LegacyClearOptions {
+  target: string
+  item: string
+  data: string
+  maxCount: string
+  nbt: string
+}
+
+export interface LegacyWorldborderOptions {
+  action: 'set' | 'center' | 'damage' | 'warning' | 'get' | 'add'
+  value: string
+  seconds: string
+  x: string
+  z: string
+  amount: string
+  buffer: string
+  distance: string
+}
+
+export interface LegacySpreadplayersOptions {
+  x: string
+  z: string
+  min: string
+  max: string
+  respectTeams: boolean
+  targets: string
 }
 
 export interface LegacyExecuteOptions {
@@ -425,6 +503,94 @@ export function buildSetidletimeout(options: LegacyIdleOptions): BuildResult {
 
 export function buildSave(options: LegacySaveOptions): BuildResult {
   return finish(['save', options.action], [])
+}
+
+export function buildAdvancement(options: LegacyAdvancementOptions): BuildResult {
+  const diagnostics: Diagnostic[] = []
+  if (!options.target.trim()) diagnostics.push(error('legacy.target', '目标不能为空', 'target'))
+  if (!options.advancement.trim()) {
+    diagnostics.push(error('legacy.advancement', '进度 ID 不能为空', 'advancement'))
+  }
+  if (options.action === 'test') {
+    return finish(
+      ['advancement', 'test', options.target.trim(), options.advancement.trim()],
+      diagnostics
+    )
+  }
+  return finish(
+    [
+      'advancement',
+      options.action,
+      options.target.trim(),
+      options.mode,
+      options.advancement.trim()
+    ],
+    diagnostics
+  )
+}
+
+export function buildClear(options: LegacyClearOptions): BuildResult {
+  const diagnostics: Diagnostic[] = []
+  if (!options.target.trim()) diagnostics.push(error('legacy.target', '目标不能为空', 'target'))
+  if (options.data.trim() && !/^\d+$/.test(options.data.trim())) {
+    diagnostics.push(error('legacy.data', '数据值必须是非负整数', 'data'))
+  }
+  if (options.maxCount.trim() && !/^\d+$/.test(options.maxCount.trim())) {
+    diagnostics.push(error('legacy.count', '最大数量必须是非负整数', 'maxCount'))
+  }
+  const parts = ['clear', options.target.trim()]
+  if (options.item.trim()) parts.push(options.item.trim())
+  if (options.data.trim()) parts.push(options.data.trim())
+  if (options.maxCount.trim()) parts.push(options.maxCount.trim())
+  if (options.nbt.trim()) parts.push(options.nbt.trim())
+  return finish(parts, diagnostics)
+}
+
+export function buildWorldborder(options: LegacyWorldborderOptions): BuildResult {
+  const diagnostics: Diagnostic[] = []
+  if (options.action === 'center') {
+    return finish(['worldborder', 'center', options.x.trim(), options.z.trim()], diagnostics)
+  }
+  if (options.action === 'damage') {
+    return finish(
+      ['worldborder', 'damage', options.amount.trim(), options.buffer.trim()].filter(Boolean),
+      diagnostics
+    )
+  }
+  if (options.action === 'warning') {
+    return finish(['worldborder', 'warning', options.distance.trim()], diagnostics)
+  }
+  if (options.action === 'get') return finish(['worldborder', 'get'], diagnostics)
+  if (options.action === 'add') {
+    return finish(
+      ['worldborder', 'add', options.distance.trim(), options.seconds.trim()].filter(Boolean),
+      diagnostics
+    )
+  }
+  return finish(
+    ['worldborder', 'set', options.value.trim(), options.seconds.trim()].filter(Boolean),
+    diagnostics
+  )
+}
+
+export function buildSpreadplayers(options: LegacySpreadplayersOptions): BuildResult {
+  const diagnostics: Diagnostic[] = []
+  if (!options.targets.trim()) diagnostics.push(error('legacy.target', '目标不能为空', 'targets'))
+  if (!options.min.trim() || !options.max.trim()) {
+    diagnostics.push(error('legacy.range', '最小/最大距离不能为空', 'min'))
+  }
+  return finish(
+    [
+      'spreadplayers',
+      options.x.trim(),
+      options.z.trim(),
+      options.min.trim(),
+      options.max.trim(),
+      String(options.respectTeams),
+      options.targets.trim()
+    ],
+    diagnostics
+  )
 }
 
 export function buildLegacyExecute(options: LegacyExecuteOptions): BuildResult {
