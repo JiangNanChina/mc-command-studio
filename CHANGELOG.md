@@ -2,6 +2,26 @@
 
 所有版本变更记录在此。版本号遵循 SemVer。
 
+## [0.4.0] - 2026-10-27
+
+快捷表单覆盖 93/94。
+
+### 新增
+
+- 快捷表单从 18 个扩展到 50 个。
+- 管理命令：ban / ban-ip / banlist / pardon / pardon-ip / whitelist / op / deop / kick。
+- 玩家命令：kill / say / me / tell / msg / tm / teammsg / w / experience / teleport / defaultgamemode。
+- 系统命令：stop / stopwatch / swing / test / trigger / fetchprofile / posteffect / unpublish / save-off / save-on。
+- 1.12.2 stats 表单。
+
+### 改进
+
+- 26.3 可视化覆盖 60 → 93 / 94。
+- 版本矩阵：25 个基础包 + 29 个别名。
+- 单元测试 259 个。
+
+## [0.3.0] - 2026-10-27
+
 ## [0.3.0] - 2026-10-27
 
 版本矩阵、18 个快捷表单、25 个基础包。

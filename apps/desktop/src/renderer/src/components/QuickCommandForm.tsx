@@ -106,7 +106,172 @@ export const QUICK_SCHEMAS: Record<string, QuickSchema> = {
   list: { fields: [], build: () => 'list' },
   version: { fields: [], build: () => 'version' },
   publish: { fields: [], build: () => 'publish' },
-  'save-all': { fields: [], build: () => 'save-all' }
+  'save-all': { fields: [], build: () => 'save-all' },
+  'save-off': { fields: [], build: () => 'save-off' },
+  'save-on': { fields: [], build: () => 'save-on' },
+  stop: { fields: [], build: () => 'stop' },
+  unpublish: { fields: [], build: () => 'unpublish' },
+  waypoint: { fields: [], build: () => 'waypoint list' },
+  kill: {
+    fields: [{ key: 'target', label: '目标', kind: 'text', defaultValue: '@e[type=item]' }],
+    build: (v) => `kill ${v.target}`
+  },
+  kick: {
+    fields: [
+      { key: 'target', label: '目标', kind: 'text', defaultValue: '@p' },
+      { key: 'reason', label: '原因', kind: 'text', defaultValue: '请稍后再试' }
+    ],
+    build: (v) => `kick ${v.target} ${v.reason}`
+  },
+  op: {
+    fields: [{ key: 'target', label: '目标', kind: 'text', defaultValue: '@p' }],
+    build: (v) => `op ${v.target}`
+  },
+  deop: {
+    fields: [{ key: 'target', label: '目标', kind: 'text', defaultValue: '@p' }],
+    build: (v) => `deop ${v.target}`
+  },
+  say: {
+    fields: [{ key: 'message', label: '消息', kind: 'text', defaultValue: '服务器将在 5 分钟后重启' }],
+    build: (v) => `say ${v.message}`
+  },
+  me: {
+    fields: [{ key: 'message', label: '动作', kind: 'text', defaultValue: '正在建造' }],
+    build: (v) => `me ${v.message}`
+  },
+  setidletimeout: {
+    fields: [{ key: 'minutes', label: '分钟', kind: 'text', defaultValue: '30' }],
+    build: (v) => `setidletimeout ${v.minutes}`
+  },
+  ban: {
+    fields: [
+      { key: 'target', label: '玩家', kind: 'text', defaultValue: 'Steve' },
+      { key: 'reason', label: '原因', kind: 'text', defaultValue: '违反服务器规则' }
+    ],
+    build: (v) => `ban ${v.target} ${v.reason}`
+  },
+  'ban-ip': {
+    fields: [
+      { key: 'target', label: 'IP/玩家', kind: 'text', defaultValue: '127.0.0.1' },
+      { key: 'reason', label: '原因', kind: 'text', defaultValue: '违反服务器规则' }
+    ],
+    build: (v) => `ban-ip ${v.target} ${v.reason}`
+  },
+  banlist: {
+    fields: [{ key: 'type', label: '类型', kind: 'select', options: ['ips', 'players'], defaultValue: 'players' }],
+    build: (v) => `banlist ${v.type}`
+  },
+  pardon: {
+    fields: [{ key: 'target', label: '玩家', kind: 'text', defaultValue: 'Steve' }],
+    build: (v) => `pardon ${v.target}`
+  },
+  'pardon-ip': {
+    fields: [{ key: 'target', label: 'IP', kind: 'text', defaultValue: '127.0.0.1' }],
+    build: (v) => `pardon-ip ${v.target}`
+  },
+  whitelist: {
+    fields: [
+      { key: 'action', label: '动作', kind: 'select', options: ['add', 'remove', 'list'], defaultValue: 'add' },
+      { key: 'target', label: '玩家', kind: 'text', defaultValue: 'Steve' }
+    ],
+    build: (v) => (v.action === 'list' ? 'whitelist list' : `whitelist ${v.action} ${v.target}`)
+  },
+  tell: {
+    fields: [
+      { key: 'target', label: '目标', kind: 'text', defaultValue: '@p' },
+      { key: 'message', label: '消息', kind: 'text', defaultValue: '你好' }
+    ],
+    build: (v) => `tell ${v.target} ${v.message}`
+  },
+  msg: {
+    fields: [
+      { key: 'target', label: '目标', kind: 'text', defaultValue: '@p' },
+      { key: 'message', label: '消息', kind: 'text', defaultValue: '你好' }
+    ],
+    build: (v) => `msg ${v.target} ${v.message}`
+  },
+  tm: {
+    fields: [
+      { key: 'target', label: '目标', kind: 'text', defaultValue: '@p' },
+      { key: 'message', label: '消息', kind: 'text', defaultValue: '你好' }
+    ],
+    build: (v) => `tm ${v.target} ${v.message}`
+  },
+  teammsg: {
+    fields: [{ key: 'message', label: '消息', kind: 'text', defaultValue: '集合' }],
+    build: (v) => `teammsg ${v.message}`
+  },
+  w: {
+    fields: [
+      { key: 'target', label: '目标', kind: 'text', defaultValue: '@p' },
+      { key: 'message', label: '消息', kind: 'text', defaultValue: '你好' }
+    ],
+    build: (v) => `w ${v.target} ${v.message}`
+  },
+  teleport: {
+    fields: [
+      { key: 'target', label: '目标', kind: 'text', defaultValue: '@s' },
+      { key: 'x', label: 'X', kind: 'text', defaultValue: '~' },
+      { key: 'y', label: 'Y', kind: 'text', defaultValue: '~' },
+      { key: 'z', label: 'Z', kind: 'text', defaultValue: '~' }
+    ],
+    build: (v) => `teleport ${v.target} ${v.x} ${v.y} ${v.z}`
+  },
+  experience: {
+    fields: [
+      { key: 'action', label: '动作', kind: 'select', options: ['add', 'set', 'query'], defaultValue: 'add' },
+      { key: 'amount', label: '数量', kind: 'text', defaultValue: '100' },
+      { key: 'unit', label: '单位', kind: 'select', options: ['points', 'levels'], defaultValue: 'points' }
+    ],
+    build: (v) =>
+      v.action === 'query'
+        ? `experience query @s ${v.unit}`
+        : `experience ${v.action} @s ${v.amount} ${v.unit}`
+  },
+  defaultgamemode: {
+    fields: [{ key: 'mode', label: '模式', kind: 'select', options: ['survival', 'creative', 'adventure', 'spectator'], defaultValue: 'survival' }],
+    build: (v) => `defaultgamemode ${v.mode}`
+  },
+  test: {
+    fields: [
+      { key: 'action', label: '动作', kind: 'select', options: ['run', 'clear'], defaultValue: 'run' },
+      { key: 'id', label: '测试 ID', kind: 'text', defaultValue: 'minecraft:always_pass' }
+    ],
+    build: (v) => `test ${v.action} ${v.id}`
+  },
+  stopwatch: {
+    fields: [{ key: 'action', label: '动作', kind: 'select', options: ['start', 'stop', 'reset'], defaultValue: 'start' }],
+    build: (v) => `stopwatch ${v.action}`
+  },
+  swing: {
+    fields: [
+      { key: 'target', label: '目标', kind: 'text', defaultValue: '@s' },
+      { key: 'hand', label: '手', kind: 'select', options: ['mainhand', 'offhand'], defaultValue: 'mainhand' }
+    ],
+    build: (v) => `swing ${v.target} ${v.hand}`
+  },
+  fetchprofile: {
+    fields: [
+      { key: 'type', label: '类型', kind: 'select', options: ['name', 'id'], defaultValue: 'name' },
+      { key: 'value', label: '名称/UUID', kind: 'text', defaultValue: 'Steve' }
+    ],
+    build: (v) => `fetchprofile ${v.type} ${v.value}`
+  },
+  trigger: {
+    fields: [
+      { key: 'objective', label: '目标', kind: 'text', defaultValue: 'quest' },
+      { key: 'action', label: '动作', kind: 'select', options: ['add', 'set'], defaultValue: 'add' },
+      { key: 'value', label: '数值', kind: 'text', defaultValue: '1' }
+    ],
+    build: (v) => `trigger ${v.objective} ${v.action} ${v.value}`
+  },
+  posteffect: {
+    fields: [
+      { key: 'target', label: '目标', kind: 'text', defaultValue: '@s' },
+      { key: 'effect', label: '效果', kind: 'text', defaultValue: 'minecraft:invert' }
+    ],
+    build: (v) => `posteffect give ${v.target} ${v.effect}`
+  }
 }
 
 export function isQuickCommand(id: string | null): boolean {
