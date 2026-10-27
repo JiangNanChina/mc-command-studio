@@ -25,10 +25,10 @@ export const CHANGELOG: ChangelogEntry[] = [
     version: '0.3.0',
     date: '2026-10-27',
     title: '版本矩阵与 18 个快捷表单',
-    highlights: ['26.3 可视化覆盖 70/94。', '25 个基础包 + 29 个别名。'],
+    highlights: ['26.3 可视化覆盖 60/94。', '25 个基础包 + 29 个别名。'],
     sections: [
       { type: 'added', items: ['18 个快捷命令表单。', '1.12.2 stats 表单。', '版本矩阵校验。', '1.20.2 / 1.21.3 / 1.21.7 独立包。'] },
-      { type: 'improved', items: ['54 个正式版。', '可视化覆盖 52 → 70 / 94。', '单元测试 259。'] },
+      { type: 'improved', items: ['54 个正式版。', '可视化覆盖 42 → 60 / 94。', '单元测试 259。'] },
       { type: 'fixed', items: ['无。'] }
     ],
     releaseUrl: REPO + '/releases/tag/v0.3.0'
