@@ -17,9 +17,9 @@
 
 | 文件 | 大小 |
 |---|---:|
-| `MC-Command-Studio-Setup-0.1.66.exe` | 130,150,796 B ≈ 124.1 MiB |
-| `MC-Command-Studio-0.1.66-portable.exe` | 117,221,420 B ≈ 111.8 MiB |
-| `MC-Command-Studio-Setup-0.1.66.exe.blockmap` | 137,158 B |
+| `MC-Command-Studio-Setup-0.1.66.exe` | 130,150,234 B ≈ 124.1 MiB |
+| `MC-Command-Studio-0.1.66-portable.exe` | 117,220,448 B ≈ 111.8 MiB |
+| `MC-Command-Studio-Setup-0.1.66.exe.blockmap` | 136,751 B |
 | `latest.yml` | 366 B |
 
 安装目录为 `%LOCALAPPDATA%\Programs\MC Command Studio`（per-user），卸载器保留用户项目与设置，可选择手动删除。
@@ -348,7 +348,7 @@ GitHub Actions 的 Release 工作流已在本仓库成功执行：
 - v0.1.64：run 40472724327 → [Release](https://github.com/JiangNanChina/mc-command-studio/releases/tag/v0.1.64)
 - v0.1.66：run 40475224586 → [Release](https://github.com/JiangNanChina/mc-command-studio/releases/tag/v0.1.66)
 
-公开的 `releases/latest/download/latest.yml` 返回 200，内容版本 `0.1.66`，指向 `MC-Command-Studio-Setup-0.1.66.exe`，大小 130,150,796 字节，与 Release 资产一致。
+公开的 `releases/latest/download/latest.yml` 返回 200，内容版本 `0.1.66`，指向 `MC-Command-Studio-Setup-0.1.66.exe`，大小 130,150,234 字节，与 Release 资产一致。
 
 Release 工作流已包含打包版 Electron 冒烟门禁：`v0.1.33` 的 Release run 中该步骤通过。
 
