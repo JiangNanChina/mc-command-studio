@@ -66,6 +66,19 @@ async function main() {
 
   // 首次启动：更新公告横幅 → 版本历史弹窗
   await page.waitForSelector('.banner.announcement', { timeout: 10_000 })
+  const bannerLayout = await page.evaluate(() => {
+    const stack = document.querySelector('.banner-stack')
+    const workspace = document.querySelector('.workspace')
+    const header = document.querySelector('.header')
+    return {
+      position: stack ? getComputedStyle(stack).position : '',
+      workspaceTop: workspace?.getBoundingClientRect().top ?? -1,
+      headerBottom: header?.getBoundingClientRect().bottom ?? -1
+    }
+  })
+  if (bannerLayout.position !== 'fixed' || Math.abs(bannerLayout.workspaceTop - bannerLayout.headerBottom) > 1) {
+    throw new Error(`通知栏应浮动显示，不应挤占工作区：${JSON.stringify(bannerLayout)}`)
+  }
   const announcementText = await page.locator('.banner.announcement').innerText()
   if (!announcementText.includes(`v${APP_VERSION}`)) {
     throw new Error(`公告横幅版本不正确：${announcementText}`)

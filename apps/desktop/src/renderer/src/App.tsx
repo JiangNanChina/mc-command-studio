@@ -368,9 +368,11 @@ export default function App() {
   return (
     <div className="app">
       <Header />
-      <AnnouncementBanner />
-      <UpdateBanner />
-      <AutosaveBanner />
+      <div className="banner-stack">
+        <AnnouncementBanner />
+        <UpdateBanner />
+        <AutosaveBanner />
+      </div>
       {pack && pack.manifest.id !== '26.3' ? (
         <div className="version-notice">
           <Info size={14} />
