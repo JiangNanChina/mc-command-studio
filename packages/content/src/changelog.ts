@@ -22,6 +22,36 @@ const REPO = 'https://github.com/JiangNanChina/mc-command-studio'
  */
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: '0.6.0',
+    date: '2026-10-27',
+    title: '1.12.2 全覆盖与 NBT 表单',
+    highlights: ['1.12.2 覆盖 64/64。', '44 个 NBT 安全快捷表单。', '45 个基础包 + 9 个别名。'],
+    sections: [
+      {
+        type: 'added',
+        items: [
+          '1.12.2 新增 22 个专用/分组表单，覆盖 64 个根命令。',
+          'NBT 新增 replaceitem、locatebiome 等快捷表单。',
+          '旧版本图标与中文名别名映射。'
+        ]
+      },
+      {
+        type: 'improved',
+        items: [
+          '别名审计 26 → 9，17 个补丁版升级为独立包。',
+          '10 个版本特定快捷表单接入命令树能力矩阵。',
+          '正式版更新按钮改为“重新载入”，自动安装并重新打开。',
+          '单元测试 275。'
+        ]
+      },
+      {
+        type: 'fixed',
+        items: ['修正 1.13 manifest 命令数量。', '修正 1.12.2 命令表为 64 个根命令。']
+      }
+    ],
+    releaseUrl: REPO + '/releases/tag/v0.6.0'
+  },
+  {
     version: '0.5.0',
     date: '2026-10-27',
     title: '26.3 覆盖 94/94',

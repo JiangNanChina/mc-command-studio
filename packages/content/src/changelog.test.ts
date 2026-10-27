@@ -1,6 +1,11 @@
+import { readFileSync } from 'node:fs'
 import { describe, expect, it } from 'vitest'
 import { compareVersions } from '@mcstudio/core'
 import { CHANGELOG, getChangelogEntry, latestChangelog } from './changelog'
+
+const packageJson = JSON.parse(
+  readFileSync(new URL('../../../package.json', import.meta.url), 'utf8')
+) as { version: string }
 
 describe('changelog', () => {
   it('is sorted from newest to oldest', () => {
@@ -10,7 +15,7 @@ describe('changelog', () => {
   })
 
   it('has the current release at the top', () => {
-    expect(latestChangelog().version).toBe('0.5.0')
+    expect(latestChangelog().version).toBe(packageJson.version)
   })
 
   it('contains non-empty sections and items', () => {

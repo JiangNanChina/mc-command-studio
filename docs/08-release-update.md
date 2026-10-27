@@ -17,10 +17,10 @@
 
 | 文件 | 大小 |
 |---|---:|
-| `MC-Command-Studio-Setup-0.5.0.exe` | 131,986,077 B ≈ 124.1 MiB |
-| `MC-Command-Studio-0.5.0-portable.exe` | 117,338,188 B ≈ 111.8 MiB |
-| `MC-Command-Studio-Setup-0.5.0.exe.blockmap` | 137,996 B |
-| `latest.yml` | 366 B |
+| `MC-Command-Studio-Setup-0.6.0.exe` | 132,854,619 B ≈ 126.7 MiB |
+| `MC-Command-Studio-0.6.0-portable.exe` | 117,358,907 B ≈ 111.9 MiB |
+| `MC-Command-Studio-Setup-0.6.0.exe.blockmap` | 138,905 B |
+| `latest.yml` | 363 B |
 
 安装目录为 `%LOCALAPPDATA%\Programs\MC Command Studio`（per-user），卸载器保留用户项目与设置，可选择手动删除。
 
@@ -72,7 +72,7 @@ publish:
 ```
 
 本仓库已完成配置，并已发布：
-[MC 指令工坊 v0.5.0](https://github.com/JiangNanChina/mc-command-studio/releases/tag/v0.5.0)（最新）、
+[MC 指令工坊 v0.6.0](https://github.com/JiangNanChina/mc-command-studio/releases/tag/v0.6.0)（最新）、
 [v0.1.64](https://github.com/JiangNanChina/mc-command-studio/releases/tag/v0.1.64)、
 [v0.1.63](https://github.com/JiangNanChina/mc-command-studio/releases/tag/v0.1.63)、
 [v0.1.62](https://github.com/JiangNanChina/mc-command-studio/releases/tag/v0.1.62)、
@@ -214,7 +214,7 @@ CI 已经透传这两个 secrets；没有配置时构建继续，但产物未签
 
 ## 6. 版本、渠道与回滚
 
-- SemVer：`0.5.0`；tag `v0.5.0`。
+- SemVer：`0.6.0`；tag `v0.6.0`。
 - 软件版本与游戏版本（`26.3`）解耦；数据包版本在设置中显示。
 - 渠道：stable（默认）/ beta（设置切换）。
 - 不自动降级；回滚 = 发布一个更高版本的修复版，或让用户手动安装 Releases 里的旧安装包。
