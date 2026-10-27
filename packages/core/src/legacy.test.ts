@@ -22,6 +22,8 @@ import {
   buildParticle,
   buildSummon,
   buildGamerule,
+  buildXp,
+  buildTellraw,
   createDefaultBlockdata,
   createDefaultEntitydata,
   createDefaultGive,
@@ -37,7 +39,9 @@ import {
   createDefaultTitle,
   createDefaultParticle,
   createDefaultSummon,
-  createDefaultGamerule
+  createDefaultGamerule,
+  createDefaultXp,
+  createDefaultTellraw
 } from './legacy'
 
 describe('1.12 legacy commands', () => {
@@ -111,6 +115,14 @@ describe('1.12 legacy commands', () => {
     expect(buildStats({ ...base, action: 'clear', stat: 'SuccessCount' }).text).toBe(
       'stats entity @p clear SuccessCount'
     )
+  })
+
+  it('builds xp and tellraw', () => {
+    expect(buildXp({ amount: '100', levels: false, target: '@p' }).text).toBe('xp 100 @p')
+    expect(buildXp({ amount: '5', levels: true, target: '@p' }).text).toBe('xp 5L @p')
+    expect(
+      buildTellraw({ target: '@a', json: '{"text":"Hello","color":"gold"}' }).text
+    ).toBe('tellraw @a {"text":"Hello","color":"gold"}')
   })
 
   it('builds summon and gamerule', () => {

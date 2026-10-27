@@ -27,6 +27,8 @@ import {
   buildParticle,
   buildSummon,
   buildGamerule,
+  buildXp,
+  buildTellraw,
   createDefaultBlockdata,
   createDefaultEntitydata,
   createDefaultGive,
@@ -48,12 +50,14 @@ import {
   createDefaultTitle,
   createDefaultParticle,
   createDefaultSummon,
-  createDefaultGamerule
+  createDefaultGamerule,
+  createDefaultXp,
+  createDefaultTellraw
 } from '@mcstudio/core'
 import { useAppStore } from '../store'
 import { CustomPresetBar } from './CustomPresetBar'
 
-type LegacyTab = 'testfor' | 'blockdata' | 'entitydata' | 'replaceitem' | 'give' | 'testforblock' | 'testforblocks' | 'achievement' | 'trigger' | 'setidletimeout' | 'save' | 'stats' | 'scoreboard' | 'execute' | 'advancement' | 'clear' | 'worldborder' | 'spreadplayers' | 'title' | 'particle' | 'summon' | 'gamerule'
+type LegacyTab = 'testfor' | 'blockdata' | 'entitydata' | 'replaceitem' | 'give' | 'testforblock' | 'testforblocks' | 'achievement' | 'trigger' | 'setidletimeout' | 'save' | 'stats' | 'scoreboard' | 'execute' | 'advancement' | 'clear' | 'worldborder' | 'spreadplayers' | 'title' | 'particle' | 'summon' | 'gamerule' | 'xp' | 'tellraw'
 
 const TABS: { id: LegacyTab; label: string }[] = [
   { id: 'testfor', label: 'testfor' },
@@ -77,7 +81,9 @@ const TABS: { id: LegacyTab; label: string }[] = [
   { id: 'title', label: 'title' },
   { id: 'particle', label: 'particle' },
   { id: 'summon', label: 'summon' },
-  { id: 'gamerule', label: 'gamerule' }
+  { id: 'gamerule', label: 'gamerule' },
+  { id: 'xp', label: 'xp' },
+  { id: 'tellraw', label: 'tellraw' }
 ]
 
 export function LegacyToolsForm() {
@@ -105,6 +111,8 @@ export function LegacyToolsForm() {
   const [particle, setParticle] = useState(createDefaultParticle)
   const [summon, setSummon] = useState(createDefaultSummon)
   const [gamerule, setGamerule] = useState(createDefaultGamerule)
+  const [xp, setXp] = useState(createDefaultXp)
+  const [tellraw, setTellraw] = useState(createDefaultTellraw)
   const pack = useAppStore((state) => state.pack)
   const itemOptions = pack?.registries.item ?? []
   const blockOptions = pack?.registries.block ?? []
@@ -132,8 +140,10 @@ export function LegacyToolsForm() {
     if (tab === 'particle') return buildParticle(particle)
     if (tab === 'summon') return buildSummon(summon)
     if (tab === 'gamerule') return buildGamerule(gamerule)
+    if (tab === 'xp') return buildXp(xp)
+    if (tab === 'tellraw') return buildTellraw(tellraw)
     return buildReplaceitem(replaceitem)
-  }, [tab, testfor, blockdata, entitydata, replaceitem, give, testforblock, testforblocks, achievement, trigger, idle, save, stats, scoreboard, execute, advancement, clear, worldborder, spreadplayers, title, particle, summon, gamerule])
+  }, [tab, testfor, blockdata, entitydata, replaceitem, give, testforblock, testforblocks, achievement, trigger, idle, save, stats, scoreboard, execute, advancement, clear, worldborder, spreadplayers, title, particle, summon, gamerule, xp, tellraw])
 
   const copy = async () => {
     if (!result.text) return
@@ -1114,6 +1124,43 @@ export function LegacyToolsForm() {
                   onChange={(event) => setGamerule({ ...gamerule, value: event.target.value })} />
               </div>
             </div>
+          ) : null}
+
+          {tab === 'xp' ? (
+            <>
+              <div className="grid-2">
+                <div className="field">
+                  <label className="field-label" htmlFor="legacy-xp-amount">经验值</label>
+                  <input id="legacy-xp-amount" className="input" value={xp.amount}
+                    onChange={(event) => setXp({ ...xp, amount: event.target.value })} />
+                </div>
+                <div className="field">
+                  <label className="field-label" htmlFor="legacy-xp-target">目标</label>
+                  <input id="legacy-xp-target" className="input" value={xp.target}
+                    onChange={(event) => setXp({ ...xp, target: event.target.value })} />
+                </div>
+              </div>
+              <label className="checkbox-row" style={{ marginTop: 12 }}>
+                <input type="checkbox" checked={xp.levels}
+                  onChange={(event) => setXp({ ...xp, levels: event.target.checked })} />
+                按等级（L）
+              </label>
+            </>
+          ) : null}
+
+          {tab === 'tellraw' ? (
+            <>
+              <div className="field">
+                <label className="field-label" htmlFor="legacy-tellraw-target">目标</label>
+                <input id="legacy-tellraw-target" className="input" value={tellraw.target}
+                  onChange={(event) => setTellraw({ ...tellraw, target: event.target.value })} />
+              </div>
+              <div className="field" style={{ marginTop: 12 }}>
+                <label className="field-label" htmlFor="legacy-tellraw-json">JSON 文本</label>
+                <textarea id="legacy-tellraw-json" className="textarea" rows={4} value={tellraw.json}
+                  onChange={(event) => setTellraw({ ...tellraw, json: event.target.value })} />
+              </div>
+            </>
           ) : null}
 
           {result.diagnostics.length > 0 ? (

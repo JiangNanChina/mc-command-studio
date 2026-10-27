@@ -7,14 +7,15 @@
 - 别名审计：26 → 9，17 个补丁版升级为独立包。
 - 1.13 独立包；1.13.1 按官方 reports 确认与 1.13.2 一致。
 - 1.12.2 命令表补齐到 64 个根命令（含 ban/kick/whitelist 等）。
-- 1.12.2 新增 execute / advancement / clear / worldborder / spreadplayers / title / particle / summon / gamerule 表单，旧版工具达到 22 个。
+- 1.12.2 新增 execute / advancement / clear / worldborder / spreadplayers / title / particle / summon / gamerule 表单，旧版工具达到 24 个。
 - 18 个版本矩阵 UI 冒烟。
 - Ctrl+K 聚焦命令搜索。
 - 命令搜索使用 useDeferredValue，输入更顺滑。
 - NBT 版本接入 41 个快捷表单。
 - 10 个版本特定快捷表单接入命令树能力矩阵。
+- place / test 增加逐版本字段与子命令过滤。
 - compute / dialog / test 表单增加条件字段与版本选项过滤。
-- 单元测试 265 个。
+- 单元测试 266 个。
 
 ## [0.5.0] - 2026-10-27
 

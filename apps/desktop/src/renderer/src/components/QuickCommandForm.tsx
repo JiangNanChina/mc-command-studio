@@ -49,12 +49,20 @@ export const QUICK_SCHEMAS: Record<string, QuickSchema> = {
       { key: 'y', label: 'Y', kind: 'text', defaultValue: '~' },
       { key: 'z', label: 'Z', kind: 'text', defaultValue: '~' },
       { key: 'target', label: '拼图目标', kind: 'text', defaultValue: 'minecraft:empty', visible: (v) => v.type === 'jigsaw' },
-      { key: 'maxDepth', label: '最大深度', kind: 'text', defaultValue: '7', visible: (v) => v.type === 'jigsaw' }
+      { key: 'maxDepth', label: '最大深度', kind: 'text', defaultValue: '7', visible: (v) => v.type === 'jigsaw' },
+      { key: 'rotation', label: '旋转（template）', kind: 'select', options: ['none', 'clockwise_90', '180', 'counterclockwise_90'], defaultValue: 'none', visible: (v) => v.type === 'template' },
+      { key: 'mirror', label: '镜像（template）', kind: 'select', options: ['none', 'left_right', 'front_back'], defaultValue: 'none', visible: (v) => v.type === 'template' }
     ],
-    build: (v) =>
-      v.type === 'jigsaw'
-        ? `place jigsaw ${v.id} ${v.target} ${v.maxDepth} ${v.x} ${v.y} ${v.z}`
-        : `place ${v.type} ${v.id} ${v.x} ${v.y} ${v.z}`
+    build: (v) => {
+      const position = `${v.x} ${v.y} ${v.z}`
+      if (v.type === 'jigsaw') {
+        return `place jigsaw ${v.id} ${v.target} ${v.maxDepth} ${position}`
+      }
+      if (v.type === 'template') {
+        return `place template ${v.id} ${position} ${v.rotation} ${v.mirror}`
+      }
+      return `place ${v.type} ${v.id} ${position}`
+    }
   },
   spectate: {
     fields: [
@@ -243,16 +251,28 @@ export const QUICK_SCHEMAS: Record<string, QuickSchema> = {
   },
   test: {
     fields: [
-      { key: 'action', label: '动作', kind: 'select', options: ['run', 'runclosest', 'runfailed', 'stop', 'clearall'], defaultValue: 'run', optionRoot: 'test' },
-      { key: 'id', label: '测试 ID', kind: 'text', defaultValue: 'minecraft:always_pass', visible: (v) => v.action === 'run' },
-      { key: 'radius', label: '半径（clearall 可选）', kind: 'text', defaultValue: '', visible: (v) => v.action === 'clearall' }
+      { key: 'action', label: '动作', kind: 'select', options: ['run', 'runclosest', 'runfailed', 'runmultiple', 'stop', 'clearall', 'clearthat', 'clearthese', 'verify', 'locate', 'create'], defaultValue: 'run', optionRoot: 'test' },
+      { key: 'tests', label: '测试选择器', kind: 'text', defaultValue: '@e', visible: (v) => ['run', 'runmultiple', 'verify', 'locate'].includes(v.action) },
+      { key: 'id', label: '测试实例 ID', kind: 'text', defaultValue: 'minecraft:always_pass', visible: (v) => v.action === 'create' },
+      { key: 'width', label: '宽度', kind: 'text', defaultValue: '5', visible: (v) => v.action === 'create' },
+      { key: 'height', label: '高度', kind: 'text', defaultValue: '5', visible: (v) => v.action === 'create' },
+      { key: 'depth', label: '深度', kind: 'text', defaultValue: '5', visible: (v) => v.action === 'create' },
+      { key: 'times', label: '执行次数（可选）', kind: 'text', defaultValue: '', visible: (v) => ['run', 'runclosest', 'runfailed'].includes(v.action) },
+      { key: 'until', label: '失败即停', kind: 'select', options: ['false', 'true'], defaultValue: 'false', visible: (v) => ['run', 'runclosest', 'runfailed'].includes(v.action) && Boolean(v.times?.trim()) },
+      { key: 'amount', label: '数量', kind: 'text', defaultValue: '1', visible: (v) => v.action === 'runmultiple' },
+      { key: 'radius', label: '半径（可选）', kind: 'text', defaultValue: '', visible: (v) => v.action === 'clearall' }
     ],
-    build: (v) =>
-      v.action === 'run'
-        ? `test run ${v.id}`
-        : v.action === 'clearall'
-          ? `test clearall${v.radius.trim() ? ` ${v.radius.trim()}` : ''}`
-          : `test ${v.action}`
+    build: (v) => {
+      const tail = v.times?.trim() ? ` ${v.times.trim()}${v.until === 'true' ? ' true' : ''}` : ''
+      if (v.action === 'run') return `test run ${v.tests}${tail}`
+      if (v.action === 'runclosest' || v.action === 'runfailed') return `test ${v.action}${tail}`
+      if (v.action === 'runmultiple') return `test runmultiple ${v.tests} ${v.amount}`
+      if (v.action === 'clearall') return `test clearall${v.radius.trim() ? ` ${v.radius.trim()}` : ''}`
+      if (v.action === 'verify') return `test verify ${v.tests}`
+      if (v.action === 'locate') return `test locate ${v.tests}`
+      if (v.action === 'create') return `test create ${v.id} ${v.width} ${v.height} ${v.depth}`
+      return `test ${v.action}`
+    }
   },
   stopwatch: {
     fields: [
@@ -282,7 +302,8 @@ export const QUICK_SCHEMAS: Record<string, QuickSchema> = {
       { key: 'targetType', label: '计算目标', kind: 'select', options: ['default', 'entity', 'block'], defaultValue: 'default', optionRoot: 'compute' },
       { key: 'target', label: '实体/方块坐标', kind: 'text', defaultValue: '@s', visible: (v) => v.targetType !== 'default' },
       { key: 'valueType', label: '数值类型', kind: 'select', options: ['float', 'integer'], defaultValue: 'float' },
-      { key: 'providerPreset', label: 'Provider 预设', kind: 'select', options: ['constant(1.0)', 'constant(0.0)', 'custom'], defaultValue: 'constant(1.0)' },
+      { key: 'providerPreset', label: 'Provider 类型', kind: 'select', options: ['constant', 'custom'], defaultValue: 'constant' },
+      { key: 'constantValue', label: '常量值', kind: 'text', defaultValue: '1.0', visible: (v) => v.providerPreset === 'constant' },
       { key: 'provider', label: '自定义 Provider', kind: 'text', defaultValue: 'constant(1.0)', visible: (v) => v.providerPreset === 'custom' },
       { key: 'scale', label: 'float 缩放（可选）', kind: 'text', defaultValue: '', visible: (v) => v.valueType === 'float' }
     ],
@@ -293,8 +314,10 @@ export const QUICK_SCHEMAS: Record<string, QuickSchema> = {
           : v.targetType === 'block'
             ? `compute block ${v.target}`
             : 'compute default'
-      if (v.valueType === 'integer') return `${prefix} integer ${v.providerPreset === 'custom' ? v.provider : v.providerPreset}`
-      return `${prefix} float ${v.providerPreset === 'custom' ? v.provider : v.providerPreset}${v.scale.trim() ? ` ${v.scale.trim()}` : ''}`
+      const provider =
+        v.providerPreset === 'custom' ? v.provider : `constant(${v.constantValue})`
+      if (v.valueType === 'integer') return `${prefix} integer ${provider}`
+      return `${prefix} float ${provider}${v.scale.trim() ? ` ${v.scale.trim()}` : ''}`
     }
   },
   trigger: {

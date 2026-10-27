@@ -84,6 +84,14 @@ export function createDefaultSave(): LegacySaveOptions {
   return { action: 'hold' }
 }
 
+export function createDefaultXp(): LegacyXpOptions {
+  return { amount: '100', levels: false, target: '@p' }
+}
+
+export function createDefaultTellraw(): LegacyTellrawOptions {
+  return { target: '@a', json: '{"text":"Hello","color":"gold"}' }
+}
+
 export function createDefaultSummon(): LegacySummonOptions {
   return {
     entity: 'minecraft:zombie',
@@ -285,6 +293,17 @@ export interface LegacyIdleOptions {
 
 export interface LegacySaveOptions {
   action: 'hold' | 'query'
+}
+
+export interface LegacyXpOptions {
+  amount: string
+  levels: boolean
+  target: string
+}
+
+export interface LegacyTellrawOptions {
+  target: string
+  json: string
 }
 
 export interface LegacySummonOptions {
@@ -576,6 +595,23 @@ export function buildSetidletimeout(options: LegacyIdleOptions): BuildResult {
 
 export function buildSave(options: LegacySaveOptions): BuildResult {
   return finish(['save', options.action], [])
+}
+
+export function buildXp(options: LegacyXpOptions): BuildResult {
+  const diagnostics: Diagnostic[] = []
+  if (!options.amount.trim()) diagnostics.push(error('legacy.amount', '经验值不能为空', 'amount'))
+  if (!options.target.trim()) diagnostics.push(error('legacy.target', '目标不能为空', 'target'))
+  return finish(
+    ['xp', `${options.amount.trim()}${options.levels ? 'L' : ''}`, options.target.trim()],
+    diagnostics
+  )
+}
+
+export function buildTellraw(options: LegacyTellrawOptions): BuildResult {
+  const diagnostics: Diagnostic[] = []
+  if (!options.target.trim()) diagnostics.push(error('legacy.target', '目标不能为空', 'target'))
+  if (!options.json.trim()) diagnostics.push(error('legacy.json', 'JSON 文本不能为空', 'json'))
+  return finish(['tellraw', options.target.trim(), options.json.trim()], diagnostics)
 }
 
 export function buildSummon(options: LegacySummonOptions): BuildResult {
