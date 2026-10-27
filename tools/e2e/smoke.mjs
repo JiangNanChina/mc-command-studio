@@ -1223,7 +1223,7 @@ async function main() {
   await selectVersion(page, '1.12.2')
   await page.waitForTimeout(500)
   const pack1122 = await page.locator('.pack-count').innerText()
-  if (!pack1122.includes('53')) {
+  if (!pack1122.includes('64')) {
     throw new Error(`1.12.2 命令数量不符合预期：${pack1122}`)
   }
   await page.getByRole('button', { name: /OOC 生成器/ }).click()
@@ -1328,6 +1328,13 @@ async function main() {
   if (!legacyGive.startsWith('give @p minecraft:diamond 1 0')) {
     throw new Error(`1.12.2 give 输出不符合预期：${legacyGive}`)
   }
+  await page.getByRole('button', { name: 'execute', exact: true }).click()
+  await page.waitForSelector('#legacy-exec-command', { timeout: 10_000 })
+  await page.waitForTimeout(300)
+  const legacyExecute = await page.locator('#legacy-output').innerText()
+  if (!legacyExecute.includes('execute @p ~ ~ ~ say hi')) {
+    throw new Error(`1.12.2 execute 输出不符合预期：${legacyExecute}`)
+  }
   await page.screenshot({ path: join(ARTIFACTS, 'ooc-1.12.2.png') })
   await selectVersion(page, '1.13.2')
   await page.waitForTimeout(500)
@@ -1359,7 +1366,7 @@ async function main() {
   await selectVersion(page, '1.12')
   await page.waitForTimeout(500)
   const pack112 = await page.locator('.pack-count').innerText()
-  if (!pack112.includes('53')) {
+  if (!pack112.includes('64')) {
     throw new Error(`1.12 别名包不符合预期：${pack112}`)
   }
   await page.getByRole('button', { name: /OOC 生成器/ }).click()

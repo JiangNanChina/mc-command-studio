@@ -35,6 +35,51 @@ async function fetchSummary(version, file) {
   return response.json()
 }
 
+async function localFallback(version, baseId, baseTree) {
+  const reports = join(ROOT, 'artifacts', `mcreports-${version}`, 'generated', 'reports', 'commands.json')
+  try {
+    const commands = JSON.parse(await readFile(reports, 'utf8'))
+    const tree = countTree(commands)
+    const rootDiff =
+      tree.roots.length !== baseTree.roots.length ||
+      tree.roots.some((root, index) => root !== baseTree.roots[index])
+    return {
+      id: version,
+      base: baseId,
+      status: rootDiff || tree.literals !== baseTree.literals ? 'DIFF' : 'same',
+      roots: `${tree.roots.length}/${baseTree.roots.length}`,
+      literals: `${tree.literals}/${baseTree.literals}`,
+      items: 'n/a',
+      blocks: 'n/a',
+      note: '官方 reports'
+    }
+  } catch {
+    // 1.12 没有数据生成器，退回官方服务端运行时 help 的根命令表。
+  }
+  const log = join(ROOT, 'artifacts', `mcserver-${version}`, 'out.log')
+  try {
+    const text = await readFile(log, 'utf8')
+    const roots = new Set()
+    for (const match of text.matchAll(/: \/([a-z0-9-]+)/g)) roots.add(match[1])
+    const sorted = [...roots].sort()
+    const rootDiff =
+      sorted.length !== baseTree.roots.length ||
+      sorted.some((root, index) => root !== baseTree.roots[index])
+    return {
+      id: version,
+      base: baseId,
+      status: rootDiff ? 'DIFF' : 'same',
+      roots: `${sorted.length}/${baseTree.roots.length}`,
+      literals: 'n/a',
+      items: 'n/a',
+      blocks: 'n/a',
+      note: '官方服务端 help'
+    }
+  } catch {
+    return null
+  }
+}
+
 const baseCache = new Map()
 async function baseData(id) {
   if (!baseCache.has(id)) {
@@ -70,7 +115,12 @@ for (const alias of aliases) {
       blocks: `${registries.block?.length ?? 0}/${base.registries.block?.length ?? 0}`
     })
   } catch (error) {
-    results.push({ id: alias.id, base: alias.aliasOf, status: 'unavailable', error: error.message })
+    const fallback = await localFallback(alias.id, alias.aliasOf, baseTree)
+    if (fallback) {
+      results.push(fallback)
+    } else {
+      results.push({ id: alias.id, base: alias.aliasOf, status: 'unavailable', error: error.message })
+    }
   }
 }
 

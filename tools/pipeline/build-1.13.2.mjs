@@ -17,9 +17,14 @@ const valueOf = (name, fallback) => {
   const index = args.indexOf(`--${name}`)
   return index >= 0 ? args[index + 1] : fallback
 }
-const reportsDir = valueOf('reports', 'artifacts/mcreports-1.13.2/generated/reports')
-const langPath = valueOf('lang', 'artifacts/client-1.13.2/assets/minecraft/lang/en_us.json')
-const output = 'packs/1.13.2'
+const version = valueOf('version', '1.13.2')
+const reportsDir = valueOf('reports', `artifacts/mcreports-${version}/generated/reports`)
+const langPath = valueOf(
+  'lang',
+  `artifacts/client-${version}/assets/minecraft/lang/en_us.json`
+)
+const output = valueOf('output', `packs/${version}`)
+const dataVersion = Number(valueOf('data-version', version === '1.13' ? '1519' : '1631'))
 
 const readJson = async (path) => JSON.parse(await readFile(path, 'utf8'))
 const strip = (id) => id.replace(/^minecraft:/, '')
@@ -101,8 +106,8 @@ const main = async () => {
   const itemCount = registries.item.length
   const blockCount = Object.keys(blocks).length
 
-  const server = await readFile('artifacts/server-1.13.2.jar')
-  const client = await readFile('artifacts/client-1.13.2.jar')
+  const server = await readFile(`artifacts/server-${version}.jar`)
+  const client = await readFile(`artifacts/client-${version}.jar`)
   const commandsBuffer = Buffer.from(JSON.stringify(commands))
   const registriesBuffer = Buffer.from(JSON.stringify(registries))
   const blocksBuffer = Buffer.from(JSON.stringify(blocks))
@@ -116,9 +121,9 @@ const main = async () => {
 
   const manifest = {
     schemaVersion: 1,
-    id: '1.13.2',
-    gameVersion: '1.13.2',
-    dataVersion: 1631,
+    id: version,
+    gameVersion: version,
+    dataVersion,
     packFormat: 4,
     engine: 'nbt',
     type: 'release',
@@ -153,21 +158,21 @@ const main = async () => {
 
   const indexPath = 'packs/index.json'
   const index = await readJson(indexPath)
-  const packs = index.packs.filter((entry) => entry.id !== '1.13.2')
+  const packs = index.packs.filter((entry) => entry.id !== version)
   packs.push({
-    id: '1.13.2',
-    gameVersion: '1.13.2',
-    dataVersion: 1631,
+    id: version,
+    gameVersion: version,
+    dataVersion,
     packFormat: 4,
     engine: 'nbt',
     type: 'release',
     builtAt: manifest.generatedAt,
-    manifest: '1.13.2/manifest.json'
+    manifest: `${version}/manifest.json`
   })
   index.packs = packs
   index.updatedAt = manifest.generatedAt
   await writeFile(indexPath, `${JSON.stringify(index)}\n`)
-  console.log('✓ 1.13.2 pack', manifest.counts)
+  console.log(`✓ ${version} pack`, manifest.counts)
 }
 
 await main()
