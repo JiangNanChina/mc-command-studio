@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import { createHash } from 'node:crypto'
-import { copyFile, mkdir, readFile, writeFile } from 'node:fs/promises'
+import { copyFile, mkdir, readFile, readdir, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
 
 const VERSIONS = [
@@ -43,11 +43,22 @@ for (const version of VERSIONS) {
   const dir = join('packs', version.id)
   await mkdir(dir, { recursive: true })
   await writeFile(join(dir, 'commands.json'), `${commandsBuffer.toString('utf8')}\n`)
-  await copyFile('packs/1.13.2/registries.json', join(dir, 'registries.json'))
+  const baseRegistries = JSON.parse(
+    await readFile('packs/1.13.2/registries.json', 'utf8')
+  )
+  const assetsDir = join('artifacts', `assets-${version.id}`, 'assets', 'minecraft')
+  const blockDir = join(assetsDir, 'blockstates')
+  const itemDir = join(assetsDir, 'models', 'item')
+  const blocks = (await readdir(blockDir)).filter((file) => file.endsWith('.json'))
+  const items = (await readdir(itemDir)).filter((file) => file.endsWith('.json'))
+  const registries = {
+    ...baseRegistries,
+    item: items.map((file) => file.replace(/\.json$/, '')).sort(),
+    block: blocks.map((file) => file.replace(/\.json$/, '')).sort()
+  }
+  await writeFile(join(dir, 'registries.json'), `${JSON.stringify(registries)}\n`)
   await copyFile('packs/1.13.2/blocks.json', join(dir, 'blocks.json'))
   await writeFile(join(dir, 'item-components.json'), '{}\n')
-  const registries = JSON.parse(await readFile(join(dir, 'registries.json'), 'utf8'))
-  const blocks = JSON.parse(await readFile(join(dir, 'blocks.json'), 'utf8'))
   const manifest = {
     schemaVersion: 1,
     id: version.id,
@@ -68,10 +79,10 @@ for (const version of VERSIONS) {
       roots: ROOTS.length,
       literals: 0,
       parsers: 1,
-      items: registries.item?.length ?? 0,
-      blocks: Object.keys(blocks).length,
-      enchantments: registries.enchantment?.length ?? 0,
-      entities: registries.entity_type?.length ?? 0
+      items: items.length,
+      blocks: blocks.length,
+      enchantments: baseRegistries.enchantment?.length ?? 0,
+      entities: baseRegistries.entity_type?.length ?? 0
     }
   }
   await writeFile(join(dir, 'manifest.json'), `${JSON.stringify(manifest, null, 2)}\n`)
