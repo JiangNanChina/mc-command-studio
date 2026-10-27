@@ -5,6 +5,7 @@ import type { BuildResult, Diagnostic } from './types'
 
 export type OocMode = 'falling-sand' | 'command-block-minecart' | 'command-block'
 export type OocLayoutAxis = 'x' | 'y' | 'z'
+export type OocSecondaryAxis = 'none' | 'x' | 'y' | 'z'
 
 export interface OocOptions {
   mode: OocMode
@@ -17,6 +18,8 @@ export interface OocOptions {
   facing: LegacyDirection
   layerStep: string
   layoutAxis: OocLayoutAxis
+  secondaryAxis: OocSecondaryAxis
+  rowSize: string
   trackOutput: boolean
 }
 
@@ -38,6 +41,8 @@ export function createDefaultOocOptions(): OocOptions {
     facing: 'up',
     layerStep: '1',
     layoutAxis: 'y',
+    secondaryAxis: 'none',
+    rowSize: '2',
     trackOutput: false
   }
 }
@@ -100,7 +105,12 @@ export function buildOocCommand(options: OocOptions): BuildResult {
   if (!/^\d+$/.test(options.layerStep.trim())) {
     diagnostics.push(error('ooc.layerStep', '层间距必须是非负整数', 'layerStep'))
   }
+  if (!/^\d+$/.test(options.rowSize.trim()) || Number(options.rowSize) < 1) {
+    diagnostics.push(error('ooc.rowSize', '每行层数必须是大于 0 的整数', 'rowSize'))
+  }
   const layerStep = /^\d+$/.test(options.layerStep.trim()) ? Number(options.layerStep) : 0
+  const rowSize = /^\d+$/.test(options.rowSize.trim()) ? Math.max(1, Number(options.rowSize)) : 1
+  const secondaryAxis = options.secondaryAxis === options.layoutAxis ? 'none' : options.secondaryAxis
   for (const command of commands) {
     if (containsControlCharacters(command)) {
       diagnostics.push(warn('ooc.control', '命令中包含不可见控制字符', 'commands'))
@@ -115,10 +125,15 @@ export function buildOocCommand(options: OocOptions): BuildResult {
         LEGACY_DIRECTIONS.find((direction) => direction.value === options.facing)?.meta ?? 1
       text = commands
         .map((command, index) => {
-          const offset = index * layerStep
-          const x = options.layoutAxis === 'x' ? offsetCoordinate(options.x, offset) : options.x.trim()
-          const y = options.layoutAxis === 'y' ? offsetCoordinate(options.y, offset) : options.y.trim()
-          const z = options.layoutAxis === 'z' ? offsetCoordinate(options.z, offset) : options.z.trim()
+          const primaryOffset =
+            secondaryAxis === 'none' ? index * layerStep : Math.floor(index / rowSize) * layerStep
+          const secondaryOffset = secondaryAxis === 'none' ? 0 : (index % rowSize) * layerStep
+          const offsetFor = (axis: OocLayoutAxis): number =>
+            (options.layoutAxis === axis ? primaryOffset : 0) +
+            (secondaryAxis === axis ? secondaryOffset : 0)
+          const x = offsetCoordinate(options.x, offsetFor('x'))
+          const y = offsetCoordinate(options.y, offsetFor('y'))
+          const z = offsetCoordinate(options.z, offsetFor('z'))
           // 条件链：第一块保持无条件，后续块加 8 形成 conditional 链。
           const meta = baseMeta + (options.conditional && index > 0 ? 8 : 0)
           return `setblock ${x} ${y} ${z} command_block ${meta} replace {${commandBlockNbt(command, options)}}`
@@ -140,7 +155,12 @@ export function buildOocCommand(options: OocOptions): BuildResult {
       text = `summon minecraft:falling_block ${options.x.trim()} ${options.y.trim()} ${options.z.trim()} {Block:"minecraft:redstone_block",Time:1b,Passengers:[${passengers}]}`
       if (options.conditional) {
         diagnostics.push(
-          warn('ooc.conditional', '掉落沙模式不支持条件链；条件仅用于命令方块模式', 'conditional')
+          warn('ooc.conditional', '掉落沙模式不支持条件链，已自动回退为无条件链', 'conditional')
+        )
+      }
+      if (secondaryAxis !== 'none') {
+        diagnostics.push(
+          warn('ooc.secondary', '掉落沙模式只使用层间距递增 Time，双轴排布已忽略', 'secondaryAxis')
         )
       }
     }

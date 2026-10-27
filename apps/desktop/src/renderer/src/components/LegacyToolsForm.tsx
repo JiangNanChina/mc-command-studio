@@ -3,6 +3,7 @@ import { Copy, Wrench } from 'lucide-react'
 import {
   LEGACY_BLOCK_PRESETS,
   LEGACY_ENTITY_PRESETS,
+  LEGACY_ITEM_PRESETS,
   LEGACY_SLOTS,
   buildBlockdata,
   buildEntitydata,
@@ -343,6 +344,24 @@ export function LegacyToolsForm() {
                 <label className="field-label" htmlFor="legacy-replaceitem-nbt">
                   NBT（可选）
                 </label>
+                <select
+                  id="legacy-replaceitem-preset"
+                  className="select"
+                  defaultValue=""
+                  style={{ marginBottom: 8 }}
+                  onChange={(event) => {
+                    const preset = LEGACY_ITEM_PRESETS[Number(event.target.value)]
+                    if (preset) setReplaceitem({ ...replaceitem, nbt: preset.nbt })
+                    event.target.value = ''
+                  }}
+                >
+                  <option value="">选择物品 NBT 预设…</option>
+                  {LEGACY_ITEM_PRESETS.map((preset, index) => (
+                    <option key={preset.label} value={index}>
+                      {preset.label}
+                    </option>
+                  ))}
+                </select>
                 <textarea
                   id="legacy-replaceitem-nbt"
                   className="textarea"

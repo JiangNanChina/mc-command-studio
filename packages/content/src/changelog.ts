@@ -22,6 +22,35 @@ const REPO = 'https://github.com/JiangNanChina/mc-command-studio'
  */
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: '0.1.58',
+    date: '2026-10-27',
+    title: '1.12.2 NBT 模板与 OOC 双轴网格',
+    highlights: ['刷怪笼/命令方块链/成书。', 'OOC 双轴网格与条件回退。'],
+    sections: [
+      {
+        type: 'added',
+        items: [
+          '1.12.2 刷怪笼/命令方块链预设。',
+          '成书/附魔剑/药水/头颅物品 NBT 预设。',
+          'OOC 第二轴与每行层数。'
+        ]
+      },
+      {
+        type: 'improved',
+        items: [
+          '条件链不支持时自动回退并提示。',
+          '1.13.2 注册表门禁扩展。',
+          '单元测试 246 → 247。'
+        ]
+      },
+      {
+        type: 'fixed',
+        items: ['无。']
+      }
+    ],
+    releaseUrl: `${REPO}/releases/tag/v0.1.58`
+  },
+  {
     version: '0.1.57',
     date: '2026-10-27',
     title: '1.12.2 NBT 模板与 OOC 条件链',

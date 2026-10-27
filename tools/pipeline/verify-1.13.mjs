@@ -16,11 +16,20 @@ if ((registries.particle_type ?? []).length !== 48) {
 if ((registries.attribute ?? []).length !== 0) {
   errors.push(`attribute 应为空，实际 ${(registries.attribute ?? []).length}`)
 }
+if ((registries.entity_type ?? []).length !== 144) {
+  errors.push(`entity_type 应为 144，实际 ${(registries.entity_type ?? []).length}`)
+}
+if ((registries.enchantment ?? []).length !== 34) {
+  errors.push(`enchantment 应为 34，实际 ${(registries.enchantment ?? []).length}`)
+}
+if ((registries.mob_effect ?? []).length !== 30) {
+  errors.push(`mob_effect 应为 30，实际 ${(registries.mob_effect ?? []).length}`)
+}
 
 if (errors.length > 0) {
   console.error('✗ 1.13.2 注册表校验失败')
   for (const error of errors) console.error(`  - ${error}`)
   process.exitCode = 1
 } else {
-  console.log('✓ 1.13.2 注册表校验通过（48 粒子 / 0 属性）')
+  console.log('✓ 1.13.2 注册表校验通过（48 粒子 / 0 属性 / 144 实体 / 34 附魔 / 30 效果）')
 }

@@ -1197,6 +1197,14 @@ async function main() {
   if (!oocChain.includes('command_block 13') || !oocChain.includes('~1')) {
     throw new Error(`OOC 条件链不符合预期：${oocChain}`)
   }
+  await page.selectOption('#ooc-secondary-axis', 'y')
+  await page.fill('#ooc-layer-step', '1')
+  await page.fill('#ooc-commands', 'say a\nsay b\nsay c\nsay d')
+  await page.waitForTimeout(300)
+  const oocGrid = await page.locator('#ooc-output').innerText()
+  if (!oocGrid.includes('~ ~2') || !oocGrid.includes('~1 ~1')) {
+    throw new Error(`OOC 双轴网格不符合预期：${oocGrid}`)
+  }
   await page.getByRole('button', { name: /1.12.2 旧版工具/ }).click()
   await page.waitForSelector('#legacy-testfor-target', { timeout: 10_000 })
   await page.fill('#legacy-testfor-nbt', '{Health:10f}')
@@ -1226,6 +1234,14 @@ async function main() {
   const legacyTrade = await page.locator('#legacy-output').innerText()
   if (!legacyTrade.includes('Offers') || !legacyTrade.includes('Recipes')) {
     throw new Error(`1.12.2 村民交易预设不符合预期：${legacyTrade}`)
+  }
+  await page.getByRole('button', { name: 'replaceitem', exact: true }).click()
+  await page.waitForSelector('#legacy-replaceitem-preset', { timeout: 10_000 })
+  await page.selectOption('#legacy-replaceitem-preset', '0')
+  await page.waitForTimeout(300)
+  const legacyBook = await page.locator('#legacy-output').innerText()
+  if (!legacyBook.includes('title:"MC Studio"') || !legacyBook.includes('pages')) {
+    throw new Error(`1.12.2 成书预设不符合预期：${legacyBook}`)
   }
   await page.screenshot({ path: join(ARTIFACTS, 'ooc-1.12.2.png') })
   await page.selectOption('#pack-select', '1.20.4')

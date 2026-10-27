@@ -95,7 +95,16 @@ export const LEGACY_BLOCK_PRESETS = [
   { label: '命令方块', nbt: '{Command:"say hello",auto:1b,powered:1b,TrackOutput:0b}' },
   { label: '刷怪笼', nbt: '{SpawnCount:4s,SpawnRange:4s,Delay:20s,MinSpawnDelay:200s,MaxSpawnDelay:800s}' },
   { label: '旗帜图案', nbt: '{Base:4,Patterns:[{Pattern:"cre",Color:1},{Pattern:"bri",Color:15}]}' },
-  { label: '药水效果', nbt: '{CustomPotionEffects:[{Id:1b,Amplifier:1b,Duration:200}]}' }
+  { label: '药水效果', nbt: '{CustomPotionEffects:[{Id:1b,Amplifier:1b,Duration:200}]}' },
+  { label: '刷怪笼实体', nbt: '{SpawnData:{id:"minecraft:zombie"},SpawnCount:4s,SpawnRange:4s,Delay:20s,MinSpawnDelay:200s,MaxSpawnDelay:800s}' },
+  { label: '命令方块链', nbt: '{Command:"say chain",auto:1b,conditionMet:1b,powered:1b,TrackOutput:0b}' }
+]
+
+export const LEGACY_ITEM_PRESETS = [
+  { label: '成书', nbt: '{title:"MC Studio",author:"MC Studio",pages:["第一页","第二页"]}' },
+  { label: '附魔剑', nbt: '{display:{Name:"{\\"text\\":\\"Excalibur\\"}"},ench:[{id:16s,lvl:5s}]}' },
+  { label: '药水', nbt: '{Potion:"minecraft:strong_healing"}' },
+  { label: '头颅', nbt: '{SkullOwner:"Notch"}' }
 ]
 
 export const LEGACY_ENTITY_PRESETS = [

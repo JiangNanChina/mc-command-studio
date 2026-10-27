@@ -67,6 +67,26 @@ describe('ooc', () => {
     expect(lines[1]).toContain('setblock 1 64 0 command_block 9 ')
   })
 
+  it('lays out a two-axis grid', () => {
+    const result = buildOocCommand({
+      ...createDefaultOocOptions(),
+      mode: 'command-block',
+      x: '0',
+      y: '64',
+      z: '0',
+      layerStep: '1',
+      layoutAxis: 'x',
+      secondaryAxis: 'y',
+      rowSize: '2',
+      commands: 'say a\nsay b\nsay c\nsay d'
+    })
+    const lines = result.text.split('\n')
+    expect(lines[0]).toContain('setblock 0 64 0')
+    expect(lines[1]).toContain('setblock 0 65 0')
+    expect(lines[2]).toContain('setblock 1 64 0')
+    expect(lines[3]).toContain('setblock 1 65 0')
+  })
+
   it('validates empty commands and coordinates', () => {
     const result = buildOocCommand({ ...createDefaultOocOptions(), commands: '', x: 'bad' })
     expect(result.diagnostics.some((item) => item.code === 'ooc.commands')).toBe(true)

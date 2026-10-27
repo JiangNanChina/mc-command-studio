@@ -7,7 +7,8 @@ import {
   createDefaultOocOptions,
   type LegacyDirection,
   type OocLayoutAxis,
-  type OocMode
+  type OocMode,
+  type OocSecondaryAxis
 } from '@mcstudio/core'
 import { useAppStore } from '../store'
 
@@ -171,6 +172,38 @@ export function OocForm() {
               <option value="y">Y 轴</option>
               <option value="z">Z 轴</option>
             </select>
+          </div>
+
+          <div className="grid-2" style={{ marginTop: 12 }}>
+            <div className="field">
+              <label className="field-label" htmlFor="ooc-secondary-axis">
+                第二轴
+              </label>
+              <select
+                id="ooc-secondary-axis"
+                className="select"
+                value={options.secondaryAxis}
+                onChange={(event) =>
+                  update({ secondaryAxis: event.target.value as OocSecondaryAxis })
+                }
+              >
+                <option value="none">不启用</option>
+                <option value="x">X 轴</option>
+                <option value="y">Y 轴</option>
+                <option value="z">Z 轴</option>
+              </select>
+            </div>
+            <div className="field">
+              <label className="field-label" htmlFor="ooc-row-size">
+                每行层数
+              </label>
+              <input
+                id="ooc-row-size"
+                className="input"
+                value={options.rowSize}
+                onChange={(event) => update({ rowSize: event.target.value })}
+              />
+            </div>
           </div>
 
           <div className="field" style={{ marginTop: 12 }}>
