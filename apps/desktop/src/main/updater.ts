@@ -3,6 +3,7 @@ import log from 'electron-log/main'
 import { autoUpdater, type UpdateInfo } from 'electron-updater'
 import type { UpdateState, UserSettings } from '../shared/types'
 import { readSettings, updateSettings } from './storage'
+import { isNewerVersion } from './version'
 
 let state: UpdateState = { status: 'idle' }
 let mainWindow: BrowserWindow | null = null
@@ -11,6 +12,11 @@ let manualCheck = false
 let checkTimer: NodeJS.Timeout | null = null
 let intervalTimer: NodeJS.Timeout | null = null
 let currentSettings: UserSettings | null = null
+
+function currentChannel(): 'stable' | 'beta' | 'test' {
+  if (app.getVersion().includes('-test')) return 'test'
+  return currentSettings?.updateChannel === 'beta' ? 'beta' : 'stable'
+}
 
 function releaseNotes(info: UpdateInfo): string {
   const notes = info.releaseNotes
@@ -34,18 +40,8 @@ function setState(next: UpdateState): void {
 }
 
 export function updateFeedDescription(): string {
+  if (app.getVersion().includes('-test')) return '本地测试源（app-update.yml）'
   return process.env.MCSTUDIO_UPDATE_URL ?? 'GitHub Releases（app-update.yml）'
-}
-
-function isNewerVersion(candidate: string, current: string): boolean {
-  const left = candidate.split('-')[0].split('.').map(Number)
-  const right = current.split('-')[0].split('.').map(Number)
-  for (let i = 0; i < Math.max(left.length, right.length); i += 1) {
-    const a = Number.isFinite(left[i]) ? left[i] : 0
-    const b = Number.isFinite(right[i]) ? right[i] : 0
-    if (a !== b) return a > b
-  }
-  return false
 }
 
 export function initUpdater(window: BrowserWindow, settings: UserSettings): void {
@@ -89,7 +85,7 @@ export function initUpdater(window: BrowserWindow, settings: UserSettings): void
       setState({
         status: 'idle',
         version: info.version,
-        channel: currentSettings?.updateChannel ?? 'stable'
+        channel: currentChannel()
       })
       return
     }
@@ -98,7 +94,7 @@ export function initUpdater(window: BrowserWindow, settings: UserSettings): void
         status: 'idle',
         version: info.version,
         skipped: true,
-        channel: currentSettings.updateChannel
+        channel: currentChannel()
       })
       return
     }
@@ -107,7 +103,7 @@ export function initUpdater(window: BrowserWindow, settings: UserSettings): void
       version: info.version,
       notes: releaseNotes(info),
       manual: manualCheck,
-      channel: currentSettings?.updateChannel ?? 'stable',
+      channel: currentChannel(),
       error: undefined
     })
   })
@@ -116,11 +112,11 @@ export function initUpdater(window: BrowserWindow, settings: UserSettings): void
     setState({
       status: 'not-available',
       manual: manualCheck,
-      channel: currentSettings?.updateChannel ?? 'stable'
+      channel: currentChannel()
     })
     setTimeout(() => {
       if (state.status === 'not-available') {
-        setState({ status: 'idle', channel: currentSettings?.updateChannel ?? 'stable' })
+        setState({ status: 'idle', channel: currentChannel() })
       }
     }, 5000)
   })
@@ -171,8 +167,13 @@ export function applySettings(settings: UserSettings): void {
     intervalTimer = null
   }
 
-  autoUpdater.allowPrerelease = settings.updateChannel === 'beta'
-  autoUpdater.channel = settings.updateChannel === 'beta' ? 'beta' : 'latest'
+  const testChannel = app.getVersion().includes('-test')
+  autoUpdater.allowPrerelease = testChannel || settings.updateChannel === 'beta'
+  autoUpdater.channel = testChannel
+    ? 'test'
+    : settings.updateChannel === 'beta'
+      ? 'beta'
+      : 'latest'
 
   if (!settings.autoUpdate) return
 
@@ -219,7 +220,7 @@ export async function checkForUpdates(manual = false): Promise<UpdateState> {
   setState({
     status: 'checking',
     manual,
-    channel: currentSettings?.updateChannel ?? 'stable'
+    channel: currentChannel()
   })
 
   try {

@@ -58,4 +58,4 @@ node tools/pipeline/verify-quick-matrix.mjs
 - 快捷表单：53
 - NBT 安全快捷表单：44
 - 版本特定快捷表单：10
-- 单元测试：273
+- 单元测试：275

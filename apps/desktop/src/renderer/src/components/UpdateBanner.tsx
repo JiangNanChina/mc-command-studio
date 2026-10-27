@@ -38,7 +38,7 @@ export function UpdateBanner() {
         </div>
         <div className="banner-text">
           <div className="banner-title">正在下载 v{update.version}…</div>
-          <div className="banner-sub">下载完成后会提示重启安装，不会丢失当前项目。</div>
+          <div className="banner-sub">下载完成后点击“重新载入”即可自动安装并重新打开。</div>
         </div>
         <div className="progress-track">
           <div className="progress-bar" style={{ width: `${Math.round(update.percent ?? 0)}%` }} />
@@ -61,14 +61,14 @@ export function UpdateBanner() {
         </div>
         <div className="banner-text">
           <div className="banner-title">v{update.version} 已下载完成</div>
-          <div className="banner-sub">重启应用后自动安装。项目文件会保留。</div>
+          <div className="banner-sub">点击重新载入完成升级，应用会自动安装并重新打开，无需手动关闭。</div>
         </div>
         <div className="banner-actions">
           <button type="button" className="btn btn-sm" onClick={() => setHidden(true)}>
             稍后
           </button>
           <button type="button" className="btn btn-sm btn-primary" onClick={() => void installUpdate()}>
-            重启并安装
+            重新载入
           </button>
         </div>
       </div>

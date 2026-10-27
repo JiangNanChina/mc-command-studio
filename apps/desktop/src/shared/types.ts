@@ -110,7 +110,7 @@ export interface UpdateState {
   error?: string
   manual?: boolean
   skipped?: boolean
-  channel?: 'stable' | 'beta'
+  channel?: 'stable' | 'beta' | 'test'
 }
 
 export type MenuAction =

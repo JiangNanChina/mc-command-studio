@@ -1,0 +1,39 @@
+appId: com.mcstudio.app.test
+productName: MC 指令工坊 测试版
+copyright: Copyright © 2026 MC Command Studio
+directories:
+  buildResources: build
+  output: ../../release-test
+asar: true
+compression: normal
+files:
+  - out/**/*
+  - package.json
+extraResources:
+  - from: ../../packs
+    to: packs
+    filter:
+      - "**/*"
+  - from: build/icon.png
+    to: icon.png
+win:
+  icon: build/icon.ico
+  target:
+    - target: nsis
+      arch:
+        - x64
+  artifactName: MC-Command-Studio-Test-${version}-${arch}.${ext}
+nsis:
+  oneClick: false
+  perMachine: false
+  allowToChangeInstallationDirectory: true
+  createDesktopShortcut: true
+  createStartMenuShortcut: true
+  shortcutName: MC 指令工坊 测试版
+  uninstallDisplayName: MC 指令工坊 测试版
+  artifactName: MC-Command-Studio-Test-Setup-${version}.${ext}
+  deleteAppDataOnUninstall: false
+  runAfterFinish: true
+publish:
+  provider: generic
+  url: http://127.0.0.1:8123/updates/

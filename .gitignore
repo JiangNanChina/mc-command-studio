@@ -25,3 +25,4 @@ test-results/
 
 # ²âÊÔÁÙÊ±Ä¿Â¼
 *.tmpdir/
+/release-test/
