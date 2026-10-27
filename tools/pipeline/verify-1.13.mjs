@@ -25,11 +25,18 @@ if ((registries.enchantment ?? []).length !== 34) {
 if ((registries.mob_effect ?? []).length !== 30) {
   errors.push(`mob_effect 应为 30，实际 ${(registries.mob_effect ?? []).length}`)
 }
+const particles = new Set(registries.particle_type ?? [])
+for (const required of ['block', 'dust', 'item', 'effect', 'entity_effect']) {
+  if (!particles.has(required)) errors.push(`缺少 1.13 粒子参数类型 ${required}`)
+}
+for (const forbidden of ['campfire_cosy_smoke', 'sneeze', 'flash']) {
+  if (particles.has(forbidden)) errors.push(`不应包含 1.14 粒子 ${forbidden}`)
+}
 
 if (errors.length > 0) {
   console.error('✗ 1.13.2 注册表校验失败')
   for (const error of errors) console.error(`  - ${error}`)
   process.exitCode = 1
 } else {
-  console.log('✓ 1.13.2 注册表校验通过（48 粒子 / 0 属性 / 144 实体 / 34 附魔 / 30 效果）')
+  console.log('✓ 1.13.2 注册表校验通过（48 粒子 / 5 参数类型 / 0 属性 / 144 实体 / 34 附魔 / 30 效果）')
 }

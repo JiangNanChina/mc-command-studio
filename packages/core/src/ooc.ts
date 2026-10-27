@@ -17,6 +17,7 @@ export interface OocOptions {
   conditional: boolean
   facing: LegacyDirection
   layerStep: string
+  secondaryStep: string
   layoutAxis: OocLayoutAxis
   secondaryAxis: OocSecondaryAxis
   rowSize: string
@@ -40,6 +41,7 @@ export function createDefaultOocOptions(): OocOptions {
     conditional: false,
     facing: 'up',
     layerStep: '1',
+    secondaryStep: '1',
     layoutAxis: 'y',
     secondaryAxis: 'none',
     rowSize: '2',
@@ -108,7 +110,13 @@ export function buildOocCommand(options: OocOptions): BuildResult {
   if (!/^\d+$/.test(options.rowSize.trim()) || Number(options.rowSize) < 1) {
     diagnostics.push(error('ooc.rowSize', '每行层数必须是大于 0 的整数', 'rowSize'))
   }
+  if (!/^\d+$/.test(options.secondaryStep.trim())) {
+    diagnostics.push(error('ooc.secondaryStep', '第二轴间距必须是非负整数', 'secondaryStep'))
+  }
   const layerStep = /^\d+$/.test(options.layerStep.trim()) ? Number(options.layerStep) : 0
+  const secondaryStep = /^\d+$/.test(options.secondaryStep.trim())
+    ? Number(options.secondaryStep)
+    : 0
   const rowSize = /^\d+$/.test(options.rowSize.trim()) ? Math.max(1, Number(options.rowSize)) : 1
   const secondaryAxis = options.secondaryAxis === options.layoutAxis ? 'none' : options.secondaryAxis
   for (const command of commands) {
@@ -127,7 +135,7 @@ export function buildOocCommand(options: OocOptions): BuildResult {
         .map((command, index) => {
           const primaryOffset =
             secondaryAxis === 'none' ? index * layerStep : Math.floor(index / rowSize) * layerStep
-          const secondaryOffset = secondaryAxis === 'none' ? 0 : (index % rowSize) * layerStep
+          const secondaryOffset = secondaryAxis === 'none' ? 0 : (index % rowSize) * secondaryStep
           const offsetFor = (axis: OocLayoutAxis): number =>
             (options.layoutAxis === axis ? primaryOffset : 0) +
             (secondaryAxis === axis ? secondaryOffset : 0)

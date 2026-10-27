@@ -1,6 +1,6 @@
 {
   "name": "mc-command-studio",
-  "version": "0.1.58",
+  "version": "0.1.59",
   "private": true,
   "description": "MC 指令工坊 - Windows 桌面版 Minecraft Java 命令编辑器",
   "packageManager": "pnpm@11.28.5",

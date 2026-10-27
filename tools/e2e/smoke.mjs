@@ -1205,6 +1205,12 @@ async function main() {
   if (!oocGrid.includes('~ ~2') || !oocGrid.includes('~1 ~1')) {
     throw new Error(`OOC 双轴网格不符合预期：${oocGrid}`)
   }
+  await page.fill('#ooc-secondary-step', '3')
+  await page.waitForTimeout(300)
+  const oocStep = await page.locator('#ooc-output').innerText()
+  if (!oocStep.includes('~ ~4') || !oocStep.includes('~1 ~1')) {
+    throw new Error(`OOC 第二轴间距不符合预期：${oocStep}`)
+  }
   await page.getByRole('button', { name: /1.12.2 旧版工具/ }).click()
   await page.waitForSelector('#legacy-testfor-target', { timeout: 10_000 })
   await page.fill('#legacy-testfor-nbt', '{Health:10f}')

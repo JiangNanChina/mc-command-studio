@@ -22,6 +22,36 @@ const REPO = 'https://github.com/JiangNanChina/mc-command-studio'
  */
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: '0.1.59',
+    date: '2026-10-27',
+    title: '1.12.2 模板扩展与 OOC 独立轴间距',
+    highlights: ['刷怪笼列表/长书/循环命令方块。', 'OOC 第二轴独立间距。'],
+    sections: [
+      {
+        type: 'added',
+        items: [
+          '1.12.2 刷怪笼实体列表/循环命令方块预设。',
+          '1.12.2 长书物品 NBT 预设。',
+          'OOC 第二轴间距。',
+          '1.13.2 粒子参数类型门禁。'
+        ]
+      },
+      {
+        type: 'improved',
+        items: [
+          '主副轴间距分别配置。',
+          '单元测试 247 → 248。',
+          '冒烟覆盖新预设。'
+        ]
+      },
+      {
+        type: 'fixed',
+        items: ['无。']
+      }
+    ],
+    releaseUrl: `${REPO}/releases/tag/v0.1.59`
+  },
+  {
     version: '0.1.58',
     date: '2026-10-27',
     title: '1.12.2 NBT 模板与 OOC 双轴网格',

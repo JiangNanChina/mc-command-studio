@@ -174,7 +174,7 @@ export function OocForm() {
             </select>
           </div>
 
-          <div className="grid-2" style={{ marginTop: 12 }}>
+          <div className="grid-3" style={{ marginTop: 12 }}>
             <div className="field">
               <label className="field-label" htmlFor="ooc-secondary-axis">
                 第二轴
@@ -202,6 +202,17 @@ export function OocForm() {
                 className="input"
                 value={options.rowSize}
                 onChange={(event) => update({ rowSize: event.target.value })}
+              />
+            </div>
+            <div className="field">
+              <label className="field-label" htmlFor="ooc-secondary-step">
+                第二轴间距
+              </label>
+              <input
+                id="ooc-secondary-step"
+                className="input"
+                value={options.secondaryStep}
+                onChange={(event) => update({ secondaryStep: event.target.value })}
               />
             </div>
           </div>
