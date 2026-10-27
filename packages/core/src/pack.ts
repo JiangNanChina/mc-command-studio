@@ -34,7 +34,8 @@ export const packManifestSchema = z.object({
   generatedAt: z.string(),
   sources: z.array(packSourceSchema),
   files: z.record(z.string(), z.string()),
-  counts: packCountsSchema
+  counts: packCountsSchema,
+  aliasOf: z.string().min(1).optional()
 })
 
 const registriesSchema = z.record(z.string(), z.array(z.string()))

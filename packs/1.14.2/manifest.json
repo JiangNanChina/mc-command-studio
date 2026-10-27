@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "id": "1.14.2",
+  "gameVersion": "1.14.2",
+  "dataVersion": 1963,
+  "packFormat": 4,
+  "engine": "nbt",
+  "type": "release",
+  "generatedAt": "2026-10-27T10:32:51.811Z",
+  "sources": [
+    {
+      "name": "alias",
+      "url": "local://packs/1.14.4",
+      "sha256": "8c6079bc91e3acbca044ad4bd2dafc5797bd540d2aeb6a827d7f481131c61dd5"
+    }
+  ],
+  "files": {
+    "commands": "commands.json",
+    "registries": "registries.json",
+    "blocks": "blocks.json",
+    "itemComponents": "item-components.json"
+  },
+  "counts": {
+    "roots": 71,
+    "literals": 539,
+    "parsers": 40,
+    "items": 877,
+    "blocks": 417,
+    "enchantments": 37,
+    "entities": 102
+  },
+  "aliasOf": "1.14.4"
+}

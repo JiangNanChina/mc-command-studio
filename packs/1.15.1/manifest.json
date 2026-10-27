@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "id": "1.15.1",
+  "gameVersion": "1.15.1",
+  "dataVersion": 2227,
+  "packFormat": 5,
+  "engine": "nbt",
+  "type": "release",
+  "generatedAt": "2026-10-27T10:32:51.816Z",
+  "sources": [
+    {
+      "name": "alias",
+      "url": "local://packs/1.15.2",
+      "sha256": "fcf3d2f7a629e2dac85044131b50cdd7f8100e7cea90f413384c5ab0fcc5f87b"
+    }
+  ],
+  "files": {
+    "commands": "commands.json",
+    "registries": "registries.json",
+    "blocks": "blocks.json",
+    "itemComponents": "item-components.json"
+  },
+  "counts": {
+    "roots": 72,
+    "literals": 612,
+    "parsers": 40,
+    "items": 884,
+    "blocks": 419,
+    "enchantments": 37,
+    "entities": 103
+  },
+  "aliasOf": "1.15.2"
+}

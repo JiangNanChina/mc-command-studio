@@ -58,6 +58,7 @@ export interface PackSummary {
   engine?: 'components' | 'nbt' | 'legacy'
   type: 'release' | 'snapshot'
   builtAt: string
+  aliasOf?: string
 }
 
 export interface LoadedPack {

@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "id": "1.21",
+  "gameVersion": "1.21",
+  "dataVersion": 3953,
+  "packFormat": 48,
+  "type": "release",
+  "generatedAt": "2026-10-27T10:32:51.837Z",
+  "sources": [
+    {
+      "name": "alias",
+      "url": "local://packs/1.21.1",
+      "sha256": "7cb73c93b4f4dd7bf454794b507c6f502d943c27f12509f188e3d961160abf22"
+    }
+  ],
+  "files": {
+    "commands": "commands.json",
+    "registries": "registries.json",
+    "blocks": "blocks.json",
+    "itemComponents": "item-components.json"
+  },
+  "counts": {
+    "roots": 83,
+    "literals": 816,
+    "parsers": 51,
+    "items": 1333,
+    "blocks": 1060,
+    "enchantments": 42,
+    "entities": 130
+  },
+  "engine": "components",
+  "aliasOf": "1.21.1"
+}

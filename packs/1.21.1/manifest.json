@@ -1,0 +1,52 @@
+{
+  "schemaVersion": 1,
+  "id": "1.21.1",
+  "gameVersion": "1.21.1",
+  "dataVersion": 3955,
+  "packFormat": 48,
+  "type": "release",
+  "generatedAt": "2026-10-26T17:45:52.091Z",
+  "sources": [
+    {
+      "name": "commands",
+      "url": "https://cdn.jsdelivr.net/gh/misode/mcmeta@1.21.1-summary/commands/data.min.json",
+      "sha256": "7cb73c93b4f4dd7bf454794b507c6f502d943c27f12509f188e3d961160abf22"
+    },
+    {
+      "name": "registries",
+      "url": "https://cdn.jsdelivr.net/gh/misode/mcmeta@1.21.1-summary/registries/data.min.json",
+      "sha256": "e2b1d4d13681186b23e47975158f184901562c5a52923f5873b4a4472dff6b34"
+    },
+    {
+      "name": "blocks",
+      "url": "https://cdn.jsdelivr.net/gh/misode/mcmeta@1.21.1-summary/blocks/data.min.json",
+      "sha256": "fdfbbedc575b89b0116f33daf3ad69afa4698ff38770692433bf639317a6fcf0"
+    },
+    {
+      "name": "item_components",
+      "url": "https://cdn.jsdelivr.net/gh/misode/mcmeta@1.21.1-summary/item_components/data.min.json",
+      "sha256": "f5e45babb6977ba7a2737b7a8aa46b4c55395079a39e851f42e4836f2ab670f8"
+    },
+    {
+      "name": "versions",
+      "url": "https://cdn.jsdelivr.net/gh/misode/mcmeta@1.21.1-summary/versions/data.json",
+      "sha256": "791295ef8b494fe634ae6af818e27038d5d7320172c6c1fdd2ea99ac78c40e29"
+    }
+  ],
+  "files": {
+    "commands": "commands.json",
+    "registries": "registries.json",
+    "blocks": "blocks.json",
+    "itemComponents": "item-components.json"
+  },
+  "counts": {
+    "roots": 83,
+    "literals": 816,
+    "parsers": 51,
+    "items": 1333,
+    "blocks": 1060,
+    "enchantments": 42,
+    "entities": 130
+  },
+  "engine": "components"
+}

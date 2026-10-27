@@ -74,11 +74,20 @@ export async function loadPack(id: string): Promise<LoadPackResult> {
 
   try {
     const manifest = await readJson<PackManifest>(manifestPath)
+    let sourceDir = dir
+    if (manifest.aliasOf) {
+      if (!isSafeId(manifest.aliasOf)) {
+        throw new Error(`别名目标不合法：${manifest.aliasOf}`)
+      }
+      sourceDir = join(packsDir(), manifest.aliasOf)
+      const baseManifest = await readJson<PackManifest>(join(sourceDir, 'manifest.json'))
+      if (baseManifest.aliasOf) throw new Error('数据包别名不能指向另一个别名')
+    }
     const [commands, registries, blocks, itemComponents] = await Promise.all([
-      readJson<CommandTree>(join(dir, 'commands.json')),
-      readJson<Registries>(join(dir, 'registries.json')),
-      readJson<BlockStates>(join(dir, 'blocks.json')),
-      readJson<ItemComponentDefaults>(join(dir, 'item-components.json'))
+      readJson<CommandTree>(join(sourceDir, 'commands.json')),
+      readJson<Registries>(join(sourceDir, 'registries.json')),
+      readJson<BlockStates>(join(sourceDir, 'blocks.json')),
+      readJson<ItemComponentDefaults>(join(sourceDir, 'item-components.json'))
     ])
     if (!commands?.children) throw new Error('commands.json 缺少根节点')
     if (!registries || typeof registries !== 'object') throw new Error('registries.json 格式不正确')

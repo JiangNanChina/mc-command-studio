@@ -31,6 +31,12 @@ describe('version pack', () => {
     expect(parsePackManifest(manifest).id).toBe('26.3')
   })
 
+  it('parses an alias manifest', () => {
+    expect(parsePackManifest({ ...manifest, id: '1.20.6', aliasOf: '1.20.5' }).aliasOf).toBe(
+      '1.20.5'
+    )
+  })
+
   it('rejects an invalid manifest', () => {
     expect(() => parsePackManifest({ ...manifest, id: '' })).toThrow()
     expect(() => parsePackManifest({ ...manifest, type: 'weekly' })).toThrow()

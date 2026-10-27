@@ -47,6 +47,7 @@ export interface PackManifest {
   sources: PackSource[]
   files: Record<string, string>
   counts: PackCounts
+  aliasOf?: string
 }
 
 /** 注册表：registry 名称 -> 去命名空间的 ID 列表 */
