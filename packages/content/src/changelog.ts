@@ -22,7 +22,7 @@ const REPO = 'https://github.com/JiangNanChina/mc-command-studio'
  */
 export const CHANGELOG: ChangelogEntry[] = [
   {
-    version: '0.1.52',
+    version: '0.1.53',
     date: '2026-10-27',
     title: '补齐 1.13.2 数据包',
     highlights: ['10 个数据包覆盖 1.13.2–1.20.4。', '1.13.2 官方 reports 转换器。'],
@@ -44,7 +44,7 @@ export const CHANGELOG: ChangelogEntry[] = [
         items: ['1.13.2 不再依赖 mcmeta 缺失的历史数据。']
       }
     ],
-    releaseUrl: `${REPO}/releases/tag/v0.1.52`
+    releaseUrl: `${REPO}/releases/tag/v0.1.53`
   },
   {
     version: '0.1.51',

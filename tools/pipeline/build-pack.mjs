@@ -10,7 +10,7 @@
  *   node tools/pipeline/build-pack.mjs --version 26.3 --force
  */
 import { createHash } from 'node:crypto'
-import { mkdir, readFile, rename, stat, writeFile } from 'node:fs/promises'
+import { mkdir, readFile, readdir, rename, stat, writeFile } from 'node:fs/promises'
 import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
@@ -241,6 +241,27 @@ async function updateIndex(version, manifest) {
     builtAt: manifest.generatedAt,
     manifest: `${version}/manifest.json`
   })
+  // 保留由其它管线生成、未参与本次 data:build 的数据包（例如 1.13.2）。
+  for (const entry of await readdir(PACKS_DIR, { withFileTypes: true })) {
+    if (!entry.isDirectory() || packs.some((pack) => pack.id === entry.name)) continue
+    const manifestPath = join(PACKS_DIR, entry.name, 'manifest.json')
+    if (!(await exists(manifestPath))) continue
+    try {
+      const other = await readJson(manifestPath)
+      packs.push({
+        id: entry.name,
+        gameVersion: other.gameVersion,
+        dataVersion: other.dataVersion,
+        packFormat: other.packFormat,
+        engine: other.engine,
+        type: other.type,
+        builtAt: other.generatedAt,
+        manifest: `${entry.name}/manifest.json`
+      })
+    } catch {
+      // 损坏的数据包不进入索引。
+    }
+  }
   packs.sort((a, b) => (a.id < b.id ? 1 : -1))
   await writeJsonAtomic(indexPath, {
     schemaVersion: 1,
