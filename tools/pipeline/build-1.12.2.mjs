@@ -3,6 +3,7 @@
  * 1.12.2 没有 Brigadier 命令树；用静态命令表生成一个 legacy 包。
  * 该包只用于版本切换、原始命令构建与 OOC；可视化表单按 legacy 引擎禁用。
  */
+import { createHash } from 'node:crypto'
 import { copyFile, mkdir, readFile, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
 
@@ -80,7 +81,8 @@ for (const root of ROOTS) {
   }
 }
 const commands = { type: 'root', children }
-await writeFile(join(output, 'commands.json'), `${JSON.stringify(commands)}\n`)
+const commandsBuffer = Buffer.from(JSON.stringify(commands))
+await writeFile(join(output, 'commands.json'), `${commandsBuffer.toString('utf8')}\n`)
 
 // 1.12 的注册表/方块表仅用于图标与选择器兜底；legacy 表单已关闭。
 await copyFile('packs/1.13.2/registries.json', join(output, 'registries.json'))
@@ -96,7 +98,13 @@ const manifest = {
   engine: 'legacy',
   type: 'release',
   generatedAt: new Date().toISOString(),
-  sources: [{ name: 'legacy_static', url: 'local://legacy-command-list', sha256: '' }],
+  sources: [
+    {
+      name: 'legacy_static',
+      url: 'local://legacy-command-list',
+      sha256: createHash('sha256').update(commandsBuffer).digest('hex')
+    }
+  ],
   files: {
     commands: 'commands.json',
     registries: 'registries.json',
