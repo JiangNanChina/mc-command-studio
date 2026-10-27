@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import { createHash } from 'node:crypto'
-import { copyFile, mkdir, readFile, readdir, writeFile } from 'node:fs/promises'
+import { mkdir, readFile, readdir, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
 
 const VERSIONS = [
@@ -37,6 +37,38 @@ for (const root of ROOTS) {
 const commands = { type: 'root', children }
 const commandsBuffer = Buffer.from(JSON.stringify(commands))
 const commandsSha = createHash('sha256').update(commandsBuffer).digest('hex')
+
+async function readBlockStates(dir) {
+  const result = {}
+  for (const file of await readdir(dir)) {
+    if (!file.endsWith('.json')) continue
+    const id = file.replace(/\.json$/, '')
+    const data = JSON.parse(await readFile(join(dir, file), 'utf8'))
+    const keys = data.variants
+      ? Object.keys(data.variants)
+      : (data.multipart ?? []).flatMap((part) => {
+          if (!part.when) return []
+          return Array.isArray(part.when) ? part.when : [part.when]
+        })
+    const properties = {}
+    const defaults = {}
+    for (const key of keys) {
+      if (typeof key !== 'string') continue
+      for (const token of key.split(',')) {
+        const index = token.indexOf('=')
+        if (index < 0) continue
+        const name = token.slice(0, index)
+        const value = token.slice(index + 1)
+        if (!name || !value) continue
+        properties[name] ??= []
+        if (!properties[name].includes(value)) properties[name].push(value)
+        defaults[name] ??= value
+      }
+    }
+    result[id] = [properties, defaults]
+  }
+  return result
+}
 
 const index = JSON.parse(await readFile('packs/index.json', 'utf8'))
 for (const version of VERSIONS) {
@@ -86,7 +118,10 @@ for (const version of VERSIONS) {
       .sort()
   }
   await writeFile(join(dir, 'registries.json'), `${JSON.stringify(registries)}\n`)
-  await copyFile('packs/1.13.2/blocks.json', join(dir, 'blocks.json'))
+  await writeFile(
+    join(dir, 'blocks.json'),
+    `${JSON.stringify(await readBlockStates(blockDir))}\n`
+  )
   await writeFile(join(dir, 'item-components.json'), '{}\n')
   const manifest = {
     schemaVersion: 1,

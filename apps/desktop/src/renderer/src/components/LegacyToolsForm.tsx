@@ -61,6 +61,9 @@ export function LegacyToolsForm() {
   const [trigger, setTrigger] = useState(createDefaultTrigger)
   const [idle, setIdle] = useState(createDefaultIdle)
   const [save, setSave] = useState(createDefaultSave)
+  const pack = useAppStore((state) => state.pack)
+  const itemOptions = pack?.registries.item ?? []
+  const blockOptions = pack?.registries.block ?? []
   const [copied, setCopied] = useState(false)
 
   const result = useMemo(() => {
@@ -86,6 +89,16 @@ export function LegacyToolsForm() {
 
   return (
     <div className="content">
+      <datalist id="legacy-item-options">
+        {itemOptions.map((id) => (
+          <option key={id} value={`minecraft:${id}`} />
+        ))}
+      </datalist>
+      <datalist id="legacy-block-options">
+        {blockOptions.map((id) => (
+          <option key={id} value={`minecraft:${id}`} />
+        ))}
+      </datalist>
       <div className="page-head">
         <div>
           <div className="crumb">命令库 / 工具 / 1.12.2 旧版工具</div>
@@ -95,11 +108,11 @@ export function LegacyToolsForm() {
             </div>
             <div>
               <h1 className="hero-title">
-                1.12.2 旧版工具
+                旧版工具
                 <span className="hero-id">legacy</span>
               </h1>
               <p className="hero-sub">
-                testfor / blockdata / entitydata / replaceitem 的 1.12 语法可视化编辑。
+                testfor / blockdata / entitydata / replaceitem / give / testforblock / testforblocks / achievement 的 1.8–1.12 语法可视化编辑。
               </p>
             </div>
           </div>
@@ -293,6 +306,7 @@ export function LegacyToolsForm() {
                   <input
                     id="legacy-give-item"
                     className="input"
+                    list="legacy-item-options"
                     value={give.item}
                     onChange={(event) => setGive({ ...give, item: event.target.value })}
                   />
@@ -424,6 +438,7 @@ export function LegacyToolsForm() {
                   <input
                     id="legacy-replaceitem-item"
                     className="input"
+                    list="legacy-item-options"
                     value={replaceitem.item}
                     onChange={(event) =>
                       setReplaceitem({ ...replaceitem, item: event.target.value })
@@ -512,7 +527,7 @@ export function LegacyToolsForm() {
               <div className="grid-2" style={{ marginTop: 12 }}>
                 <div className="field">
                   <label className="field-label" htmlFor="legacy-tfb-block">方块</label>
-                  <input id="legacy-tfb-block" className="input" value={testforblock.block}
+                  <input id="legacy-tfb-block" className="input" list="legacy-block-options" value={testforblock.block}
                     onChange={(event) => setTestforblock({ ...testforblock, block: event.target.value })} />
                 </div>
                 <div className="field">
