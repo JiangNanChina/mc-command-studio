@@ -2,6 +2,23 @@
 
 所有版本变更记录在此。版本号遵循 SemVer。
 
+## [0.1.48] - 2026-10-27
+
+normalize 按领域拆分。
+
+### 改进
+
+- `store/normalize.ts` 从 1,208 行拆为：
+  - `normalize/common.ts`：坐标与文本片段
+  - `normalize/player.ts`：物品/消息/效果类
+  - `normalize/entity.ts`：实体/传送/execute 类
+  - `normalize/world.ts`：方块/世界/计分板类
+  - `normalize/datapack.ts`：数据包/函数/数据命令
+  - `normalize/project.ts`：项目聚合
+  - `normalize/index.ts`：统一出口
+- 入口文件保持 `normalizeProjectPayload` 导入兼容。
+- 单元测试 232 个；冒烟测试通过。
+
 ## [0.1.47] - 2026-10-27
 
 store 拆分。

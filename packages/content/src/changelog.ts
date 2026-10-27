@@ -22,6 +22,27 @@ const REPO = 'https://github.com/JiangNanChina/mc-command-studio'
  */
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: '0.1.48',
+    date: '2026-10-27',
+    title: 'normalize 按领域拆分',
+    highlights: ['1208 行归一化拆为 6 个领域模块。', '保持项目归一化入口兼容。'],
+    sections: [
+      {
+        type: 'improved',
+        items: [
+          'common/player/entity/world/datapack/project 分模块。',
+          'normalize/index.ts 统一出口。',
+          '单元测试 232 个，冒烟通过。'
+        ]
+      },
+      {
+        type: 'fixed',
+        items: ['无。']
+      }
+    ],
+    releaseUrl: `${REPO}/releases/tag/v0.1.48`
+  },
+  {
     version: '0.1.47',
     date: '2026-10-27',
     title: 'store 拆分',
