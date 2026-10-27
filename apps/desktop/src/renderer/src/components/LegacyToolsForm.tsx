@@ -1331,6 +1331,14 @@ export function LegacyToolsForm() {
             <>
               <div className="grid-2">
                 <div className="field">
+                  <label className="field-label" htmlFor="legacy-tp-command">命令</label>
+                  <select id="legacy-tp-command" className="select" value={teleport.command}
+                    onChange={(event) => setTeleport({ ...teleport, command: event.target.value as 'tp' | 'teleport' })}>
+                    <option value="tp">tp</option>
+                    <option value="teleport">teleport</option>
+                  </select>
+                </div>
+                <div className="field">
                   <label className="field-label" htmlFor="legacy-tp-mode">模式</label>
                   <select id="legacy-tp-mode" className="select" value={teleport.mode}
                     onChange={(event) => setTeleport({ ...teleport, mode: event.target.value as 'coords' | 'entity' })}>
@@ -1338,12 +1346,12 @@ export function LegacyToolsForm() {
                     <option value="entity">实体</option>
                   </select>
                 </div>
+              </div>
                 <div className="field">
                   <label className="field-label" htmlFor="legacy-tp-target">目标</label>
                   <input id="legacy-tp-target" className="input" value={teleport.target}
                     onChange={(event) => setTeleport({ ...teleport, target: event.target.value })} />
                 </div>
-              </div>
               {teleport.mode === 'entity' ? (
                 <div className="field" style={{ marginTop: 12 }}>
                   <label className="field-label" htmlFor="legacy-tp-destination">目标实体</label>

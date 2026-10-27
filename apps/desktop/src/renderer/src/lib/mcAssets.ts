@@ -1,6 +1,7 @@
 import atlasUrl from '../assets/mc-icons.png'
 import atlasData from '../data/mc-icons.json'
 import namesData from '../data/mc-names.json'
+import legacyAssets from '../data/legacy-assets.json'
 
 export type McCategory =
   | 'items'
@@ -29,65 +30,12 @@ const atlas = atlasData as AtlasData
 const names = namesData as NamesData
 const allIcons = Object.values(atlas.icons).flatMap((group) => Object.values(group))
 
-const LEGACY_ICON_ALIASES: Partial<Record<McCategory, Record<string, string>>> = {
-  items: {
-    grass: 'short_grass',
-    grass_path: 'dirt_path',
-    sign: 'oak_sign',
-    rose_red: 'red_dye',
-    dandelion_yellow: 'yellow_dye',
-    cactus_green: 'green_dye',
-    scute: 'turtle_scute',
-    zombie_pigman_spawn_egg: 'zombified_piglin_spawn_egg'
-  },
-  blocks: {
-    grass: 'short_grass',
-    grass_path: 'dirt_path',
-    sign: 'oak_sign',
-    wall_sign: 'oak_sign',
-    chain: 'iron_chain'
-  },
-  entities: {
-    boat: 'oak_boat',
-    chest_boat: 'oak_chest_boat',
-    potion: 'potion',
-    zombie_pigman: 'zombified_piglin'
-  },
-  enchantments: {
-    sweeping: 'sweeping_edge'
-  }
-}
-
-const LEGACY_NAMES: Partial<Record<McCategory, Record<string, string>>> = {
-  items: {
-    grass: '草',
-    grass_path: '土径',
-    sign: '告示牌',
-    rose_red: '玫瑰红染料',
-    dandelion_yellow: '蒲公英黄染料',
-    cactus_green: '仙人掌绿染料',
-    scute: '鳞甲',
-    zombie_pigman_spawn_egg: '僵尸猪人刷怪蛋',
-    chain: '锁链'
-  },
-  blocks: {
-    grass: '草方块',
-    grass_path: '土径',
-    sign: '告示牌',
-    wall_sign: '墙上的告示牌',
-    chain: '锁链'
-  },
-  entities: {
-    boat: '船',
-    chest_boat: '运输船',
-    potion: '药水',
-    zombie_pigman: '僵尸猪人',
-    tropical_fish: '热带鱼'
-  },
-  enchantments: {
-    sweeping: '横扫之刃'
-  }
-}
+const LEGACY_ICON_ALIASES = legacyAssets.icons as Partial<
+  Record<McCategory, Record<string, string>>
+>
+const LEGACY_NAMES = legacyAssets.names as Partial<
+  Record<McCategory, Record<string, string>>
+>
 
 function legacyIconId(category: McCategory, id: string): string {
   const short = mcShortId(id)
@@ -151,6 +99,9 @@ export function mcName(category: McCategory, id: string): string {
 export function mcIconIndex(category: McCategory, id: string): number | undefined {
   const direct = atlas.icons[category]?.[mcShortId(id)]
   if (direct !== undefined) return direct
+  if (category === 'entities' && mcShortId(id) === 'potion') {
+    return atlas.icons.items?.potion
+  }
   return atlas.icons[category]?.[legacyIconId(category, id)]
 }
 

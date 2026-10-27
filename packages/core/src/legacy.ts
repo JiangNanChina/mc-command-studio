@@ -156,6 +156,7 @@ export function createDefaultSound(): LegacySoundOptions {
 
 export function createDefaultTeleport(): LegacyTeleportOptions {
   return {
+    command: 'tp',
     mode: 'coords',
     target: '@s',
     destination: '@p',
@@ -487,6 +488,7 @@ export interface LegacySoundOptions {
 }
 
 export interface LegacyTeleportOptions {
+  command: 'tp' | 'teleport'
   mode: 'coords' | 'entity'
   target: string
   destination: string
@@ -985,9 +987,9 @@ export function buildTeleport(options: LegacyTeleportOptions): BuildResult {
     if (!options.destination.trim()) {
       diagnostics.push(error('legacy.destination', '目标实体不能为空', 'destination'))
     }
-    return finish(['tp', options.target.trim(), options.destination.trim()], diagnostics)
+    return finish([options.command, options.target.trim(), options.destination.trim()], diagnostics)
   }
-  const parts = ['tp', options.target.trim(), options.x.trim(), options.y.trim(), options.z.trim()]
+  const parts = [options.command, options.target.trim(), options.x.trim(), options.y.trim(), options.z.trim()]
   if (options.yaw.trim() && options.pitch.trim()) parts.push(options.yaw.trim(), options.pitch.trim())
   return finish(parts, diagnostics)
 }

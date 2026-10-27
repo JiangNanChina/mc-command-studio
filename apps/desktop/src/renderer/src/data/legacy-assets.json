@@ -1,0 +1,73 @@
+{
+  "icons": {
+    "items": {
+      "grass": "short_grass",
+      "grass_path": "dirt_path",
+      "sign": "oak_sign",
+      "rose_red": "red_dye",
+      "dandelion_yellow": "yellow_dye",
+      "cactus_green": "green_dye",
+      "scute": "turtle_scute",
+      "zombie_pigman_spawn_egg": "zombified_piglin_spawn_egg",
+      "chain": "iron_chain",
+      "pottery_shard_archer": "archer_pottery_sherd",
+      "pottery_shard_arms_up": "arms_up_pottery_sherd",
+      "pottery_shard_prize": "prize_pottery_sherd",
+      "pottery_shard_skull": "skull_pottery_sherd"
+    },
+    "blocks": {
+      "grass": "short_grass",
+      "grass_path": "dirt_path",
+      "sign": "oak_sign",
+      "wall_sign": "oak_sign",
+      "chain": "iron_chain"
+    },
+    "entities": {
+      "boat": "oak_boat",
+      "chest_boat": "oak_chest_boat",
+      "potion": "potion",
+      "zombie_pigman": "zombified_piglin",
+      "killer_bunny": "rabbit",
+      "creaking_transient": "creaking"
+    },
+    "enchantments": {
+      "sweeping": "sweeping_edge"
+    }
+  },
+  "names": {
+    "items": {
+      "grass": "草",
+      "grass_path": "土径",
+      "sign": "告示牌",
+      "rose_red": "玫瑰红染料",
+      "dandelion_yellow": "蒲公英黄染料",
+      "cactus_green": "仙人掌绿染料",
+      "scute": "鳞甲",
+      "zombie_pigman_spawn_egg": "僵尸猪人刷怪蛋",
+      "chain": "锁链",
+      "pottery_shard_archer": "弓箭手陶片",
+      "pottery_shard_arms_up": "举臂陶片",
+      "pottery_shard_prize": "奖品陶片",
+      "pottery_shard_skull": "骷髅陶片"
+    },
+    "blocks": {
+      "grass": "草方块",
+      "grass_path": "土径",
+      "sign": "告示牌",
+      "wall_sign": "墙上的告示牌",
+      "chain": "锁链"
+    },
+    "entities": {
+      "boat": "船",
+      "chest_boat": "运输船",
+      "potion": "药水",
+      "zombie_pigman": "僵尸猪人",
+      "tropical_fish": "热带鱼",
+      "killer_bunny": "杀手兔",
+      "creaking_transient": "嘎枝"
+    },
+    "enchantments": {
+      "sweeping": "横扫之刃"
+    }
+  }
+}

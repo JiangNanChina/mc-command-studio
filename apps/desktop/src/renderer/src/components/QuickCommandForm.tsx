@@ -546,6 +546,11 @@ export function QuickCommandForm({ id }: { id: string }) {
         ) : (
           <div className="hint">该命令没有参数，直接生成。</div>
         )}
+        {schema.fields.some((field) => field.optionRoot || field.optionsRegistry) ? (
+          <div className="hint" style={{ marginTop: 10 }}>
+            选项已按当前版本命令树过滤，不支持的子命令会自动隐藏。
+          </div>
+        ) : null}
         <div className="hint" style={{ marginTop: 12 }}>
           生成：<code>{text}</code>
         </div>

@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { Braces, Database } from 'lucide-react'
 import {
   type DataAction,
@@ -9,6 +10,7 @@ import { COMMAND_MAP } from '@mcstudio/content'
 import { PositionInput } from './PositionInput'
 import { SelectorField } from './SelectorField'
 import { useAppStore } from '../store'
+import { hasCommandPath } from '../lib/versionFeatures'
 
 const meta = COMMAND_MAP.get('data')
 
@@ -43,6 +45,15 @@ const SOURCES: { value: DataSourceType; label: string }[] = [
 export function DataCommandForm() {
   const state = useAppStore()
   const options = state.dataCommand
+  const actions = ACTIONS.filter((action) =>
+    hasCommandPath(state.pack, 'data', action.value)
+  )
+
+  useEffect(() => {
+    if (actions.length > 0 && !actions.some((action) => action.value === options.action)) {
+      state.updateDataCommand({ action: actions[0].value })
+    }
+  }, [actions, options.action, state])
 
   return (
     <div className="content">
@@ -73,7 +84,7 @@ export function DataCommandForm() {
             操作与目标
           </div>
           <div className="row">
-            {ACTIONS.map((action) => (
+            {actions.map((action) => (
               <button
                 key={action.value}
                 type="button"

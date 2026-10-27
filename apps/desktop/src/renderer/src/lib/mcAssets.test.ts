@@ -24,4 +24,11 @@ describe('legacy minecraft asset aliases', () => {
     expect(mcName('entities', 'minecraft:tropical_fish.type.betty')).toBe('热带鱼')
     expect(mcName('entities', 'minecraft:villager.armorer')).toBe('村民（盔甲匠）')
   })
+
+  it('maps 1.19 pottery shards and chain items', () => {
+    expect(mcName('items', 'minecraft:pottery_shard_archer')).toBe('弓箭手陶片')
+    expect(mcIconIndex('items', 'minecraft:pottery_shard_archer')).toBeTypeOf('number')
+    expect(mcIconIndex('items', 'minecraft:chain')).toBeTypeOf('number')
+    expect(mcIconIndex('entities', 'minecraft:potion')).toBeTypeOf('number')
+  })
 })

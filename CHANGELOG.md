@@ -2,6 +2,14 @@
 
 所有版本变更记录在此。版本号遵循 SemVer。
 
+## [Unreleased]
+
+- 1.13–1.20.4 execute 子命令/条件与 data 动作按命令树过滤。
+- 45 个基础包图标与中文名审计通过。
+- 旧版资源别名抽到 legacy-assets.json。
+- 1.12.2 teleport 支持 tp / teleport 选择。
+- 单元测试 276 个。
+
 ## [0.6.0] - 2026-10-27
 
 - 本地测试版构建与独立 localhost 更新源。

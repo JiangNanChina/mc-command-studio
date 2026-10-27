@@ -21,6 +21,7 @@ import {
 } from '@mcstudio/core'
 import { SelectorDialog } from './SelectorDialog'
 import { useAppStore } from '../store'
+import { hasCommandPath } from '../lib/versionFeatures'
 
 const meta = COMMAND_MAP.get('execute')
 
@@ -233,6 +234,14 @@ function ClauseEditor({
   onEditConditionSelector
 }: ClauseEditorProps) {
   const state = useAppStore()
+  const conditionTypes = (
+    Object.keys(EXECUTE_CONDITION_LABELS) as ExecuteCondition['type'][]
+  ).filter(
+    (type) =>
+      type === 'raw' ||
+      hasCommandPath(state.pack, 'execute', 'if', type) ||
+      hasCommandPath(state.pack, 'execute', 'unless', type)
+  )
 
   const positionFields = (
     position: { x: string; y: string; z: string },
@@ -385,7 +394,7 @@ function ClauseEditor({
                   })
                 }
               >
-                {(Object.keys(EXECUTE_CONDITION_LABELS) as ExecuteCondition['type'][]).map((type) => (
+                {conditionTypes.map((type) => (
                   <option key={type} value={type}>
                     {EXECUTE_CONDITION_LABELS[type]}
                   </option>
@@ -494,6 +503,9 @@ function ClauseEditor({
 export function ExecuteForm() {
   const state = useAppStore()
   const execute = state.execute
+  const clauseKinds = CLAUSE_KINDS.filter(
+    (kind) => kind === 'raw' || hasCommandPath(state.pack, 'execute', kind)
+  )
   const [selectorTarget, setSelectorTarget] = useState<SelectorTarget | null>(null)
 
   const targetClause = selectorTarget
@@ -579,7 +591,7 @@ export function ExecuteForm() {
               }}
             >
               <option value="">+ 添加子命令…</option>
-              {CLAUSE_KINDS.map((kind) => (
+              {clauseKinds.map((kind) => (
                 <option key={kind} value={kind}>
                   {EXECUTE_CLAUSE_LABELS[kind]}
                 </option>
