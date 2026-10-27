@@ -1224,6 +1224,9 @@ async function main() {
   if (!oocRange.includes('坐标范围') || !oocRange.includes('X')) {
     throw new Error(`OOC 坐标范围不符合预期：${oocRange}`)
   }
+  if ((await page.locator('#ooc-layout-preview-graphic circle').count()) === 0) {
+    throw new Error('OOC 缩略图没有绘制命令方块点')
+  }
   await page.getByRole('button', { name: /1.12.2 旧版工具/ }).click()
   await page.waitForSelector('#legacy-testfor-target', { timeout: 10_000 })
   await page.fill('#legacy-testfor-nbt', '{Health:10f}')

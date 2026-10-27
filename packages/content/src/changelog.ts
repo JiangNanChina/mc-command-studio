@@ -22,6 +22,35 @@ const REPO = 'https://github.com/JiangNanChina/mc-command-studio'
  */
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: '0.1.65',
+    date: '2026-10-27',
+    title: '预设冲突确认与缩略图坐标联动',
+    highlights: ['导入同名预设确认。', '缩略图点选显示坐标。'],
+    sections: [
+      {
+        type: 'added',
+        items: [
+          '预设导入冲突确认。',
+          '缩略图点选/悬停坐标。',
+          'entity_effect 旧参数测试。'
+        ]
+      },
+      {
+        type: 'improved',
+        items: [
+          '冲突列表与无效 JSON 提示。',
+          '点选高亮与坐标联动。',
+          '单元测试 250。'
+        ]
+      },
+      {
+        type: 'fixed',
+        items: ['无。']
+      }
+    ],
+    releaseUrl: `${REPO}/releases/tag/v0.1.65`
+  },
+  {
     version: '0.1.64',
     date: '2026-10-27',
     title: '项目预设迁移与坐标范围',

@@ -324,6 +324,9 @@ export function OocForm() {
             secondaryAxis={options.secondaryAxis}
             primaryStep={Number(options.layerStep) || 0}
             secondaryStep={Number(options.secondaryStep) || 0}
+            baseX={options.x}
+            baseY={options.y}
+            baseZ={options.z}
           />
           {options.mode === 'command-block' && rangeText ? (
             <div className="hint" id="ooc-coordinate-range" style={{ marginTop: 4 }}>

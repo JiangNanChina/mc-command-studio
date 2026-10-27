@@ -115,6 +115,17 @@ describe('particle', () => {
         'nbt'
       ).text
     ).toContain('particle minecraft:effect 0 1 0 ~ ~1 ~')
+    expect(
+      buildParticleCommand(
+        {
+          ...base,
+          particle: 'minecraft:entity_effect',
+          effectColor: '#00ff00',
+          alpha: '0.5'
+        },
+        'nbt'
+      ).text
+    ).toContain('particle minecraft:entity_effect 0 1 0 0.5 ~ ~1 ~')
   })
 
   it('validates numeric fields and raw syntax', () => {

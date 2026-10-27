@@ -57,7 +57,29 @@ export function CustomPresetBar({ storageKey, value, label, onApply }: Props) {
 
   const upload = async (file: File | undefined) => {
     if (!file) return
-    setPresets(importPresets(storageKey, await file.text()))
+    const source = await file.text()
+    try {
+      const value = JSON.parse(source)
+      if (Array.isArray(value)) {
+        const names = value
+          .map((item) => (item && typeof item.name === 'string' ? item.name : ''))
+          .filter(Boolean)
+        const conflicts = names.filter((name) =>
+          presets.some((preset) => preset.name === name)
+        )
+        if (
+          conflicts.length > 0 &&
+          !window.confirm(
+            `有 ${conflicts.length} 个同名预设：${conflicts.slice(0, 5).join('、')}${conflicts.length > 5 ? '…' : ''}\n继续导入将覆盖同名预设。`
+          )
+        ) {
+          return
+        }
+      }
+      setPresets(importPresets(storageKey, source))
+    } catch {
+      window.alert('预设文件不是有效的 JSON')
+    }
   }
 
   return (

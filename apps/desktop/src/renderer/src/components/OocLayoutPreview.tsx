@@ -1,3 +1,6 @@
+import { useState } from 'react'
+import { offsetCoordinate } from '@mcstudio/core'
+
 interface Props {
   count: number
   rowSize: number
@@ -6,6 +9,9 @@ interface Props {
   secondaryAxis: string
   primaryStep: number
   secondaryStep: number
+  baseX: string
+  baseY: string
+  baseZ: string
 }
 
 export function OocLayoutPreview({
@@ -15,8 +21,12 @@ export function OocLayoutPreview({
   primaryAxis,
   secondaryAxis,
   primaryStep,
-  secondaryStep
+  secondaryStep,
+  baseX,
+  baseY,
+  baseZ
 }: Props) {
+  const [active, setActive] = useState<number | null>(null)
   if (count <= 0) {
     return <div className="hint">填写命令后显示布局预览。</div>
   }
@@ -27,6 +37,15 @@ export function OocLayoutPreview({
   const stepX = columns > 1 ? (width - 40) / (columns - 1) : 0
   const stepY = rows > 1 ? (height - 55) / (rows - 1) : 0
   const gapRatio = secondaryStep > 0 && primaryStep > 0 ? secondaryStep / primaryStep : 1
+
+  const coordinateFor = (index: number): string => {
+    const primaryIndex = secondary ? Math.floor(index / columns) : index
+    const secondaryIndex = secondary ? index % columns : 0
+    const offsetFor = (axis: string): number =>
+      (primaryAxis === axis ? primaryIndex * primaryStep : 0) +
+      (secondaryAxis === axis ? secondaryIndex * secondaryStep : 0)
+    return `${offsetCoordinate(baseX, offsetFor('x'))} ${offsetCoordinate(baseY, offsetFor('y'))} ${offsetCoordinate(baseZ, offsetFor('z'))}`
+  }
 
   return (
     <svg
@@ -57,6 +76,17 @@ export function OocLayoutPreview({
           ? `${secondaryAxis.toUpperCase()} 间距 ${secondaryStep}（横向比例 ${gapRatio.toFixed(1)}×）`
           : '单轴'}
       </text>
+      {active !== null ? (
+        <text
+          x={width - 10}
+          y={16}
+          fill="var(--accent, #4f8cff)"
+          fontSize={10}
+          textAnchor="end"
+        >
+          #{active + 1} {coordinateFor(active)}
+        </text>
+      ) : null}
       {Array.from({ length: Math.min(count, 60) }, (_, index) => {
         const column = secondary ? index % columns : 0
         const row = secondary ? Math.floor(index / columns) : index
@@ -67,10 +97,16 @@ export function OocLayoutPreview({
             key={index}
             cx={x}
             cy={y}
-            r={4}
+            r={active === index ? 6 : 4}
             fill="var(--accent, #4f8cff)"
-            opacity={0.85}
-          />
+            opacity={active === index ? 1 : 0.85}
+            style={{ cursor: 'pointer' }}
+            onMouseEnter={() => setActive(index)}
+            onMouseLeave={() => setActive(null)}
+            onClick={() => setActive(index)}
+          >
+            <title>{`#${index + 1} ${coordinateFor(index)}`}</title>
+          </circle>
         )
       })}
     </svg>
