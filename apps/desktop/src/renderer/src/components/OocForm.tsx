@@ -11,6 +11,7 @@ import {
   type OocSecondaryAxis
 } from '@mcstudio/core'
 import { useAppStore } from '../store'
+import { CustomPresetBar } from './CustomPresetBar'
 
 const LAYOUT_PRESETS = [
   {
@@ -217,6 +218,34 @@ export function OocForm() {
                 {preset.label}
               </button>
             ))}
+          </div>
+
+          <div style={{ marginTop: 8 }}>
+            <CustomPresetBar
+              storageKey="ooc:layout"
+              label="布局"
+              value={JSON.stringify({
+                layoutAxis: options.layoutAxis,
+                secondaryAxis: options.secondaryAxis,
+                layerStep: options.layerStep,
+                secondaryStep: options.secondaryStep,
+                rowSize: options.rowSize
+              })}
+              onApply={(value) => {
+                try {
+                  const next = JSON.parse(value)
+                  update({
+                    layoutAxis: next.layoutAxis,
+                    secondaryAxis: next.secondaryAxis,
+                    layerStep: next.layerStep,
+                    secondaryStep: next.secondaryStep,
+                    rowSize: next.rowSize
+                  })
+                } catch {
+                  state.showToast('布局预设格式无效', 'error')
+                }
+              }}
+            />
           </div>
 
           <div className="grid-3" style={{ marginTop: 12 }}>

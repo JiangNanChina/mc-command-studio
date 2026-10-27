@@ -18,7 +18,7 @@ import { McIcon } from './McIcon'
 import { ParticlePickerDialog } from './ParticlePickerDialog'
 import { PositionInput } from './PositionInput'
 import { SelectorField } from './SelectorField'
-import { isLegacyNbtPack } from '../lib/versionFeatures'
+import { isLegacyNbtPack, particleModeSupported } from '../lib/versionFeatures'
 import { useAppStore } from '../store'
 
 const meta = COMMAND_MAP.get('particle')
@@ -43,10 +43,13 @@ export function ParticleForm() {
   const [itemOpen, setItemOpen] = useState(false)
   const legacy = isLegacyNbtPack(state.pack)
   const is113 = state.pack?.manifest.gameVersion === '1.13.2'
-  const optionModes = (legacy
-    ? OPTION_MODES.filter((item) => item.value !== 'raw')
-    : OPTION_MODES
-  ).filter((item) => !is113 || item.value !== 'dust_transition')
+  const optionModes = OPTION_MODES.filter((item) =>
+    particleModeSupported(
+      state.pack?.manifest.gameVersion,
+      state.pack?.manifest.engine,
+      item.value
+    )
+  )
 
   useEffect(() => {
     if (legacy && particle.optionMode === 'raw') {

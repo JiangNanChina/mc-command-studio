@@ -46,3 +46,14 @@ export function hasLiteral(
 export function isLegacyNbtPack(pack: VersionPack | null): boolean {
   return pack?.manifest.engine === 'nbt'
 }
+
+/** 1.13.2 不支持 dust_color_transition；NBT 引擎不支持 raw SNBT。 */
+export function particleModeSupported(
+  gameVersion: string | undefined,
+  engine: string | undefined,
+  mode: string
+): boolean {
+  if (mode === 'raw') return engine === 'components'
+  if (gameVersion === '1.13.2' && mode === 'dust_transition') return false
+  return true
+}

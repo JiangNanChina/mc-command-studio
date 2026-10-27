@@ -15,6 +15,7 @@ import {
   createDefaultTestfor
 } from '@mcstudio/core'
 import { useAppStore } from '../store'
+import { CustomPresetBar } from './CustomPresetBar'
 
 type LegacyTab = 'testfor' | 'blockdata' | 'entitydata' | 'replaceitem'
 
@@ -147,6 +148,12 @@ export function LegacyToolsForm() {
                 <label className="field-label" htmlFor="legacy-blockdata-nbt">
                   NBT
                 </label>
+                <CustomPresetBar
+                  storageKey="legacy:block"
+                  value={blockdata.nbt}
+                  label="方块 NBT"
+                  onApply={(nbt) => setBlockdata({ ...blockdata, nbt })}
+                />
                 <select
                   id="legacy-blockdata-preset"
                   className="select"
@@ -194,6 +201,12 @@ export function LegacyToolsForm() {
                 <label className="field-label" htmlFor="legacy-entitydata-nbt">
                   NBT
                 </label>
+                <CustomPresetBar
+                  storageKey="legacy:entity"
+                  value={entitydata.nbt}
+                  label="实体 NBT"
+                  onApply={(nbt) => setEntitydata({ ...entitydata, nbt })}
+                />
                 <select
                   id="legacy-entitydata-preset"
                   className="select"
@@ -344,6 +357,12 @@ export function LegacyToolsForm() {
                 <label className="field-label" htmlFor="legacy-replaceitem-nbt">
                   NBT（可选）
                 </label>
+                <CustomPresetBar
+                  storageKey="legacy:item"
+                  value={replaceitem.nbt}
+                  label="物品 NBT"
+                  onApply={(nbt) => setReplaceitem({ ...replaceitem, nbt })}
+                />
                 <select
                   id="legacy-replaceitem-preset"
                   className="select"

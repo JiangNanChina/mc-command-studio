@@ -22,6 +22,35 @@ const REPO = 'https://github.com/JiangNanChina/mc-command-studio'
  */
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: '0.1.61',
+    date: '2026-10-27',
+    title: '自定义预设与粒子模式能力表',
+    highlights: ['NBT/布局自定义预设。', '粒子模式按版本过滤。'],
+    sections: [
+      {
+        type: 'added',
+        items: [
+          '1.12.2 自定义方块/实体/物品 NBT 预设。',
+          'OOC 自定义布局预设。',
+          'particleModeSupported 能力表。'
+        ]
+      },
+      {
+        type: 'improved',
+        items: [
+          '预设保存到 localStorage。',
+          '1.13.2 隐藏 dust_transition。',
+          '单元测试 248 → 249。'
+        ]
+      },
+      {
+        type: 'fixed',
+        items: ['无。']
+      }
+    ],
+    releaseUrl: `${REPO}/releases/tag/v0.1.61`
+  },
+  {
     version: '0.1.60',
     date: '2026-10-27',
     title: '1.12.2 模板与 OOC 布局预设',
