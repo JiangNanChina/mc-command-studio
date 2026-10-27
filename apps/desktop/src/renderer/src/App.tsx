@@ -66,7 +66,7 @@ import { AnnouncementBanner } from './components/AnnouncementBanner'
 import { AnnouncementDialog } from './components/AnnouncementDialog'
 import { AutosaveBanner } from './components/AutosaveBanner'
 import { Toast } from './components/Toast'
-import { QuickCommandForm, isQuickCommand } from './components/QuickCommandForm'
+import { QuickCommandForm, isQuickCommand, isNbtQuickSafe } from './components/QuickCommandForm'
 
 function LoadingScreen() {
   return (
@@ -415,6 +415,8 @@ export default function App() {
             <OocForm />
           ) : activeCommandId === 'legacy-tools' ? (
             <LegacyToolsForm />
+          ) : treeOnly && !legacyEngine && isNbtQuickSafe(activeCommandId) ? (
+            <QuickCommandForm key={activeCommandId} id={activeCommandId} />
           ) : treeOnly && (legacyEngine || !supportsLegacyForm(activeCommandId ?? '')) ? (
             <GenericBuilder />
           ) : activeCommandId === 'give' ? (

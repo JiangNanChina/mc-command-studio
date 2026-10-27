@@ -297,6 +297,48 @@ export function isQuickCommand(id: string | null): boolean {
   return Boolean(id && QUICK_SCHEMAS[id])
 }
 
+const NBT_SAFE_QUICK = new Set([
+  'locate',
+  'help',
+  'reload',
+  'seed',
+  'list',
+  'version',
+  'publish',
+  'save-all',
+  'save-off',
+  'save-on',
+  'stop',
+  'unpublish',
+  'kill',
+  'kick',
+  'op',
+  'deop',
+  'say',
+  'me',
+  'setidletimeout',
+  'ban',
+  'ban-ip',
+  'banlist',
+  'pardon',
+  'pardon-ip',
+  'whitelist',
+  'tell',
+  'msg',
+  'tm',
+  'teammsg',
+  'w',
+  'teleport',
+  'experience',
+  'defaultgamemode',
+  'trigger'
+])
+
+/** NBT 版本（1.13–1.20.4）可安全复用的快捷表单。 */
+export function isNbtQuickSafe(id: string | null): boolean {
+  return Boolean(id && NBT_SAFE_QUICK.has(id))
+}
+
 function defaultsFor(schema: QuickSchema): Record<string, string> {
   return Object.fromEntries(schema.fields.map((field) => [field.key, field.defaultValue]))
 }

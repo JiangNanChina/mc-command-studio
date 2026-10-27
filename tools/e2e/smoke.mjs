@@ -1335,6 +1335,20 @@ async function main() {
   if (!legacyExecute.includes('execute @p ~ ~ ~ say hi')) {
     throw new Error(`1.12.2 execute 输出不符合预期：${legacyExecute}`)
   }
+  await page.getByRole('button', { name: 'title', exact: true }).click()
+  await page.waitForSelector('#legacy-title-text', { timeout: 10_000 })
+  await page.waitForTimeout(300)
+  const legacyTitle = await page.locator('#legacy-output').innerText()
+  if (!legacyTitle.includes('title @a title')) {
+    throw new Error(`1.12.2 title 输出不符合预期：${legacyTitle}`)
+  }
+  await page.getByRole('button', { name: 'particle', exact: true }).click()
+  await page.waitForSelector('#legacy-particle-name', { timeout: 10_000 })
+  await page.waitForTimeout(300)
+  const legacyParticle = await page.locator('#legacy-output').innerText()
+  if (!legacyParticle.startsWith('particle minecraft:flame')) {
+    throw new Error(`1.12.2 particle 输出不符合预期：${legacyParticle}`)
+  }
   await page.screenshot({ path: join(ARTIFACTS, 'ooc-1.12.2.png') })
   await selectVersion(page, '1.13.2')
   await page.waitForTimeout(500)
@@ -1467,6 +1481,16 @@ async function main() {
     particle1204.includes('{')
   ) {
     throw new Error(`1.20.4 particle 旧语法不符合预期：${particle1204}`)
+  }
+  await page.locator('.command-item', { hasText: '查看种子' }).first().click()
+  await page.waitForFunction(
+    () => document.querySelector('.hero-id')?.textContent === 'seed',
+    { timeout: 10_000 }
+  )
+  await page.waitForTimeout(300)
+  const nbtSeed = (await page.locator('.output-code .cm-content').innerText()).trim()
+  if (nbtSeed !== 'seed') {
+    throw new Error(`1.20.4 NBT 快捷表单不符合预期：${nbtSeed}`)
   }
   await page.screenshot({ path: join(ARTIFACTS, 'pack-1.20.4.png') })
   await selectVersion(page, '26.3')

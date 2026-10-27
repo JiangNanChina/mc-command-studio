@@ -18,6 +18,8 @@ import {
   buildClear,
   buildWorldborder,
   buildSpreadplayers,
+  buildTitle,
+  buildParticle,
   createDefaultBlockdata,
   createDefaultEntitydata,
   createDefaultGive,
@@ -29,7 +31,9 @@ import {
   createDefaultAdvancement,
   createDefaultClear,
   createDefaultWorldborder,
-  createDefaultSpreadplayers
+  createDefaultSpreadplayers,
+  createDefaultTitle,
+  createDefaultParticle
 } from './legacy'
 
 describe('1.12 legacy commands', () => {
@@ -103,6 +107,31 @@ describe('1.12 legacy commands', () => {
     expect(buildStats({ ...base, action: 'clear', stat: 'SuccessCount' }).text).toBe(
       'stats entity @p clear SuccessCount'
     )
+  })
+
+  it('builds title and particle', () => {
+    expect(
+      buildTitle({
+        ...createDefaultTitle(),
+        target: '@a',
+        action: 'title',
+        text: '{"text":"Hi"}'
+      }).text
+    ).toBe('title @a title {"text":"Hi"}')
+    expect(
+      buildParticle({
+        ...createDefaultParticle(),
+        name: 'minecraft:flame',
+        x: '~',
+        y: '~1',
+        z: '~',
+        dx: '0',
+        dy: '0',
+        dz: '0',
+        speed: '0.1',
+        count: '20'
+      }).text
+    ).toBe('particle minecraft:flame ~ ~1 ~ 0 0 0 0.1 20')
   })
 
   it('builds advancement and clear', () => {

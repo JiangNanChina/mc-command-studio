@@ -84,6 +84,31 @@ export function createDefaultSave(): LegacySaveOptions {
   return { action: 'hold' }
 }
 
+export function createDefaultTitle(): LegacyTitleOptions {
+  return {
+    target: '@a',
+    action: 'title',
+    text: '{"text":"欢迎","color":"gold"}',
+    fadeIn: '10',
+    stay: '70',
+    fadeOut: '20'
+  }
+}
+
+export function createDefaultParticle(): LegacyParticleOptions {
+  return {
+    name: 'minecraft:flame',
+    x: '~',
+    y: '~1',
+    z: '~',
+    dx: '0',
+    dy: '0',
+    dz: '0',
+    speed: '0.1',
+    count: '20'
+  }
+}
+
 export function createDefaultAdvancement(): LegacyAdvancementOptions {
   return {
     action: 'grant',
@@ -246,6 +271,27 @@ export interface LegacyIdleOptions {
 
 export interface LegacySaveOptions {
   action: 'hold' | 'query'
+}
+
+export interface LegacyTitleOptions {
+  target: string
+  action: 'title' | 'subtitle' | 'actionbar' | 'clear' | 'reset' | 'times'
+  text: string
+  fadeIn: string
+  stay: string
+  fadeOut: string
+}
+
+export interface LegacyParticleOptions {
+  name: string
+  x: string
+  y: string
+  z: string
+  dx: string
+  dy: string
+  dz: string
+  speed: string
+  count: string
 }
 
 export interface LegacyAdvancementOptions {
@@ -503,6 +549,49 @@ export function buildSetidletimeout(options: LegacyIdleOptions): BuildResult {
 
 export function buildSave(options: LegacySaveOptions): BuildResult {
   return finish(['save', options.action], [])
+}
+
+export function buildTitle(options: LegacyTitleOptions): BuildResult {
+  const diagnostics: Diagnostic[] = []
+  if (!options.target.trim()) diagnostics.push(error('legacy.target', '目标不能为空', 'target'))
+  if (options.action === 'times') {
+    if (![options.fadeIn, options.stay, options.fadeOut].every((value) => /^\d+$/.test(value.trim()))) {
+      diagnostics.push(error('legacy.times', '淡入/停留/淡出必须是非负整数', 'times'))
+    }
+    return finish(
+      ['title', options.target.trim(), 'times', options.fadeIn.trim(), options.stay.trim(), options.fadeOut.trim()],
+      diagnostics
+    )
+  }
+  if (options.action === 'clear' || options.action === 'reset') {
+    return finish(['title', options.target.trim(), options.action], diagnostics)
+  }
+  const parts = ['title', options.target.trim(), options.action]
+  if (options.text.trim()) parts.push(options.text.trim())
+  return finish(parts, diagnostics)
+}
+
+export function buildParticle(options: LegacyParticleOptions): BuildResult {
+  const diagnostics: Diagnostic[] = []
+  if (!options.name.trim()) diagnostics.push(error('legacy.particle', '粒子名不能为空', 'name'))
+  if (!/^\d+$/.test(options.count.trim())) {
+    diagnostics.push(error('legacy.count', '数量必须是非负整数', 'count'))
+  }
+  return finish(
+    [
+      'particle',
+      options.name.trim(),
+      options.x.trim(),
+      options.y.trim(),
+      options.z.trim(),
+      options.dx.trim(),
+      options.dy.trim(),
+      options.dz.trim(),
+      options.speed.trim(),
+      options.count.trim()
+    ],
+    diagnostics
+  )
 }
 
 export function buildAdvancement(options: LegacyAdvancementOptions): BuildResult {

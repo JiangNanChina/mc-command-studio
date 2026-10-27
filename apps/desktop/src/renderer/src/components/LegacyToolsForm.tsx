@@ -23,6 +23,8 @@ import {
   buildClear,
   buildWorldborder,
   buildSpreadplayers,
+  buildTitle,
+  buildParticle,
   createDefaultBlockdata,
   createDefaultEntitydata,
   createDefaultGive,
@@ -40,12 +42,14 @@ import {
   createDefaultAdvancement,
   createDefaultClear,
   createDefaultWorldborder,
-  createDefaultSpreadplayers
+  createDefaultSpreadplayers,
+  createDefaultTitle,
+  createDefaultParticle
 } from '@mcstudio/core'
 import { useAppStore } from '../store'
 import { CustomPresetBar } from './CustomPresetBar'
 
-type LegacyTab = 'testfor' | 'blockdata' | 'entitydata' | 'replaceitem' | 'give' | 'testforblock' | 'testforblocks' | 'achievement' | 'trigger' | 'setidletimeout' | 'save' | 'stats' | 'scoreboard' | 'execute' | 'advancement' | 'clear' | 'worldborder' | 'spreadplayers'
+type LegacyTab = 'testfor' | 'blockdata' | 'entitydata' | 'replaceitem' | 'give' | 'testforblock' | 'testforblocks' | 'achievement' | 'trigger' | 'setidletimeout' | 'save' | 'stats' | 'scoreboard' | 'execute' | 'advancement' | 'clear' | 'worldborder' | 'spreadplayers' | 'title' | 'particle'
 
 const TABS: { id: LegacyTab; label: string }[] = [
   { id: 'testfor', label: 'testfor' },
@@ -65,7 +69,9 @@ const TABS: { id: LegacyTab; label: string }[] = [
   { id: 'advancement', label: 'advancement' },
   { id: 'clear', label: 'clear' },
   { id: 'worldborder', label: 'worldborder' },
-  { id: 'spreadplayers', label: 'spreadplayers' }
+  { id: 'spreadplayers', label: 'spreadplayers' },
+  { id: 'title', label: 'title' },
+  { id: 'particle', label: 'particle' }
 ]
 
 export function LegacyToolsForm() {
@@ -89,6 +95,8 @@ export function LegacyToolsForm() {
   const [clear, setClear] = useState(createDefaultClear)
   const [worldborder, setWorldborder] = useState(createDefaultWorldborder)
   const [spreadplayers, setSpreadplayers] = useState(createDefaultSpreadplayers)
+  const [title, setTitle] = useState(createDefaultTitle)
+  const [particle, setParticle] = useState(createDefaultParticle)
   const pack = useAppStore((state) => state.pack)
   const itemOptions = pack?.registries.item ?? []
   const blockOptions = pack?.registries.block ?? []
@@ -112,8 +120,10 @@ export function LegacyToolsForm() {
     if (tab === 'clear') return buildClear(clear)
     if (tab === 'worldborder') return buildWorldborder(worldborder)
     if (tab === 'spreadplayers') return buildSpreadplayers(spreadplayers)
+    if (tab === 'title') return buildTitle(title)
+    if (tab === 'particle') return buildParticle(particle)
     return buildReplaceitem(replaceitem)
-  }, [tab, testfor, blockdata, entitydata, replaceitem, give, testforblock, testforblocks, achievement, trigger, idle, save, stats, scoreboard, execute, advancement, clear, worldborder, spreadplayers])
+  }, [tab, testfor, blockdata, entitydata, replaceitem, give, testforblock, testforblocks, achievement, trigger, idle, save, stats, scoreboard, execute, advancement, clear, worldborder, spreadplayers, title, particle])
 
   const copy = async () => {
     if (!result.text) return
@@ -975,6 +985,85 @@ export function LegacyToolsForm() {
                   onChange={(event) => setSpreadplayers({ ...spreadplayers, respectTeams: event.target.checked })} />
                 按队伍分散
               </label>
+            </>
+          ) : null}
+
+          {tab === 'title' ? (
+            <>
+              <div className="grid-2">
+                <div className="field">
+                  <label className="field-label" htmlFor="legacy-title-target">目标</label>
+                  <input id="legacy-title-target" className="input" value={title.target}
+                    onChange={(event) => setTitle({ ...title, target: event.target.value })} />
+                </div>
+                <div className="field">
+                  <label className="field-label" htmlFor="legacy-title-action">动作</label>
+                  <select id="legacy-title-action" className="select" value={title.action}
+                    onChange={(event) => setTitle({ ...title, action: event.target.value as typeof title.action })}>
+                    <option value="title">title</option>
+                    <option value="subtitle">subtitle</option>
+                    <option value="actionbar">actionbar</option>
+                    <option value="clear">clear</option>
+                    <option value="reset">reset</option>
+                    <option value="times">times</option>
+                  </select>
+                </div>
+              </div>
+              {title.action === 'times' ? (
+                <div className="grid-3" style={{ marginTop: 12 }}>
+                  {(['fadeIn', 'stay', 'fadeOut'] as const).map((key) => (
+                    <div className="field" key={key}>
+                      <label className="field-label" htmlFor={`legacy-title-${key}`}>{key}</label>
+                      <input id={`legacy-title-${key}`} className="input" value={title[key]}
+                        onChange={(event) => setTitle({ ...title, [key]: event.target.value })} />
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="field" style={{ marginTop: 12 }}>
+                  <label className="field-label" htmlFor="legacy-title-text">JSON 文本</label>
+                  <textarea id="legacy-title-text" className="textarea" rows={3} value={title.text}
+                    onChange={(event) => setTitle({ ...title, text: event.target.value })} />
+                </div>
+              )}
+            </>
+          ) : null}
+
+          {tab === 'particle' ? (
+            <>
+              <div className="field">
+                <label className="field-label" htmlFor="legacy-particle-name">粒子名</label>
+                <input id="legacy-particle-name" className="input" value={particle.name}
+                  onChange={(event) => setParticle({ ...particle, name: event.target.value })} />
+              </div>
+              <div className="grid-3" style={{ marginTop: 12 }}>
+                {(['x', 'y', 'z'] as const).map((axis) => (
+                  <div className="field" key={axis}>
+                    <label className="field-label" htmlFor={`legacy-particle-${axis}`}>{axis.toUpperCase()}</label>
+                    <input id={`legacy-particle-${axis}`} className="input" value={particle[axis]}
+                      onChange={(event) => setParticle({ ...particle, [axis]: event.target.value })} />
+                  </div>
+                ))}
+                {(['dx', 'dy', 'dz'] as const).map((axis) => (
+                  <div className="field" key={axis}>
+                    <label className="field-label" htmlFor={`legacy-particle-${axis}`}>{axis}</label>
+                    <input id={`legacy-particle-${axis}`} className="input" value={particle[axis]}
+                      onChange={(event) => setParticle({ ...particle, [axis]: event.target.value })} />
+                  </div>
+                ))}
+              </div>
+              <div className="grid-2" style={{ marginTop: 12 }}>
+                <div className="field">
+                  <label className="field-label" htmlFor="legacy-particle-speed">速度</label>
+                  <input id="legacy-particle-speed" className="input" value={particle.speed}
+                    onChange={(event) => setParticle({ ...particle, speed: event.target.value })} />
+                </div>
+                <div className="field">
+                  <label className="field-label" htmlFor="legacy-particle-count">数量</label>
+                  <input id="legacy-particle-count" className="input" value={particle.count}
+                    onChange={(event) => setParticle({ ...particle, count: event.target.value })} />
+                </div>
+              </div>
             </>
           ) : null}
 
