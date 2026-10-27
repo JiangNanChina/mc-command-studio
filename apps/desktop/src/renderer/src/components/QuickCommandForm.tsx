@@ -13,6 +13,7 @@ interface QuickField {
   defaultValue: string
   placeholder?: string
   visible?: (values: Record<string, string>) => boolean
+  optionRoot?: string
 }
 
 interface QuickSchema {
@@ -42,13 +43,18 @@ export const QUICK_SCHEMAS: Record<string, QuickSchema> = {
   },
   place: {
     fields: [
-      { key: 'type', label: '类型', kind: 'select', options: ['structure', 'jigsaw', 'template', 'feature'], defaultValue: 'structure' },
+      { key: 'type', label: '类型', kind: 'select', options: ['structure', 'jigsaw', 'template', 'feature'], defaultValue: 'structure', optionRoot: 'place' },
       { key: 'id', label: '结构/模板 ID', kind: 'text', defaultValue: 'minecraft:village_plains' },
       { key: 'x', label: 'X', kind: 'text', defaultValue: '~' },
       { key: 'y', label: 'Y', kind: 'text', defaultValue: '~' },
-      { key: 'z', label: 'Z', kind: 'text', defaultValue: '~' }
+      { key: 'z', label: 'Z', kind: 'text', defaultValue: '~' },
+      { key: 'target', label: '拼图目标', kind: 'text', defaultValue: 'minecraft:empty', visible: (v) => v.type === 'jigsaw' },
+      { key: 'maxDepth', label: '最大深度', kind: 'text', defaultValue: '7', visible: (v) => v.type === 'jigsaw' }
     ],
-    build: (v) => `place ${v.type} ${v.id} ${v.x} ${v.y} ${v.z}`
+    build: (v) =>
+      v.type === 'jigsaw'
+        ? `place jigsaw ${v.id} ${v.target} ${v.maxDepth} ${v.x} ${v.y} ${v.z}`
+        : `place ${v.type} ${v.id} ${v.x} ${v.y} ${v.z}`
   },
   spectate: {
     fields: [
@@ -74,13 +80,15 @@ export const QUICK_SCHEMAS: Record<string, QuickSchema> = {
   transfer: {
     fields: [
       { key: 'host', label: '主机', kind: 'text', defaultValue: 'localhost' },
-      { key: 'port', label: '端口（可选）', kind: 'text', defaultValue: '25565' }
+      { key: 'port', label: '端口（可选）', kind: 'text', defaultValue: '25565' },
+      { key: 'players', label: '玩家（可选）', kind: 'text', defaultValue: '@a', visible: (v) => Boolean(v.port.trim()) }
     ],
-    build: (v) => `transfer ${v.host}${v.port.trim() ? ` ${v.port.trim()}` : ''}`
+    build: (v) =>
+      `transfer ${v.host}${v.port.trim() ? ` ${v.port.trim()}` : ''}${v.port.trim() && v.players.trim() ? ` ${v.players.trim()}` : ''}`
   },
   dialog: {
     fields: [
-      { key: 'action', label: '动作', kind: 'select', options: ['show', 'clear'], defaultValue: 'show' },
+      { key: 'action', label: '动作', kind: 'select', options: ['show', 'clear'], defaultValue: 'show', optionRoot: 'dialog' },
       { key: 'targets', label: '目标', kind: 'text', defaultValue: '@s' },
       { key: 'dialog', label: '对话框 ID', kind: 'text', defaultValue: 'minecraft:server_links', visible: (v) => v.action === 'show' }
     ],
@@ -235,14 +243,25 @@ export const QUICK_SCHEMAS: Record<string, QuickSchema> = {
   },
   test: {
     fields: [
-      { key: 'action', label: '动作', kind: 'select', options: ['run', 'clear'], defaultValue: 'run' },
-      { key: 'id', label: '测试 ID', kind: 'text', defaultValue: 'minecraft:always_pass' }
+      { key: 'action', label: '动作', kind: 'select', options: ['run', 'runclosest', 'runfailed', 'stop', 'clearall'], defaultValue: 'run', optionRoot: 'test' },
+      { key: 'id', label: '测试 ID', kind: 'text', defaultValue: 'minecraft:always_pass', visible: (v) => v.action === 'run' },
+      { key: 'radius', label: '半径（clearall 可选）', kind: 'text', defaultValue: '', visible: (v) => v.action === 'clearall' }
     ],
-    build: (v) => `test ${v.action} ${v.id}`
+    build: (v) =>
+      v.action === 'run'
+        ? `test run ${v.id}`
+        : v.action === 'clearall'
+          ? `test clearall${v.radius.trim() ? ` ${v.radius.trim()}` : ''}`
+          : `test ${v.action}`
   },
   stopwatch: {
-    fields: [{ key: 'action', label: '动作', kind: 'select', options: ['start', 'stop', 'reset'], defaultValue: 'start' }],
-    build: (v) => `stopwatch ${v.action}`
+    fields: [
+      { key: 'action', label: '动作', kind: 'select', options: ['create', 'query', 'remove', 'restart'], defaultValue: 'create', optionRoot: 'stopwatch' },
+      { key: 'id', label: '计时器 ID', kind: 'text', defaultValue: 'timer' },
+      { key: 'scale', label: '缩放（query 可选）', kind: 'text', defaultValue: '', visible: (v) => v.action === 'query' }
+    ],
+    build: (v) =>
+      `stopwatch ${v.action} ${v.id}${v.scale.trim() ? ` ${v.scale.trim()}` : ''}`
   },
   swing: {
     fields: [
@@ -253,14 +272,14 @@ export const QUICK_SCHEMAS: Record<string, QuickSchema> = {
   },
   fetchprofile: {
     fields: [
-      { key: 'type', label: '类型', kind: 'select', options: ['name', 'id'], defaultValue: 'name' },
-      { key: 'value', label: '名称/UUID', kind: 'text', defaultValue: 'Steve' }
+      { key: 'type', label: '类型', kind: 'select', options: ['name', 'id', 'entity'], defaultValue: 'name', optionRoot: 'fetchprofile' },
+      { key: 'value', label: '名称/UUID/实体', kind: 'text', defaultValue: 'Steve' }
     ],
     build: (v) => `fetchprofile ${v.type} ${v.value}`
   },
   compute: {
     fields: [
-      { key: 'targetType', label: '计算目标', kind: 'select', options: ['default', 'entity', 'block'], defaultValue: 'default' },
+      { key: 'targetType', label: '计算目标', kind: 'select', options: ['default', 'entity', 'block'], defaultValue: 'default', optionRoot: 'compute' },
       { key: 'target', label: '实体/方块坐标', kind: 'text', defaultValue: '@s', visible: (v) => v.targetType !== 'default' },
       { key: 'valueType', label: '数值类型', kind: 'select', options: ['float', 'integer'], defaultValue: 'float' },
       { key: 'providerPreset', label: 'Provider 预设', kind: 'select', options: ['constant(1.0)', 'constant(0.0)', 'custom'], defaultValue: 'constant(1.0)' },
@@ -288,11 +307,17 @@ export const QUICK_SCHEMAS: Record<string, QuickSchema> = {
   },
   posteffect: {
     fields: [
+      { key: 'action', label: '动作', kind: 'select', options: ['add', 'clear', 'list', 'remove'], defaultValue: 'add', optionRoot: 'posteffect' },
       { key: 'target', label: '目标', kind: 'text', defaultValue: '@s' },
-      { key: 'effect', label: '效果', kind: 'text', defaultValue: 'minecraft:invert' }
+      { key: 'effect', label: '效果', kind: 'text', defaultValue: 'minecraft:invert', visible: (v) => v.action === 'add' || v.action === 'remove' }
     ],
-    build: (v) => `posteffect give ${v.target} ${v.effect}`
-  }
+    build: (v) =>
+      v.action === 'clear'
+        ? `posteffect clear ${v.target}`
+        : v.action === 'list'
+          ? `posteffect list ${v.target}`
+          : `posteffect ${v.action} ${v.target} ${v.effect}`
+  },
 }
 
 export function isQuickCommand(id: string | null): boolean {
@@ -354,6 +379,7 @@ function defaultsFor(schema: QuickSchema): Record<string, string> {
 
 export function QuickCommandForm({ id }: { id: string }) {
   const schema = QUICK_SCHEMAS[id]
+  const pack = useAppStore((state) => state.pack)
   const setQuickCommand = useAppStore((state) => state.setQuickCommand)
   const [values, setValues] = useState<Record<string, string>>(() => defaultsFor(schema))
   const meta = COMMAND_MAP.get(id)
@@ -364,11 +390,20 @@ export function QuickCommandForm({ id }: { id: string }) {
 
   useEffect(() => {
     setValues(defaultsFor(schema))
-  }, [schema])
+  }, [schema, pack?.manifest.gameVersion])
 
   useEffect(() => {
     setQuickCommand(text)
   }, [setQuickCommand, text])
+
+  const optionsFor = (field: QuickField): string[] => {
+    const options = field.options ?? []
+    if (!field.optionRoot) return options
+    const allowed = options.filter((option) =>
+      Boolean(pack?.commands.children?.[field.optionRoot!]?.children?.[option])
+    )
+    return allowed.length > 0 ? allowed : options
+  }
 
   return (
     <div className="content">
@@ -413,7 +448,7 @@ export function QuickCommandForm({ id }: { id: string }) {
                       setValues({ ...values, [field.key]: event.target.value })
                     }
                   >
-                    {field.options?.map((option) => (
+                    {optionsFor(field).map((option) => (
                       <option key={option} value={option}>
                         {option}
                       </option>
