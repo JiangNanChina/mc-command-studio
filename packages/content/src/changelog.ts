@@ -22,6 +22,35 @@ const REPO = 'https://github.com/JiangNanChina/mc-command-studio'
  */
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: '0.1.64',
+    date: '2026-10-27',
+    title: '项目预设迁移与坐标范围',
+    highlights: ['打开项目提示预设恢复。', 'OOC 显示坐标范围。'],
+    sections: [
+      {
+        type: 'added',
+        items: [
+          '项目预设恢复数量提示。',
+          'OOC 坐标范围提示。',
+          '1.13.x 粒子模式前缀过滤。'
+        ]
+      },
+      {
+        type: 'improved',
+        items: [
+          '旧项目无预设时明确提示。',
+          '坐标范围实时更新。',
+          '粒子模式能力表覆盖 1.13.x。'
+        ]
+      },
+      {
+        type: 'fixed',
+        items: ['无。']
+      }
+    ],
+    releaseUrl: `${REPO}/releases/tag/v0.1.64`
+  },
+  {
     version: '0.1.63',
     date: '2026-10-27',
     title: '预设随项目保存与缩略图轴距',

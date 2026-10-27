@@ -71,7 +71,7 @@ function commandBlockNbt(command: string, options: OocOptions): string {
   return `Command:${commandBlockString(command)},auto:${options.auto ? '1b' : '0b'},conditionMet:0b,powered:1b,TrackOutput:${options.trackOutput ? '1b' : '0b'},UpdateLastExecution:0b`
 }
 
-function offsetCoordinate(value: string, offset: number): string {
+export function offsetCoordinate(value: string, offset: number): string {
   if (!offset) return value
   const relative = /^([~^])(-?\d+(?:\.\d+)?)?$/.exec(value.trim())
   if (relative) {

@@ -1220,6 +1220,10 @@ async function main() {
   if (!oocPreset.includes('3 列') || !oocPreset.includes('X + Y')) {
     throw new Error(`OOC 布局预设预览不符合预期：${oocPreset}`)
   }
+  const oocRange = await page.locator('#ooc-coordinate-range').innerText()
+  if (!oocRange.includes('坐标范围') || !oocRange.includes('X')) {
+    throw new Error(`OOC 坐标范围不符合预期：${oocRange}`)
+  }
   await page.getByRole('button', { name: /1.12.2 旧版工具/ }).click()
   await page.waitForSelector('#legacy-testfor-target', { timeout: 10_000 })
   await page.fill('#legacy-testfor-nbt', '{Health:10f}')

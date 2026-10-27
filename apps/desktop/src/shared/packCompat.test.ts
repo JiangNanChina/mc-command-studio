@@ -26,6 +26,7 @@ describe('legacy pack compatibility', () => {
   it('filters particle modes by version', () => {
     expect(particleModeSupported('1.13.2', 'nbt', 'block')).toBe(true)
     expect(particleModeSupported('1.13.2', 'nbt', 'dust_transition')).toBe(false)
+    expect(particleModeSupported('1.13.1', 'nbt', 'dust_transition')).toBe(false)
     expect(particleModeSupported('1.20.4', 'nbt', 'dust_transition')).toBe(true)
     expect(particleModeSupported('1.20.4', 'nbt', 'raw')).toBe(false)
     expect(particleModeSupported('26.3', 'components', 'raw')).toBe(true)

@@ -5,6 +5,7 @@ import {
   OOC_MODES,
   buildOocCommand,
   createDefaultOocOptions,
+  offsetCoordinate,
   type LegacyDirection,
   type OocLayoutAxis,
   type OocMode,
@@ -51,6 +52,24 @@ export function OocForm() {
     options.secondaryAxis === 'none'
       ? commandCount
       : Math.ceil(commandCount / Math.max(1, Number(options.rowSize) || 1))
+  const columns =
+    options.secondaryAxis === 'none'
+      ? 1
+      : Math.max(1, Math.min(Number(options.rowSize) || 1, commandCount))
+  const primaryExtent =
+    (options.secondaryAxis === 'none' ? Math.max(0, commandCount - 1) : Math.max(0, rows - 1)) *
+    (Number(options.layerStep) || 0)
+  const secondaryExtent = Math.max(0, columns - 1) * (Number(options.secondaryStep) || 0)
+  const rangeText = (['x', 'y', 'z'] as const)
+    .map((axis) => {
+      const extent =
+        (options.layoutAxis === axis ? primaryExtent : 0) +
+        (options.secondaryAxis === axis ? secondaryExtent : 0)
+      if (!extent) return null
+      return `${axis.toUpperCase()} ${options[axis]}..${offsetCoordinate(options[axis], extent)}`
+    })
+    .filter(Boolean)
+    .join(' · ')
 
   const update = (patch: Partial<typeof options>) => {
     setOptions((current) => ({ ...current, ...patch }))
@@ -306,6 +325,11 @@ export function OocForm() {
             primaryStep={Number(options.layerStep) || 0}
             secondaryStep={Number(options.secondaryStep) || 0}
           />
+          {options.mode === 'command-block' && rangeText ? (
+            <div className="hint" id="ooc-coordinate-range" style={{ marginTop: 4 }}>
+              坐标范围：{rangeText}
+            </div>
+          ) : null}
 
           <div className="field" style={{ marginTop: 12 }}>
             <label className="field-label" htmlFor="ooc-commands">

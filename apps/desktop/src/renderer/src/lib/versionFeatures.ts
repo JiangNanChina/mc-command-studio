@@ -54,6 +54,6 @@ export function particleModeSupported(
   mode: string
 ): boolean {
   if (mode === 'raw') return engine === 'components'
-  if (gameVersion === '1.13.2' && mode === 'dust_transition') return false
+  if (gameVersion?.startsWith('1.13') && mode === 'dust_transition') return false
   return true
 }

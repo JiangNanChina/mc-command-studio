@@ -1551,7 +1551,16 @@ export const useAppStore = create<AppStore>()(
       })
       get().clearHistory()
       await getApi().project.clearAutosave()
-      get().showToast('项目已打开', 'success')
+      const presetCount = Object.values(project.presets ?? {}).reduce<number>(
+        (total, value) => total + (Array.isArray(value) ? value.length : 0),
+        0
+      )
+      get().showToast(
+        presetCount > 0
+          ? `项目已打开，已恢复 ${presetCount} 条自定义预设`
+          : '项目已打开（未包含自定义预设）',
+        'success'
+      )
     },
 
     saveProject: async (saveAs = false) => {
