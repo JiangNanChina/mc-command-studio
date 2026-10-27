@@ -29,7 +29,11 @@
     "test:e2e:quick": "node tools/e2e/quick-matrix-smoke.mjs",
     "test:build": "node tools/test/build-test.mjs",
     "test:serve": "node tools/release/mock-update-server.mjs release-test 8123",
-    "assets:audit": "node tools/pipeline/audit-assets.mjs"
+    "assets:audit": "node tools/pipeline/audit-assets.mjs",
+    "test:e2e:all": "node tools/e2e/all-versions-load.mjs",
+    "test:e2e:legacy": "node tools/e2e/legacy-groups-smoke.mjs",
+    "test:e2e:shots": "node tools/e2e/quick-matrix-shots.mjs",
+    "test:e2e:update-ui": "node tools/e2e/update-ui-test.mjs"
   },
   "devDependencies": {
     "@types/node": "^24.0.0",

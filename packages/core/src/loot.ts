@@ -4,7 +4,7 @@ import { serializePosition, type Position } from './position'
 import { serializeSelector, type Selector } from './selector'
 import type { BuildResult, Diagnostic } from './types'
 
-export type LootAction = 'give' | 'insert' | 'spawn'
+export type LootAction = 'give' | 'insert' | 'spawn' | 'replace'
 
 export interface LootOptions {
   action: LootAction
@@ -12,6 +12,8 @@ export interface LootOptions {
   position: Position
   lootTable: string
   slot: string
+  replaceTargetType: 'block' | 'entity'
+  count: string
 }
 
 export function createDefaultLootOptions(): LootOptions {
@@ -20,7 +22,9 @@ export function createDefaultLootOptions(): LootOptions {
     target: { base: '@s' },
     position: { x: '~', y: '~', z: '~' },
     lootTable: 'minecraft:chests/simple_dungeon',
-    slot: 'container.0'
+    slot: 'container.0',
+    replaceTargetType: 'block',
+    count: '1'
   }
 }
 
@@ -37,6 +41,23 @@ export function buildLootCommand(
     diagnostics.push(...target.diagnostics)
     return {
       text: `loot give ${target.text} loot ${options.lootTable.trim()}`,
+      diagnostics
+    }
+  }
+
+  if (options.action === 'replace') {
+    const count = options.count.trim() || '1'
+    const target =
+      options.replaceTargetType === 'entity'
+        ? serializeSelector(options.target)
+        : serializePosition(options.position)
+    diagnostics.push(...target.diagnostics)
+    const place =
+      options.replaceTargetType === 'entity'
+        ? `entity ${target.text}`
+        : `block ${target.text}`
+    return {
+      text: `loot replace ${place} ${options.slot.trim()} ${count} loot ${options.lootTable.trim()}`,
       diagnostics
     }
   }

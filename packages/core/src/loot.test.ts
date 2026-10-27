@@ -40,6 +40,29 @@ describe('loot', () => {
     ).toBe('loot insert 10 64 -5 loot minecraft:chests/simple_dungeon')
   })
 
+  it('builds loot replace for blocks and entities', () => {
+    expect(
+      buildLootCommand({
+        ...createDefaultLootOptions(),
+        action: 'replace',
+        replaceTargetType: 'block',
+        position: { x: '1', y: '64', z: '2' },
+        slot: 'container.0',
+        count: '3'
+      }).text
+    ).toBe('loot replace block 1 64 2 container.0 3 loot minecraft:chests/simple_dungeon')
+    expect(
+      buildLootCommand({
+        ...createDefaultLootOptions(),
+        action: 'replace',
+        replaceTargetType: 'entity',
+        target: { base: '@s' },
+        slot: 'weapon.mainhand',
+        count: '1'
+      }).text
+    ).toBe('loot replace entity @s weapon.mainhand 1 loot minecraft:chests/simple_dungeon')
+  })
+
   it('validates loot table and slot', () => {
     const result = buildLootCommand({
       ...createDefaultLootOptions(),

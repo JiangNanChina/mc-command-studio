@@ -61,6 +61,6 @@
 
 ## 验证
 
-- 单元测试：276
+- 单元测试：277
 - 别名测试：`mcAssets.test.ts`
 - 1.16.5 replaceitem NBT 表单冒烟

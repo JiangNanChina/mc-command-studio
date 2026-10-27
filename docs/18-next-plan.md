@@ -11,7 +11,7 @@
 | NBT 安全快捷表单 | 44 |
 | 快捷表单 | 53 |
 | 旧版工具 | 34 |
-| 单元测试 | 276 |
+| 单元测试 | 277 |
 | 资源审计 | 45 个基础包 0 缺失 |
 
 ## P0：NBT 深度
@@ -23,8 +23,8 @@
 - [x] summon NBT 字段
 - [x] attribute reset 版本过滤
 - [x] particle 旧版参数模式
-- [ ] loot replace 动作
-- [ ] NBT item / entity 预设库
+- [x] loot replace 动作
+- [x] NBT item / entity 预设库
 - [ ] 1.13–1.20.4 逐版本游戏内验证
 
 ## P1：10 个版本表单
@@ -39,7 +39,8 @@
 - [x] fetchprofile：name / id / entity
 - [x] transfer：host / port / players
 - [x] posteffect：add / clear / list / remove
-- [ ] 逐版本字段截图与游戏内验证
+- [x] 10 个版本表单逐版本截图
+- [ ] 逐版本游戏内验证
 
 ## P1：1.12.2
 
@@ -48,7 +49,8 @@
 - [x] teleport 支持 tp / teleport
 - [x] block mask / mode
 - [x] time query
-- [ ] 分组表单逐项游戏内验证
+- [x] 分组表单冒烟
+- [ ] 分组表单游戏内验证
 
 ## P1：体验与质量
 
@@ -57,8 +59,9 @@
 - [x] 更新版本比较支持 test prerelease
 - [x] 正式版更新按钮改为“重新载入”
 - [x] 本地测试版独立更新源
-- [ ] 更新 UI 自动化 E2E
-- [ ] 全量 10 表单逐版本截图
+- [x] 更新 UI 自动化 E2E
+- [x] 全量 10 表单逐版本截图
+- [x] 全部 54 个版本加载验证
 - [ ] 45 个基础包游戏内抽样验证
 
 ## P2：发布基础设施
@@ -72,8 +75,7 @@
 
 **v0.7.0**
 
-1. loot replace / NBT 预设库
-2. 10 个版本表单逐版本截图
-3. 更新 UI E2E
-4. 6 个关键版本游戏内验证
-5. 代码签名/镜像仍按用户确认后再做
+1. 6 个关键版本游戏内验证
+2. 1.13 manifest 修复回归
+3. 更新 UI 下载/安装完整 E2E
+4. 代码签名/镜像仍按用户确认后再做

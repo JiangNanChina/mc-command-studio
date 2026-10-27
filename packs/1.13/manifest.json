@@ -9,9 +9,9 @@
   "generatedAt": "2026-10-27T13:47:35.752Z",
   "sources": [
     {
-      "name": "alias",
-      "url": "local://packs/1.13.2",
-      "sha256": "ffd3aa2c25c5ba68a706b59f2abdc69ac1748e115ca9d3b47941e197736f088e"
+      "name": "official-server-reports",
+      "url": "generated://1.13",
+      "sha256": "c6cfff3f35a649713e7186e74f1368cfd89cb4abc5cf7323d798bbdb7ed96f55"
     }
   ],
   "files": {
@@ -28,6 +28,5 @@
     "blocks": 593,
     "enchantments": 34,
     "entities": 110
-  },
-  "aliasOf": "1.13.2"
+  }
 }

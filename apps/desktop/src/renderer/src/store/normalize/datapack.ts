@@ -197,11 +197,17 @@ export function normalizeLoot(input: Partial<LootOptions> | undefined): LootOpti
   if (!input) return fallback
   return {
     action:
-      input.action === 'insert' || input.action === 'spawn' ? input.action : 'give',
+      input.action === 'insert' ||
+      input.action === 'spawn' ||
+      input.action === 'replace'
+        ? input.action
+        : 'give',
     target: input.target?.base ? input.target : fallback.target,
     position: normalizePosition(input.position),
     lootTable: typeof input.lootTable === 'string' ? input.lootTable : fallback.lootTable,
-    slot: typeof input.slot === 'string' ? input.slot : fallback.slot
+    slot: typeof input.slot === 'string' ? input.slot : fallback.slot,
+    replaceTargetType: input.replaceTargetType === 'entity' ? 'entity' : 'block',
+    count: typeof input.count === 'string' ? input.count : fallback.count
   }
 }
 

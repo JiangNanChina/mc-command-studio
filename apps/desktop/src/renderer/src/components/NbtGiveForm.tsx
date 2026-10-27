@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Package, Plus, Sparkles, Trash2 } from 'lucide-react'
 import { COMMAND_MAP } from '@mcstudio/content'
+import { createDefaultNbtGiveOptions } from '@mcstudio/core'
 import { ItemPickerDialog } from './ItemPickerDialog'
 import { McIcon } from './McIcon'
 import { SelectorField } from './SelectorField'
@@ -18,6 +19,43 @@ const COMMON_ENCHANTS = [
   'minecraft:fire_aspect',
   'minecraft:looting',
   'minecraft:efficiency'
+]
+
+const NBT_PRESETS: { label: string; patch: Partial<ReturnType<typeof createDefaultNbtGiveOptions>> }[] = [
+  {
+    label: '锋利钻石剑',
+    patch: {
+      item: 'minecraft:diamond_sword',
+      name: '锋利之剑',
+      enchantments: [{ id: 'minecraft:sharpness', level: '5' }],
+      unbreakable: true
+    }
+  },
+  {
+    label: '无限弓',
+    patch: {
+      item: 'minecraft:bow',
+      name: '无限之弓',
+      enchantments: [{ id: 'minecraft:infinity', level: '1' }],
+      unbreakable: true
+    }
+  },
+  {
+    label: '无法破坏鞘翅',
+    patch: {
+      item: 'minecraft:elytra',
+      name: '永久鞘翅',
+      unbreakable: true
+    }
+  },
+  {
+    label: '命名金苹果',
+    patch: {
+      item: 'minecraft:golden_apple',
+      name: '黄金苹果',
+      count: '16'
+    }
+  }
 ]
 
 export function NbtGiveForm() {
@@ -99,6 +137,18 @@ export function NbtGiveForm() {
               />
               无法破坏（Unbreakable）
             </label>
+          </div>
+          <div className="row" style={{ marginTop: 12, flexWrap: 'wrap' }}>
+            {NBT_PRESETS.map((preset) => (
+              <button
+                key={preset.label}
+                type="button"
+                className="btn btn-sm"
+                onClick={() => state.updateNbtGive(preset.patch)}
+              >
+                {preset.label}
+              </button>
+            ))}
           </div>
         </div>
       </div>

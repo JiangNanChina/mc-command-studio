@@ -10,7 +10,8 @@ const meta = COMMAND_MAP.get('loot')
 const ACTIONS: { value: LootAction; label: string }[] = [
   { value: 'give', label: '给予玩家' },
   { value: 'spawn', label: '生成掉落物' },
-  { value: 'insert', label: '插入容器' }
+  { value: 'insert', label: '插入容器' },
+  { value: 'replace', label: '替换槽位' }
 ]
 
 const COMMON_LOOT_TABLES = [
@@ -104,6 +105,61 @@ export function LootForm() {
                 onChange={(target) => state.updateLoot({ target })}
               />
             </div>
+          ) : loot.action === 'replace' ? (
+            <>
+              <div className="field" style={{ marginTop: 12 }}>
+                <label className="field-label" htmlFor="loot-replace-type">替换目标</label>
+                <select
+                  id="loot-replace-type"
+                  className="select"
+                  value={loot.replaceTargetType}
+                  onChange={(event) =>
+                    state.updateLoot({
+                      replaceTargetType: event.target.value as 'block' | 'entity'
+                    })
+                  }
+                >
+                  <option value="block">方块容器</option>
+                  <option value="entity">实体</option>
+                </select>
+              </div>
+              <div style={{ marginTop: 12 }}>
+                {loot.replaceTargetType === 'block' ? (
+                  <PositionInput
+                    label="容器坐标"
+                    value={loot.position}
+                    onChange={(position) => state.updateLoot({ position })}
+                  />
+                ) : (
+                  <SelectorField
+                    value={loot.target}
+                    label="实体目标"
+                    onChange={(target) => state.updateLoot({ target })}
+                  />
+                )}
+              </div>
+              <div className="grid-2" style={{ marginTop: 12 }}>
+                <div className="field">
+                  <label className="field-label" htmlFor="loot-slot">槽位</label>
+                  <input
+                    id="loot-slot"
+                    className="input"
+                    value={loot.slot}
+                    spellCheck={false}
+                    onChange={(event) => state.updateLoot({ slot: event.target.value })}
+                  />
+                </div>
+                <div className="field">
+                  <label className="field-label" htmlFor="loot-count">数量</label>
+                  <input
+                    id="loot-count"
+                    className="input"
+                    value={loot.count}
+                    onChange={(event) => state.updateLoot({ count: event.target.value })}
+                  />
+                </div>
+              </div>
+            </>
           ) : (
             <>
               <div style={{ marginTop: 12 }}>
