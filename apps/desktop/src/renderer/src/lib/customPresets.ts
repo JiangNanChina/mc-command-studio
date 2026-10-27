@@ -5,6 +5,13 @@ export interface CustomPreset {
 
 const PREFIX = 'mcstudio:presets:'
 
+export const PRESET_KEYS = [
+  'legacy:block',
+  'legacy:entity',
+  'legacy:item',
+  'ooc:layout'
+] as const
+
 export function loadPresets(key: string): CustomPreset[] {
   try {
     const raw = localStorage.getItem(`${PREFIX}${key}`)
@@ -72,4 +79,25 @@ export function importPresets(key: string, source: string): CustomPreset[] {
   } catch {
     return loadPresets(key)
   }
+}
+
+export function loadPresetBundle(): Record<string, CustomPreset[]> {
+  return Object.fromEntries(PRESET_KEYS.map((key) => [key, loadPresets(key)]))
+}
+
+export function applyPresetBundle(bundle: unknown): void {
+  if (!bundle || typeof bundle !== 'object') return
+  for (const key of PRESET_KEYS) {
+    const value = (bundle as Record<string, unknown>)[key]
+    if (!Array.isArray(value)) continue
+    const presets = value.filter(
+      (item): item is CustomPreset =>
+        !!item &&
+        typeof item === 'object' &&
+        typeof (item as CustomPreset).name === 'string' &&
+        typeof (item as CustomPreset).value === 'string'
+    )
+    savePresets(key, presets.slice(0, 30))
+  }
+  window.dispatchEvent(new CustomEvent('mcstudio:presets-changed'))
 }

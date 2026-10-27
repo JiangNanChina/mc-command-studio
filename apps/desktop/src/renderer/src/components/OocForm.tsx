@@ -301,6 +301,10 @@ export function OocForm() {
             count={commandCount}
             rowSize={Math.max(1, Number(options.rowSize) || 1)}
             secondary={options.secondaryAxis !== 'none'}
+            primaryAxis={options.layoutAxis}
+            secondaryAxis={options.secondaryAxis}
+            primaryStep={Number(options.layerStep) || 0}
+            secondaryStep={Number(options.secondaryStep) || 0}
           />
 
           <div className="field" style={{ marginTop: 12 }}>

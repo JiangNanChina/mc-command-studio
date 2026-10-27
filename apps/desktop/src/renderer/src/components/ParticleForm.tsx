@@ -136,6 +136,7 @@ export function ParticleForm() {
             <div className="hint">
               当前使用：{mode === 'none' ? '无参数' : OPTION_MODES.find((item) => item.value === mode)?.label}
               {legacy ? '；1.20.4 使用旧参数语法' : ''}
+              {is113 ? '；1.13.2 支持 block / dust / item / effect / entity_effect' : ''}
             </div>
           </div>
 

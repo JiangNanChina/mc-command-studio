@@ -15,6 +15,14 @@ describe('project file', () => {
     expect(file.name).toBe('未命名项目')
   })
 
+  it('round trips custom presets', () => {
+    const presets = { 'legacy:block': [{ name: 'test', value: '{Lock:"x"}' }] }
+    const file = createProjectFile('presets', '1.12.2', null, presets)
+    const parsed = parseProjectFile(file)
+    expect(parsed.ok).toBe(true)
+    expect(parsed.project?.presets).toEqual(presets)
+  })
+
   it('rejects an incompatible schema', () => {
     const result = parseProjectFile({ schemaVersion: 99, name: 'x', packId: '26.3' })
     expect(result.ok).toBe(false)

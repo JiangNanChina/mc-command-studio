@@ -1,6 +1,6 @@
 {
   "name": "@mcstudio/desktop",
-  "version": "0.1.62",
+  "version": "0.1.63",
   "private": true,
   "description": "MC 指令工坊 Windows 桌面应用",
   "main": "out/main/index.js",

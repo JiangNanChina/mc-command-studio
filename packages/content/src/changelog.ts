@@ -22,6 +22,35 @@ const REPO = 'https://github.com/JiangNanChina/mc-command-studio'
  */
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: '0.1.63',
+    date: '2026-10-27',
+    title: '预设随项目保存与缩略图轴距',
+    highlights: ['项目文件保存自定义预设。', '缩略图显示轴距。'],
+    sections: [
+      {
+        type: 'added',
+        items: [
+          '项目 presets 字段与恢复。',
+          'OOC 缩略图轴距标注。',
+          '1.13.2 粒子参数提示。'
+        ]
+      },
+      {
+        type: 'improved',
+        items: [
+          '导入后预设栏即时刷新。',
+          '单元测试 249 → 250。',
+          '预设去重与 30 条上限。'
+        ]
+      },
+      {
+        type: 'fixed',
+        items: ['无。']
+      }
+    ],
+    releaseUrl: `${REPO}/releases/tag/v0.1.63`
+  },
+  {
     version: '0.1.62',
     date: '2026-10-27',
     title: '预设管理与布局缩略图',

@@ -29,6 +29,9 @@ export function CustomPresetBar({ storageKey, value, label, onApply }: Props) {
     setPresets(loadPresets(storageKey))
     setSelected('')
     setRename('')
+    const reload = () => setPresets(loadPresets(storageKey))
+    window.addEventListener('mcstudio:presets-changed', reload)
+    return () => window.removeEventListener('mcstudio:presets-changed', reload)
   }, [storageKey])
 
   const save = () => {

@@ -167,6 +167,7 @@ import { DEFAULT_SETTINGS } from '../../shared/types'
 import { create } from 'zustand'
 import { immer } from 'zustand/middleware/immer'
 import { getApi } from './lib/api'
+import { applyPresetBundle, loadPresetBundle } from './lib/customPresets'
 import type {
   AutomationOptions,
   DatapackDataFileDraft,
@@ -1477,7 +1478,12 @@ export const useAppStore = create<AppStore>()(
         commandBlock: state.commandBlock,
         outputMode: state.outputMode
       }
-      const file = createProjectFile(state.projectName, state.activePackId, payload)
+      const file = createProjectFile(
+        state.projectName,
+        state.activePackId,
+        payload,
+        loadPresetBundle()
+      )
       return `${JSON.stringify(file, null, 2)}\n`
     },
 
@@ -1491,6 +1497,7 @@ export const useAppStore = create<AppStore>()(
         await get().loadPack(project.packId)
       }
       const payload = normalizeProjectPayload(project.data)
+      applyPresetBundle(project.presets)
       set((state) => {
         state.activeCommandId = payload.activeCommandId
         state.give = payload.give

@@ -8,6 +8,7 @@ export const projectFileSchema = z.object({
   packId: z.string().min(1),
   createdAt: z.string(),
   updatedAt: z.string(),
+  presets: z.record(z.string(), z.unknown()).optional(),
   data: z.unknown()
 })
 
@@ -16,7 +17,8 @@ export type ProjectFile = z.infer<typeof projectFileSchema>
 export function createProjectFile(
   name: string,
   packId: string,
-  data: unknown
+  data: unknown,
+  presets?: Record<string, unknown>
 ): ProjectFile {
   const now = new Date().toISOString()
   return {
@@ -25,6 +27,7 @@ export function createProjectFile(
     packId,
     createdAt: now,
     updatedAt: now,
+    ...(presets ? { presets } : {}),
     data
   }
 }
