@@ -3,12 +3,14 @@ export type PredicateType =
   | 'random_chance'
   | 'weather_check'
   | 'time_check'
+  | 'value_check'
   | 'entity_properties'
 
 export const PREDICATE_TYPES: { value: PredicateType; label: string }[] = [
   { value: 'random_chance', label: '随机概率' },
   { value: 'weather_check', label: '天气检查' },
   { value: 'time_check', label: '时间检查' },
+  { value: 'value_check', label: '记分板数值' },
   { value: 'entity_properties', label: '实体状态' }
 ]
 
@@ -28,6 +30,9 @@ export interface PredicateCondition {
   raining: boolean
   thundering: boolean
   time: number
+  valueObjective: string
+  valueMin: number
+  valueMax: number
   entity: string
   flags: EntityFlag[]
 }
@@ -47,6 +52,9 @@ function createCondition(type: PredicateType): PredicateCondition {
     raining: true,
     thundering: false,
     time: 0,
+    valueObjective: 'kills',
+    valueMin: 1,
+    valueMax: 5,
     entity: 'this',
     flags: []
   }
@@ -93,6 +101,38 @@ function parseCondition(input: unknown): PredicateCondition | null {
       if (Object.keys(record).some((key) => key !== 'condition' && key !== 'value')) return null
       if (typeof record.value !== 'number' || record.value < 0) return null
       return { ...createCondition('time_check'), time: record.value }
+    }
+    case 'minecraft:value_check': {
+      if (Object.keys(record).some((key) => key !== 'condition' && key !== 'value' && key !== 'range')) {
+        return null
+      }
+      const value = record.value
+      const range = record.range
+      if (!value || typeof value !== 'object' || Array.isArray(value)) return null
+      if (!range || typeof range !== 'object' || Array.isArray(range)) return null
+      const valueRecord = value as Record<string, unknown>
+      const rangeRecord = range as Record<string, unknown>
+      const target = valueRecord.target
+      if (
+        valueRecord.type !== 'minecraft:score' ||
+        typeof valueRecord.score !== 'string' ||
+        valueRecord.score.trim() === '' ||
+        !target ||
+        typeof target !== 'object' ||
+        Array.isArray(target)
+      ) {
+        return null
+      }
+      const targetRecord = target as Record<string, unknown>
+      if (targetRecord.type !== 'minecraft:fixed' || targetRecord.name !== 'this') return null
+      if (typeof rangeRecord.min !== 'number' || typeof rangeRecord.max !== 'number') return null
+      if (rangeRecord.min > rangeRecord.max) return null
+      return {
+        ...createCondition('value_check'),
+        valueObjective: valueRecord.score,
+        valueMin: rangeRecord.min,
+        valueMax: rangeRecord.max
+      }
     }
     case 'minecraft:entity_properties': {
       if (
@@ -168,6 +208,16 @@ function serializeCondition(condition: PredicateCondition): Record<string, unkno
       }
     case 'time_check':
       return { condition: 'minecraft:time_check', value: condition.time }
+    case 'value_check':
+      return {
+        condition: 'minecraft:value_check',
+        value: {
+          type: 'minecraft:score',
+          target: { type: 'minecraft:fixed', name: 'this' },
+          score: condition.valueObjective
+        },
+        range: { min: condition.valueMin, max: condition.valueMax }
+      }
     default:
       return {
         condition: 'minecraft:entity_properties',

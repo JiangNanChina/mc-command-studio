@@ -22,6 +22,27 @@ const REPO = 'https://github.com/JiangNanChina/mc-command-studio'
  */
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: '0.1.49',
+    date: '2026-10-27',
+    title: '谓词新增记分板数值条件',
+    highlights: ['value_check 条件。', '记分板目标 + 数值区间。'],
+    sections: [
+      {
+        type: 'added',
+        items: ['谓词 value_check 结构化编辑。', 'JSON 双向解析/序列化。']
+      },
+      {
+        type: 'improved',
+        items: ['单元测试 232 → 234。', '冒烟覆盖 value_check。']
+      },
+      {
+        type: 'fixed',
+        items: ['无。']
+      }
+    ],
+    releaseUrl: `${REPO}/releases/tag/v0.1.49`
+  },
+  {
     version: '0.1.48',
     date: '2026-10-27',
     title: 'normalize 按领域拆分',

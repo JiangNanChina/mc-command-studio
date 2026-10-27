@@ -122,7 +122,9 @@ export function PredicateEditor({ content, onChange }: PredicateEditorProps) {
                       ? { chance: 0.5 }
                       : event.target.value === 'time_check'
                         ? { time: 0 }
-                        : {})
+                        : event.target.value === 'value_check'
+                          ? { valueObjective: 'kills', valueMin: 1, valueMax: 5 }
+                          : {})
                   })
                 }
               >
@@ -202,6 +204,57 @@ export function PredicateEditor({ content, onChange }: PredicateEditorProps) {
                   }
                 />
               </div>
+            ) : null}
+
+            {condition.type === 'value_check' ? (
+              <>
+                <div className="field" style={{ marginTop: 8 }}>
+                  <label className="field-label" htmlFor={`predicate-value-objective-${index}`}>
+                    记分板目标
+                  </label>
+                  <input
+                    id={`predicate-value-objective-${index}`}
+                    className="input"
+                    value={condition.valueObjective}
+                    onChange={(event) =>
+                      patch(index, { valueObjective: event.target.value })
+                    }
+                  />
+                </div>
+                <div className="grid-2" style={{ marginTop: 8 }}>
+                  <div className="field">
+                    <label className="field-label" htmlFor={`predicate-value-min-${index}`}>
+                      最小值
+                    </label>
+                    <input
+                      id={`predicate-value-min-${index}`}
+                      className="input"
+                      type="number"
+                      value={condition.valueMin}
+                      onChange={(event) =>
+                        patch(index, { valueMin: Number(event.target.value) })
+                      }
+                    />
+                  </div>
+                  <div className="field">
+                    <label className="field-label" htmlFor={`predicate-value-max-${index}`}>
+                      最大值
+                    </label>
+                    <input
+                      id={`predicate-value-max-${index}`}
+                      className="input"
+                      type="number"
+                      value={condition.valueMax}
+                      onChange={(event) =>
+                        patch(index, { valueMax: Number(event.target.value) })
+                      }
+                    />
+                  </div>
+                </div>
+                <div className="hint" style={{ marginTop: 6 }}>
+                  读取执行者 this 的记分板数值，判断是否落在区间内。
+                </div>
+              </>
             ) : null}
 
             {condition.type === 'entity_properties' ? (

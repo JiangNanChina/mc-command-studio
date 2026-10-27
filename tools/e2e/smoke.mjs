@@ -847,6 +847,20 @@ async function main() {
   if (!predicateContent.includes('0.25')) {
     throw new Error('谓词结构化编辑未写回概率')
   }
+  await page.selectOption('#predicate-type-0', 'value_check')
+  await page.waitForSelector('#predicate-value-objective-0', { timeout: 10_000 })
+  await page.fill('#predicate-value-objective-0', 'kills')
+  await page.fill('#predicate-value-min-0', '2')
+  await page.fill('#predicate-value-max-0', '8')
+  await page.waitForTimeout(300)
+  const valueCheckContent = await page.inputValue('#datapack-data-content')
+  if (
+    !valueCheckContent.includes('minecraft:value_check') ||
+    !valueCheckContent.includes('"score": "kills"') ||
+    !valueCheckContent.includes('"min": 2')
+  ) {
+    throw new Error(`value_check 谓词未正确写回：${valueCheckContent}`)
+  }
   await page.screenshot({ path: join(ARTIFACTS, 'datapack-predicate.png') })
   await page.getByRole('button', { name: '进度', exact: true }).click()
   await page.waitForSelector('#advancement-structured-title', { timeout: 10_000 })
