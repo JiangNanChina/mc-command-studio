@@ -56,6 +56,35 @@ for (const version of VERSIONS) {
     item: items.map((file) => file.replace(/\.json$/, '')).sort(),
     block: blocks.map((file) => file.replace(/\.json$/, '')).sort()
   }
+
+  // 1.8–1.11 仍使用旧 ID：entity.Creeper.name / enchantment.damage.all / effect.moveSpeed。
+  const langDir = join(assetsDir, 'lang')
+  const langFiles = await readdir(langDir)
+  const langFile = langFiles.find((file) => file.toLowerCase() === 'en_us.lang')
+  if (langFile) {
+    const lang = Object.fromEntries(
+      (await readFile(join(langDir, langFile), 'utf8'))
+        .split(/\r?\n/)
+        .filter((line) => line.includes('='))
+        .map((line) => {
+          const index = line.indexOf('=')
+          return [line.slice(0, index), line.slice(index + 1)]
+        })
+    )
+    const keys = Object.keys(lang)
+    registries.entity_type = keys
+      .filter((key) => key.startsWith('entity.') && key.endsWith('.name'))
+      .map((key) => key.slice('entity.'.length, -'.name'.length))
+      .sort()
+    registries.enchantment = keys
+      .filter((key) => key.startsWith('enchantment.') && !key.startsWith('enchantment.level.'))
+      .map((key) => key.slice('enchantment.'.length))
+      .sort()
+    registries.mob_effect = keys
+      .filter((key) => key.startsWith('effect.') && key !== 'effect.none')
+      .map((key) => key.slice('effect.'.length))
+      .sort()
+  }
   await writeFile(join(dir, 'registries.json'), `${JSON.stringify(registries)}\n`)
   await copyFile('packs/1.13.2/blocks.json', join(dir, 'blocks.json'))
   await writeFile(join(dir, 'item-components.json'), '{}\n')
@@ -81,8 +110,8 @@ for (const version of VERSIONS) {
       parsers: 1,
       items: items.length,
       blocks: blocks.length,
-      enchantments: baseRegistries.enchantment?.length ?? 0,
-      entities: baseRegistries.entity_type?.length ?? 0
+      enchantments: registries.enchantment.length,
+      entities: registries.entity_type.length
     }
   }
   await writeFile(join(dir, 'manifest.json'), `${JSON.stringify(manifest, null, 2)}\n`)

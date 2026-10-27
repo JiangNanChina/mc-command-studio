@@ -13,6 +13,9 @@ import {
   buildTestforblock,
   buildTestforblocks,
   buildAchievement,
+  buildTrigger,
+  buildSetidletimeout,
+  buildSave,
   createDefaultBlockdata,
   createDefaultEntitydata,
   createDefaultGive,
@@ -20,12 +23,15 @@ import {
   createDefaultTestfor,
   createDefaultTestforblock,
   createDefaultTestforblocks,
-  createDefaultAchievement
+  createDefaultAchievement,
+  createDefaultTrigger,
+  createDefaultIdle,
+  createDefaultSave
 } from '@mcstudio/core'
 import { useAppStore } from '../store'
 import { CustomPresetBar } from './CustomPresetBar'
 
-type LegacyTab = 'testfor' | 'blockdata' | 'entitydata' | 'replaceitem' | 'give' | 'testforblock' | 'testforblocks' | 'achievement'
+type LegacyTab = 'testfor' | 'blockdata' | 'entitydata' | 'replaceitem' | 'give' | 'testforblock' | 'testforblocks' | 'achievement' | 'trigger' | 'setidletimeout' | 'save'
 
 const TABS: { id: LegacyTab; label: string }[] = [
   { id: 'testfor', label: 'testfor' },
@@ -35,7 +41,10 @@ const TABS: { id: LegacyTab; label: string }[] = [
   { id: 'give', label: 'give' },
   { id: 'testforblock', label: 'testforblock' },
   { id: 'testforblocks', label: 'testforblocks' },
-  { id: 'achievement', label: 'achievement' }
+  { id: 'achievement', label: 'achievement' },
+  { id: 'trigger', label: 'trigger' },
+  { id: 'setidletimeout', label: 'setidletimeout' },
+  { id: 'save', label: 'save' }
 ]
 
 export function LegacyToolsForm() {
@@ -49,6 +58,9 @@ export function LegacyToolsForm() {
   const [testforblock, setTestforblock] = useState(createDefaultTestforblock)
   const [testforblocks, setTestforblocks] = useState(createDefaultTestforblocks)
   const [achievement, setAchievement] = useState(createDefaultAchievement)
+  const [trigger, setTrigger] = useState(createDefaultTrigger)
+  const [idle, setIdle] = useState(createDefaultIdle)
+  const [save, setSave] = useState(createDefaultSave)
   const [copied, setCopied] = useState(false)
 
   const result = useMemo(() => {
@@ -59,8 +71,11 @@ export function LegacyToolsForm() {
     if (tab === 'testforblock') return buildTestforblock(testforblock)
     if (tab === 'testforblocks') return buildTestforblocks(testforblocks)
     if (tab === 'achievement') return buildAchievement(achievement)
+    if (tab === 'trigger') return buildTrigger(trigger)
+    if (tab === 'setidletimeout') return buildSetidletimeout(idle)
+    if (tab === 'save') return buildSave(save)
     return buildReplaceitem(replaceitem)
-  }, [tab, testfor, blockdata, entitydata, replaceitem, give, testforblock, testforblocks, achievement])
+  }, [tab, testfor, blockdata, entitydata, replaceitem, give, testforblock, testforblocks, achievement, trigger, idle, save])
 
   const copy = async () => {
     if (!result.text) return
@@ -560,6 +575,48 @@ export function LegacyToolsForm() {
                   onChange={(event) => setAchievement({ ...achievement, achievement: event.target.value })} />
               </div>
             </>
+          ) : null}
+
+          {tab === 'trigger' ? (
+            <div className="grid-3">
+              <div className="field">
+                <label className="field-label" htmlFor="legacy-trigger-objective">目标</label>
+                <input id="legacy-trigger-objective" className="input" value={trigger.objective}
+                  onChange={(event) => setTrigger({ ...trigger, objective: event.target.value })} />
+              </div>
+              <div className="field">
+                <label className="field-label" htmlFor="legacy-trigger-action">动作</label>
+                <select id="legacy-trigger-action" className="select" value={trigger.action}
+                  onChange={(event) => setTrigger({ ...trigger, action: event.target.value as 'add' | 'set' })}>
+                  <option value="add">add</option>
+                  <option value="set">set</option>
+                </select>
+              </div>
+              <div className="field">
+                <label className="field-label" htmlFor="legacy-trigger-value">数值</label>
+                <input id="legacy-trigger-value" className="input" value={trigger.value}
+                  onChange={(event) => setTrigger({ ...trigger, value: event.target.value })} />
+              </div>
+            </div>
+          ) : null}
+
+          {tab === 'setidletimeout' ? (
+            <div className="field">
+              <label className="field-label" htmlFor="legacy-idle-minutes">挂机超时（分钟）</label>
+              <input id="legacy-idle-minutes" className="input" value={idle.minutes}
+                onChange={(event) => setIdle({ minutes: event.target.value })} />
+            </div>
+          ) : null}
+
+          {tab === 'save' ? (
+            <div className="field">
+              <label className="field-label" htmlFor="legacy-save-action">动作</label>
+              <select id="legacy-save-action" className="select" value={save.action}
+                onChange={(event) => setSave({ action: event.target.value as 'hold' | 'query' })}>
+                <option value="hold">hold</option>
+                <option value="query">query</option>
+              </select>
+            </div>
           ) : null}
 
           {result.diagnostics.length > 0 ? (

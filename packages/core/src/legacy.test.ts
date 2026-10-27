@@ -8,6 +8,9 @@ import {
   buildTestforblock,
   buildTestforblocks,
   buildAchievement,
+  buildTrigger,
+  buildSetidletimeout,
+  buildSave,
   createDefaultBlockdata,
   createDefaultEntitydata,
   createDefaultGive,
@@ -68,6 +71,14 @@ describe('1.12 legacy commands', () => {
     expect(
       buildAchievement({ action: 'give', target: '@p', achievement: 'minecraft:story/root' }).text
     ).toBe('achievement give minecraft:story/root @p')
+  })
+
+  it('builds trigger, idle timeout and save', () => {
+    expect(buildTrigger({ objective: 'quest', action: 'add', value: '1' }).text).toBe(
+      'trigger quest add 1'
+    )
+    expect(buildSetidletimeout({ minutes: '30' }).text).toBe('setidletimeout 30')
+    expect(buildSave({ action: 'query' }).text).toBe('save query')
   })
 
   it('builds legacy give with NBT', () => {

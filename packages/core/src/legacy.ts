@@ -72,6 +72,18 @@ export function createDefaultEntitydata(): LegacyEntitydataOptions {
   return { target: '@e', nbt: '' }
 }
 
+export function createDefaultTrigger(): LegacyTriggerOptions {
+  return { objective: 'objective', action: 'add', value: '1' }
+}
+
+export function createDefaultIdle(): LegacyIdleOptions {
+  return { minutes: '0' }
+}
+
+export function createDefaultSave(): LegacySaveOptions {
+  return { action: 'hold' }
+}
+
 export function createDefaultGive(): LegacyGiveOptions {
   return {
     target: '@p',
@@ -139,6 +151,20 @@ export interface LegacyAchievementOptions {
   action: 'give' | 'take'
   target: string
   achievement: string
+}
+
+export interface LegacyTriggerOptions {
+  objective: string
+  action: 'add' | 'set'
+  value: string
+}
+
+export interface LegacyIdleOptions {
+  minutes: string
+}
+
+export interface LegacySaveOptions {
+  action: 'hold' | 'query'
 }
 
 export interface LegacyGiveOptions {
@@ -297,6 +323,32 @@ export function buildAchievement(options: LegacyAchievementOptions): BuildResult
     ['achievement', options.action, options.achievement.trim(), options.target.trim()],
     diagnostics
   )
+}
+
+export function buildTrigger(options: LegacyTriggerOptions): BuildResult {
+  const diagnostics: Diagnostic[] = []
+  if (!options.objective.trim()) {
+    diagnostics.push(error('legacy.objective', '记分板目标不能为空', 'objective'))
+  }
+  if (!/^\d+$/.test(options.value.trim())) {
+    diagnostics.push(error('legacy.value', 'trigger 值必须是非负整数', 'value'))
+  }
+  return finish(
+    ['trigger', options.objective.trim(), options.action, options.value.trim()],
+    diagnostics
+  )
+}
+
+export function buildSetidletimeout(options: LegacyIdleOptions): BuildResult {
+  const diagnostics: Diagnostic[] = []
+  if (!/^\d+$/.test(options.minutes.trim())) {
+    diagnostics.push(error('legacy.minutes', '挂机时间必须是非负整数分钟', 'minutes'))
+  }
+  return finish(['setidletimeout', options.minutes.trim()], diagnostics)
+}
+
+export function buildSave(options: LegacySaveOptions): BuildResult {
+  return finish(['save', options.action], [])
 }
 
 export function buildLegacyGive(options: LegacyGiveOptions): BuildResult {

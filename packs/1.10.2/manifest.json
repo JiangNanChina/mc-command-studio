@@ -6,7 +6,7 @@
   "packFormat": 1,
   "engine": "legacy",
   "type": "release",
-  "generatedAt": "2026-10-27T10:02:39.104Z",
+  "generatedAt": "2026-10-27T10:15:27.197Z",
   "sources": [
     {
       "name": "legacy_static",
@@ -26,7 +26,7 @@
     "parsers": 1,
     "items": 650,
     "blocks": 360,
-    "enchantments": 34,
-    "entities": 144
+    "enchantments": 27,
+    "entities": 62
   }
 }
