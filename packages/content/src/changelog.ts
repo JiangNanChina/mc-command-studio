@@ -22,6 +22,35 @@ const REPO = 'https://github.com/JiangNanChina/mc-command-studio'
  */
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: '0.1.55',
+    date: '2026-10-27',
+    title: '1.12.2 旧版工具与 OOC 增强',
+    highlights: ['testfor/blockdata/entitydata/replaceitem。', 'OOC 方向/条件/坐标快捷填充。'],
+    sections: [
+      {
+        type: 'added',
+        items: [
+          '1.12.2 旧版工具页（4 个命令）。',
+          'OOC 方向与条件模式。',
+          '坐标快捷填充按钮。'
+        ]
+      },
+      {
+        type: 'improved',
+        items: [
+          '1.13.2 粒子 48 种确认。',
+          '单元测试 240 → 244。',
+          '冒烟覆盖旧版工具与 OOC 方向。'
+        ]
+      },
+      {
+        type: 'fixed',
+        items: ['无。']
+      }
+    ],
+    releaseUrl: `${REPO}/releases/tag/v0.1.55`
+  },
+  {
     version: '0.1.54',
     date: '2026-10-27',
     title: '1.12.2 Legacy 与 OOC',

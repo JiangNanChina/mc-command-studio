@@ -24,7 +24,7 @@ describe('ooc', () => {
       z: '0'
     })
     expect(block.text).toBe(
-      'setblock 0 64 0 command_block 0 replace {Command:"say hi",auto:1b,conditionMet:0b,powered:1b,TrackOutput:0b,UpdateLastExecution:0b}'
+      'setblock 0 64 0 command_block 1 replace {Command:"say hi",auto:1b,conditionMet:0b,powered:1b,TrackOutput:0b,UpdateLastExecution:0b}'
     )
     const minecart = buildOocCommand({
       ...createDefaultOocOptions(),

@@ -54,6 +54,7 @@ import { DataCommandForm } from './components/DataCommandForm'
 import { LootForm } from './components/LootForm'
 import { GenericBuilder } from './components/GenericBuilder'
 import { OocForm } from './components/OocForm'
+import { LegacyToolsForm } from './components/LegacyToolsForm'
 import { OutputPanel } from './components/OutputPanel'
 import { StatusBar } from './components/StatusBar'
 import { SettingsDialog } from './components/SettingsDialog'
@@ -400,6 +401,8 @@ export default function App() {
             <ChainBuilder />
           ) : activeCommandId === 'ooc' ? (
             <OocForm />
+          ) : activeCommandId === 'legacy-tools' ? (
+            <LegacyToolsForm />
           ) : treeOnly && (legacyEngine || !supportsLegacyForm(activeCommandId ?? '')) ? (
             <GenericBuilder />
           ) : activeCommandId === 'give' ? (

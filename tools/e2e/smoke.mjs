@@ -1155,6 +1155,12 @@ async function main() {
   if (!notice1132.includes('NBT')) {
     throw new Error(`1.13.2 NBT 提示不符合预期：${notice1132}`)
   }
+  await page.locator('.command-item', { hasText: '粒子效果' }).first().click()
+  await page.waitForSelector('#particle-mode', { timeout: 10_000 })
+  const particle1132 = await page.locator('.card-hint', { hasText: '种粒子' }).innerText()
+  if (!particle1132.includes('48')) {
+    throw new Error(`1.13.2 粒子数量不符合预期：${particle1132}`)
+  }
   await page.selectOption('#pack-select', '1.12.2')
   await page.waitForTimeout(500)
   const pack1122 = await page.locator('.pack-count').innerText()
@@ -1168,6 +1174,22 @@ async function main() {
   const oocOutput = await page.locator('#ooc-output').innerText()
   if (!oocOutput.includes('summon minecraft:falling_block') || !oocOutput.includes('say two')) {
     throw new Error(`OOC 输出不符合预期：${oocOutput}`)
+  }
+  await page.selectOption('#ooc-mode', 'command-block')
+  await page.selectOption('#ooc-facing', 'east')
+  await page.fill('#ooc-commands', 'say directed')
+  await page.waitForTimeout(300)
+  const oocDirected = await page.locator('#ooc-output').innerText()
+  if (!oocDirected.includes('command_block 5 replace') || !oocDirected.includes('say directed')) {
+    throw new Error(`OOC 方向输出不符合预期：${oocDirected}`)
+  }
+  await page.getByRole('button', { name: /1.12.2 旧版工具/ }).click()
+  await page.waitForSelector('#legacy-testfor-target', { timeout: 10_000 })
+  await page.fill('#legacy-testfor-nbt', '{Health:10f}')
+  await page.waitForTimeout(300)
+  const legacyTestfor = await page.locator('#legacy-output').innerText()
+  if (!legacyTestfor.includes('testfor @a {Health:10f}')) {
+    throw new Error(`1.12.2 testfor 输出不符合预期：${legacyTestfor}`)
   }
   await page.screenshot({ path: join(ARTIFACTS, 'ooc-1.12.2.png') })
   await page.selectOption('#pack-select', '1.20.4')

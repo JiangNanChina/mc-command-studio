@@ -1,9 +1,11 @@
 import { useMemo, useState } from 'react'
 import { Copy, TerminalSquare } from 'lucide-react'
 import {
+  LEGACY_DIRECTIONS,
   OOC_MODES,
   buildOocCommand,
   createDefaultOocOptions,
+  type LegacyDirection,
   type OocMode
 } from '@mcstudio/core'
 import { useAppStore } from '../store'
@@ -89,6 +91,53 @@ export function OocForm() {
               </div>
             ))}
           </div>
+
+          <div className="row" style={{ marginTop: 8, gap: 8 }}>
+            <button
+              type="button"
+              className="btn btn-sm"
+              onClick={() => update({ x: '~', y: '~', z: '~' })}
+            >
+              使用 ~ ~ ~
+            </button>
+            <button
+              type="button"
+              className="btn btn-sm"
+              onClick={() => update({ x: '~', y: '~1', z: '~' })}
+            >
+              使用 ~ ~1 ~
+            </button>
+            <button
+              type="button"
+              className="btn btn-sm"
+              onClick={() => update({ x: '0', y: '64', z: '0' })}
+            >
+              使用 0 64 0
+            </button>
+          </div>
+
+          {options.mode === 'command-block' ? (
+            <div className="field" style={{ marginTop: 12 }}>
+              <label className="field-label" htmlFor="ooc-facing">
+                方向
+              </label>
+              <select
+                id="ooc-facing"
+                className="select"
+                value={options.facing}
+                onChange={(event) =>
+                  update({ facing: event.target.value as LegacyDirection })
+                }
+              >
+                {LEGACY_DIRECTIONS.map((direction) => (
+                  <option key={direction.value} value={direction.value}>
+                    {direction.label}（meta {direction.meta}）
+                  </option>
+                ))}
+              </select>
+              <div className="hint">方向写入 1.12 命令方块的 metadata；条件模式额外 +8。</div>
+            </div>
+          ) : null}
 
           <div className="field" style={{ marginTop: 12 }}>
             <label className="field-label" htmlFor="ooc-commands">

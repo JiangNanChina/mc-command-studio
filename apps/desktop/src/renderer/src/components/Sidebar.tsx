@@ -1,5 +1,5 @@
 import { useMemo } from 'react'
-import { Search, X, Boxes, Link2, PackageOpen, TerminalSquare } from 'lucide-react'
+import { Search, X, Boxes, Link2, PackageOpen, TerminalSquare, Wrench } from 'lucide-react'
 import {
   CATEGORY_ORDER,
   COMMAND_MAP,
@@ -85,6 +85,22 @@ export function Sidebar() {
         {category === ALL && !query ? (
           <>
             <div className="command-group-label">工具</div>
+            <button
+              type="button"
+              className={`command-item${state.activeCommandId === 'legacy-tools' ? ' active' : ''}`}
+              onClick={() => state.selectCommand('legacy-tools')}
+            >
+              <span className="command-glyph">
+                <Wrench size={15} />
+              </span>
+              <span className="command-text">
+                <span className="command-name">
+                  1.12.2 旧版工具
+                  <span className="command-id">legacy</span>
+                </span>
+                <span className="command-desc">testfor / blockdata / entitydata / replaceitem</span>
+              </span>
+            </button>
             <button
               type="button"
               className={`command-item${state.activeCommandId === 'ooc' ? ' active' : ''}`}

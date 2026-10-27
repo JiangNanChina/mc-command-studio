@@ -1,5 +1,6 @@
 import { error, warn } from './diagnostics'
 import { commandBlockString, containsControlCharacters } from './escape'
+import { LEGACY_DIRECTIONS, type LegacyDirection } from './legacy'
 import type { BuildResult, Diagnostic } from './types'
 
 export type OocMode = 'falling-sand' | 'command-block-minecart' | 'command-block'
@@ -12,6 +13,7 @@ export interface OocOptions {
   commands: string
   auto: boolean
   conditional: boolean
+  facing: LegacyDirection
   trackOutput: boolean
 }
 
@@ -30,6 +32,7 @@ export function createDefaultOocOptions(): OocOptions {
     commands: '',
     auto: true,
     conditional: false,
+    facing: 'up',
     trackOutput: false
   }
 }
@@ -83,7 +86,10 @@ export function buildOocCommand(options: OocOptions): BuildResult {
   let text = ''
   if (commands.length > 0) {
     if (options.mode === 'command-block') {
-      text = `setblock ${options.x.trim()} ${options.y.trim()} ${options.z.trim()} command_block 0 replace {${commandBlockNbt(commands[0], options)}}`
+      const meta =
+        (LEGACY_DIRECTIONS.find((direction) => direction.value === options.facing)?.meta ?? 1) +
+        (options.conditional ? 8 : 0)
+      text = `setblock ${options.x.trim()} ${options.y.trim()} ${options.z.trim()} command_block ${meta} replace {${commandBlockNbt(commands[0], options)}}`
       if (commands.length > 1) {
         diagnostics.push(warn('ooc.single', '命令方块模式只写入第一条命令；多条请用掉落沙 OOC', 'commands'))
       }
@@ -98,6 +104,11 @@ export function buildOocCommand(options: OocOptions): BuildResult {
         passengers = fallingBlock(commands[index], options, passengers)
       }
       text = `summon minecraft:falling_block ${options.x.trim()} ${options.y.trim()} ${options.z.trim()} {Block:"minecraft:redstone_block",Time:1b,Passengers:[${passengers}]}`
+      if (options.conditional) {
+        diagnostics.push(
+          warn('ooc.conditional', '掉落沙模式不支持条件链；条件仅用于命令方块模式', 'conditional')
+        )
+      }
     }
   }
 
