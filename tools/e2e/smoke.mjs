@@ -17,6 +17,26 @@ const USER_DATA = join(ARTIFACTS, 'test-userdata')
 const DATAPACK_DIR = join(ARTIFACTS, 'datapack')
 const APP_VERSION = JSON.parse(readFileSync(join(ROOT, 'package.json'), 'utf8')).version
 
+async function selectVersion(page, version) {
+  await page.locator('.version-trigger').click()
+  await page.locator('.version-search').fill(version)
+  const clicked = await page.evaluate((target) => {
+    const option = [...document.querySelectorAll('.version-option')].find(
+      (element) => element.querySelector('.version-name')?.textContent === target
+    )
+    option?.click()
+    return Boolean(option)
+  }, version)
+  if (!clicked) throw new Error('找不到版本选项：' + version)
+  await page.waitForFunction(
+    (target) => document.querySelector('.version-trigger .version-current')?.textContent === target,
+    version
+  ).catch(async () => {
+    const current = await page.locator('.version-trigger .version-current').innerText().catch(() => '?')
+    throw new Error(`切换版本失败：${version}，当前 ${current}`)
+  })
+}
+
 const errors = []
 let app
 
@@ -1060,7 +1080,7 @@ async function main() {
   await page.locator('.template-card', { hasText: '1.20.4 NBT 剑' }).click()
   await page.waitForSelector('#nbt-give-count', { timeout: 15_000 })
   await page.waitForFunction(
-    () => document.querySelector('#pack-select')?.value === '1.20.4',
+    () => document.querySelector('.version-trigger .version-current')?.textContent === '1.20.4',
     { timeout: 15_000 }
   )
   const nbtTemplateOutput = await page.locator('.output-code .cm-content').innerText()
@@ -1074,7 +1094,11 @@ async function main() {
   await page.screenshot({ path: join(ARTIFACTS, 'templates-nbt.png') })
 
   // 多版本数据包切换
-  const packOptions = await page.locator('#pack-select option').allTextContents()
+  await page.locator('.version-trigger').click()
+  await page.waitForSelector('.version-popover', { timeout: 10_000 })
+  const packOptions = [...new Set(await page.locator('.version-name').allTextContents())]
+  await page.keyboard.press('Escape')
+  await page.waitForSelector('.version-popover', { state: 'detached', timeout: 10_000 })
   const requiredPacks = [
     '1.12', '1.12.2', '1.13', '1.13.2', '1.14.4', '1.15.2', '1.16.5',
     '1.17.1', '1.18.2', '1.19.4', '1.20.4', '1.20.5', '1.20.6',
@@ -1086,7 +1110,7 @@ async function main() {
   ) {
     throw new Error(`版本选项不符合预期：${packOptions.join(', ')}`)
   }
-  await page.selectOption('#pack-select', '1.21.1')
+  await selectVersion(page, '1.21.1')
   await page.waitForSelector('.version-notice', { timeout: 15_000 })
   const pack121 = await page.locator('.pack-count').innerText()
   if (!pack121.includes('83')) {
@@ -1111,13 +1135,13 @@ async function main() {
     throw new Error(`1.21.1 粒子数量不符合预期：${particleHint}`)
   }
   await page.screenshot({ path: join(ARTIFACTS, 'pack-1.21.1.png') })
-  await page.selectOption('#pack-select', '1.20.3')
+  await selectVersion(page, '1.20.3')
   await page.waitForTimeout(500)
   const pack1203 = await page.locator('.pack-count').innerText()
   if (!pack1203.includes('82')) {
     throw new Error(`1.20.3 命令数量不符合预期：${pack1203}`)
   }
-  await page.selectOption('#pack-select', '1.19.4')
+  await selectVersion(page, '1.19.4')
   await page.waitForTimeout(500)
   const pack1194 = await page.locator('.pack-count').innerText()
   if (!pack1194.includes('79')) {
@@ -1128,33 +1152,33 @@ async function main() {
     throw new Error(`1.19.4 NBT 提示不符合预期：${notice1194}`)
   }
   await page.screenshot({ path: join(ARTIFACTS, 'pack-1.19.4.png') })
-  await page.selectOption('#pack-select', '1.18.2')
+  await selectVersion(page, '1.18.2')
   await page.waitForTimeout(500)
   const pack1182 = await page.locator('.pack-count').innerText()
   if (!pack1182.includes('77')) {
     throw new Error(`1.18.2 命令数量不符合预期：${pack1182}`)
   }
-  await page.selectOption('#pack-select', '1.16.5')
+  await selectVersion(page, '1.16.5')
   await page.waitForTimeout(500)
   const pack1165 = await page.locator('.pack-count').innerText()
   if (!pack1165.includes('74')) {
     throw new Error(`1.16.5 命令数量不符合预期：${pack1165}`)
   }
   await page.screenshot({ path: join(ARTIFACTS, 'pack-1.16.5.png') })
-  await page.selectOption('#pack-select', '1.15.2')
+  await selectVersion(page, '1.15.2')
   await page.waitForTimeout(500)
   const pack1152 = await page.locator('.pack-count').innerText()
   if (!pack1152.includes('72')) {
     throw new Error(`1.15.2 命令数量不符合预期：${pack1152}`)
   }
-  await page.selectOption('#pack-select', '1.14.4')
+  await selectVersion(page, '1.14.4')
   await page.waitForTimeout(500)
   const pack1144 = await page.locator('.pack-count').innerText()
   if (!pack1144.includes('71')) {
     throw new Error(`1.14.4 命令数量不符合预期：${pack1144}`)
   }
   await page.screenshot({ path: join(ARTIFACTS, 'pack-1.14.4.png') })
-  await page.selectOption('#pack-select', '1.13.2')
+  await selectVersion(page, '1.13.2')
   await page.waitForTimeout(500)
   const pack1132 = await page.locator('.pack-count').innerText()
   if (!pack1132.includes('67')) {
@@ -1173,7 +1197,7 @@ async function main() {
   if ((await page.locator('#particle-mode option[value="dust_transition"]').count()) !== 0) {
     throw new Error('1.13.2 不应显示 dust_transition 参数')
   }
-  await page.selectOption('#pack-select', '1.12.2')
+  await selectVersion(page, '1.12.2')
   await page.waitForTimeout(500)
   const pack1122 = await page.locator('.pack-count').innerText()
   if (!pack1122.includes('53')) {
@@ -1282,19 +1306,34 @@ async function main() {
     throw new Error(`1.12.2 give 输出不符合预期：${legacyGive}`)
   }
   await page.screenshot({ path: join(ARTIFACTS, 'ooc-1.12.2.png') })
-  await page.selectOption('#pack-select', '1.20.5')
+  await selectVersion(page, '1.13.2')
+  await page.waitForTimeout(500)
+  const pack113 = await page.locator('.pack-count').innerText()
+  const notice113 = await page.locator('.version-notice').innerText()
+  if (!pack113.includes('67') || !notice113.includes('NBT')) {
+    throw new Error(`1.13.2 回归不符合预期：${pack113} / ${notice113}`)
+  }
+  await selectVersion(page, '1.14.4')
+  await page.waitForTimeout(500)
+  const pack114 = await page.locator('.pack-count').innerText()
+  const notice114 = await page.locator('.version-notice').innerText()
+  if (!pack114.includes('71') || !notice114.includes('NBT')) {
+    throw new Error(`1.14.4 回归不符合预期：${pack114} / ${notice114}`)
+  }
+  await selectVersion(page, '1.20.5')
   await page.waitForTimeout(500)
   const pack1205 = await page.locator('.pack-count').innerText()
-  if (!pack1205.includes('83')) {
-    throw new Error(`1.20.5 命令数量不符合预期：${pack1205}`)
+  const notice1205 = await page.locator('.version-notice').innerText()
+  if (!pack1205.includes('83') || !notice1205.includes('组件')) {
+    throw new Error(`1.20.5 组件引擎不符合预期：${pack1205} / ${notice1205}`)
   }
-  await page.selectOption('#pack-select', '1.20.6')
+  await selectVersion(page, '1.20.6')
   await page.waitForTimeout(500)
   const pack1206 = await page.locator('.pack-count').innerText()
   if (!pack1206.includes('83')) {
     throw new Error(`1.20.6 别名包不符合预期：${pack1206}`)
   }
-  await page.selectOption('#pack-select', '1.12')
+  await selectVersion(page, '1.12')
   await page.waitForTimeout(500)
   const pack112 = await page.locator('.pack-count').innerText()
   if (!pack112.includes('53')) {
@@ -1307,7 +1346,7 @@ async function main() {
   if (!(await page.locator('#ooc-output').innerText()).includes('minecraft:falling_block')) {
     throw new Error('1.12 OOC 实体 ID 不符合预期')
   }
-  await page.selectOption('#pack-select', '1.20.4')
+  await selectVersion(page, '1.20.4')
   await page.waitForTimeout(500)
   const pack1204 = await page.locator('.pack-count').innerText()
   if (!pack1204.includes('82')) {
@@ -1316,8 +1355,7 @@ async function main() {
   const notice1204 = await page.locator('.version-notice').innerText()
   if (!notice1204.includes('NBT')) {
     throw new Error(`1.20.4 树模式提示不符合预期：${notice1204}`)
-  }
-  await page.locator('.tab').filter({ hasText: /^\s*命令\s*$/ }).click()
+  }  await page.locator('.tab').filter({ hasText: /^\s*命令\s*$/ }).click()
   await page.locator('.command-item', { hasText: '给予物品' }).first().click()
   await page.waitForSelector('#nbt-give-count', { timeout: 10_000 })
   await page.fill('#nbt-give-name', '旧版剑')
@@ -1401,7 +1439,7 @@ async function main() {
     throw new Error(`1.20.4 particle 旧语法不符合预期：${particle1204}`)
   }
   await page.screenshot({ path: join(ARTIFACTS, 'pack-1.20.4.png') })
-  await page.selectOption('#pack-select', '26.3')
+  await selectVersion(page, '26.3')
   await page.waitForSelector('.version-notice', { state: 'detached', timeout: 15_000 })
   const pack26 = await page.locator('.pack-count').innerText()
   if (!pack26.includes('94')) {

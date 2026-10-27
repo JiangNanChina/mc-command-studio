@@ -378,7 +378,11 @@ export default function App() {
           <Info size={14} />
           {treeOnly
             ? `当前使用 ${pack.manifest.gameVersion}（NBT 引擎）：give 使用 NBT 表单，召唤/方块/execute 等兼容表单已启用，其余命令使用命令树。`
-            : `当前使用 ${pack.manifest.gameVersion} 数据包：命令树与通用构建器来自该版本；可视化表单按 26.3 语法生成，跨版本使用前请核对。`}
+            : pack.manifest.engine === 'components'
+              ? `当前使用 ${pack.manifest.gameVersion}（组件引擎）：give/item 使用组件语法，表单与命令树按该版本生成；跨补丁版使用前请核对。`
+              : pack.manifest.engine === 'legacy'
+                ? `当前使用 ${pack.manifest.gameVersion}（Legacy 引擎）：使用旧版命令语法与 OOC 生成器。`
+                : `当前使用 ${pack.manifest.gameVersion} 数据包：命令树与通用构建器来自该版本；可视化表单按 26.3 语法生成，跨版本使用前请核对。`}
         </div>
       ) : null}
       <div className={`workspace${activeCommandId === 'datapack' ? ' no-output' : ''}`}>

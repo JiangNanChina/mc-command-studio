@@ -16,6 +16,7 @@ import {
 import { useAppStore } from '../store'
 import icon from '../assets/icon.png'
 import { TemplateDialog } from './TemplateDialog'
+import { VersionSelect } from './VersionSelect'
 
 export function Header() {
   const state = useAppStore()
@@ -51,21 +52,7 @@ export function Header() {
 
       <div className="header-actions">
         <div className="pack-pill" title="切换 Minecraft 版本">
-          <span className="dot" />
-          <select
-            id="pack-select"
-            className="pack-select"
-            aria-label="Minecraft 版本"
-            value={state.activePackId}
-            disabled={loading || state.packs.length <= 1}
-            onChange={(event) => void state.loadPack(event.target.value)}
-          >
-            {state.packs.map((pack) => (
-              <option key={pack.id} value={pack.id}>
-                {pack.gameVersion}
-              </option>
-            ))}
-          </select>
+          <VersionSelect />
           {state.pack ? (
             <span className="pack-count">{state.pack.manifest.counts.roots} 命令</span>
           ) : null}
