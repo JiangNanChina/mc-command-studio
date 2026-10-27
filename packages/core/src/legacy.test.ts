@@ -12,12 +12,14 @@ import {
   buildSetidletimeout,
   buildSave,
   buildStats,
+  buildScoreboard,
   createDefaultBlockdata,
   createDefaultEntitydata,
   createDefaultGive,
   createDefaultReplaceitem,
   createDefaultTestfor,
-  createDefaultStats
+  createDefaultStats,
+  createDefaultScoreboard
 } from './legacy'
 
 describe('1.12 legacy commands', () => {
@@ -91,6 +93,18 @@ describe('1.12 legacy commands', () => {
     expect(buildStats({ ...base, action: 'clear', stat: 'SuccessCount' }).text).toBe(
       'stats entity @p clear SuccessCount'
     )
+  })
+
+  it('builds legacy scoreboard operations', () => {
+    const base = createDefaultScoreboard()
+    expect(
+      buildScoreboard({ ...base, action: 'players-set', target: '@p', objective: 'kills', value: '3' })
+        .text
+    ).toBe('scoreboard players set @p kills 3')
+    expect(
+      buildScoreboard({ ...base, action: 'objectives-add', name: 'kills', criterion: 'dummy', display: '击杀数' })
+        .text
+    ).toBe('scoreboard objectives add kills dummy 击杀数')
   })
 
   it('builds legacy give with NBT', () => {

@@ -257,6 +257,25 @@ export const QUICK_SCHEMAS: Record<string, QuickSchema> = {
     ],
     build: (v) => `fetchprofile ${v.type} ${v.value}`
   },
+  compute: {
+    fields: [
+      { key: 'targetType', label: '计算目标', kind: 'select', options: ['default', 'entity', 'block'], defaultValue: 'default' },
+      { key: 'target', label: '实体/方块坐标', kind: 'text', defaultValue: '@s' },
+      { key: 'valueType', label: '数值类型', kind: 'select', options: ['float', 'integer'], defaultValue: 'float' },
+      { key: 'provider', label: 'Provider 表达式', kind: 'text', defaultValue: 'constant(1.0)' },
+      { key: 'scale', label: 'float 缩放（可选）', kind: 'text', defaultValue: '' }
+    ],
+    build: (v) => {
+      const prefix =
+        v.targetType === 'entity'
+          ? `compute entity ${v.target}`
+          : v.targetType === 'block'
+            ? `compute block ${v.target}`
+            : 'compute default'
+      if (v.valueType === 'integer') return `${prefix} integer ${v.provider}`
+      return `${prefix} float ${v.provider}${v.scale.trim() ? ` ${v.scale.trim()}` : ''}`
+    }
+  },
   trigger: {
     fields: [
       { key: 'objective', label: '目标', kind: 'text', defaultValue: 'quest' },
@@ -287,7 +306,10 @@ export function QuickCommandForm({ id }: { id: string }) {
   const setQuickCommand = useAppStore((state) => state.setQuickCommand)
   const [values, setValues] = useState<Record<string, string>>(() => defaultsFor(schema))
   const meta = COMMAND_MAP.get(id)
-  const text = useMemo(() => schema.build(values), [schema, values])
+  const text = useMemo(
+    () => schema.build({ ...defaultsFor(schema), ...values }),
+    [schema, values]
+  )
 
   useEffect(() => {
     setValues(defaultsFor(schema))

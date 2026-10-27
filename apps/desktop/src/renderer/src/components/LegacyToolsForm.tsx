@@ -17,6 +17,7 @@ import {
   buildSetidletimeout,
   buildSave,
   buildStats,
+  buildScoreboard,
   createDefaultBlockdata,
   createDefaultEntitydata,
   createDefaultGive,
@@ -28,12 +29,13 @@ import {
   createDefaultTrigger,
   createDefaultIdle,
   createDefaultSave,
-  createDefaultStats
+  createDefaultStats,
+  createDefaultScoreboard
 } from '@mcstudio/core'
 import { useAppStore } from '../store'
 import { CustomPresetBar } from './CustomPresetBar'
 
-type LegacyTab = 'testfor' | 'blockdata' | 'entitydata' | 'replaceitem' | 'give' | 'testforblock' | 'testforblocks' | 'achievement' | 'trigger' | 'setidletimeout' | 'save' | 'stats'
+type LegacyTab = 'testfor' | 'blockdata' | 'entitydata' | 'replaceitem' | 'give' | 'testforblock' | 'testforblocks' | 'achievement' | 'trigger' | 'setidletimeout' | 'save' | 'stats' | 'scoreboard'
 
 const TABS: { id: LegacyTab; label: string }[] = [
   { id: 'testfor', label: 'testfor' },
@@ -47,7 +49,8 @@ const TABS: { id: LegacyTab; label: string }[] = [
   { id: 'trigger', label: 'trigger' },
   { id: 'setidletimeout', label: 'setidletimeout' },
   { id: 'save', label: 'save' },
-  { id: 'stats', label: 'stats' }
+  { id: 'stats', label: 'stats' },
+  { id: 'scoreboard', label: 'scoreboard' }
 ]
 
 export function LegacyToolsForm() {
@@ -65,6 +68,7 @@ export function LegacyToolsForm() {
   const [idle, setIdle] = useState(createDefaultIdle)
   const [save, setSave] = useState(createDefaultSave)
   const [stats, setStats] = useState(createDefaultStats)
+  const [scoreboard, setScoreboard] = useState(createDefaultScoreboard)
   const pack = useAppStore((state) => state.pack)
   const itemOptions = pack?.registries.item ?? []
   const blockOptions = pack?.registries.block ?? []
@@ -82,8 +86,9 @@ export function LegacyToolsForm() {
     if (tab === 'setidletimeout') return buildSetidletimeout(idle)
     if (tab === 'save') return buildSave(save)
     if (tab === 'stats') return buildStats(stats)
+    if (tab === 'scoreboard') return buildScoreboard(scoreboard)
     return buildReplaceitem(replaceitem)
-  }, [tab, testfor, blockdata, entitydata, replaceitem, give, testforblock, testforblocks, achievement, trigger, idle, save, stats])
+  }, [tab, testfor, blockdata, entitydata, replaceitem, give, testforblock, testforblocks, achievement, trigger, idle, save, stats, scoreboard])
 
   const copy = async () => {
     if (!result.text) return
@@ -688,6 +693,60 @@ export function LegacyToolsForm() {
                     onChange={(event) => setStats({ ...stats, objective: event.target.value })} />
                 </div>
               </div>
+            </>
+          ) : null}
+
+          {tab === 'scoreboard' ? (
+            <>
+              <div className="field">
+                <label className="field-label" htmlFor="legacy-score-action">操作</label>
+                <select id="legacy-score-action" className="select" value={scoreboard.action}
+                  onChange={(event) => setScoreboard({ ...scoreboard, action: event.target.value as typeof scoreboard.action })}>
+                  <option value="objectives-add">objectives add</option>
+                  <option value="objectives-remove">objectives remove</option>
+                  <option value="objectives-list">objectives list</option>
+                  <option value="players-set">players set</option>
+                  <option value="players-add">players add</option>
+                  <option value="players-remove">players remove</option>
+                </select>
+              </div>
+              {scoreboard.action.startsWith('objectives') ? (
+                <div className="grid-3" style={{ marginTop: 12 }}>
+                  <div className="field">
+                    <label className="field-label" htmlFor="legacy-score-name">目标名</label>
+                    <input id="legacy-score-name" className="input" value={scoreboard.name}
+                      onChange={(event) => setScoreboard({ ...scoreboard, name: event.target.value })} />
+                  </div>
+                  <div className="field">
+                    <label className="field-label" htmlFor="legacy-score-criterion">准则</label>
+                    <input id="legacy-score-criterion" className="input" value={scoreboard.criterion}
+                      onChange={(event) => setScoreboard({ ...scoreboard, criterion: event.target.value })} />
+                  </div>
+                  <div className="field">
+                    <label className="field-label" htmlFor="legacy-score-display">显示名</label>
+                    <input id="legacy-score-display" className="input" value={scoreboard.display}
+                      onChange={(event) => setScoreboard({ ...scoreboard, display: event.target.value })} />
+                  </div>
+                </div>
+              ) : (
+                <div className="grid-3" style={{ marginTop: 12 }}>
+                  <div className="field">
+                    <label className="field-label" htmlFor="legacy-score-target">目标</label>
+                    <input id="legacy-score-target" className="input" value={scoreboard.target}
+                      onChange={(event) => setScoreboard({ ...scoreboard, target: event.target.value })} />
+                  </div>
+                  <div className="field">
+                    <label className="field-label" htmlFor="legacy-score-objective">目标名</label>
+                    <input id="legacy-score-objective" className="input" value={scoreboard.objective}
+                      onChange={(event) => setScoreboard({ ...scoreboard, objective: event.target.value })} />
+                  </div>
+                  <div className="field">
+                    <label className="field-label" htmlFor="legacy-score-value">分数</label>
+                    <input id="legacy-score-value" className="input" value={scoreboard.value}
+                      onChange={(event) => setScoreboard({ ...scoreboard, value: event.target.value })} />
+                  </div>
+                </div>
+              )}
             </>
           ) : null}
 

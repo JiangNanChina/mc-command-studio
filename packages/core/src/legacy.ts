@@ -84,6 +84,18 @@ export function createDefaultSave(): LegacySaveOptions {
   return { action: 'hold' }
 }
 
+export function createDefaultScoreboard(): LegacyScoreboardOptions {
+  return {
+    action: 'players-set',
+    name: 'kills',
+    criterion: 'dummy',
+    display: '击杀数',
+    target: '@p',
+    objective: 'kills',
+    value: '0'
+  }
+}
+
 export function createDefaultStats(): LegacyStatsOptions {
   return {
     targetType: 'entity',
@@ -178,6 +190,22 @@ export interface LegacyIdleOptions {
 
 export interface LegacySaveOptions {
   action: 'hold' | 'query'
+}
+
+export interface LegacyScoreboardOptions {
+  action:
+    | 'objectives-add'
+    | 'objectives-remove'
+    | 'objectives-list'
+    | 'players-set'
+    | 'players-add'
+    | 'players-remove'
+  name: string
+  criterion: string
+  display: string
+  target: string
+  objective: string
+  value: string
 }
 
 export interface LegacyStatsOptions {
@@ -373,6 +401,44 @@ export function buildSetidletimeout(options: LegacyIdleOptions): BuildResult {
 
 export function buildSave(options: LegacySaveOptions): BuildResult {
   return finish(['save', options.action], [])
+}
+
+export function buildScoreboard(options: LegacyScoreboardOptions): BuildResult {
+  const diagnostics: Diagnostic[] = []
+  if (options.action === 'objectives-add') {
+    if (!options.name.trim()) diagnostics.push(error('legacy.name', '目标名不能为空', 'name'))
+    if (!options.criterion.trim()) {
+      diagnostics.push(error('legacy.criterion', '准则不能为空', 'criterion'))
+    }
+    const parts = ['scoreboard', 'objectives', 'add', options.name.trim(), options.criterion.trim()]
+    if (options.display.trim()) parts.push(options.display.trim())
+    return finish(parts, diagnostics)
+  }
+  if (options.action === 'objectives-remove') {
+    if (!options.name.trim()) diagnostics.push(error('legacy.name', '目标名不能为空', 'name'))
+    return finish(['scoreboard', 'objectives', 'remove', options.name.trim()], diagnostics)
+  }
+  if (options.action === 'objectives-list') {
+    return finish(['scoreboard', 'objectives', 'list'], diagnostics)
+  }
+  if (!options.target.trim()) diagnostics.push(error('legacy.target', '目标不能为空', 'target'))
+  if (!options.objective.trim()) {
+    diagnostics.push(error('legacy.objective', '目标名不能为空', 'objective'))
+  }
+  if (!/^-?\d+$/.test(options.value.trim())) {
+    diagnostics.push(error('legacy.value', '分数必须是整数', 'value'))
+  }
+  return finish(
+    [
+      'scoreboard',
+      'players',
+      options.action.replace('players-', ''),
+      options.target.trim(),
+      options.objective.trim(),
+      options.value.trim()
+    ],
+    diagnostics
+  )
 }
 
 export function buildStats(options: LegacyStatsOptions): BuildResult {

@@ -504,7 +504,7 @@ export default function App() {
             <LootForm />
           ) : activeCommandId ? (
             isQuickCommand(activeCommandId) ? (
-              <QuickCommandForm id={activeCommandId} />
+              <QuickCommandForm key={activeCommandId} id={activeCommandId} />
             ) : (
               <GenericBuilder />
             )
