@@ -34,6 +34,10 @@ import {
   buildSound,
   buildTeleport,
   buildAdmin,
+  buildWorld,
+  buildSimple,
+  buildGamemode,
+  buildBlock,
   createDefaultBlockdata,
   createDefaultEntitydata,
   createDefaultGive,
@@ -62,12 +66,16 @@ import {
   createDefaultEnchant,
   createDefaultSound,
   createDefaultTeleport,
-  createDefaultAdmin
+  createDefaultAdmin,
+  createDefaultWorld,
+  createDefaultSimple,
+  createDefaultGamemode,
+  createDefaultBlock
 } from '@mcstudio/core'
 import { useAppStore } from '../store'
 import { CustomPresetBar } from './CustomPresetBar'
 
-type LegacyTab = 'testfor' | 'blockdata' | 'entitydata' | 'replaceitem' | 'give' | 'testforblock' | 'testforblocks' | 'achievement' | 'trigger' | 'setidletimeout' | 'save' | 'stats' | 'scoreboard' | 'execute' | 'advancement' | 'clear' | 'worldborder' | 'spreadplayers' | 'title' | 'particle' | 'summon' | 'gamerule' | 'xp' | 'tellraw' | 'effect' | 'enchant' | 'sound' | 'teleport' | 'admin'
+type LegacyTab = 'testfor' | 'blockdata' | 'entitydata' | 'replaceitem' | 'give' | 'testforblock' | 'testforblocks' | 'achievement' | 'trigger' | 'setidletimeout' | 'save' | 'stats' | 'scoreboard' | 'execute' | 'advancement' | 'clear' | 'worldborder' | 'spreadplayers' | 'title' | 'particle' | 'summon' | 'gamerule' | 'xp' | 'tellraw' | 'effect' | 'enchant' | 'sound' | 'teleport' | 'admin' | 'world' | 'simple' | 'gamemode' | 'block'
 
 const TABS: { id: LegacyTab; label: string }[] = [
   { id: 'testfor', label: 'testfor' },
@@ -98,7 +106,11 @@ const TABS: { id: LegacyTab; label: string }[] = [
   { id: 'enchant', label: 'enchant' },
   { id: 'sound', label: 'sound' },
   { id: 'teleport', label: 'teleport' },
-  { id: 'admin', label: 'admin' }
+  { id: 'admin', label: 'admin' },
+  { id: 'world', label: 'world' },
+  { id: 'simple', label: 'simple' },
+  { id: 'gamemode', label: 'gamemode' },
+  { id: 'block', label: 'block' }
 ]
 
 export function LegacyToolsForm() {
@@ -133,6 +145,10 @@ export function LegacyToolsForm() {
   const [sound, setSound] = useState(createDefaultSound)
   const [teleport, setTeleport] = useState(createDefaultTeleport)
   const [admin, setAdmin] = useState(createDefaultAdmin)
+  const [world, setWorld] = useState(createDefaultWorld)
+  const [simple, setSimple] = useState(createDefaultSimple)
+  const [gamemode, setGamemode] = useState(createDefaultGamemode)
+  const [block, setBlock] = useState(createDefaultBlock)
   const pack = useAppStore((state) => state.pack)
   const itemOptions = pack?.registries.item ?? []
   const blockOptions = pack?.registries.block ?? []
@@ -167,8 +183,12 @@ export function LegacyToolsForm() {
     if (tab === 'sound') return buildSound(sound)
     if (tab === 'teleport') return buildTeleport(teleport)
     if (tab === 'admin') return buildAdmin(admin)
+    if (tab === 'world') return buildWorld(world)
+    if (tab === 'simple') return buildSimple(simple)
+    if (tab === 'gamemode') return buildGamemode(gamemode)
+    if (tab === 'block') return buildBlock(block)
     return buildReplaceitem(replaceitem)
-  }, [tab, testfor, blockdata, entitydata, replaceitem, give, testforblock, testforblocks, achievement, trigger, idle, save, stats, scoreboard, execute, advancement, clear, worldborder, spreadplayers, title, particle, summon, gamerule, xp, tellraw, effect, enchant, sound, teleport, admin])
+  }, [tab, testfor, blockdata, entitydata, replaceitem, give, testforblock, testforblocks, achievement, trigger, idle, save, stats, scoreboard, execute, advancement, clear, worldborder, spreadplayers, title, particle, summon, gamerule, xp, tellraw, effect, enchant, sound, teleport, admin, world, simple, gamemode, block])
 
   const copy = async () => {
     if (!result.text) return
@@ -1391,6 +1411,194 @@ export function LegacyToolsForm() {
                     onChange={(event) => setAdmin({ ...admin, reason: event.target.value })} />
                 </div>
               ) : null}
+            </>
+          ) : null}
+
+          {tab === 'world' ? (
+            <>
+              <div className="field">
+                <label className="field-label" htmlFor="legacy-world-action">类型</label>
+                <select id="legacy-world-action" className="select" value={world.action}
+                  onChange={(event) => setWorld({ ...world, action: event.target.value as typeof world.action })}>
+                  <option value="time">time</option>
+                  <option value="weather">weather</option>
+                  <option value="difficulty">difficulty</option>
+                </select>
+              </div>
+              {world.action === 'time' ? (
+                <div className="grid-2" style={{ marginTop: 12 }}>
+                  <div className="field">
+                    <label className="field-label" htmlFor="legacy-world-time-action">时间动作</label>
+                    <select id="legacy-world-time-action" className="select" value={world.timeAction}
+                      onChange={(event) => setWorld({ ...world, timeAction: event.target.value as typeof world.timeAction })}>
+                      <option value="set">set</option>
+                      <option value="add">add</option>
+                      <option value="query">query</option>
+                    </select>
+                  </div>
+                  <div className="field">
+                    <label className="field-label" htmlFor="legacy-world-time-value">时间</label>
+                    <input id="legacy-world-time-value" className="input" value={world.timeValue}
+                      onChange={(event) => setWorld({ ...world, timeValue: event.target.value })} />
+                  </div>
+                </div>
+              ) : null}
+              {world.action === 'weather' ? (
+                <div className="grid-2" style={{ marginTop: 12 }}>
+                  <div className="field">
+                    <label className="field-label" htmlFor="legacy-world-weather">天气</label>
+                    <select id="legacy-world-weather" className="select" value={world.weather}
+                      onChange={(event) => setWorld({ ...world, weather: event.target.value as typeof world.weather })}>
+                      <option value="clear">clear</option>
+                      <option value="rain">rain</option>
+                      <option value="thunder">thunder</option>
+                    </select>
+                  </div>
+                  <div className="field">
+                    <label className="field-label" htmlFor="legacy-world-duration">持续时间（秒）</label>
+                    <input id="legacy-world-duration" className="input" value={world.duration}
+                      onChange={(event) => setWorld({ ...world, duration: event.target.value })} />
+                  </div>
+                </div>
+              ) : null}
+              {world.action === 'difficulty' ? (
+                <div className="field" style={{ marginTop: 12 }}>
+                  <label className="field-label" htmlFor="legacy-world-difficulty">难度</label>
+                  <select id="legacy-world-difficulty" className="select" value={world.difficulty}
+                    onChange={(event) => setWorld({ ...world, difficulty: event.target.value as typeof world.difficulty })}>
+                    <option value="peaceful">peaceful</option>
+                    <option value="easy">easy</option>
+                    <option value="normal">normal</option>
+                    <option value="hard">hard</option>
+                  </select>
+                </div>
+              ) : null}
+            </>
+          ) : null}
+
+          {tab === 'simple' ? (
+            <>
+              <div className="field">
+                <label className="field-label" htmlFor="legacy-simple-action">命令</label>
+                <select id="legacy-simple-action" className="select" value={simple.action}
+                  onChange={(event) => setSimple({ ...simple, action: event.target.value as typeof simple.action })}>
+                  <option value="help">help</option>
+                  <option value="list">list</option>
+                  <option value="seed">seed</option>
+                  <option value="reload">reload</option>
+                  <option value="save-all">save-all</option>
+                  <option value="save-off">save-off</option>
+                  <option value="save-on">save-on</option>
+                  <option value="stop">stop</option>
+                  <option value="toggledownfall">toggledownfall</option>
+                  <option value="me">me</option>
+                  <option value="say">say</option>
+                  <option value="tell">tell</option>
+                </select>
+              </div>
+              {simple.action === 'help' ? (
+                <div className="field" style={{ marginTop: 12 }}>
+                  <label className="field-label" htmlFor="legacy-simple-help">命令（可选）</label>
+                  <input id="legacy-simple-help" className="input" value={simple.helpCommand}
+                    onChange={(event) => setSimple({ ...simple, helpCommand: event.target.value })} />
+                </div>
+              ) : null}
+              {simple.action === 'tell' ? (
+                <div className="field" style={{ marginTop: 12 }}>
+                  <label className="field-label" htmlFor="legacy-simple-target">目标</label>
+                  <input id="legacy-simple-target" className="input" value={simple.target}
+                    onChange={(event) => setSimple({ ...simple, target: event.target.value })} />
+                </div>
+              ) : null}
+              {['me', 'say', 'tell'].includes(simple.action) ? (
+                <div className="field" style={{ marginTop: 12 }}>
+                  <label className="field-label" htmlFor="legacy-simple-message">消息</label>
+                  <input id="legacy-simple-message" className="input" value={simple.message}
+                    onChange={(event) => setSimple({ ...simple, message: event.target.value })} />
+                </div>
+              ) : null}
+            </>
+          ) : null}
+
+          {tab === 'gamemode' ? (
+            <div className="grid-3">
+              <div className="field">
+                <label className="field-label" htmlFor="legacy-gm-action">命令</label>
+                <select id="legacy-gm-action" className="select" value={gamemode.action}
+                  onChange={(event) => setGamemode({ ...gamemode, action: event.target.value as typeof gamemode.action })}>
+                  <option value="gamemode">gamemode</option>
+                  <option value="defaultgamemode">defaultgamemode</option>
+                </select>
+              </div>
+              <div className="field">
+                <label className="field-label" htmlFor="legacy-gm-mode">模式</label>
+                <select id="legacy-gm-mode" className="select" value={gamemode.mode}
+                  onChange={(event) => setGamemode({ ...gamemode, mode: event.target.value as typeof gamemode.mode })}>
+                  <option value="survival">survival</option>
+                  <option value="creative">creative</option>
+                  <option value="adventure">adventure</option>
+                  <option value="spectator">spectator</option>
+                </select>
+              </div>
+              {gamemode.action === 'gamemode' ? (
+                <div className="field">
+                  <label className="field-label" htmlFor="legacy-gm-target">目标</label>
+                  <input id="legacy-gm-target" className="input" value={gamemode.target}
+                    onChange={(event) => setGamemode({ ...gamemode, target: event.target.value })} />
+                </div>
+              ) : null}
+            </div>
+          ) : null}
+
+          {tab === 'block' ? (
+            <>
+              <div className="field">
+                <label className="field-label" htmlFor="legacy-block-action">操作</label>
+                <select id="legacy-block-action" className="select" value={block.action}
+                  onChange={(event) => setBlock({ ...block, action: event.target.value as typeof block.action })}>
+                  <option value="setblock">setblock</option>
+                  <option value="fill">fill</option>
+                  <option value="clone">clone</option>
+                </select>
+              </div>
+              <div className="grid-3" style={{ marginTop: 12 }}>
+                {(['x1', 'y1', 'z1', 'x2', 'y2', 'z2'] as const).map((key) => (
+                  <div className="field" key={key}>
+                    <label className="field-label" htmlFor={`legacy-block-${key}`}>{key}</label>
+                    <input id={`legacy-block-${key}`} className="input" value={block[key]}
+                      onChange={(event) => setBlock({ ...block, [key]: event.target.value })} />
+                  </div>
+                ))}
+              </div>
+              {block.action !== 'clone' ? (
+                <div className="grid-2" style={{ marginTop: 12 }}>
+                  <div className="field">
+                    <label className="field-label" htmlFor="legacy-block-name">方块</label>
+                    <input id="legacy-block-name" className="input" value={block.block}
+                      onChange={(event) => setBlock({ ...block, block: event.target.value })} />
+                  </div>
+                  <div className="field">
+                    <label className="field-label" htmlFor="legacy-block-data">数据值</label>
+                    <input id="legacy-block-data" className="input" value={block.data}
+                      onChange={(event) => setBlock({ ...block, data: event.target.value })} />
+                  </div>
+                </div>
+              ) : (
+                <div className="grid-3" style={{ marginTop: 12 }}>
+                  {(['x', 'y', 'z', 'mask'] as const).map((key) => (
+                    <div className="field" key={key}>
+                      <label className="field-label" htmlFor={`legacy-block-${key}`}>{key}</label>
+                      <input id={`legacy-block-${key}`} className="input" value={block[key]}
+                        onChange={(event) => setBlock({ ...block, [key]: event.target.value })} />
+                    </div>
+                  ))}
+                </div>
+              )}
+              <div className="field" style={{ marginTop: 12 }}>
+                <label className="field-label" htmlFor="legacy-block-mode">模式</label>
+                <input id="legacy-block-mode" className="input" value={block.mode}
+                  onChange={(event) => setBlock({ ...block, mode: event.target.value })} />
+              </div>
             </>
           ) : null}
 

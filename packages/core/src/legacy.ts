@@ -84,6 +84,49 @@ export function createDefaultSave(): LegacySaveOptions {
   return { action: 'hold' }
 }
 
+export function createDefaultWorld(): LegacyWorldOptions {
+  return {
+    action: 'time',
+    timeAction: 'set',
+    timeValue: 'day',
+    weather: 'clear',
+    duration: '',
+    difficulty: 'normal'
+  }
+}
+
+export function createDefaultSimple(): LegacySimpleOptions {
+  return {
+    action: 'list',
+    target: '@a',
+    message: 'Hello',
+    helpCommand: ''
+  }
+}
+
+export function createDefaultGamemode(): LegacyGamemodeOptions {
+  return { action: 'gamemode', mode: 'creative', target: '@p' }
+}
+
+export function createDefaultBlock(): LegacyBlockOptions {
+  return {
+    action: 'setblock',
+    x1: '~',
+    y1: '~',
+    z1: '~',
+    x2: '~5',
+    y2: '~5',
+    z2: '~5',
+    x: '~',
+    y: '~',
+    z: '~',
+    block: 'minecraft:stone',
+    data: '0',
+    mode: 'replace',
+    mask: 'replace'
+  }
+}
+
 export function createDefaultSound(): LegacySoundOptions {
   return {
     action: 'play',
@@ -346,6 +389,57 @@ export interface LegacyIdleOptions {
 
 export interface LegacySaveOptions {
   action: 'hold' | 'query'
+}
+
+export interface LegacyWorldOptions {
+  action: 'time' | 'weather' | 'difficulty'
+  timeAction: 'set' | 'add' | 'query'
+  timeValue: string
+  weather: 'clear' | 'rain' | 'thunder'
+  duration: string
+  difficulty: 'peaceful' | 'easy' | 'normal' | 'hard'
+}
+
+export interface LegacySimpleOptions {
+  action:
+    | 'help'
+    | 'list'
+    | 'seed'
+    | 'reload'
+    | 'save-all'
+    | 'save-off'
+    | 'save-on'
+    | 'stop'
+    | 'toggledownfall'
+    | 'me'
+    | 'say'
+    | 'tell'
+  target: string
+  message: string
+  helpCommand: string
+}
+
+export interface LegacyGamemodeOptions {
+  action: 'gamemode' | 'defaultgamemode'
+  mode: 'survival' | 'creative' | 'adventure' | 'spectator'
+  target: string
+}
+
+export interface LegacyBlockOptions {
+  action: 'setblock' | 'fill' | 'clone'
+  x1: string
+  y1: string
+  z1: string
+  x2: string
+  y2: string
+  z2: string
+  x: string
+  y: string
+  z: string
+  block: string
+  data: string
+  mode: string
+  mask: string
 }
 
 export interface LegacySoundOptions {
@@ -704,6 +798,96 @@ export function buildSetidletimeout(options: LegacyIdleOptions): BuildResult {
 
 export function buildSave(options: LegacySaveOptions): BuildResult {
   return finish(['save', options.action], [])
+}
+
+export function buildWorld(options: LegacyWorldOptions): BuildResult {
+  const diagnostics: Diagnostic[] = []
+  if (options.action === 'time') {
+    if (options.timeAction === 'query') return finish(['time', 'query', 'daytime'], diagnostics)
+    return finish(['time', options.timeAction, options.timeValue.trim()], diagnostics)
+  }
+  if (options.action === 'weather') {
+    return finish(
+      ['weather', options.weather, options.duration.trim()].filter(Boolean),
+      diagnostics
+    )
+  }
+  return finish(['difficulty', options.difficulty], diagnostics)
+}
+
+export function buildSimple(options: LegacySimpleOptions): BuildResult {
+  const diagnostics: Diagnostic[] = []
+  if (options.action === 'help') {
+    return finish(['help', options.helpCommand.trim()].filter(Boolean), diagnostics)
+  }
+  if (options.action === 'me' || options.action === 'say') {
+    if (!options.message.trim()) diagnostics.push(error('legacy.message', '消息不能为空', 'message'))
+    return finish([options.action, options.message.trim()], diagnostics)
+  }
+  if (options.action === 'tell') {
+    if (!options.target.trim()) diagnostics.push(error('legacy.target', '目标不能为空', 'target'))
+    if (!options.message.trim()) diagnostics.push(error('legacy.message', '消息不能为空', 'message'))
+    return finish(['tell', options.target.trim(), options.message.trim()], diagnostics)
+  }
+  return finish([options.action], diagnostics)
+}
+
+export function buildGamemode(options: LegacyGamemodeOptions): BuildResult {
+  const parts: string[] = [options.action, options.mode]
+  if (options.action === 'gamemode') parts.push(options.target.trim())
+  return finish(parts, [])
+}
+
+export function buildBlock(options: LegacyBlockOptions): BuildResult {
+  const diagnostics: Diagnostic[] = []
+  if (options.action === 'setblock') {
+    return finish(
+      [
+        'setblock',
+        options.x1.trim(),
+        options.y1.trim(),
+        options.z1.trim(),
+        options.block.trim(),
+        options.data.trim(),
+        options.mode.trim()
+      ].filter(Boolean),
+      diagnostics
+    )
+  }
+  if (options.action === 'fill') {
+    return finish(
+      [
+        'fill',
+        options.x1.trim(),
+        options.y1.trim(),
+        options.z1.trim(),
+        options.x2.trim(),
+        options.y2.trim(),
+        options.z2.trim(),
+        options.block.trim(),
+        options.data.trim(),
+        options.mode.trim()
+      ].filter(Boolean),
+      diagnostics
+    )
+  }
+  return finish(
+    [
+      'clone',
+      options.x1.trim(),
+      options.y1.trim(),
+      options.z1.trim(),
+      options.x2.trim(),
+      options.y2.trim(),
+      options.z2.trim(),
+      options.x.trim(),
+      options.y.trim(),
+      options.z.trim(),
+      options.mask.trim(),
+      options.mode.trim()
+    ].filter(Boolean),
+    diagnostics
+  )
 }
 
 export function buildSound(options: LegacySoundOptions): BuildResult {

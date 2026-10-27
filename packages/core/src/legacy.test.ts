@@ -29,6 +29,10 @@ import {
   buildSound,
   buildTeleport,
   buildAdmin,
+  buildWorld,
+  buildSimple,
+  buildGamemode,
+  buildBlock,
   createDefaultBlockdata,
   createDefaultEntitydata,
   createDefaultGive,
@@ -51,7 +55,11 @@ import {
   createDefaultEnchant,
   createDefaultSound,
   createDefaultTeleport,
-  createDefaultAdmin
+  createDefaultAdmin,
+  createDefaultWorld,
+  createDefaultSimple,
+  createDefaultGamemode,
+  createDefaultBlock
 } from './legacy'
 
 describe('1.12 legacy commands', () => {
@@ -125,6 +133,20 @@ describe('1.12 legacy commands', () => {
     expect(buildStats({ ...base, action: 'clear', stat: 'SuccessCount' }).text).toBe(
       'stats entity @p clear SuccessCount'
     )
+  })
+
+  it('builds world, simple, gamemode and block', () => {
+    expect(buildWorld({ ...createDefaultWorld(), action: 'time', timeAction: 'set', timeValue: 'day' }).text).toBe(
+      'time set day'
+    )
+    expect(buildSimple({ ...createDefaultSimple(), action: 'list' }).text).toBe('list')
+    expect(
+      buildGamemode({ action: 'gamemode', mode: 'creative', target: '@p' }).text
+    ).toBe('gamemode creative @p')
+    expect(
+      buildBlock({ ...createDefaultBlock(), action: 'setblock', block: 'minecraft:stone', data: '0', mode: 'replace' })
+        .text
+    ).toBe('setblock ~ ~ ~ minecraft:stone 0 replace')
   })
 
   it('builds sound, teleport and admin', () => {
