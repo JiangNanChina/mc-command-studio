@@ -142,7 +142,7 @@ async function main() {
     throw new Error(`locate 快捷表单输出不符合预期：${locateOutput}`)
   }
   await page.locator('.command-item', { hasText: 'compute' }).first().click()
-  await page.waitForSelector('#quick-compute-provider', { timeout: 10_000 })
+  await page.waitForSelector('#quick-compute-providerPreset', { timeout: 10_000 })
   await page.waitForTimeout(300)
   const computeOutput = await page.locator('.output-code .cm-content').innerText()
   if (!computeOutput.startsWith('compute default float constant(1.0)')) {

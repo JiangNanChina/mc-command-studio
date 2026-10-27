@@ -20,6 +20,8 @@ import {
   buildSpreadplayers,
   buildTitle,
   buildParticle,
+  buildSummon,
+  buildGamerule,
   createDefaultBlockdata,
   createDefaultEntitydata,
   createDefaultGive,
@@ -33,7 +35,9 @@ import {
   createDefaultWorldborder,
   createDefaultSpreadplayers,
   createDefaultTitle,
-  createDefaultParticle
+  createDefaultParticle,
+  createDefaultSummon,
+  createDefaultGamerule
 } from './legacy'
 
 describe('1.12 legacy commands', () => {
@@ -106,6 +110,22 @@ describe('1.12 legacy commands', () => {
     ).toBe('stats entity @p set SuccessCount kills')
     expect(buildStats({ ...base, action: 'clear', stat: 'SuccessCount' }).text).toBe(
       'stats entity @p clear SuccessCount'
+    )
+  })
+
+  it('builds summon and gamerule', () => {
+    expect(
+      buildSummon({
+        ...createDefaultSummon(),
+        entity: 'minecraft:zombie',
+        x: '~',
+        y: '~',
+        z: '~',
+        nbt: '{NoAI:1b}'
+      }).text
+    ).toBe('summon minecraft:zombie ~ ~ ~ {NoAI:1b}')
+    expect(buildGamerule({ rule: 'keepInventory', value: 'true' }).text).toBe(
+      'gamerule keepInventory true'
     )
   })
 

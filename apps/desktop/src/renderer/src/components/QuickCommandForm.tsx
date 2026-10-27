@@ -12,6 +12,7 @@ interface QuickField {
   options?: string[]
   defaultValue: string
   placeholder?: string
+  visible?: (values: Record<string, string>) => boolean
 }
 
 interface QuickSchema {
@@ -81,7 +82,7 @@ export const QUICK_SCHEMAS: Record<string, QuickSchema> = {
     fields: [
       { key: 'action', label: '动作', kind: 'select', options: ['show', 'clear'], defaultValue: 'show' },
       { key: 'targets', label: '目标', kind: 'text', defaultValue: '@s' },
-      { key: 'dialog', label: '对话框 ID', kind: 'text', defaultValue: 'minecraft:server_links' }
+      { key: 'dialog', label: '对话框 ID', kind: 'text', defaultValue: 'minecraft:server_links', visible: (v) => v.action === 'show' }
     ],
     build: (v) => (v.action === 'show' ? `dialog show ${v.targets} ${v.dialog}` : `dialog clear ${v.targets}`)
   },
@@ -260,10 +261,11 @@ export const QUICK_SCHEMAS: Record<string, QuickSchema> = {
   compute: {
     fields: [
       { key: 'targetType', label: '计算目标', kind: 'select', options: ['default', 'entity', 'block'], defaultValue: 'default' },
-      { key: 'target', label: '实体/方块坐标', kind: 'text', defaultValue: '@s' },
+      { key: 'target', label: '实体/方块坐标', kind: 'text', defaultValue: '@s', visible: (v) => v.targetType !== 'default' },
       { key: 'valueType', label: '数值类型', kind: 'select', options: ['float', 'integer'], defaultValue: 'float' },
-      { key: 'provider', label: 'Provider 表达式', kind: 'text', defaultValue: 'constant(1.0)' },
-      { key: 'scale', label: 'float 缩放（可选）', kind: 'text', defaultValue: '' }
+      { key: 'providerPreset', label: 'Provider 预设', kind: 'select', options: ['constant(1.0)', 'constant(0.0)', 'custom'], defaultValue: 'constant(1.0)' },
+      { key: 'provider', label: '自定义 Provider', kind: 'text', defaultValue: 'constant(1.0)', visible: (v) => v.providerPreset === 'custom' },
+      { key: 'scale', label: 'float 缩放（可选）', kind: 'text', defaultValue: '', visible: (v) => v.valueType === 'float' }
     ],
     build: (v) => {
       const prefix =
@@ -272,8 +274,8 @@ export const QUICK_SCHEMAS: Record<string, QuickSchema> = {
           : v.targetType === 'block'
             ? `compute block ${v.target}`
             : 'compute default'
-      if (v.valueType === 'integer') return `${prefix} integer ${v.provider}`
-      return `${prefix} float ${v.provider}${v.scale.trim() ? ` ${v.scale.trim()}` : ''}`
+      if (v.valueType === 'integer') return `${prefix} integer ${v.providerPreset === 'custom' ? v.provider : v.providerPreset}`
+      return `${prefix} float ${v.providerPreset === 'custom' ? v.provider : v.providerPreset}${v.scale.trim() ? ` ${v.scale.trim()}` : ''}`
     }
   },
   trigger: {
@@ -331,7 +333,14 @@ const NBT_SAFE_QUICK = new Set([
   'teleport',
   'experience',
   'defaultgamemode',
-  'trigger'
+  'trigger',
+  'fillbiome',
+  'spectate',
+  'recipe',
+  'return',
+  'perf',
+  'jfr',
+  'debug'
 ])
 
 /** NBT 版本（1.13–1.20.4）可安全复用的快捷表单。 */
@@ -388,7 +397,9 @@ export function QuickCommandForm({ id }: { id: string }) {
         </div>
         {schema.fields.length > 0 ? (
           <div className="grid-2">
-            {schema.fields.map((field) => (
+            {schema.fields
+              .filter((field) => !field.visible || field.visible(values))
+              .map((field) => (
               <div className="field" key={field.key}>
                 <label className="field-label" htmlFor={`quick-${id}-${field.key}`}>
                   {field.label}

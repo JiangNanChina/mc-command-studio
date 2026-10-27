@@ -84,6 +84,20 @@ export function createDefaultSave(): LegacySaveOptions {
   return { action: 'hold' }
 }
 
+export function createDefaultSummon(): LegacySummonOptions {
+  return {
+    entity: 'minecraft:zombie',
+    x: '~',
+    y: '~',
+    z: '~',
+    nbt: ''
+  }
+}
+
+export function createDefaultGamerule(): LegacyGameruleOptions {
+  return { rule: 'keepInventory', value: 'true' }
+}
+
 export function createDefaultTitle(): LegacyTitleOptions {
   return {
     target: '@a',
@@ -271,6 +285,19 @@ export interface LegacyIdleOptions {
 
 export interface LegacySaveOptions {
   action: 'hold' | 'query'
+}
+
+export interface LegacySummonOptions {
+  entity: string
+  x: string
+  y: string
+  z: string
+  nbt: string
+}
+
+export interface LegacyGameruleOptions {
+  rule: string
+  value: string
 }
 
 export interface LegacyTitleOptions {
@@ -549,6 +576,29 @@ export function buildSetidletimeout(options: LegacyIdleOptions): BuildResult {
 
 export function buildSave(options: LegacySaveOptions): BuildResult {
   return finish(['save', options.action], [])
+}
+
+export function buildSummon(options: LegacySummonOptions): BuildResult {
+  const diagnostics: Diagnostic[] = []
+  if (!options.entity.trim()) diagnostics.push(error('legacy.entity', '实体不能为空', 'entity'))
+  validateNbt(options.nbt, diagnostics)
+  const parts = [
+    'summon',
+    options.entity.trim(),
+    options.x.trim(),
+    options.y.trim(),
+    options.z.trim()
+  ]
+  if (options.nbt.trim()) parts.push(options.nbt.trim())
+  return finish(parts, diagnostics)
+}
+
+export function buildGamerule(options: LegacyGameruleOptions): BuildResult {
+  const diagnostics: Diagnostic[] = []
+  if (!options.rule.trim()) diagnostics.push(error('legacy.rule', '规则不能为空', 'rule'))
+  const parts = ['gamerule', options.rule.trim()]
+  if (options.value.trim()) parts.push(options.value.trim())
+  return finish(parts, diagnostics)
 }
 
 export function buildTitle(options: LegacyTitleOptions): BuildResult {

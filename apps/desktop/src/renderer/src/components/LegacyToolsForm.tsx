@@ -25,6 +25,8 @@ import {
   buildSpreadplayers,
   buildTitle,
   buildParticle,
+  buildSummon,
+  buildGamerule,
   createDefaultBlockdata,
   createDefaultEntitydata,
   createDefaultGive,
@@ -44,12 +46,14 @@ import {
   createDefaultWorldborder,
   createDefaultSpreadplayers,
   createDefaultTitle,
-  createDefaultParticle
+  createDefaultParticle,
+  createDefaultSummon,
+  createDefaultGamerule
 } from '@mcstudio/core'
 import { useAppStore } from '../store'
 import { CustomPresetBar } from './CustomPresetBar'
 
-type LegacyTab = 'testfor' | 'blockdata' | 'entitydata' | 'replaceitem' | 'give' | 'testforblock' | 'testforblocks' | 'achievement' | 'trigger' | 'setidletimeout' | 'save' | 'stats' | 'scoreboard' | 'execute' | 'advancement' | 'clear' | 'worldborder' | 'spreadplayers' | 'title' | 'particle'
+type LegacyTab = 'testfor' | 'blockdata' | 'entitydata' | 'replaceitem' | 'give' | 'testforblock' | 'testforblocks' | 'achievement' | 'trigger' | 'setidletimeout' | 'save' | 'stats' | 'scoreboard' | 'execute' | 'advancement' | 'clear' | 'worldborder' | 'spreadplayers' | 'title' | 'particle' | 'summon' | 'gamerule'
 
 const TABS: { id: LegacyTab; label: string }[] = [
   { id: 'testfor', label: 'testfor' },
@@ -71,7 +75,9 @@ const TABS: { id: LegacyTab; label: string }[] = [
   { id: 'worldborder', label: 'worldborder' },
   { id: 'spreadplayers', label: 'spreadplayers' },
   { id: 'title', label: 'title' },
-  { id: 'particle', label: 'particle' }
+  { id: 'particle', label: 'particle' },
+  { id: 'summon', label: 'summon' },
+  { id: 'gamerule', label: 'gamerule' }
 ]
 
 export function LegacyToolsForm() {
@@ -97,6 +103,8 @@ export function LegacyToolsForm() {
   const [spreadplayers, setSpreadplayers] = useState(createDefaultSpreadplayers)
   const [title, setTitle] = useState(createDefaultTitle)
   const [particle, setParticle] = useState(createDefaultParticle)
+  const [summon, setSummon] = useState(createDefaultSummon)
+  const [gamerule, setGamerule] = useState(createDefaultGamerule)
   const pack = useAppStore((state) => state.pack)
   const itemOptions = pack?.registries.item ?? []
   const blockOptions = pack?.registries.block ?? []
@@ -122,8 +130,10 @@ export function LegacyToolsForm() {
     if (tab === 'spreadplayers') return buildSpreadplayers(spreadplayers)
     if (tab === 'title') return buildTitle(title)
     if (tab === 'particle') return buildParticle(particle)
+    if (tab === 'summon') return buildSummon(summon)
+    if (tab === 'gamerule') return buildGamerule(gamerule)
     return buildReplaceitem(replaceitem)
-  }, [tab, testfor, blockdata, entitydata, replaceitem, give, testforblock, testforblocks, achievement, trigger, idle, save, stats, scoreboard, execute, advancement, clear, worldborder, spreadplayers, title, particle])
+  }, [tab, testfor, blockdata, entitydata, replaceitem, give, testforblock, testforblocks, achievement, trigger, idle, save, stats, scoreboard, execute, advancement, clear, worldborder, spreadplayers, title, particle, summon, gamerule])
 
   const copy = async () => {
     if (!result.text) return
@@ -1065,6 +1075,45 @@ export function LegacyToolsForm() {
                 </div>
               </div>
             </>
+          ) : null}
+
+          {tab === 'summon' ? (
+            <>
+              <div className="field">
+                <label className="field-label" htmlFor="legacy-summon-entity">实体</label>
+                <input id="legacy-summon-entity" className="input" value={summon.entity}
+                  onChange={(event) => setSummon({ ...summon, entity: event.target.value })} />
+              </div>
+              <div className="grid-3" style={{ marginTop: 12 }}>
+                {(['x', 'y', 'z'] as const).map((axis) => (
+                  <div className="field" key={axis}>
+                    <label className="field-label" htmlFor={`legacy-summon-${axis}`}>{axis.toUpperCase()}</label>
+                    <input id={`legacy-summon-${axis}`} className="input" value={summon[axis]}
+                      onChange={(event) => setSummon({ ...summon, [axis]: event.target.value })} />
+                  </div>
+                ))}
+              </div>
+              <div className="field" style={{ marginTop: 12 }}>
+                <label className="field-label" htmlFor="legacy-summon-nbt">NBT（可选）</label>
+                <textarea id="legacy-summon-nbt" className="textarea" rows={3} value={summon.nbt}
+                  onChange={(event) => setSummon({ ...summon, nbt: event.target.value })} />
+              </div>
+            </>
+          ) : null}
+
+          {tab === 'gamerule' ? (
+            <div className="grid-2">
+              <div className="field">
+                <label className="field-label" htmlFor="legacy-rule-name">规则</label>
+                <input id="legacy-rule-name" className="input" value={gamerule.rule}
+                  onChange={(event) => setGamerule({ ...gamerule, rule: event.target.value })} />
+              </div>
+              <div className="field">
+                <label className="field-label" htmlFor="legacy-rule-value">值（留空查询）</label>
+                <input id="legacy-rule-value" className="input" value={gamerule.value}
+                  onChange={(event) => setGamerule({ ...gamerule, value: event.target.value })} />
+              </div>
+            </div>
           ) : null}
 
           {result.diagnostics.length > 0 ? (
