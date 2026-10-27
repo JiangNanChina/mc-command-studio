@@ -1071,6 +1071,7 @@ async function main() {
     !packOptions.includes('1.16.5') ||
     !packOptions.includes('1.15.2') ||
     !packOptions.includes('1.14.4') ||
+    !packOptions.includes('1.13.2') ||
     !packOptions.includes('26.3')
   ) {
     throw new Error(`版本选项不符合预期：${packOptions.join(', ')}`)
@@ -1143,6 +1144,16 @@ async function main() {
     throw new Error(`1.14.4 命令数量不符合预期：${pack1144}`)
   }
   await page.screenshot({ path: join(ARTIFACTS, 'pack-1.14.4.png') })
+  await page.selectOption('#pack-select', '1.13.2')
+  await page.waitForTimeout(500)
+  const pack1132 = await page.locator('.pack-count').innerText()
+  if (!pack1132.includes('67')) {
+    throw new Error(`1.13.2 命令数量不符合预期：${pack1132}`)
+  }
+  const notice1132 = await page.locator('.version-notice').innerText()
+  if (!notice1132.includes('NBT')) {
+    throw new Error(`1.13.2 NBT 提示不符合预期：${notice1132}`)
+  }
   await page.selectOption('#pack-select', '1.20.4')
   await page.waitForTimeout(500)
   const pack1204 = await page.locator('.pack-count').innerText()

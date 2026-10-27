@@ -7,7 +7,7 @@ pnpm data:build
 pnpm data:verify
 ```
 
-当前构建九个版本：
+当前构建十个版本：
 
 - `26.3`：主版本，所有可视化表单按此语法生成。
 - `1.21.1`：组件引擎，命令树完整；主要表单已按 1.21.1 差异适配。
@@ -18,8 +18,9 @@ pnpm data:verify
 - `1.16.5`：NBT 引擎，旧版目录与命令树。
 - `1.15.2`：NBT 引擎，旧版目录与命令树。
 - `1.14.4`：NBT 引擎，旧版目录与命令树。
+- `1.13.2`：官方 server reports + client lang 转换；NBT 引擎、旧版目录。
 
-> 1.13.x 的 mcmeta summary 缺少 commands/blocks/registries 数据，当前无法完整构建；需要改用官方 server.jar reports。
+> 1.13.2 由 `tools/pipeline/build-1.13.2.mjs` 生成，产物已提交；CI 不重复下载 server/client jar。
 
 生成内容：
 

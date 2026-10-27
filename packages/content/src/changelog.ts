@@ -22,6 +22,31 @@ const REPO = 'https://github.com/JiangNanChina/mc-command-studio'
  */
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: '0.1.52',
+    date: '2026-10-27',
+    title: '补齐 1.13.2 数据包',
+    highlights: ['10 个数据包覆盖 1.13.2–1.20.4。', '1.13.2 官方 reports 转换器。'],
+    sections: [
+      {
+        type: 'added',
+        items: [
+          '1.13.2 数据包：67 根命令、790 物品、598 方块。',
+          'tools/pipeline/build-1.13.2.mjs 转换器。',
+          '冒烟覆盖 1.13.2 版本切换。'
+        ]
+      },
+      {
+        type: 'improved',
+        items: ['data:verify 覆盖 10 个数据包。', '旧版目录自动切换。']
+      },
+      {
+        type: 'fixed',
+        items: ['1.13.2 不再依赖 mcmeta 缺失的历史数据。']
+      }
+    ],
+    releaseUrl: `${REPO}/releases/tag/v0.1.52`
+  },
+  {
     version: '0.1.51',
     date: '2026-10-27',
     title: '旧版数据管线扩展到 1.14.4–1.20.3',

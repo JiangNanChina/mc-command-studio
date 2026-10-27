@@ -20,7 +20,7 @@
 | 26.x 全量编辑器 | ⏳ | 同上 | 3–4 周 | P2 |
 | **1.20.5 – 1.21.x** | ✅ 1.21.1 组件版 | mcmeta | 2–3 周 | P3 |
 | **1.14.4 – 1.20.4** | ✅ 9 个数据包，NBT | mcmeta | 6–8 周 | P4 |
-| 1.13.x | 🚧 上游缺 commands/blocks/registries | 官方 server.jar reports | 待接 | P4 |
+| **1.13.2** | ✅ 官方 server reports + client lang | 官方 jar | 已完成 | P4 |
 | 1.12.2 及更早 | ⏳ | 手工 schema + 社区数据 | 5–7 周 | P5 |
 
 > 结论：全版本支持的总成本约 4–6 个月（1 人、20h/周），其中 1.13–1.20.4 的 NBT 编辑器与 1.12.2 的独立引擎占大头。建议先发现代版，再按版本段扩展。
@@ -29,8 +29,7 @@
 
 ### 数据
 
-- 已接入 1.14.4 / 1.15.2 / 1.16.5 / 1.18.2 / 1.19.4 / 1.20.3 / 1.20.4；命令树、注册表、方块状态均来自 mcmeta summary。
-- 1.13.x 的 mcmeta summary 缺少 commands/blocks/registries，需要官方 server.jar `--reports` 生成，暂未接入。
+- 已接入 1.13.2 / 1.14.4 / 1.15.2 / 1.16.5 / 1.18.2 / 1.19.4 / 1.20.3 / 1.20.4；1.13.2 由官方 server reports + client lang 转换，其余来自 mcmeta summary。
 - 方块状态/注册表结构基本一致，pipeline 可以复用。
 
 ### 代码
