@@ -18,6 +18,18 @@ describe('changelog', () => {
     expect(latestChangelog().version).toBe(packageJson.version)
   })
 
+  it('shows the testing-stage and unfinished-function notice in the current announcement', () => {
+    // Keep the stage warning above the fold as well as in the detailed limitations.
+    const current = latestChangelog()
+    expect(current.highlights[0]).toContain('软件仍处于测试阶段')
+    expect(current.highlights[0]).toContain('半成品')
+    const knownItems = current.sections
+      .filter((section) => section.type === 'known')
+      .flatMap((section) => section.items)
+    expect(knownItems.some((item) => item.includes('JSON / SNBT') && item.includes('尚未全部可视化'))).toBe(true)
+    expect(knownItems.some((item) => item.includes('尚未在实际 Minecraft 游戏 / 服务器中逐项执行命令'))).toBe(true)
+  })
+
   it('contains non-empty sections and items', () => {
     for (const entry of CHANGELOG) {
       expect(entry.title.length).toBeGreaterThan(0)

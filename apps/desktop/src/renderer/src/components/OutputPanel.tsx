@@ -17,6 +17,7 @@ import {
   type Diagnostic
 } from '@mcstudio/core'
 import { getApi } from '../lib/api'
+import { COMMAND_TEMPLATES } from '../lib/templateCatalog'
 import { createCurrentOutputSelector } from '../lib/commandOutput'
 import { useShallow } from 'zustand/react/shallow'
 import { useAppStore } from '../store'
@@ -187,16 +188,20 @@ export function OutputPanel() {
     setOutputMode: state.setOutputMode
   })))
   const output = useAppStore(selectOutput)
-  const commandMode = state.outputMode === 'command'
+  const legacyTemplate = state.activeCommandId?.startsWith('template:') && state.pack?.manifest.engine === 'legacy'
+  const commandMode = state.outputMode === 'command' || legacyTemplate
   const chainMode = state.activeCommandId === 'chain'
   const multiLineMode =
     chainMode ||
     state.activeCommandId === 'bossbar' ||
     state.activeCommandId === 'team' ||
     (state.activeCommandId === 'title' && state.title.times)
-  const permission = state.activeCommandId
+  const permissionRoot = state.activeCommandId?.startsWith('template:')
+    ? COMMAND_TEMPLATES.find((template) => `template:${template.id}` === state.activeCommandId)?.target.command
+    : state.activeCommandId
+  const permission = permissionRoot
     ? permissionLabel(
-        state.pack?.commands.children?.[state.activeCommandId] ??
+        state.pack?.commands.children?.[permissionRoot] ??
           ({ type: 'literal' } as CommandNodeData)
       )
     : ''
@@ -233,8 +238,8 @@ export function OutputPanel() {
             role="tab"
             aria-selected={!commandMode}
             className={`tab${!commandMode ? ' active' : ''}`}
-            disabled={multiLineMode}
-            title={multiLineMode ? '当前输出是多行命令，不能包进单个命令方块' : undefined}
+            disabled={multiLineMode || legacyTemplate}
+            title={legacyTemplate ? '旧版模板请复制命令到游戏中的命令方块' : multiLineMode ? '当前输出是多行命令，不能包进单个命令方块' : undefined}
             onClick={() => state.setOutputMode('command-block')}
           >
             命令方块

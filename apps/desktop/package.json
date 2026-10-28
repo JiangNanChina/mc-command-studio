@@ -1,8 +1,8 @@
 {
   "name": "@mcstudio/desktop",
-  "version": "0.6.2",
+  "version": "0.7.0",
   "private": true,
-  "description": "MC 指令工坊 Windows 桌面应用",
+  "description": "MC 指令工坊中文命令编辑器（测试阶段，部分功能尚未完成）",
   "main": "out/main/index.js",
   "author": "MC Command Studio",
   "license": "MIT",

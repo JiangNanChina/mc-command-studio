@@ -1,15 +1,24 @@
 import { useShallow } from 'zustand/react/shallow'
 import { useState } from 'react'
-import { Gift, Package, Plus, Crosshair, Hash, Layers, ClipboardPaste } from 'lucide-react'
+import { Gift, Package, Plus, Crosshair, Hash, Layers, ClipboardPaste, Pickaxe, SlidersHorizontal, Sparkles, FlaskConical, Save } from 'lucide-react'
 import { COMMAND_MAP, ITEM_COMPONENTS } from '@mcstudio/content'
 import { SELECTOR_BASES, serializeSelector } from '@mcstudio/core'
 import { ComponentsEditor } from './ComponentsEditor'
 import { GiveImportDialog } from './GiveImportDialog'
 import { McIcon } from './McIcon'
 import { mcName } from '../lib/mcAssets'
+import { CustomPresetBar } from './CustomPresetBar'
 import { useAppStore } from '../store'
 
 const meta = COMMAND_MAP.get('give')
+
+const COMPONENT_GROUPS = [
+  { id: 'basic', label: '基础', icon: Package, description: '数量、耐久、名称、描述与物品标签。', kinds: ['custom_name', 'item_name', 'lore', 'damage', 'max_damage', 'max_stack_size', 'item_tags', 'custom_data'] },
+  { id: 'attributes', label: '属性', icon: SlidersHorizontal, description: '物品持有或穿戴时应用的属性修饰器。', kinds: ['attribute_modifiers'] },
+  { id: 'enchantments', label: '附魔', icon: Sparkles, description: '添加多项附魔并分别设置等级。', kinds: ['enchantments'] },
+  { id: 'advanced', label: '进阶', icon: Pickaxe, description: '无法破坏、稀有度、模型数据及冒险模式限制。', kinds: ['unbreakable', 'rarity', 'enchantment_glint_override', 'custom_model_data', 'can_break', 'can_place_on'] },
+  { id: 'special', label: '特殊物品', icon: FlaskConical, description: '设置药水效果、刷怪蛋生物与刷怪笼参数。', kinds: ['potion_contents', 'entity_data', 'block_entity_data'] }
+] as const
 
 export function GiveForm() {
   const state = useAppStore(useShallow((state) => ({
@@ -21,15 +30,36 @@ export function GiveForm() {
     replaceComponent: state.replaceComponent,
     removeComponent: state.removeComponent,
     addComponent: state.addComponent,
-    showToast: state.showToast
+    showToast: state.showToast,
+    applyGiveImport: state.applyGiveImport
   })))
   const [importOpen, setImportOpen] = useState(false)
+  const [componentGroup, setComponentGroup] = useState<(typeof COMPONENT_GROUPS)[number]['id']>('basic')
   const selectorPreview = serializeSelector(state.give.target)
   const itemComponents = state.give.item.components
   const enchantments = state.pack?.registries.enchantment ?? []
+  const activeGroup = COMPONENT_GROUPS.find((group) => group.id === componentGroup) ?? COMPONENT_GROUPS[0]
+  const visibleComponents = itemComponents
+    .map((component, index) => ({ component, index }))
+    .filter(({ component }) => activeGroup.kinds.includes(component.kind as never))
   const availableComponents = ITEM_COMPONENTS.filter(
-    (component) => !itemComponents.some((item) => item.kind === component.kind)
+    (component) => activeGroup.kinds.includes(component.kind as never)
+      && !itemComponents.some((item) => item.kind === component.kind)
   )
+
+  const applySavedPlan = (value: string): void => {
+    try {
+      const plan: unknown = JSON.parse(value)
+      if (!plan || typeof plan !== 'object') throw new Error()
+      const candidate = plan as { item?: { id?: unknown; components?: unknown }; count?: unknown; target?: unknown }
+      if (typeof candidate.item?.id !== 'string' || !Array.isArray(candidate.item.components)
+        || typeof candidate.count !== 'number' || !candidate.target || typeof candidate.target !== 'object') throw new Error()
+      state.applyGiveImport(plan as Parameters<typeof state.applyGiveImport>[0])
+      state.showToast('已载入物品方案', 'success')
+    } catch {
+      state.showToast('物品方案格式无效，无法载入', 'error')
+    }
+  }
 
   return (
     <div className="content">
@@ -55,6 +85,12 @@ export function GiveForm() {
           <ClipboardPaste size={15} />
           从命令导入
         </button>
+      </div>
+
+      <div className="give-preset-toolbar">
+        <div className="card-title"><Save size={15} />物品方案</div>
+        <CustomPresetBar storageKey="give:modern" label="物品方案"
+          value={JSON.stringify(state.give)} onApply={applySavedPlan} />
       </div>
 
       <div className="card">
@@ -162,21 +198,39 @@ export function GiveForm() {
         <div className="card-head">
           <div className="card-title">
             <Layers size={15} />
-            物品组件
-            <span className="badge">{itemComponents.length}</span>
+            {activeGroup.label}设置
+            <span className="badge">{visibleComponents.length}</span>
           </div>
-          <div className="card-hint">1.20.5+ 组件语法；留空即不写入</div>
+          <div className="card-hint">{activeGroup.description}</div>
         </div>
         <div className="card-body">
+          <div className="segmented-control give-component-tabs" role="tablist" aria-label="物品设置类别">
+            {COMPONENT_GROUPS.map((group) => {
+              const Icon = group.icon
+              const count = itemComponents.filter((component) => group.kinds.includes(component.kind as never)).length
+              return (
+                <button key={group.id} type="button" role="tab" aria-selected={componentGroup === group.id}
+                  className={`give-component-tab${componentGroup === group.id ? ' active' : ''}`}
+                  onClick={() => setComponentGroup(group.id)}>
+                  <Icon size={14} />{group.label}{count > 0 ? <span className="badge">{count}</span> : null}
+                </button>
+              )
+            })}
+          </div>
+
           <ComponentsEditor
-            components={itemComponents}
+            components={visibleComponents.map(({ component }) => component)}
             enchantments={enchantments}
+            entities={state.pack?.registries.entity_type ?? []}
+            attributes={state.pack?.registries.attribute ?? []}
+            potions={state.pack?.registries.potion ?? []}
+            effects={state.pack?.registries.mob_effect ?? []}
             gameVersion={state.pack?.manifest.gameVersion}
-            onReplace={(index, component) => state.replaceComponent(index, component)}
-            onRemove={(index) => state.removeComponent(index)}
+            onReplace={(index, component) => state.replaceComponent(visibleComponents[index].index, component)}
+            onRemove={(index) => state.removeComponent(visibleComponents[index].index)}
           />
 
-          <div className="row" style={{ marginTop: 14 }}>
+          <div className="row wrap" style={{ marginTop: 14 }}>
             <select
               className="select"
               value=""

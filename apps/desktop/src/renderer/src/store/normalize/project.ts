@@ -5,6 +5,7 @@ import {
 import { emptyGeneric } from '../defaults'
 import type { ProjectPayload } from '../model'
 import { normalizeQuickDrafts } from '../../lib/quickCommands'
+import { normalizeTemplateDrafts } from '../../lib/templateState'
 import {
   normalizeGive,
   normalizeNbtGive,
@@ -54,6 +55,7 @@ export function normalizeProjectPayload(input: unknown): ProjectPayload {
   return {
     activeCommandId: typeof data.activeCommandId === 'string' ? data.activeCommandId : null,
     quickDrafts: normalizeQuickDrafts(data.quickDrafts),
+    templateDrafts: normalizeTemplateDrafts(data.templateDrafts),
     give: normalizeGive(data.give),
     nbtGive: normalizeNbtGive(data.nbtGive),
     gamemode: normalizeGamemode(data.gamemode),

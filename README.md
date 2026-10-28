@@ -4,23 +4,32 @@
 [![Release](https://img.shields.io/github/v/release/JiangNanChina/mc-command-studio)](https://github.com/JiangNanChina/mc-command-studio/releases/latest)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
-> Windows 桌面版 Minecraft Java 命令编辑器。用表单拼命令，实时复制，或生成放置命令方块的 `/setblock`。
+> 中文优先的 Minecraft Java 命令编辑器。Windows 桌面应用，支持物品配置、NBT / JSON 模板与多版本命令生成，可离线编辑、保存项目和复用物品方案。
 >
-> **不是网页**：安装包双击即用，不需要浏览器、服务器或账号，断网可编辑。
+> **测试阶段说明：软件仍处于测试阶段，部分功能属于半成品（尚未完成），可能存在错误或体验不完善。** 高级模板的专有字段仍需编辑 JSON / SNBT / 组件文本；命令尚未在实际游戏中逐项验证。请保留项目备份，并先在测试世界确认效果。
 >
-> **[下载最新版](https://github.com/JiangNanChina/mc-command-studio/releases/latest)**
+> **[下载正式发布包](https://github.com/JiangNanChina/mc-command-studio/releases/latest)** · [查看更新日志](CHANGELOG.md) · [反馈问题](https://github.com/JiangNanChina/mc-command-studio/issues)
 
 ![give 表单](docs/assets/give-form.png)
 
-## 功能（0.6.2）
+## 本次更新（0.7.0）
+
+- **中文主显示**：属性、附魔、药水、刷怪笼、实体、槽位、伤害、游戏规则等优先显示中文，英文 ID 作为次级信息保留；可按中文或 ID 搜索，选择后仍生成原始游戏 ID。
+- **给予物品分区设置**：基础、属性、附魔、进阶、特殊物品五个分区，覆盖数量、损耗耐久、名称、描述、标签、属性修饰器、药水效果和刷怪笼参数等常用字段。
+- **物品方案复用**：保存和载入当前配置；独立管理弹窗支持重命名、删除与 JSON 导入 / 导出。
+- **五类专用模板**：JSON 相关、特殊 NBT 物品 / 方块、复合物品 / 方块、特殊 NBT 实体、复合实体，共 51 个入口，按模板和版本保留独立草稿。专有数据仍通过文本编辑，并非所有字段都已可视化。
+- **旧版界面调整**：1.12.2 工具沿用主界面深色风格，按用途分组并提供中文说明和图标；基础命令集中展示，修正同行输入框与窄窗口布局。
+- **版本兼容修复**：1.13–1.15 保留旧版 camelCase 属性名，现代版本继续使用对应资源 ID；保留自定义 ID、原始命令与 JSON / NBT 编辑能力。
+
+## 主要功能
 
 - **保存与恢复**：快捷表单草稿随项目保存、恢复和撤销；关闭、重启与安装更新前可选择保存、放弃或取消。
 - **版本兼容**：按目标版本生成物品文本、附魔与模型数据组件，修复旧版 NBT give 语法及命令内部空白丢失。
 - **品牌图标**：命令方块主题的应用图标、安装包图标与界面 Logo。
-- **更新公告**：只展示当前版本更新，历史版本跳转 GitHub Releases；不再显示已知问题。
+- **更新公告**：应用内展示当前版本变更和测试阶段说明，历史版本跳转 GitHub Releases。
 - **数据包工作区**：侧栏“工具”独立打开，多函数管理、load/tick 标签、文件预览与 zip 导出；与命令编辑彻底分开。
 - **可视化选择**：物品、方块、状态效果、附魔、实体、声音统一为中文名 + 图标网格；支持中文名 / ID 搜索。
-- **中文资源库**：26.3 官方中文名称（1,658 物品、1,286 方块、40 效果、43 附魔、161 实体、1,991 声音）+ 图标图集。
+- **中文资源库**：内置物品、方块、效果、附魔、实体名称与图标；声音使用中文名称或中文事件说明。未知或模组内容显示中文分类提示并保留原始 ID。
 - **富文本可视化**：`tellraw` / `title` 支持多段文本、16 色、样式、点击/悬停、标题时序与实时预览。
 - **声音可视化**：`playsound` / `stopsound` 支持 1,991 个声音、来源、坐标、音量/音调/最小音量。
 - **BOSS 栏可视化**：`bossbar` 创建/更新/移除/查询/列表、颜色/样式/数值/可见性/玩家列表、实时预览。
@@ -28,7 +37,7 @@
 - **粒子可视化**：`particle` 128 种粒子、SNBT 参数（方块/红石尘/渐变/物品/颜色/原始）、位置/扩散/速度/数量/force/viewers。
 - **世界控制**：`time` / `weather` / `difficulty` 合并页面，时间预设/自定义 tick、天气持续时间、难度说明。
 - **标签与清除**：`tag` 添加/移除/查询实体标签；`clear` 清除全部或指定物品并可限制数量。
-- **游戏规则**：`gamerule` 59 条规则，中文名/说明搜索、布尔开关/整数范围/查询。
+- **游戏规则**：按当前版本命令树显示规则，支持中文名 / ID 搜索、布尔开关、整数值与查询，兼容新旧规则名。
 - **世界边界**：`worldborder` 尺寸/扩展/中心/伤害/警告/查询，支持过渡时间与示意预览。
 - **队伍**：`team` 创建/修改/加入/离开/删除/查询，16 色、友伤、隐身队友、名字标签与碰撞规则。
 - **出生点与加载**：`spawnpoint` / `setworldspawn` 坐标与朝向；`forceload` 矩形区块加载。
@@ -40,7 +49,7 @@
 - **NBT 版本过滤**：1.13–1.20.4 的 `execute` / `data` 选项按当前版本命令树过滤，不出现越版字段。
 - **队伍文本**：`team` 前缀/后缀与高级显示名可视化文本组件。
 - **单元体系**：资源 ID、数值、物品栈、槽位统一校验。
-- **一键模板库**：8 个模板；支持切换目标版本（含 1.20.4 NBT 剑）。
+- **起始模板与分类模板**：保留常用起始模板，并提供五类 51 个独立模板入口；支持切换目标版本。
 - **多版本**：覆盖 1.12–26.3 全部 54 个正式版；主要版本使用独立数据包，补丁版通过版本别名复用最近的基础包。
 - **26.3 数据包**：94 个根命令、1,197 个字面量、59 种参数类型。
 - **1.21.1 数据包**：83 个根命令、1,333 物品、1,060 方块。
@@ -52,15 +61,15 @@
 - **1.15.2 数据包**：72 个根命令，NBT 引擎。
 - **1.14.4 数据包**：71 个根命令，NBT 引擎。
 - **1.13.2 数据包**：67 个根命令，官方 server reports + client lang 转换，NBT 引擎。
-- **1.12.2 Legacy**：64 个根命令；OOC 生成器（掉落沙/矿车/命令方块 NBT）。
+- **1.12.2 旧版工具**：64 个根命令入口；一键命令生成器（OOC，掉落沙 / 矿车 / 命令方块 NBT）。
 - **专用表单**：`give`、`summon`、`setblock`、`execute`、`tp`、`effect`、`fill`、`clone`、`enchant`、`xp`、`tellraw`、`title`、`playsound`、`stopsound`、`bossbar`、`scoreboard`、`particle`、`time`、`weather`、`difficulty`、`tag`、`clear`、`gamerule`、`worldborder`、`team`、`spawnpoint`、`setworldspawn`、`forceload`、`attribute`、`advancement`、`function`、`schedule`、`item`、`data`、`loot`、`gamemode`、`damage`、`rotate`。
 - **命令方块链**：按方向排布最多 64 个脉冲/连锁/循环方块，自动偏移坐标，生成整链 `/setblock`。
 - **execute 执行链**：as/at/positioned/align/anchored/facing/rotated/in/if/unless/store/raw 可排序积木 + run。
 - **状态效果**：可视化选择效果，支持自定义秒数或永久（infinite）、等级、隐藏粒子。
 - **撤销 / 重做**：覆盖所有表单、通用构建器、项目名称、命令方块设置和数据包草稿；Ctrl+Z / Ctrl+Shift+Z / Ctrl+Y，最多 100 步。
-- **give**：目标选择器、物品搜索、数量、13 类物品组件；文本导入。
+- **give**：目标选择器、中文物品搜索、五个设置分区、物品方案与现代组件命令导入；可用字段按目标版本区分。
 - **setblock**：方块选择、方块状态属性、方块实体 NBT、4 种放置模式。
-- **更新公告**：每个版本的新增 / 改进 / 修复 / 已知问题内置在应用中；更新后首次启动显示横幅，顶栏铃铛随时查看版本历史。
+- **公告入口**：更新后首次启动显示横幅，顶栏铃铛可查看当前版本公告，并跳转历史发布记录。
 - **通用构建器**：未覆盖命令仍保留官方命令树作为高级兜底。
 - **本地项目**：`.mcstudio` JSON、最近打开、4 秒防抖自动保存、异常退出恢复。
 - **桌面体验**：深色/浅色主题、中文界面、原生菜单、文件关联、单实例、高 DPI。
@@ -74,7 +83,7 @@
 - 便携版：`MC-Command-Studio-<版本>-portable.exe`，双击即用；**便携版不会自动更新**，请手动下载新版。
 - 校验和：发布页附 `checksums.txt`（本地构建产物在 `release/checksums.txt`）。
 
-> 当前构建未做代码签名，Windows SmartScreen 可能提示“未知发布者”。选择“更多信息 → 仍要运行”，或自行校验 SHA-256。正式发布前应配置证书，见 [docs/08-release-update.md](docs/08-release-update.md)。
+> 当前构建未做代码签名，Windows SmartScreen 可能提示“未知发布者”。请先确认下载来源并校验 SHA-256；代码签名配置见 [docs/08-release-update.md](docs/08-release-update.md)。公开发布包仍属于测试阶段，版本号不代表所有功能已经完成。
 
 系统要求：Windows 10 22H2+ / Windows 11 x64。
 
@@ -94,8 +103,8 @@ pnpm build:win          # 安装包 + 便携版 + latest.yml
 
 产物在 `release/`：
 
-- `MC-Command-Studio-Setup-0.6.2.exe`
-- `MC-Command-Studio-0.6.2-portable.exe`
+- `MC-Command-Studio-Setup-0.7.0.exe`
+- `MC-Command-Studio-0.7.0-portable.exe`
 - `latest.yml`、`.blockmap`
 
 如果 `pnpm install` 后没有 Electron 二进制，运行 `pnpm setup:electron`；国内网络可设置：
@@ -123,6 +132,9 @@ pnpm test        # 核心、状态、存储和退出流程回归
 pnpm e2e         # Playwright 启动 Electron，覆盖指令生成与导出
 pnpm test:e2e:persistence # 自动保存、快捷草稿、跨版本输出和退出保护
 pnpm test:pipeline # 数据包损坏、哈希、计数和别名回归
+node tools/e2e/chinese-first-smoke.mjs # 中文主显示、搜索与自定义 ID
+node tools/e2e/form-usability-smoke.mjs # 表单对齐与物品方案管理
+node tools/e2e/template-catalog-smoke.mjs # 模板分类与跨版本输出
 ```
 
 `pnpm e2e` 需要先 `pnpm build`，并且需要可用的 Windows 桌面会话。截图输出到 `artifacts/`。
@@ -138,8 +150,9 @@ pnpm configure:github <你的GitHub用户名> mc-command-studio
 
 ```bash
 pnpm release:patch
-git add . && git commit -m "release: v0.1.1"
-git tag v0.1.1
+git add <本次发布文件>
+git commit -m "release: v<版本>"
+git tag v<版本>
 git push origin main --tags
 ```
 
@@ -163,10 +176,11 @@ release/             打包产物（不入库）
 
 ## 已知限制
 
-- 当前范围是 1.12–26.3 的 54 个正式版：45 个独立基础包 + 9 个补丁版别名；1.12.2 使用 Legacy 原始构建器 + OOC。
+- **软件仍处于测试阶段，部分功能属于半成品。** 现有入口或模板不代表全部参数都已完成可视化和游戏内验证。
+- 当前范围是 1.12–26.3 的 54 个游戏正式版：45 个独立基础包 + 9 个补丁版别名；1.12.2 使用旧版分组工具与一键命令生成器。
 - 1.13 以前（1.8–1.11）已移出正式支持范围，相关数据包不再出现在版本选择器。
-- 复杂物品组件暂以原始 SNBT 输入，后续补专用表单。
-- 不连接游戏做语义验证；语法/格式能校验，实际效果需进游戏确认。
+- 高级模板、复杂物品组件及部分实体 / 方块专有字段仍需编辑 JSON、SNBT 或组件文本；可视化设置和跨版本转换还会继续补全。
+- 应用不连接游戏做语义验证，尚未在实际 Minecraft 游戏 / 服务器中逐项执行命令；格式检查通过也需要在目标版本测试效果。
 - 便携版不支持自动更新。
 
 ## 许可与声明
@@ -187,4 +201,5 @@ release/             打包产物（不入库）
 - [路线图与风险](docs/07-roadmap-risks.md)
 - [发布与自动更新](docs/08-release-update.md)
 - [P1/P2 可靠性与验证改造](docs/19-reliability-hardening.md)
+- [中文优先改造与本地验收记录](docs/20-chinese-first-preview.md)
 - [中文名称与图标资源](docs/09-visual-assets.md)

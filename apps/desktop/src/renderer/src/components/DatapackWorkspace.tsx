@@ -121,8 +121,8 @@ export function DatapackWorkspace() {
                 <span className="hero-id">datapack</span>
               </h1>
               <p className="hero-sub">
-                独立于命令编辑：管理多个函数、load/tick 标签，并导出可直接放进
-                <code className="code-inline">datapacks/</code> 的 zip。
+                独立于命令编辑：管理多个函数及加载、每刻执行标签，并导出可直接放进
+                <code className="code-inline">datapacks/</code> 的压缩包。
               </p>
             </div>
           </div>
@@ -135,7 +135,7 @@ export function DatapackWorkspace() {
             <FolderTree size={15} />
             数据包信息
           </div>
-          <div className="card-hint">pack_format {packFormat}</div>
+          <div className="card-hint">数据包格式 {packFormat}</div>
         </div>
         <div className="card-body">
           <div className="grid-2">
@@ -378,9 +378,9 @@ export function DatapackWorkspace() {
                           })
                         }
                       >
-                        <option value="predicate">谓词 Predicate</option>
-                        <option value="advancement">进度 Advancement</option>
-                        <option value="loot_table">战利品表 Loot table</option>
+                        <option value="predicate">谓词</option>
+                        <option value="advancement">进度</option>
+                        <option value="loot_table">战利品表</option>
                       </select>
                     </div>
                     <div className="field">
@@ -475,7 +475,7 @@ export function DatapackWorkspace() {
             onClick={() => void exportPack()}
           >
             <Save size={14} />
-            {exporting ? '导出中…' : '导出数据包 .zip'}
+            {exporting ? '导出中…' : '导出数据包压缩包'}
           </button>
         </div>
         <div className="card-body">

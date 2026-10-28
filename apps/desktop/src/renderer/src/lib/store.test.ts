@@ -44,6 +44,30 @@ beforeEach(async () => {
 })
 
 describe('document persistence and history', () => {
+  it('keeps template edits separate from command drafts and restores them from projects', async () => {
+    store().setCount(7)
+    store().updateSummon({ nbt: '{NoAI:1b}' })
+    store().openTemplate('nbt-head')
+    expect(store().activeCommandId).toBe('template:nbt-head')
+    store().clearHistory()
+    store().updateTemplateDraft({ count: '3' })
+    store().undo()
+    expect(store().templateDrafts['26.3:nbt-head'].count).toBe('1')
+    store().redo()
+    expect(store().templateDrafts['26.3:nbt-head'].count).toBe('3')
+    store().openTemplate('complex-potion')
+    store().openTemplate('nbt-head')
+    expect(store().templateDrafts['26.3:nbt-head'].count).toBe('3')
+    expect(store().give.count).toBe(7)
+    expect(store().summon.nbt).toBe('{NoAI:1b}')
+    const content = store().serializeProject()
+    store().newProject()
+    expect(store().templateDrafts).toEqual({})
+    await store().applyProjectContent(content, null, 'restored')
+    expect(store().activeCommandId).toBe('template:nbt-head')
+    expect(store().templateDrafts['26.3:nbt-head'].count).toBe('3')
+  })
+
   it('tracks every datapack edit after the first autosave', async () => {
     const start = store().documentRevision
     store().updateDatapackMeta({ description: 'first edit' })
@@ -198,6 +222,72 @@ describe('document persistence and history', () => {
     await save
     await recovery
     expect(api.project.autosave.mock.calls.map(([content]) => JSON.parse(content).data.give.count)).toEqual([4, 4])
+  })
+})
+
+describe('give draft compatibility', () => {
+  it('fills defaults when loading an older NBT give draft', () => {
+    const payload = normalizeProjectPayload({
+      nbtGive: {
+        item: 'minecraft:diamond_sword',
+        count: '1',
+        name: '',
+        lore: '',
+        enchantments: [],
+        unbreakable: false
+      }
+    })
+
+    expect(payload.nbtGive).toMatchObject({
+      damage: '',
+      tags: [],
+      attributes: [],
+      potion: '',
+      potionColor: '',
+      potionEffects: [],
+      canDestroy: [],
+      canPlaceOn: [],
+      spawnerEntity: '',
+      spawnerDelay: '',
+      spawnerMinSpawnDelay: '',
+      spawnerMaxSpawnDelay: '',
+      spawnerSpawnCount: '',
+      spawnerMaxNearbyEntities: '',
+      spawnerRequiredPlayerRange: '',
+      spawnerSpawnRange: ''
+    })
+  })
+
+  it('round-trips enhanced NBT item settings through project JSON', () => {
+    const defaults = normalizeProjectPayload({}).nbtGive
+    const saved = {
+      ...defaults,
+      damage: '7',
+      tags: ['mcstudio:quest_reward'],
+      attributes: [{
+        attribute: 'minecraft:generic.attack_damage',
+        amount: '4',
+        operation: 1 as const,
+        slot: 'mainhand',
+        name: 'mcstudio:power'
+      }],
+      potion: 'minecraft:water',
+      potionColor: '#123456',
+      potionEffects: [{ id: 'minecraft:speed', duration: '600', amplifier: '1' }],
+      canDestroy: ['minecraft:stone'],
+      canPlaceOn: ['minecraft:dirt'],
+      spawnerEntity: 'minecraft:zombie',
+      spawnerDelay: '10',
+      spawnerMinSpawnDelay: '100',
+      spawnerMaxSpawnDelay: '500',
+      spawnerSpawnCount: '6',
+      spawnerMaxNearbyEntities: '8',
+      spawnerRequiredPlayerRange: '20',
+      spawnerSpawnRange: '5'
+    }
+    const restored = normalizeProjectPayload(JSON.parse(JSON.stringify({ nbtGive: saved })))
+
+    expect(restored.nbtGive).toEqual(saved)
   })
 })
 

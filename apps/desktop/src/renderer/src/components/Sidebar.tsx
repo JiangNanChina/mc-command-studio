@@ -5,12 +5,21 @@ import {
   CATEGORY_ORDER,
   COMMAND_MAP,
   COMMANDS,
-  type CommandCategory
+  TEMPLATE_CATEGORY_ORDER,
+  type SidebarCategory,
+  type TemplateCategory
 } from '@mcstudio/content'
 import { getRoots } from '@mcstudio/core'
+import { McIcon } from './McIcon'
+import { COMMAND_TEMPLATES, templatesInCategory } from '../lib/templateCatalog'
 import { useAppStore } from '../store'
+import { commandName } from '../lib/commandLabels'
 
-const ALL: CommandCategory | '全部' = '全部'
+const ALL: SidebarCategory | '全部' = '全部'
+
+function isTemplateCategory(category: SidebarCategory | '全部'): category is TemplateCategory {
+  return TEMPLATE_CATEGORY_ORDER.includes(category as TemplateCategory)
+}
 
 export function Sidebar() {
   const state = useAppStore(useShallow((state) => ({
@@ -22,7 +31,8 @@ export function Sidebar() {
     activeCommandId: state.activeCommandId,
     selectCommand: state.selectCommand,
     openChain: state.openChain,
-    openDatapack: state.openDatapack
+    openDatapack: state.openDatapack,
+    openTemplate: state.openTemplate
   })))
   const pack = state.pack
 
@@ -32,6 +42,12 @@ export function Sidebar() {
   const deferredSearch = useDeferredValue(state.search)
   const query = deferredSearch.trim().toLowerCase()
   const category = state.category
+  const templateCategory = isTemplateCategory(category) ? category : null
+  const templates = useMemo(() => templateCategory
+    ? templatesInCategory(templateCategory, query)
+    : category === ALL ? COMMAND_TEMPLATES.filter((template) =>
+      !query || `${template.name} ${template.id} ${template.description}`.toLowerCase().includes(query)
+    ) : [], [category, templateCategory, query])
 
   const curated = useMemo(() => {
     return COMMANDS.filter((command) => {
@@ -53,11 +69,11 @@ export function Sidebar() {
       .filter((root) => !COMMAND_MAP.has(root.name))
       .filter((root) => {
         if (!query) return true
-        return root.name.includes(query)
+        return `${root.name} ${commandName(root.name)}`.toLowerCase().includes(query)
       })
   }, [category, query, roots])
 
-  const total = curated.length + others.length
+  const total = templates.length + curated.length + others.length
 
   return (
     <aside className="sidebar">
@@ -80,12 +96,13 @@ export function Sidebar() {
         </div>
       </div>
 
-      <div className="categories">
-        {[ALL, ...CATEGORY_ORDER].map((item) => (
+      <div className="categories" aria-label="命令分类">
+        {[ALL, ...CATEGORY_ORDER, ...TEMPLATE_CATEGORY_ORDER].map((item) => (
           <button
             key={item}
             type="button"
             className={`chip${category === item ? ' active' : ''}`}
+            aria-pressed={category === item}
             onClick={() => state.setCategory(item)}
           >
             {item}
@@ -110,7 +127,7 @@ export function Sidebar() {
                   1.12.2 旧版工具
                   <span className="command-id">legacy</span>
                 </span>
-                <span className="command-desc">testfor / blockdata / entitydata / replaceitem</span>
+                <span className="command-desc">实体检测、数据编辑、槽位替换等旧版命令</span>
               </span>
             </button>
             <button
@@ -123,7 +140,7 @@ export function Sidebar() {
               </span>
               <span className="command-text">
                 <span className="command-name">
-                  OOC 生成器
+                  一键命令生成器
                   <span className="command-id">ooc</span>
                 </span>
                 <span className="command-desc">1.12.2 掉落沙 / 命令方块矿车 / 命令方块 NBT</span>
@@ -142,7 +159,7 @@ export function Sidebar() {
                   命令方块链
                   <span className="command-id">chain</span>
                 </span>
-                <span className="command-desc">排布多个命令方块，生成整链 setblock。</span>
+                <span className="command-desc">排布多个命令方块，生成整条放置命令链。</span>
               </span>
             </button>
             <button
@@ -158,7 +175,7 @@ export function Sidebar() {
                   数据包工作区
                   <span className="command-id">datapack</span>
                 </span>
-                <span className="command-desc">独立创建多函数数据包，配置 load/tick 并导出。</span>
+                <span className="command-desc">创建多函数数据包，配置加载与循环执行后导出。</span>
               </span>
             </button>
           </>
@@ -190,6 +207,31 @@ export function Sidebar() {
           </>
         ) : null}
 
+        {TEMPLATE_CATEGORY_ORDER.map((group) => {
+          const entries = templates.filter((template) => template.category === group)
+          if (!entries.length) return null
+          return (
+            <div key={group}>
+              <div className="command-group-label">{group} · {entries.length}</div>
+              {entries.map((template) => {
+                const active = state.activeCommandId === `template:${template.id}`
+                return (
+                  <button key={template.id} data-template-id={template.id} type="button"
+                    className={`command-item template-command${active ? ' active' : ''}`}
+                    aria-pressed={active} disabled={!pack} title={template.description}
+                    onClick={() => state.openTemplate(template.id)}>
+                    <span className="command-glyph template-glyph"><McIcon category={template.iconCategory} id={template.iconId} size={22} /></span>
+                    <span className="command-text">
+                      <span className="command-name">{template.name}</span>
+                      <span className="command-desc">{template.description}</span>
+                    </span>
+                  </button>
+                )
+              })}
+            </div>
+          )
+        })}
+
         {others.length > 0 ? (
           <>
             <div className="command-group-label">其他命令</div>
@@ -205,10 +247,10 @@ export function Sidebar() {
                   <span className="command-glyph">{root.name.slice(0, 1).toUpperCase()}</span>
                   <span className="command-text">
                     <span className="command-name">
-                      <span style={{ fontFamily: 'var(--mono)' }}>{root.name}</span>
-                      <span className="command-id">通用</span>
+                      {commandName(root.name)}
+                      <span className="command-id">{root.name}</span>
                     </span>
-                    <span className="command-desc">该命令的中文说明尚未收录，可用通用构建器拼写。</span>
+                    <span className="command-desc">逐步选择操作并填写参数，实时生成命令。</span>
                   </span>
                 </button>
               )
@@ -219,8 +261,8 @@ export function Sidebar() {
         {total === 0 ? (
           <div className="list-empty">
             <Boxes size={22} style={{ marginBottom: 8, opacity: 0.5 }} />
-            <div>没有匹配的命令</div>
-            <div style={{ marginTop: 4 }}>试试命令 ID，例如 give、execute。</div>
+            <div>{templateCategory ? '没有匹配的模板' : '没有匹配的命令'}</div>
+            <div style={{ marginTop: 4 }}>{templateCategory ? '试试搜索物品、方块或实体名称。' : '试试命令 ID，例如 give、execute。'}</div>
           </div>
         ) : null}
       </div>

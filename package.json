@@ -1,8 +1,8 @@
 {
   "name": "mc-command-studio",
-  "version": "0.6.2",
+  "version": "0.7.0",
   "private": true,
-  "description": "MC 指令工坊 - Windows 桌面版 Minecraft Java 命令编辑器",
+  "description": "MC 指令工坊 - 中文优先的 Windows Minecraft Java 命令编辑器（测试阶段，部分功能尚未完成）",
   "packageManager": "pnpm@11.28.5",
   "scripts": {
     "postinstall": "node tools/release/ensure-electron.mjs",

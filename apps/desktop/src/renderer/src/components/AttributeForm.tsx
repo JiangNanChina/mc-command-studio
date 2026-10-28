@@ -159,12 +159,12 @@ export function AttributeForm() {
                     state.updateAttribute({ scaleEnabled: event.target.checked })
                   }
                 />
-                使用 scale 缩放查询结果
+                使用查询倍率缩放结果
               </label>
               {attribute.scaleEnabled ? (
                 <div className="field" style={{ marginTop: 10 }}>
                   <label className="field-label" htmlFor="attribute-scale">
-                    scale
+                    查询倍率（scale）
                   </label>
                   <input
                     id="attribute-scale"

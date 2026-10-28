@@ -4,6 +4,7 @@ import { Settings2, ShieldCheck } from 'lucide-react'
 import { COMMAND_MAP } from '@mcstudio/content'
 import rulesJson from '../data/gamerules.json'
 import { GamerulePickerDialog, type GameruleRule } from './GamerulePickerDialog'
+import { gameruleLabel } from '../lib/gameruleLabels'
 import { useAppStore } from '../store'
 
 const meta = COMMAND_MAP.get('gamerule')
@@ -20,30 +21,27 @@ export function GameruleForm() {
   const rules = useMemo(() => {
     const tree = state.pack?.commands.children?.gamerule?.children
     if (!tree) return allRules
-    const bySnake = new Map(allRules.map((rule) => [rule.id, rule]))
-    const camelToSnake = (value: string): string =>
-      value.replace(/[A-Z]/g, (char) => `_${char.toLowerCase()}`)
     const dynamic = Object.entries(tree).map(([id, node]) => {
-      const meta = bySnake.get(id) ?? bySnake.get(camelToSnake(id))
+      const ruleLabel = gameruleLabel(id)
       const parser = node.children?.value?.parser
       const type: GameruleRule['type'] =
-        meta?.type ?? (parser === 'brigadier:integer' ? 'integer' : 'boolean')
+        ruleLabel.type ?? (parser === 'brigadier:integer' ? 'integer' : 'boolean')
       return {
         id,
-        name: meta?.name ?? id,
+        name: ruleLabel.name,
         description:
-          meta?.description ??
+          ruleLabel.description ||
           `来自 ${state.pack?.manifest.gameVersion ?? '当前版本'} 数据包命令树。`,
         type,
-        min: meta?.min,
-        max: meta?.max
+        min: ruleLabel.min,
+        max: ruleLabel.max
       }
     })
     return dynamic.length > 0 ? dynamic : allRules
   }, [state.pack])
   const selected = useMemo(
     () => rules.find((rule) => rule.id === gamerule.rule) ?? rules[0],
-    [gamerule.rule]
+    [gamerule.rule, rules]
   )
 
   const chooseRule = (rule: GameruleRule): void => {
@@ -75,7 +73,7 @@ export function GameruleForm() {
                 <span className="hero-id">gamerule</span>
               </h1>
               <p className="hero-sub">
-                可视化选择 59 条 26.3 游戏规则，设置开关或整数值，也可以查询当前值。
+                按当前版本选择游戏规则，设置开关或整数值，也可以查询当前值。
               </p>
             </div>
           </div>

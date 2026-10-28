@@ -92,6 +92,38 @@ export function defaultComponent(kind: ItemComponent['kind']): ItemComponent {
     case 'custom_model_data':
     case 'custom_data':
       return { kind, raw: '' }
+    case 'attribute_modifiers':
+      return {
+        kind,
+        entries: [{
+          id: 'mcstudio:attack_damage',
+          type: 'minecraft:attack_damage',
+          amount: 2,
+          operation: 'add_value',
+          slot: 'mainhand'
+        }]
+      }
+    case 'potion_contents':
+      return { kind, potion: 'minecraft:water', customColor: null, effects: [] }
+    case 'can_break':
+    case 'can_place_on':
+      return { kind, blocks: ['minecraft:stone'] }
+    case 'item_tags':
+      return { kind, tags: [] }
+    case 'entity_data':
+      return { kind, raw: '{id:"minecraft:zombie"}' }
+    case 'block_entity_data':
+      return {
+        kind,
+        entity: 'minecraft:zombie',
+        delay: 20,
+        minSpawnDelay: 200,
+        maxSpawnDelay: 800,
+        spawnCount: 4,
+        maxNearbyEntities: 6,
+        requiredPlayerRange: 16,
+        spawnRange: 4
+      }
     case 'raw':
       return { kind, id: 'minecraft:tooltip_display', value: '{}' }
   }

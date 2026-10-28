@@ -137,8 +137,8 @@ export function selectGiveOutput(give: GiveOptions, gameVersion?: string): Build
   return buildGiveCommand(give, gameVersion)
 }
 
-export function selectNbtGiveOutput(nbtGive: NbtGiveOptions): BuildResult {
-  return buildNbtGiveCommand(nbtGive)
+export function selectNbtGiveOutput(nbtGive: NbtGiveOptions, gameVersion?: string): BuildResult {
+  return buildNbtGiveCommand(nbtGive, gameVersion)
 }
 
 export function selectGamemodeOutput(gamemode: GamemodeOptions): BuildResult {

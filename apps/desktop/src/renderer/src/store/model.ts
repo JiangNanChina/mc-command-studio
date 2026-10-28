@@ -44,6 +44,7 @@ import type {
   TitleOptions,
   XpOptions
 } from '@mcstudio/core'
+import type { TemplateDraft } from '../lib/templateDraft'
 
 export type OutputMode = 'command' | 'command-block'
 
@@ -85,6 +86,7 @@ export interface AutomationOptions {
 export interface ProjectPayload {
   activeCommandId: string | null
   quickDrafts: Record<string, Record<string, string>>
+  templateDrafts: Record<string, TemplateDraft>
   give: GiveOptions
   nbtGive: NbtGiveOptions
   gamemode: GamemodeOptions

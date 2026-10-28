@@ -64,6 +64,20 @@ jobs:
           MCSTUDIO_E2E_EXE: release/win-unpacked/MC Command Studio.exe
         run: node tools/e2e/persistence-smoke.mjs
 
+      - name: Packaged Chinese UI, item plans and template regression
+        env:
+          MCSTUDIO_E2E_EXE: release/win-unpacked/MC Command Studio.exe
+          MCSTUDIO_E2E_EXPECTED_VERSION: ${{ github.ref_name }}
+        run: |
+          node tools/e2e/form-usability-smoke.mjs
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          node tools/e2e/chinese-first-smoke.mjs
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          node tools/e2e/legacy-groups-smoke.mjs
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          node tools/e2e/template-catalog-smoke.mjs
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
       - name: Verify tag and artifacts
         run: node tools/release/verify-version.mjs "${{ github.ref_name }}"
 

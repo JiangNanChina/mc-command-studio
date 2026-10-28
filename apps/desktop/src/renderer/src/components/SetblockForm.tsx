@@ -8,6 +8,7 @@ import { McIcon } from './McIcon'
 import { mcName } from '../lib/mcAssets'
 import { hasLiteral } from '../lib/versionFeatures'
 import { useAppStore } from '../store'
+import { blockStateName, blockStateValueName } from '../lib/blockStateLabels'
 
 const meta = COMMAND_MAP.get('setblock')
 
@@ -145,7 +146,7 @@ export function SetblockForm() {
                   return (
                     <div className="field" key={property.key}>
                       <label className="field-label" htmlFor={`state-${property.key}`}>
-                        {property.key}
+                        {blockStateName(property.key)}<span className="hint">{property.key}</span>
                       </label>
                       <select
                         id={`state-${property.key}`}
@@ -156,7 +157,7 @@ export function SetblockForm() {
                         {current === '' ? <option value="">默认</option> : null}
                         {values.map((value) => (
                           <option key={value} value={value}>
-                            {value}
+                            {blockStateValueName(value)}{value && !/^-?\d+$/.test(value) ? `（${value}）` : ''}
                           </option>
                         ))}
                       </select>

@@ -5,6 +5,8 @@ import { COMMAND_MAP } from '@mcstudio/content'
 import { PositionInput } from './PositionInput'
 import { SelectorField } from './SelectorField'
 import { useAppStore } from '../store'
+import { damageTypeName, namedOptions } from '../lib/localizedOptions'
+import { LocalizedIdInput } from './LocalizedIdInput'
 
 const meta = COMMAND_MAP.get('damage')
 
@@ -16,7 +18,7 @@ export function DamageForm() {
   })))
   const options = state.damage
   const damageTypes = (state.pack?.registries.damage_type ?? []).map(
-    (id) => `minecraft:${id}`
+    (id) => id.includes(':') ? id : `minecraft:${id}`
   )
 
   return (
@@ -68,21 +70,13 @@ export function DamageForm() {
               <label className="field-label" htmlFor="damage-type">
                 伤害类型
               </label>
-              <input
+              <LocalizedIdInput
                 id="damage-type"
-                className="input"
-                list="damage-type-suggestions"
                 value={options.damageType}
-                spellCheck={false}
-                onChange={(event) =>
-                  state.updateDamage({ damageType: event.target.value })
-                }
+                label="伤害类型"
+                options={namedOptions(damageTypes, damageTypeName)}
+                onChange={(damageType) => state.updateDamage({ damageType })}
               />
-              <datalist id="damage-type-suggestions">
-                {damageTypes.map((id) => (
-                  <option key={id} value={id} />
-                ))}
-              </datalist>
             </div>
           </div>
           <div className="field" style={{ marginTop: 12 }}>

@@ -6,6 +6,9 @@ export interface CustomPreset {
 const PREFIX = 'mcstudio:presets:'
 
 export const PRESET_KEYS = [
+  'give:modern',
+  'give:legacy',
+  'templates',
   'legacy:block',
   'legacy:entity',
   'legacy:item',

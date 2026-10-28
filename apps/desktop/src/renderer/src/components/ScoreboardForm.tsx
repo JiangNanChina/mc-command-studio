@@ -16,6 +16,8 @@ import { COMMAND_MAP } from '@mcstudio/content'
 import { hasCommandPath } from '../lib/versionFeatures'
 import { SelectorField } from './SelectorField'
 import { useAppStore } from '../store'
+import { namedOptions, scoreboardCriterionName, scoreboardSlotName } from '../lib/localizedOptions'
+import { LocalizedIdInput } from './LocalizedIdInput'
 
 const meta = COMMAND_MAP.get('scoreboard')
 
@@ -170,22 +172,14 @@ export function ScoreboardForm() {
                   <label className="field-label" htmlFor="scoreboard-criteria">
                     计分项
                   </label>
-                  <input
+                  <LocalizedIdInput
                     id="scoreboard-criteria"
-                    className="input"
-                    list="scoreboard-criteria-list"
                     value={scoreboard.criteria}
-                    spellCheck={false}
-                    onChange={(event) =>
-                      state.updateScoreboard({ criteria: event.target.value })
-                    }
+                    label="计分项"
+                    options={namedOptions(SCORE_CRITERIA, scoreboardCriterionName)}
+                    onChange={(criteria) => state.updateScoreboard({ criteria })}
                   />
-                  <datalist id="scoreboard-criteria-list">
-                    {SCORE_CRITERIA.map((criteria) => (
-                      <option key={criteria} value={criteria} />
-                    ))}
-                  </datalist>
-                  <div className="hint">dummy 表示由命令控制；也可以用 deathCount、health 等统计项。</div>
+                  <div className="hint">可按中文查找内置统计项，也支持输入数据包或模组计分项。</div>
                 </div>
                 <div className="field" style={{ marginTop: 12 }}>
                   <label className="field-label" htmlFor="scoreboard-display-name">
@@ -209,20 +203,14 @@ export function ScoreboardForm() {
                 <label className="field-label" htmlFor="scoreboard-slot">
                   显示位置
                 </label>
-                <input
+                <LocalizedIdInput
                   id="scoreboard-slot"
-                  className="input"
-                  list="scoreboard-slot-list"
                   value={scoreboard.slot}
-                  spellCheck={false}
-                  onChange={(event) => state.updateScoreboard({ slot: event.target.value })}
+                  label="显示位置"
+                  options={namedOptions(SCORE_SLOTS, scoreboardSlotName)}
+                  onChange={(slot) => state.updateScoreboard({ slot })}
                 />
-                <datalist id="scoreboard-slot-list">
-                  {SCORE_SLOTS.map((slot) => (
-                    <option key={slot} value={slot} />
-                  ))}
-                </datalist>
-                <div className="hint">常用：sidebar、list、belowName；也支持 sidebar.team.red 等队伍位置。</div>
+                <div className="hint">支持屏幕侧边栏、玩家列表和名字下方；队伍位置也可手动输入。</div>
               </div>
             ) : null}
 

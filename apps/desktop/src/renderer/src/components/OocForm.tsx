@@ -3,7 +3,6 @@ import { useMemo, useRef, useState } from 'react'
 import { Copy, TerminalSquare } from 'lucide-react'
 import {
   LEGACY_DIRECTIONS,
-  OOC_MODES,
   buildOocCommand,
   createDefaultOocOptions,
   offsetCoordinate,
@@ -16,17 +15,23 @@ import { useAppStore } from '../store'
 import { CustomPresetBar } from './CustomPresetBar'
 import { OocLayoutPreview } from './OocLayoutPreview'
 
+const OOC_MODE_OPTIONS: { value: OocMode; label: string; hint: string }[] = [
+  { value: 'falling-sand', label: '掉落沙一键命令', hint: '生成红石块和命令方块链，落地后自动执行。' },
+  { value: 'command-block-minecart', label: '命令方块矿车', hint: '召唤搭载命令的矿车，执行输入的多条命令。' },
+  { value: 'command-block', label: '命令方块数据', hint: '生成带有命令和方块数据的命令方块，可设置方向与条件。' }
+]
+
 const LAYOUT_PRESETS = [
   {
-    label: 'Y 直线',
+    label: '垂直直线（Y 轴）',
     patch: { layoutAxis: 'y' as const, secondaryAxis: 'none' as const, layerStep: '1', secondaryStep: '1', rowSize: '2' }
   },
   {
-    label: 'X 直线',
+    label: '水平直线（X 轴）',
     patch: { layoutAxis: 'x' as const, secondaryAxis: 'none' as const, layerStep: '1', secondaryStep: '1', rowSize: '2' }
   },
   {
-    label: 'XY 平面',
+    label: '竖直平面（XY）',
     patch: { layoutAxis: 'x' as const, secondaryAxis: 'y' as const, layerStep: '1', secondaryStep: '1', rowSize: '8' }
   },
   {
@@ -34,7 +39,7 @@ const LAYOUT_PRESETS = [
     patch: { layoutAxis: 'x' as const, secondaryAxis: 'y' as const, layerStep: '1', secondaryStep: '1', rowSize: '3' }
   },
   {
-    label: 'Z 阶梯',
+    label: '纵深阶梯（Z 轴）',
     patch: { layoutAxis: 'z' as const, secondaryAxis: 'y' as const, layerStep: '1', secondaryStep: '1', rowSize: '4' }
   }
 ]
@@ -102,22 +107,22 @@ export function OocForm() {
     if (!result.text) return
     await navigator.clipboard.writeText(result.text)
     setCopied(true)
-    state.showToast('OOC 命令已复制', 'success')
+    state.showToast('一键命令已复制', 'success')
   }
 
   return (
     <div className="content">
       <div className="page-head">
         <div>
-          <div className="crumb">命令库 / 工具 / OOC</div>
+          <div className="crumb">命令库 / 工具 / 一键命令生成器</div>
           <div className="hero">
             <div className="hero-icon">
               <TerminalSquare size={21} />
             </div>
             <div>
               <h1 className="hero-title">
-                OOC 生成器
-                <span className="hero-id">1.12.2</span>
+                一键命令生成器
+                <span className="hero-id">OOC · 1.12.2</span>
               </h1>
               <p className="hero-sub">
                 把多条命令压成一条掉落沙/命令方块矿车/命令方块 NBT，用于 1.12.2 一键命令。
@@ -142,14 +147,14 @@ export function OocForm() {
               value={options.mode}
               onChange={(event) => update({ mode: event.target.value as OocMode })}
             >
-              {OOC_MODES.map((mode) => (
+              {OOC_MODE_OPTIONS.map((mode) => (
                 <option key={mode.value} value={mode.value}>
                   {mode.label}
                 </option>
               ))}
             </select>
             <div className="hint">
-              {OOC_MODES.find((mode) => mode.value === options.mode)?.hint}
+              {OOC_MODE_OPTIONS.find((mode) => mode.value === options.mode)?.hint}
             </div>
           </div>
 
@@ -208,11 +213,11 @@ export function OocForm() {
               >
                 {LEGACY_DIRECTIONS.map((direction) => (
                   <option key={direction.value} value={direction.value}>
-                    {direction.label}（meta {direction.meta}）
+                    {direction.label}（数据值 {direction.meta}）
                   </option>
                 ))}
               </select>
-              <div className="hint">方向写入 1.12 命令方块的 metadata；条件模式额外 +8。</div>
+              <div className="hint">方向写入 1.12 命令方块的数据值；条件模式额外 +8。</div>
             </div>
           ) : null}
 
@@ -227,7 +232,7 @@ export function OocForm() {
               onChange={(event) => update({ layerStep: event.target.value })}
             />
             <div className="hint">
-              命令方块模式按所选轴每层偏移；掉落沙模式按该值递增每层 Time。
+              命令方块模式按所选轴每层偏移；掉落沙模式按该值递增每层的存在时间（Time）。
             </div>
           </div>
 

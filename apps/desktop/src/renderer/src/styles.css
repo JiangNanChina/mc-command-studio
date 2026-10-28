@@ -186,6 +186,8 @@ a {
 
 .project-name-input {
   width: min(320px, 32vw);
+  max-width: 100%;
+  min-width: 0;
   padding: 7px 10px;
   border: 1px solid transparent;
   border-radius: var(--radius-sm);
@@ -846,6 +848,78 @@ a {
   color: #04110c;
 }
 
+.template-glyph {
+  overflow: hidden;
+}
+
+.template-glyph .mc-icon {
+  image-rendering: pixelated;
+}
+
+.template-page .page-head {
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.template-page .hero,
+.template-page .hero > div {
+  min-width: 0;
+}
+
+.template-page .hero-title,
+.template-page .hero-sub {
+  overflow-wrap: anywhere;
+}
+
+.template-version-note {
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.6;
+  margin: 0 0 16px;
+}
+
+.template-version-note span {
+  display: block;
+}
+
+.template-page .card-body > .field + .field,
+.template-page .card-body > .field + .grid-3,
+.template-page .card-body > .grid-3 + .field {
+  margin-top: 12px;
+}
+
+.template-page .grid-3 > .field {
+  margin-top: 0;
+}
+
+.template-page .give-preset-toolbar {
+  display: block;
+}
+
+.template-page .give-preset-toolbar > .card-title {
+  margin-bottom: 10px;
+  white-space: nowrap;
+}
+
+.template-data-editor {
+  font-family: var(--mono);
+  overflow-wrap: anywhere;
+  min-height: 190px;
+  resize: vertical;
+}
+
+.categories {
+  max-height: 240px;
+  overflow-y: auto;
+  flex-shrink: 0;
+}
+
+.template-command:focus-visible,
+.categories .chip:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+}
+
 .command-text {
   min-width: 0;
   flex: 1;
@@ -1002,6 +1076,7 @@ a {
   display: flex;
   flex-direction: column;
   gap: 6px;
+  min-width: 0;
 }
 
 .field + .field {
@@ -1106,6 +1181,26 @@ a {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 10px;
+}
+
+/* Horizontal field groups use the parent's gap, not vertical stack spacing. */
+:is(.grid-2, .grid-3, .grid-4, .row) > .field {
+  margin-top: 0;
+}
+
+:is(.grid-2, .grid-3, .grid-4) > * {
+  min-width: 0;
+}
+
+:is(.grid-2, .grid-3, .grid-4):not(:has(> :not(.field))) > .field {
+  display: grid;
+  grid-row: span 3;
+  grid-template-rows: subgrid;
+  row-gap: 6px;
+}
+
+.row:has(> .field) {
+  align-items: flex-start;
 }
 
 .selector-card {
@@ -2587,6 +2682,80 @@ a {
   color: var(--accent);
 }
 
+.give-component-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  max-width: 100%;
+  margin-bottom: 14px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border);
+}
+
+.give-preset-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin: -4px 0 14px;
+  padding: 0 0 12px;
+  border-bottom: 1px solid var(--border);
+}
+
+.give-preset-toolbar > .card-title {
+  flex: none;
+  white-space: nowrap;
+}
+
+.give-preset-toolbar > div:last-child {
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+}
+
+.give-preset-toolbar .row {
+  flex-wrap: wrap;
+}
+
+.attribute-entry,
+.potion-effect-row {
+  min-width: 0;
+  margin: 10px 0;
+  padding: 10px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+}
+
+.give-component-tabs .badge {
+  margin-left: 1px;
+  padding: 1px 5px;
+}
+
+.give-component-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 36px;
+  padding: 7px 11px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--panel);
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.give-component-tab:hover {
+  color: var(--text);
+  border-color: var(--border-strong);
+}
+
+.give-component-tab.active {
+  border-color: color-mix(in srgb, var(--accent) 45%, var(--border));
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+
 .world-option-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
@@ -3038,6 +3207,19 @@ a {
 }
 
 @media (max-width: 1120px) {
+  .header {
+    gap: 10px;
+    padding-inline: 12px;
+  }
+  .header .brand {
+    min-width: 170px;
+  }
+  .header-actions {
+    gap: 4px;
+  }
+  .header-actions .pack-count {
+    display: none;
+  }
   .workspace {
     grid-template-columns: 250px minmax(0, 1fr) 330px;
   }

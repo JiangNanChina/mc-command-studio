@@ -1,0 +1,139 @@
+.localized-id-control {
+  position: relative;
+  width: 100%;
+  min-width: 0;
+  height: 36px;
+}
+
+.localized-id-control .localized-id-input {
+  width: 100%;
+  min-width: 0;
+  height: 36px;
+  padding-right: 30px;
+  text-overflow: ellipsis;
+}
+
+.localized-id-chevron {
+  position: absolute;
+  top: 11px;
+  right: 10px;
+  color: var(--muted);
+  pointer-events: none;
+}
+
+.localized-id-chevron.open {
+  transform: rotate(180deg);
+}
+
+.localized-id-announcement {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.localized-id-popup {
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  background: var(--panel);
+  color: var(--text);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.28);
+  font-family: var(--font);
+  font-size: 13px;
+}
+
+.localized-id-current {
+  display: grid;
+  flex: 0 0 auto;
+  gap: 2px;
+  padding: 9px 12px;
+  border-bottom: 1px solid var(--border);
+  color: var(--muted);
+  font-size: 12px;
+  overflow-wrap: anywhere;
+}
+
+.localized-id-current code,
+.localized-id-option code {
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: 11px;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+
+.localized-id-options {
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 4px;
+}
+
+.localized-id-option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  width: 100%;
+  min-width: 0;
+  padding: 9px 8px;
+  border: 0;
+  border-radius: 5px;
+  background: transparent;
+  color: var(--text);
+  text-align: left;
+  cursor: pointer;
+}
+
+.localized-id-option-text {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.localized-id-option-label {
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+}
+
+.localized-id-option.is-active {
+  background: var(--panel-3);
+}
+
+.localized-id-option.is-selected {
+  background: var(--accent-soft);
+}
+
+.localized-id-option > svg {
+  flex: 0 0 auto;
+  color: var(--accent);
+}
+
+.localized-id-popup-hint,
+.localized-id-empty {
+  padding: 10px 12px;
+  color: var(--muted);
+  font-size: 11.5px;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+.localized-id-popup-hint {
+  flex: 0 0 auto;
+  border-top: 1px solid var(--border);
+  background: var(--panel-2);
+}
+
+.localized-id-empty {
+  font-size: 12px;
+}

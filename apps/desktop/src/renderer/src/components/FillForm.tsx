@@ -13,12 +13,12 @@ import { useAppStore } from '../store'
 const meta = COMMAND_MAP.get('fill')
 
 const MODES: { value: FillMode; label: string }[] = [
-  { value: 'replace', label: 'replace（替换）' },
-  { value: 'destroy', label: 'destroy（破坏）' },
-  { value: 'hollow', label: 'hollow（空心）' },
-  { value: 'keep', label: 'keep（只填空气）' },
-  { value: 'outline', label: 'outline（只填外框）' },
-  { value: 'strict', label: 'strict（严格）' }
+  { value: 'replace', label: '替换（replace）' },
+  { value: 'destroy', label: '破坏并掉落（destroy）' },
+  { value: 'hollow', label: '填充空心区域（hollow）' },
+  { value: 'keep', label: '只填空气（keep）' },
+  { value: 'outline', label: '只填外框（outline）' },
+  { value: 'strict', label: '严格填充（strict）' }
 ]
 
 const QUICK_BLOCKS = ['minecraft:stone', 'minecraft:oak_planks', 'minecraft:glass', 'minecraft:dirt', 'minecraft:air']

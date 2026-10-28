@@ -114,9 +114,9 @@ export function WorldControlForm() {
                     state.updateTime({ query: event.target.value as TimeQuery })
                   }
                 >
-                  <option value="day">day（当前天数）</option>
-                  <option value="daytime">daytime（当天时间）</option>
-                  <option value="gametime">gametime（世界总时间）</option>
+                  <option value="day">当前天数（day）</option>
+                  <option value="daytime">当天时间（daytime）</option>
+                  <option value="gametime">世界总时间（gametime）</option>
                 </select>
               </div>
             ) : (

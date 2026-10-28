@@ -30,7 +30,7 @@ export function GamerulePickerDialog({
     return rules.filter((rule) => {
       if (!normalized) return true
       return (
-        rule.id.includes(normalized) ||
+        rule.id.toLowerCase().includes(normalized) ||
         rule.name.toLowerCase().includes(normalized) ||
         rule.description.toLowerCase().includes(normalized)
       )

@@ -5,6 +5,7 @@ import {
   ExternalLink,
   Plus,
   Sparkles,
+  TriangleAlert,
   Wrench
 } from 'lucide-react'
 import {
@@ -20,10 +21,11 @@ import { useAppStore } from '../store'
 
 const RELEASES_URL = 'https://github.com/JiangNanChina/mc-command-studio/releases'
 
-const SECTION_ICONS: Record<Exclude<ChangeType, 'known'>, typeof Plus> = {
+const SECTION_ICONS: Record<ChangeType, typeof Plus> = {
   added: Plus,
   improved: Sparkles,
-  fixed: Wrench
+  fixed: Wrench,
+  known: TriangleAlert
 }
 
 function sectionClass(type: ChangeType): string {
@@ -67,9 +69,8 @@ function EntryView({ entry }: { entry: ChangelogEntry }) {
       </div>
 
       {entry.sections
-        .filter((section) => section.type !== 'known')
         .map((section) => {
-          const Icon = SECTION_ICONS[section.type as Exclude<ChangeType, 'known'>] ?? Plus
+          const Icon = SECTION_ICONS[section.type] ?? Plus
           return (
             <div key={section.type} className={sectionClass(section.type)}>
               <div className="changelog-section-head">

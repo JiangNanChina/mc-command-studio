@@ -1,0 +1,245 @@
+.legacy-tools-page {
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  container-name: legacy-tools;
+  container-type: inline-size;
+}
+
+.legacy-command-nav {
+  display: grid;
+  gap: 10px;
+  min-width: 0;
+  margin-bottom: 14px;
+  padding: 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--panel);
+}
+
+.legacy-group-tabs {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px;
+  min-width: 0;
+}
+
+.legacy-group-tab,
+.legacy-tool-option {
+  min-width: 0;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg-elev);
+  color: var(--muted);
+  font: inherit;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background-color 0.15s ease, color 0.15s ease;
+}
+
+.legacy-group-tab {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-height: 38px;
+  padding: 7px 9px;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: normal;
+}
+
+.legacy-group-tab svg,
+.legacy-tool-option > svg {
+  flex: 0 0 auto;
+}
+
+.legacy-group-tab:hover,
+.legacy-tool-option:hover {
+  border-color: var(--border-strong);
+  background: var(--panel-2);
+  color: var(--text);
+}
+
+.legacy-group-tab.active,
+.legacy-tool-option.active {
+  border-color: color-mix(in srgb, var(--accent) 55%, var(--border));
+  background: var(--accent-soft);
+  color: var(--text);
+}
+
+.legacy-group-tab.active svg,
+.legacy-tool-option.active > svg {
+  color: var(--accent);
+}
+
+.legacy-group-tab:focus-visible,
+.legacy-tool-option:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.legacy-count {
+  display: inline-grid;
+  place-items: center;
+  min-width: 19px;
+  height: 19px;
+  padding: 0 4px;
+  border-radius: 10px;
+  background: var(--panel-2);
+  color: var(--faint);
+  font-family: var(--mono);
+  font-size: 10px;
+  line-height: 1;
+}
+
+.legacy-tools-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 7px;
+  min-width: 0;
+}
+
+.legacy-tool-option {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  min-height: 64px;
+  padding: 10px;
+  text-align: left;
+}
+
+.legacy-tool-option > svg {
+  margin-top: 2px;
+  color: var(--faint);
+}
+
+.legacy-tool-copy {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+
+.legacy-tool-title {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 5px;
+  min-width: 0;
+  color: var(--text);
+  font-size: 12px;
+  font-weight: 650;
+  line-height: 1.35;
+}
+
+.legacy-tool-title code,
+.legacy-active-id {
+  color: var(--faint);
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 500;
+  overflow-wrap: anywhere;
+}
+
+.legacy-tool-description {
+  min-width: 0;
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+
+.legacy-editor-card,
+.legacy-editor-card .card-head,
+.legacy-editor-card .card-body,
+.legacy-editor-card .field,
+.legacy-editor-card .grid-2 > *,
+.legacy-editor-card .grid-3 > * {
+  min-width: 0;
+}
+
+.legacy-editor-card .input,
+.legacy-editor-card .select,
+.legacy-editor-card .textarea,
+.legacy-editor-card .output-code {
+  max-width: 100%;
+}
+
+.legacy-editor-card .output-code {
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.legacy-editor-card .card-title {
+  min-width: 0;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 900px) {
+  .legacy-group-tabs {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .legacy-tools-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 560px) {
+  .legacy-command-nav {
+    padding: 8px;
+  }
+
+  .legacy-group-tabs {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .legacy-group-tab {
+    justify-content: flex-start;
+  }
+
+  .legacy-tools-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .legacy-editor-card .card-head {
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .legacy-editor-card .grid-3 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 360px) {
+  .legacy-group-tabs {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .legacy-editor-card .grid-2,
+  .legacy-editor-card .grid-3 {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .legacy-editor-card .card-body {
+    padding: 12px;
+  }
+}
+
+@container legacy-tools (min-width: 720px) {
+  .legacy-group-tabs {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
+}
+
+@container legacy-tools (max-width: 420px) {
+  .legacy-group-tabs {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@container legacy-tools (max-width: 300px) {
+  .legacy-group-tabs {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

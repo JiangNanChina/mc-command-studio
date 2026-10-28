@@ -124,8 +124,12 @@ async function main() {
   if ((await modal.locator('.changelog-versions').count()) > 0) {
     throw new Error('公告弹窗不应显示所有版本列表')
   }
-  if ((await modal.locator('.changelog-section.known').count()) > 0) {
-    throw new Error('公告弹窗不应显示已知问题栏目')
+  if ((await modal.locator('.changelog-section.known').count()) === 0) {
+    throw new Error('公告弹窗必须公开当前测试阶段与已知问题')
+  }
+  const visibleAnnouncement = await modal.innerText()
+  if (!visibleAnnouncement.includes('测试阶段') || !visibleAnnouncement.includes('半成品')) {
+    throw new Error('更新公告必须明确说明软件处于测试阶段，部分功能属于半成品')
   }
   await modal.getByRole('button', { name: '知道了' }).click()
   await page.waitForSelector('.banner.announcement', { state: 'detached', timeout: 10_000 })
@@ -735,6 +739,7 @@ async function main() {
   }
   await page.getByRole('button', { name: '方块容器', exact: true }).click()
   await page.fill('#item-slot', 'container.0')
+  await page.press('#item-slot', 'Enter')
   await page.getByRole('button', { name: '选择物品', exact: true }).click()
   await page.waitForSelector('.mc-grid', { timeout: 10_000 })
   await page.locator('.modal input[placeholder*="搜索中文名"]').fill('苹果')
@@ -957,7 +962,7 @@ async function main() {
   await page.locator('#loot-structured-type').scrollIntoViewIfNeeded()
   await page.waitForTimeout(300)
   await page.screenshot({ path: join(ARTIFACTS, 'datapack.png') })
-  await page.getByRole('button', { name: '导出数据包 .zip' }).click()
+  await page.getByRole('button', { name: '导出数据包压缩包', exact: true }).click()
   await page.waitForSelector('text=数据包已导出', { timeout: 20_000 })
   if (!existsSync(join(DATAPACK_DIR, 'mcstudio-datapack.zip'))) {
     throw new Error('数据包工作区 zip 未生成')
@@ -1246,7 +1251,7 @@ async function main() {
   if (!pack1122.includes('64')) {
     throw new Error(`1.12.2 命令数量不符合预期：${pack1122}`)
   }
-  await page.getByRole('button', { name: /OOC 生成器/ }).click()
+  await page.getByRole('button', { name: /一键命令生成器/ }).click()
   await page.waitForSelector('#ooc-commands', { timeout: 10_000 })
   await page.fill('#ooc-commands', 'say one\nsay two')
   await page.waitForTimeout(300)
@@ -1311,7 +1316,7 @@ async function main() {
   if (!legacyTestfor.includes('testfor @a {Health:10f}')) {
     throw new Error(`1.12.2 testfor 输出不符合预期：${legacyTestfor}`)
   }
-  await page.getByRole('button', { name: 'blockdata', exact: true }).click()
+  await page.locator('.legacy-tool-option').filter({ has: page.locator('code:text-is("/blockdata")') }).click()
   await page.waitForSelector('#legacy-blockdata-preset', { timeout: 10_000 })
   await page.selectOption('#legacy-blockdata-preset', '0')
   await page.waitForTimeout(300)
@@ -1325,7 +1330,7 @@ async function main() {
   if (!legacyBanner.includes('Patterns')) {
     throw new Error(`1.12.2 旗帜预设不符合预期：${legacyBanner}`)
   }
-  await page.getByRole('button', { name: 'entitydata', exact: true }).click()
+  await page.locator('.legacy-tool-option').filter({ has: page.locator('code:text-is("/entitydata")') }).click()
   await page.waitForSelector('#legacy-entitydata-preset', { timeout: 10_000 })
   await page.selectOption('#legacy-entitydata-preset', '8')
   await page.waitForTimeout(300)
@@ -1333,7 +1338,8 @@ async function main() {
   if (!legacyTrade.includes('Offers') || !legacyTrade.includes('Recipes')) {
     throw new Error(`1.12.2 村民交易预设不符合预期：${legacyTrade}`)
   }
-  await page.getByRole('button', { name: 'replaceitem', exact: true }).click()
+  await page.locator('.legacy-group-tab').filter({ hasText: /^物品/ }).click()
+  await page.locator('.legacy-tool-option').filter({ has: page.locator('code:text-is("/replaceitem")') }).click()
   await page.waitForSelector('#legacy-replaceitem-preset', { timeout: 10_000 })
   await page.selectOption('#legacy-replaceitem-preset', '0')
   await page.waitForTimeout(300)
@@ -1341,28 +1347,30 @@ async function main() {
   if (!legacyBook.includes('title:"MC Studio"') || !legacyBook.includes('pages')) {
     throw new Error(`1.12.2 成书预设不符合预期：${legacyBook}`)
   }
-  await page.getByRole('button', { name: 'give', exact: true }).click()
+  await page.locator('.legacy-tool-option').filter({ has: page.locator('code:text-is("/give")') }).click()
   await page.waitForSelector('#legacy-give-item', { timeout: 10_000 })
   await page.waitForTimeout(300)
   const legacyGive = await page.locator('#legacy-output').innerText()
   if (!legacyGive.startsWith('give @p minecraft:diamond 1 0')) {
     throw new Error(`1.12.2 give 输出不符合预期：${legacyGive}`)
   }
-  await page.getByRole('button', { name: 'execute', exact: true }).click()
+  await page.locator('.legacy-group-tab').filter({ hasText: /^世界控制/ }).click()
+  await page.locator('.legacy-tool-option').filter({ has: page.locator('code:text-is("/execute")') }).click()
   await page.waitForSelector('#legacy-exec-command', { timeout: 10_000 })
   await page.waitForTimeout(300)
   const legacyExecute = await page.locator('#legacy-output').innerText()
   if (!legacyExecute.includes('execute @p ~ ~ ~ say hi')) {
     throw new Error(`1.12.2 execute 输出不符合预期：${legacyExecute}`)
   }
-  await page.getByRole('button', { name: 'title', exact: true }).click()
+  await page.locator('.legacy-group-tab').filter({ hasText: /^系统与展示/ }).click()
+  await page.locator('.legacy-tool-option').filter({ has: page.locator('code:text-is("/title")') }).click()
   await page.waitForSelector('#legacy-title-text', { timeout: 10_000 })
   await page.waitForTimeout(300)
   const legacyTitle = await page.locator('#legacy-output').innerText()
   if (!legacyTitle.includes('title @a title')) {
     throw new Error(`1.12.2 title 输出不符合预期：${legacyTitle}`)
   }
-  await page.getByRole('button', { name: 'particle', exact: true }).click()
+  await page.locator('.legacy-tool-option').filter({ has: page.locator('code:text-is("/particle")') }).click()
   await page.waitForSelector('#legacy-particle-name', { timeout: 10_000 })
   await page.waitForTimeout(300)
   const legacyParticle = await page.locator('#legacy-output').innerText()
@@ -1403,7 +1411,7 @@ async function main() {
   if (!pack112.includes('64')) {
     throw new Error(`1.12 别名包不符合预期：${pack112}`)
   }
-  await page.getByRole('button', { name: /OOC 生成器/ }).click()
+  await page.getByRole('button', { name: /一键命令生成器/ }).click()
   await page.waitForSelector('#ooc-commands', { timeout: 10_000 })
   await page.fill('#ooc-commands', 'say 1.12')
   await page.waitForTimeout(300)
@@ -1423,6 +1431,7 @@ async function main() {
   await page.locator('.command-item', { hasText: '给予物品' }).first().click()
   await page.waitForSelector('#nbt-give-count', { timeout: 10_000 })
   await page.fill('#nbt-give-name', '旧版剑')
+  await page.getByRole('tab', { name: '附魔', exact: true }).click()
   await page.getByRole('button', { name: '添加附魔', exact: true }).click()
   await page.waitForTimeout(400)
   const nbtGiveOutput = await page.locator('.output-code .cm-content').innerText()

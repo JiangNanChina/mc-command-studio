@@ -56,6 +56,7 @@ import { LootForm } from './components/LootForm'
 import { GenericBuilder } from './components/GenericBuilder'
 import { OocForm } from './components/OocForm'
 import { LegacyToolsForm } from './components/LegacyToolsForm'
+import { TemplateForm } from './components/TemplateForm'
 import { OutputPanel } from './components/OutputPanel'
 import { StatusBar } from './components/StatusBar'
 import { SettingsDialog } from './components/SettingsDialog'
@@ -308,11 +309,11 @@ export default function App() {
         <div className="version-notice">
           <Info size={14} />
           {treeOnly
-            ? `当前使用 ${pack.manifest.gameVersion}（NBT 引擎）：give 使用 NBT 表单，召唤/方块/execute 等兼容表单已启用，其余命令使用命令树。`
+            ? `当前使用 ${pack.manifest.gameVersion}（NBT 引擎）：给予物品使用 NBT 表单，召唤、方块、执行链等兼容表单已启用，其余命令使用命令树。`
             : pack.manifest.engine === 'components'
-              ? `当前使用 ${pack.manifest.gameVersion}（组件引擎）：give/item 使用组件语法，表单与命令树按该版本生成；跨补丁版使用前请核对。`
+              ? `当前使用 ${pack.manifest.gameVersion}（组件引擎）：给予物品与物品操作使用组件语法，表单与命令树按该版本生成；跨补丁版使用前请核对。`
               : pack.manifest.engine === 'legacy'
-                ? `当前使用 ${pack.manifest.gameVersion}（Legacy 引擎）：使用旧版命令语法与 OOC 生成器。`
+                ? `当前使用 ${pack.manifest.gameVersion}（旧版引擎）：使用旧版命令语法与一键命令生成器。`
                 : `当前使用 ${pack.manifest.gameVersion} 数据包：命令树与通用构建器来自该版本；可视化表单按 26.3 语法生成，跨版本使用前请核对。`}
         </div>
       ) : null}
@@ -340,6 +341,8 @@ export default function App() {
             <OocForm />
           ) : activeCommandId === 'legacy-tools' ? (
             <LegacyToolsForm />
+          ) : activeCommandId?.startsWith('template:') ? (
+            <TemplateForm key={`${pack.manifest.id}:${activeCommandId}`} templateId={activeCommandId.slice('template:'.length)} />
           ) : treeOnly && !legacyEngine && isNbtQuickSafe(activeCommandId) ? (
             <QuickCommandForm key={activeCommandId} id={activeCommandId} />
           ) : treeOnly && (legacyEngine || !supportsLegacyForm(activeCommandId ?? '')) ? (

@@ -2,6 +2,9 @@ import { buildCommandBlockSetblock, error, hasErrors, type BuildResult, type Dia
 import type { ProjectPayload } from '../store/model'
 import { buildQuickCommand, isNbtQuickSafe, isQuickCommand } from './quickCommands'
 import { supportsLegacyForm } from './packCompat'
+import { buildTemplateOutput, createTemplateDraft } from './templateDraft'
+import { templateDraftKey } from './templateState'
+import { COMMAND_TEMPLATES } from './templateCatalog'
 import {
   selectNbtGiveOutput,
   selectGamemodeOutput,
@@ -77,6 +80,14 @@ function usesGenericForm(state: CommandOutputState): boolean {
 export function getCommandOutput(state: CommandOutputState): BuildResult {
   const { pack, activeCommandId, give, nbtGive, gamemode, damage, rotate, spreadplayers, ride, random, tick, social, summon, setblock, execute, teleport, effect, fill, clone, chain, enchant, xp, tellraw, title, sound, bossbar, scoreboard, particle, world, tag, clear, gamerule, worldborder, team, spawnpoint, worldSpawn, forceload, attribute, automation, itemCommand, dataCommand, loot, generic } = state
   if (!activeCommandId || ['datapack', 'ooc', 'legacy-tools'].includes(activeCommandId)) return { text: '', diagnostics: [] }
+  if (activeCommandId.startsWith('template:')) {
+    const id = activeCommandId.slice('template:'.length)
+    if (!pack || !COMMAND_TEMPLATES.some((template) => template.id === id)) {
+      return { text: '', diagnostics: [error('template.missing', '找不到此模板或版本数据，请重新选择模板', 'template')] }
+    }
+    const draft = state.templateDrafts[templateDraftKey(pack.manifest.id, id)] ?? createTemplateDraft(id, pack)
+    return buildTemplateOutput(draft, pack)
+  }
   if (activeCommandId !== 'chain' && !pack?.commands.children?.[activeCommandId]) {
     return { text: '', diagnostics: [error('command.unsupported', '当前版本不支持此命令', 'command')] }
   }
@@ -84,7 +95,7 @@ export function getCommandOutput(state: CommandOutputState): BuildResult {
   if (usesGenericForm(state)) return selectGenericOutput(pack, { ...generic, root: generic.root ?? activeCommandId })
   if (activeCommandId === 'give') {
     return pack?.manifest.engine === 'nbt'
-      ? selectNbtGiveOutput(nbtGive)
+      ? selectNbtGiveOutput(nbtGive, pack?.manifest.gameVersion)
       : selectGiveOutput(give, pack?.manifest.gameVersion)
   }
   if (activeCommandId === 'gamemode') return selectGamemodeOutput(gamemode)
@@ -158,7 +169,7 @@ export function getCommandOutput(state: CommandOutputState): BuildResult {
 
 export function getCurrentOutput(state: CommandOutputState): CurrentOutput {
   const command = getCommandOutput(state)
-  if (state.outputMode === 'command') {
+  if (state.outputMode === 'command' || (state.activeCommandId?.startsWith('template:') && state.pack?.manifest.engine === 'legacy')) {
     return { command, text: command.text, diagnostics: command.diagnostics, hasErrors: hasErrors(command.diagnostics) }
   }
   const commandBlockResult = buildCommandBlockSetblock(command.text, state.commandBlock)
@@ -182,7 +193,8 @@ export function createCurrentOutputSelector(): (state: CommandOutputState) => Cu
   return (state) => {
     const id = state.activeCommandId ?? ''
     let draft: unknown
-    if (usesNbtQuickForm(state)) draft = state.quickDrafts[id]
+    if (id.startsWith('template:')) draft = state.templateDrafts[templateDraftKey(state.pack?.manifest.id ?? '', id.slice('template:'.length))]
+    else if (usesNbtQuickForm(state)) draft = state.quickDrafts[id]
     else if (usesGenericForm(state)) draft = state.generic
     else if (isQuickCommand(id) && !QUICK_WITH_SPECIALIZED_FORM.has(id)) draft = state.quickDrafts[id]
     else if (id === 'give') draft = state.pack?.manifest.engine === 'nbt' ? state.nbtGive : state.give

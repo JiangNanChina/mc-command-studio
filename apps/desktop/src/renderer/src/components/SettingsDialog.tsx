@@ -214,7 +214,7 @@ export function SettingsDialog() {
             </div>
             <div className="setting-desc">
               {state.pack
-                ? `${state.pack.manifest.counts.roots} 根命令 · ${state.pack.manifest.counts.items} 物品 · ${state.pack.manifest.counts.parsers} 参数类型 · pack_format ${state.pack.manifest.packFormat}`
+                ? `${state.pack.manifest.counts.roots} 根命令 · ${state.pack.manifest.counts.items} 物品 · ${state.pack.manifest.counts.parsers} 参数类型 · 数据包格式 ${state.pack.manifest.packFormat}`
                 : '请运行 pnpm data:build 生成数据包'}
             </div>
             <div className="settings-meta" style={{ marginTop: 4 }}>

@@ -23,6 +23,8 @@ import {
 import { SelectorDialog } from './SelectorDialog'
 import { useAppStore } from '../store'
 import { hasCommandPath } from '../lib/versionFeatures'
+import { builtinOptionLabel, builtinOptionName, namedOptions } from '../lib/localizedOptions'
+import { LocalizedIdInput } from './LocalizedIdInput'
 
 const meta = COMMAND_MAP.get('execute')
 
@@ -321,7 +323,7 @@ function ClauseEditor({
           >
             {AXES.map((axes) => (
               <option key={axes} value={axes}>
-                {axes}
+                {axes.toUpperCase()} 轴
               </option>
             ))}
           </select>
@@ -335,8 +337,8 @@ function ClauseEditor({
               onChange({ ...clause, anchor: event.target.value as 'eyes' | 'feet' })
             }
           >
-            <option value="eyes">eyes（眼睛）</option>
-            <option value="feet">feet（脚）</option>
+            <option value="eyes">眼睛（eyes）</option>
+            <option value="feet">脚部（feet）</option>
           </select>
         ) : null}
 
@@ -364,17 +366,15 @@ function ClauseEditor({
         {clause.kind === 'in' ? (
           <div className="field">
             <label className="field-label">维度</label>
-            <input
-              className="input"
-              list={`dimensions-${clause.id}`}
+            <LocalizedIdInput
+              id={`dimensions-${clause.id}`}
+              label="维度"
               value={clause.dimension}
-              onChange={(event) => onChange({ ...clause, dimension: event.target.value })}
+              options={namedOptions(
+                (pack?.registries.dimension?.length ? pack.registries.dimension : DIMENSIONS)
+                  .map((dimension) => dimension.includes(':') ? dimension : `minecraft:${dimension}`), builtinOptionName)}
+              onChange={(dimension) => onChange({ ...clause, dimension })}
             />
-            <datalist id={`dimensions-${clause.id}`}>
-              {DIMENSIONS.map((dimension) => (
-                <option key={dimension} value={dimension} />
-              ))}
-            </datalist>
           </div>
         ) : null}
 
@@ -452,8 +452,8 @@ function ClauseEditor({
                     onChange({ ...clause, mode: event.target.value as 'result' | 'success' })
                   }
                 >
-                  <option value="result">result（返回值）</option>
-                  <option value="success">success（是否成功）</option>
+                  <option value="result">{builtinOptionLabel('result')}</option>
+                  <option value="success">{builtinOptionLabel('success')}</option>
                 </select>
               </div>
               <div className="field">

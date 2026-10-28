@@ -61,7 +61,31 @@ export function normalizeNbtGive(input: Partial<NbtGiveOptions> | undefined): Nb
             level: typeof entry.level === 'string' ? entry.level : '1'
           }))
       : [],
-    unbreakable: Boolean(input.unbreakable)
+    unbreakable: Boolean(input.unbreakable),
+    damage: typeof input.damage === 'string' ? input.damage : '',
+    tags: Array.isArray(input.tags) ? input.tags.filter((tag): tag is string => typeof tag === 'string') : [],
+    attributes: Array.isArray(input.attributes) ? input.attributes.filter((entry) => entry && typeof entry.attribute === 'string')
+      .map((entry) => ({
+        attribute: entry.attribute,
+        amount: typeof entry.amount === 'string' ? entry.amount : '1',
+        operation: [0, 1, 2].includes(entry.operation) ? entry.operation : 0,
+        slot: typeof entry.slot === 'string' ? entry.slot : 'mainhand',
+        name: typeof entry.name === 'string' ? entry.name : 'mcstudio:modifier'
+      })) : [],
+    potion: typeof input.potion === 'string' ? input.potion : '',
+    potionColor: typeof input.potionColor === 'string' ? input.potionColor : '',
+    potionEffects: Array.isArray(input.potionEffects) ? input.potionEffects.filter((entry) => entry && typeof entry.id === 'string')
+      .map((entry) => ({ id: entry.id, duration: typeof entry.duration === 'string' ? entry.duration : '200', amplifier: typeof entry.amplifier === 'string' ? entry.amplifier : '0' })) : [],
+    canDestroy: Array.isArray(input.canDestroy) ? input.canDestroy.filter((id): id is string => typeof id === 'string') : [],
+    canPlaceOn: Array.isArray(input.canPlaceOn) ? input.canPlaceOn.filter((id): id is string => typeof id === 'string') : [],
+    spawnerEntity: typeof input.spawnerEntity === 'string' ? input.spawnerEntity : '',
+    spawnerDelay: typeof input.spawnerDelay === 'string' ? input.spawnerDelay : '',
+    spawnerMinSpawnDelay: typeof input.spawnerMinSpawnDelay === 'string' ? input.spawnerMinSpawnDelay : '',
+    spawnerMaxSpawnDelay: typeof input.spawnerMaxSpawnDelay === 'string' ? input.spawnerMaxSpawnDelay : '',
+    spawnerSpawnCount: typeof input.spawnerSpawnCount === 'string' ? input.spawnerSpawnCount : '',
+    spawnerMaxNearbyEntities: typeof input.spawnerMaxNearbyEntities === 'string' ? input.spawnerMaxNearbyEntities : '',
+    spawnerRequiredPlayerRange: typeof input.spawnerRequiredPlayerRange === 'string' ? input.spawnerRequiredPlayerRange : '',
+    spawnerSpawnRange: typeof input.spawnerSpawnRange === 'string' ? input.spawnerSpawnRange : ''
   }
 }
 

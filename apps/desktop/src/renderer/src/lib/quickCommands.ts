@@ -341,8 +341,8 @@ export const QUICK_SCHEMAS: Record<string, QuickSchema> = {
       { key: 'targetType', label: '计算目标', kind: 'select', options: ['default', 'entity', 'block'], defaultValue: 'default', optionRoot: 'compute' },
       { key: 'target', label: '实体/方块坐标', kind: 'text', defaultValue: '@s', visible: (v) => v.targetType !== 'default' },
       { key: 'valueType', label: '数值类型', kind: 'select', options: ['float', 'integer'], defaultValue: 'float' },
-      { key: 'floatProvider', label: 'Float Provider', kind: 'select', options: [], defaultValue: 'minecraft:brewing/speed_default', optionsRegistry: 'context_float_provider', visible: (v) => v.valueType === 'float' },
-      { key: 'integerProvider', label: 'Integer Provider', kind: 'select', options: [], defaultValue: 'minecraft:brewing/uses_default', optionsRegistry: 'context_int_provider', visible: (v) => v.valueType === 'integer' },
+      { key: 'floatProvider', label: '浮点数提供器', kind: 'select', options: [], defaultValue: 'minecraft:brewing/speed_default', optionsRegistry: 'context_float_provider', visible: (v) => v.valueType === 'float' },
+      { key: 'integerProvider', label: '整数提供器', kind: 'select', options: [], defaultValue: 'minecraft:brewing/uses_default', optionsRegistry: 'context_int_provider', visible: (v) => v.valueType === 'integer' },
       { key: 'scale', label: 'float 缩放（可选）', kind: 'text', defaultValue: '', visible: (v) => v.valueType === 'float' }
     ],
     build: (v) => {

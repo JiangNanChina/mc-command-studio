@@ -95,8 +95,8 @@ export function XpForm() {
                   value={xp.unit}
                   onChange={(event) => state.updateXp({ unit: event.target.value as XpUnit })}
                 >
-                  <option value="points">points（经验点）</option>
-                  <option value="levels">levels（等级）</option>
+                  <option value="points">经验点（points）</option>
+                  <option value="levels">经验等级（levels）</option>
                 </select>
               </div>
             </div>
@@ -111,8 +111,8 @@ export function XpForm() {
                 value={xp.unit}
                 onChange={(event) => state.updateXp({ unit: event.target.value as XpUnit })}
               >
-                <option value="points">points（经验点）</option>
-                <option value="levels">levels（等级）</option>
+                <option value="points">经验点（points）</option>
+                <option value="levels">经验等级（levels）</option>
               </select>
               <div className="hint">查询结果会显示在命令执行者的聊天栏中。</div>
             </div>

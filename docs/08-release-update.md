@@ -71,8 +71,10 @@ publish:
     releaseType: draft
 ```
 
-本仓库已完成配置，并已发布：
-[MC 指令工坊 v0.6.2](https://github.com/JiangNanChina/mc-command-studio/releases/tag/v0.6.2)（最新）、
+本仓库已完成配置。当前版本为 [MC 指令工坊 v0.7.0](https://github.com/JiangNanChina/mc-command-studio/releases/tag/v0.7.0)，本次更新包括中文优先界面、物品分区设置、方案管理与独立模板分类。**软件仍处于测试阶段，部分功能属于半成品，正式发布渠道不代表所有功能已经完成。** 具体范围见 [更新日志](../CHANGELOG.md)。
+
+历史版本：
+[v0.6.2](https://github.com/JiangNanChina/mc-command-studio/releases/tag/v0.6.2)、
 [v0.6.1](https://github.com/JiangNanChina/mc-command-studio/releases/tag/v0.6.1)、
 [v0.6.0](https://github.com/JiangNanChina/mc-command-studio/releases/tag/v0.6.0)、
 [v0.1.64](https://github.com/JiangNanChina/mc-command-studio/releases/tag/v0.1.64)、

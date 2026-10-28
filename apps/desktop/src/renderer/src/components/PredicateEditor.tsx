@@ -19,10 +19,10 @@ interface PredicateEditorProps {
 }
 
 const ENTITY_OPTIONS = [
-  { value: 'this', label: 'this（当前实体）' },
-  { value: 'killer', label: 'killer（击杀者）' },
-  { value: 'player', label: 'player（玩家）' },
-  { value: 'direct_killer', label: 'direct_killer（直接击杀者）' }
+  { value: 'this', label: '当前实体（this）' },
+  { value: 'killer', label: '击杀者（killer）' },
+  { value: 'player', label: '玩家（player）' },
+  { value: 'direct_killer', label: '直接击杀者（direct_killer）' }
 ]
 
 export function PredicateEditor({ content, onChange }: PredicateEditorProps) {

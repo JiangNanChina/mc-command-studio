@@ -56,7 +56,7 @@ export function Header() {
         </div>
         <div>
           <div className="brand-name">MC 指令工坊</div>
-          <div className="brand-sub">Minecraft Java 命令编辑器</div>
+          <div className="brand-sub">我的世界 Java 版命令编辑器</div>
         </div>
       </div>
 
@@ -72,7 +72,7 @@ export function Header() {
       </div>
 
       <div className="header-actions">
-        <div className="pack-pill" title="切换 Minecraft 版本">
+        <div className="pack-pill" title="切换游戏版本">
           <VersionSelect />
           {state.pack ? (
             <span className="pack-count">{state.pack.manifest.counts.roots} 命令</span>
@@ -133,6 +133,7 @@ export function Header() {
           type="button"
           className="icon-btn"
           title={state.settings.theme === 'dark' ? '切换浅色主题' : '切换深色主题'}
+          aria-label={state.settings.theme === 'dark' ? '切换浅色主题' : '切换深色主题'}
           onClick={() => state.setTheme(state.settings.theme === 'dark' ? 'light' : 'dark')}
         >
           {state.settings.theme === 'dark' ? <Sun size={17} /> : <Moon size={17} />}
@@ -141,6 +142,7 @@ export function Header() {
           type="button"
           className="icon-btn"
           title="检查更新"
+          aria-label="检查更新"
           onClick={() => state.checkForUpdates(true)}
         >
           {state.updateStatus === 'checking' ? <RotateCcw size={17} className="spin" /> : <Sparkles size={17} />}
@@ -149,6 +151,7 @@ export function Header() {
           type="button"
           className="icon-btn"
           title="设置 (Ctrl+,)"
+          aria-label="设置"
           onClick={() => state.setDialog('settings', true)}
         >
           <Settings size={17} />

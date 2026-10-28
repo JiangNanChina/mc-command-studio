@@ -1,6 +1,12 @@
 import { useShallow } from 'zustand/react/shallow'
 import { useMemo, useState } from 'react'
-import { Copy, Wrench } from 'lucide-react'
+import {
+  Award, Blocks, Bot, Box, ChartNoAxesColumn, Circle, ClipboardCheck, CloudSun,
+  Copy, Eraser, Eye, FlaskConical, Gamepad2, Gift, Globe2, ListOrdered, MapPin,
+  Medal, MessageSquareText, Moon, MousePointerClick, Move3d, Package, Repeat2,
+  Save, Search, Settings2, Shield, Sparkles, Star, Terminal, Type, Users, Volume2,
+  WandSparkles, Workflow, Wrench, type LucideIcon
+} from 'lucide-react'
 import {
   LEGACY_BLOCK_PRESETS,
   LEGACY_ENTITY_PRESETS,
@@ -77,44 +83,65 @@ import {
 } from '@mcstudio/core'
 import { useAppStore } from '../store'
 import { CustomPresetBar } from './CustomPresetBar'
+import { LocalizedIdInput } from './LocalizedIdInput'
+import { builtinOptionLabel, itemSlotName, registryOptions } from '../lib/localizedOptions'
+import './LegacyToolsForm.css'
 
 type LegacyTab = 'testfor' | 'blockdata' | 'entitydata' | 'replaceitem' | 'give' | 'testforblock' | 'testforblocks' | 'achievement' | 'trigger' | 'setidletimeout' | 'save' | 'stats' | 'scoreboard' | 'execute' | 'advancement' | 'clear' | 'worldborder' | 'spreadplayers' | 'title' | 'particle' | 'summon' | 'gamerule' | 'xp' | 'tellraw' | 'effect' | 'enchant' | 'sound' | 'teleport' | 'admin' | 'world' | 'simple' | 'gamemode' | 'block' | 'misc'
+type LegacyGroup = '检测与数据' | '基础命令' | '物品' | '玩家与实体' | '世界控制' | '系统与展示'
 
-const TABS: { id: LegacyTab; label: string }[] = [
-  { id: 'testfor', label: 'testfor' },
-  { id: 'blockdata', label: 'blockdata' },
-  { id: 'entitydata', label: 'entitydata' },
-  { id: 'replaceitem', label: 'replaceitem' },
-  { id: 'give', label: 'give' },
-  { id: 'testforblock', label: 'testforblock' },
-  { id: 'testforblocks', label: 'testforblocks' },
-  { id: 'achievement', label: 'achievement' },
-  { id: 'trigger', label: 'trigger' },
-  { id: 'setidletimeout', label: 'setidletimeout' },
-  { id: 'save', label: 'save' },
-  { id: 'stats', label: 'stats' },
-  { id: 'scoreboard', label: 'scoreboard' },
-  { id: 'execute', label: 'execute' },
-  { id: 'advancement', label: 'advancement' },
-  { id: 'clear', label: 'clear' },
-  { id: 'worldborder', label: 'worldborder' },
-  { id: 'spreadplayers', label: 'spreadplayers' },
-  { id: 'title', label: 'title' },
-  { id: 'particle', label: 'particle' },
-  { id: 'summon', label: 'summon' },
-  { id: 'gamerule', label: 'gamerule' },
-  { id: 'xp', label: 'xp' },
-  { id: 'tellraw', label: 'tellraw' },
-  { id: 'effect', label: 'effect' },
-  { id: 'enchant', label: 'enchant' },
-  { id: 'sound', label: 'sound' },
-  { id: 'teleport', label: 'teleport' },
-  { id: 'admin', label: 'admin' },
-  { id: 'world', label: 'world' },
-  { id: 'simple', label: 'simple' },
-  { id: 'gamemode', label: 'gamemode' },
-  { id: 'block', label: 'block' },
-  { id: 'misc', label: 'misc' }
+interface LegacyTool {
+  id: LegacyTab
+  label: string
+  description: string
+  group: LegacyGroup
+  icon: LucideIcon
+}
+
+const GROUPS: { id: LegacyGroup; label: string; icon: LucideIcon }[] = [
+  { id: '检测与数据', label: '检测与数据', icon: Search },
+  { id: '基础命令', label: '基础命令', icon: Terminal },
+  { id: '物品', label: '物品', icon: Package },
+  { id: '玩家与实体', label: '玩家与实体', icon: Users },
+  { id: '世界控制', label: '世界控制', icon: Globe2 },
+  { id: '系统与展示', label: '系统与展示', icon: Settings2 }
+]
+
+const TABS: LegacyTool[] = [
+  { id: 'testfor', label: '检测实体', description: '按选择器和 NBT 检查实体。', group: '检测与数据', icon: Eye },
+  { id: 'blockdata', label: '修改方块数据', description: '读取或修改方块实体 NBT。', group: '检测与数据', icon: Blocks },
+  { id: 'entitydata', label: '修改实体数据', description: '读取或修改目标实体 NBT。', group: '检测与数据', icon: Bot },
+  { id: 'testforblock', label: '检测单个方块', description: '检查坐标上的方块和数据值。', group: '检测与数据', icon: Box },
+  { id: 'testforblocks', label: '比较方块区域', description: '比较两个长方体区域的方块。', group: '检测与数据', icon: ClipboardCheck },
+  { id: 'give', label: '给予物品', description: '给目标物品、数量、数据值与 NBT。', group: '物品', icon: Gift },
+  { id: 'replaceitem', label: '替换物品槽位', description: '替换实体装备栏或容器槽位。', group: '物品', icon: Repeat2 },
+  { id: 'achievement', label: '成就', description: '授予或撤销旧版成就。', group: '基础命令', icon: Award },
+  { id: 'trigger', label: '触发计分目标', description: '更新玩家可触发的计分目标。', group: '玩家与实体', icon: MousePointerClick },
+  { id: 'stats', label: '统计项', description: '将实体或方块统计写入计分板。', group: '玩家与实体', icon: ChartNoAxesColumn },
+  { id: 'scoreboard', label: '计分板', description: '管理目标、玩家分数与显示栏。', group: '玩家与实体', icon: ListOrdered },
+  { id: 'advancement', label: '进度', description: '按新式子命令兼容旧版进度。', group: '基础命令', icon: Medal },
+  { id: 'clear', label: '清除物品', description: '移除目标背包中的指定物品。', group: '玩家与实体', icon: Eraser },
+  { id: 'xp', label: '经验', description: '添加经验点或设置经验等级。', group: '基础命令', icon: Star },
+  { id: 'effect', label: '状态效果', description: '给予或清除药水状态效果。', group: '玩家与实体', icon: FlaskConical },
+  { id: 'enchant', label: '附魔物品', description: '为玩家主手物品添加附魔。', group: '玩家与实体', icon: Sparkles },
+  { id: 'teleport', label: '传送', description: '将玩家传送到坐标或目标实体。', group: '基础命令', icon: MapPin },
+  { id: 'admin', label: '玩家管理', description: '管理名单、封禁、踢出及权限。', group: '玩家与实体', icon: Shield },
+  { id: 'gamemode', label: '游戏模式', description: '切换生存、创造、冒险或旁观。', group: '基础命令', icon: Gamepad2 },
+  { id: 'setidletimeout', label: '挂机超时', description: '设置玩家挂机自动退出时间。', group: '玩家与实体', icon: Moon },
+  { id: 'worldborder', label: '世界边界', description: '设置边界中心、尺寸和伤害。', group: '世界控制', icon: Circle },
+  { id: 'spreadplayers', label: '分散玩家', description: '把多个实体分散到安全位置。', group: '世界控制', icon: Move3d },
+  { id: 'world', label: '时间与天气', description: '调整世界时间、天气与难度。', group: '基础命令', icon: CloudSun },
+  { id: 'gamerule', label: '游戏规则', description: '查看或更改世界游戏规则。', group: '基础命令', icon: Settings2 },
+  { id: 'block', label: '区域操作', description: '填充、复制或替换方块区域。', group: '世界控制', icon: Blocks },
+  { id: 'summon', label: '生成实体', description: '在坐标位置生成实体与 NBT。', group: '世界控制', icon: WandSparkles },
+  { id: 'execute', label: '执行链', description: '组合旧版 execute 条件和目标。', group: '世界控制', icon: Workflow },
+  { id: 'misc', label: '常用杂项', description: '函数、配方、定位、出生点和调试。', group: '基础命令', icon: Terminal },
+  { id: 'title', label: '屏幕标题', description: '向玩家显示标题、副标题与动作栏。', group: '系统与展示', icon: Type },
+  { id: 'particle', label: '粒子效果', description: '在指定位置播放粒子特效。', group: '系统与展示', icon: Sparkles },
+  { id: 'tellraw', label: '聊天文本', description: '发送支持格式化的 JSON 聊天消息。', group: '基础命令', icon: MessageSquareText },
+  { id: 'sound', label: '声音', description: '向目标播放或停止声音。', group: '基础命令', icon: Volume2 },
+  { id: 'save', label: '存档控制', description: '暂停或恢复世界保存。', group: '系统与展示', icon: Save },
+  { id: 'simple', label: '基础命令', description: '帮助、停止、保存及其他单步命令。', group: '基础命令', icon: Terminal }
 ]
 
 export function LegacyToolsForm() {
@@ -123,6 +150,7 @@ export function LegacyToolsForm() {
     showToast: state.showToast
   })))
   const [tab, setTab] = useState<LegacyTab>('testfor')
+  const [group, setGroup] = useState<LegacyGroup>('检测与数据')
   const [testfor, setTestfor] = useState(createDefaultTestfor)
   const [blockdata, setBlockdata] = useState(createDefaultBlockdata)
   const [entitydata, setEntitydata] = useState(createDefaultEntitydata)
@@ -160,7 +188,10 @@ export function LegacyToolsForm() {
   const pack = useAppStore((state) => state.pack)
   const itemOptions = pack?.registries.item ?? []
   const blockOptions = pack?.registries.block ?? []
+  const localizedItems = registryOptions('items', itemOptions)
+  const localizedBlocks = registryOptions('blocks', blockOptions)
   const [copied, setCopied] = useState(false)
+  const activeTool = TABS.find((tool) => tool.id === tab) ?? TABS[0]
 
   const result = useMemo(() => {
     if (tab === 'testfor') return buildTestfor(testfor)
@@ -207,17 +238,7 @@ export function LegacyToolsForm() {
   }
 
   return (
-    <div className="content">
-      <datalist id="legacy-item-options">
-        {itemOptions.map((id) => (
-          <option key={id} value={`minecraft:${id}`} />
-        ))}
-      </datalist>
-      <datalist id="legacy-block-options">
-        {blockOptions.map((id) => (
-          <option key={id} value={`minecraft:${id}`} />
-        ))}
-      </datalist>
+    <div className="content legacy-tools-page">
       <div className="page-head">
         <div>
           <div className="crumb">命令库 / 工具 / 1.12.2 旧版工具</div>
@@ -231,32 +252,63 @@ export function LegacyToolsForm() {
                 <span className="hero-id">legacy</span>
               </h1>
               <p className="hero-sub">
-                testfor / blockdata / entitydata / replaceitem / give / testforblock / testforblocks / achievement 的 1.8–1.12 语法可视化编辑。
+                将旧版命令拆成可视化设置，自动生成适用于 1.8–1.12 的语法。
               </p>
             </div>
           </div>
         </div>
       </div>
 
-      <div className="world-tabs">
-        {TABS.map((item) => (
-          <button
-            key={item.id}
-            type="button"
-            className={`world-tab${tab === item.id ? ' active' : ''}`}
-            onClick={() => {
-              setTab(item.id)
-              setCopied(false)
-            }}
-          >
-            {item.label}
-          </button>
-        ))}
+      <div className="legacy-command-nav">
+        <div className="legacy-group-tabs" role="group" aria-label="旧版命令类别">
+          {GROUPS.map((item) => {
+            const Icon = item.icon
+            const count = TABS.filter((tool) => tool.group === item.id).length
+            return (
+              <button key={item.id} type="button" aria-pressed={group === item.id}
+                className={`legacy-group-tab${group === item.id ? ' active' : ''}`}
+                onClick={() => {
+                  setGroup(item.id)
+                  const firstTool = TABS.find((tool) => tool.group === item.id)
+                  if (firstTool) setTab(firstTool.id)
+                  setCopied(false)
+                }}>
+                <Icon size={15} />
+                <span>{item.label}</span>
+                <span className="legacy-count">{count}</span>
+              </button>
+            )
+          })}
+        </div>
+        <div className="legacy-tools-grid" role="group" aria-label={`${group}命令`}>
+          {TABS.filter((item) => item.group === group).map((item) => {
+            const Icon = item.icon
+            return (
+              <button key={item.id} type="button"
+                className={`legacy-tool-option${tab === item.id ? ' active' : ''}`}
+                aria-pressed={tab === item.id}
+                onClick={() => {
+                  setTab(item.id)
+                  setCopied(false)
+                }}>
+                <Icon size={16} aria-hidden="true" />
+                <span className="legacy-tool-copy">
+                  <span className="legacy-tool-title">{item.label}<code>/{item.id}</code></span>
+                  <span className="legacy-tool-description">{item.description}</span>
+                </span>
+              </button>
+            )
+          })}
+        </div>
       </div>
 
-      <div className="card">
+      <div className="card legacy-editor-card">
         <div className="card-head">
-          <div className="card-title">{tab}</div>
+          <div className="card-title">
+            {(() => { const Icon = activeTool.icon; return <Icon size={15} /> })()}
+            {activeTool.label}
+            <code className="legacy-active-id">/{activeTool.id}</code>
+          </div>
           <button type="button" className="btn btn-sm" onClick={() => void copy()}>
             <Copy size={13} />
             {copied ? '已复制' : '复制'}
@@ -422,12 +474,12 @@ export function LegacyToolsForm() {
                   <label className="field-label" htmlFor="legacy-give-item">
                     物品
                   </label>
-                  <input
+                  <LocalizedIdInput
                     id="legacy-give-item"
-                    className="input"
-                    list="legacy-item-options"
+                    label="物品"
+                    options={localizedItems}
                     value={give.item}
-                    onChange={(event) => setGive({ ...give, item: event.target.value })}
+                    onChange={(item) => setGive({ ...give, item })}
                   />
                 </div>
               </div>
@@ -545,7 +597,7 @@ export function LegacyToolsForm() {
                   >
                     {LEGACY_SLOTS.map((slot) => (
                       <option key={slot} value={slot}>
-                        {slot}
+                        {itemSlotName(slot)}（{slot}）
                       </option>
                     ))}
                   </select>
@@ -554,14 +606,12 @@ export function LegacyToolsForm() {
                   <label className="field-label" htmlFor="legacy-replaceitem-item">
                     物品 ID
                   </label>
-                  <input
+                  <LocalizedIdInput
                     id="legacy-replaceitem-item"
-                    className="input"
-                    list="legacy-item-options"
+                    label="物品 ID"
+                    options={localizedItems}
                     value={replaceitem.item}
-                    onChange={(event) =>
-                      setReplaceitem({ ...replaceitem, item: event.target.value })
-                    }
+                    onChange={(item) => setReplaceitem({ ...replaceitem, item })}
                   />
                 </div>
               </div>
@@ -646,8 +696,8 @@ export function LegacyToolsForm() {
               <div className="grid-2" style={{ marginTop: 12 }}>
                 <div className="field">
                   <label className="field-label" htmlFor="legacy-tfb-block">方块</label>
-                  <input id="legacy-tfb-block" className="input" list="legacy-block-options" value={testforblock.block}
-                    onChange={(event) => setTestforblock({ ...testforblock, block: event.target.value })} />
+                  <LocalizedIdInput id="legacy-tfb-block" label="方块" options={localizedBlocks} value={testforblock.block}
+                    onChange={(block) => setTestforblock({ ...testforblock, block })} />
                 </div>
                 <div className="field">
                   <label className="field-label" htmlFor="legacy-tfb-data">数据值（可选）</label>
@@ -679,8 +729,8 @@ export function LegacyToolsForm() {
                 <label className="field-label" htmlFor="legacy-tfbs-mode">模式</label>
                 <select id="legacy-tfbs-mode" className="select" value={testforblocks.mode}
                   onChange={(event) => setTestforblocks({ ...testforblocks, mode: event.target.value as 'all' | 'masked' })}>
-                  <option value="all">all</option>
-                  <option value="masked">masked</option>
+                  <option value="all">{builtinOptionLabel('all')}</option>
+                  <option value="masked">{builtinOptionLabel('masked')}</option>
                 </select>
               </div>
             </>
@@ -693,8 +743,8 @@ export function LegacyToolsForm() {
                   <label className="field-label" htmlFor="legacy-ach-action">动作</label>
                   <select id="legacy-ach-action" className="select" value={achievement.action}
                     onChange={(event) => setAchievement({ ...achievement, action: event.target.value as 'give' | 'take' })}>
-                    <option value="give">give</option>
-                    <option value="take">take</option>
+                    <option value="give">{builtinOptionLabel('give')}</option>
+                    <option value="take">{builtinOptionLabel('take')}</option>
                   </select>
                 </div>
                 <div className="field">
@@ -722,8 +772,8 @@ export function LegacyToolsForm() {
                 <label className="field-label" htmlFor="legacy-trigger-action">动作</label>
                 <select id="legacy-trigger-action" className="select" value={trigger.action}
                   onChange={(event) => setTrigger({ ...trigger, action: event.target.value as 'add' | 'set' })}>
-                  <option value="add">add</option>
-                  <option value="set">set</option>
+                  <option value="add">{builtinOptionLabel('add')}</option>
+                  <option value="set">{builtinOptionLabel('set')}</option>
                 </select>
               </div>
               <div className="field">
@@ -747,8 +797,8 @@ export function LegacyToolsForm() {
               <label className="field-label" htmlFor="legacy-save-action">动作</label>
               <select id="legacy-save-action" className="select" value={save.action}
                 onChange={(event) => setSave({ action: event.target.value as 'hold' | 'query' })}>
-                <option value="hold">hold</option>
-                <option value="query">query</option>
+                <option value="hold">{builtinOptionLabel('hold')}</option>
+                <option value="query">{builtinOptionLabel('query')}</option>
               </select>
             </div>
           ) : null}
@@ -760,8 +810,8 @@ export function LegacyToolsForm() {
                   <label className="field-label" htmlFor="legacy-stats-type">目标类型</label>
                   <select id="legacy-stats-type" className="select" value={stats.targetType}
                     onChange={(event) => setStats({ ...stats, targetType: event.target.value as 'entity' | 'block' })}>
-                    <option value="entity">entity</option>
-                    <option value="block">block</option>
+                    <option value="entity">{builtinOptionLabel('entity')}</option>
+                    <option value="block">{builtinOptionLabel('block')}</option>
                   </select>
                 </div>
                 {stats.targetType === 'entity' ? (
@@ -787,8 +837,8 @@ export function LegacyToolsForm() {
                   <label className="field-label" htmlFor="legacy-stats-action">动作</label>
                   <select id="legacy-stats-action" className="select" value={stats.action}
                     onChange={(event) => setStats({ ...stats, action: event.target.value as 'set' | 'clear' })}>
-                    <option value="set">set</option>
-                    <option value="clear">clear</option>
+                    <option value="set">{builtinOptionLabel('set')}</option>
+                    <option value="clear">{builtinOptionLabel('clear')}</option>
                   </select>
                 </div>
                 <div className="field">
@@ -811,12 +861,12 @@ export function LegacyToolsForm() {
                 <label className="field-label" htmlFor="legacy-score-action">操作</label>
                 <select id="legacy-score-action" className="select" value={scoreboard.action}
                   onChange={(event) => setScoreboard({ ...scoreboard, action: event.target.value as typeof scoreboard.action })}>
-                  <option value="objectives-add">objectives add</option>
-                  <option value="objectives-remove">objectives remove</option>
-                  <option value="objectives-list">objectives list</option>
-                  <option value="players-set">players set</option>
-                  <option value="players-add">players add</option>
-                  <option value="players-remove">players remove</option>
+                  <option value="objectives-add">{builtinOptionLabel('objectives-add')}</option>
+                  <option value="objectives-remove">{builtinOptionLabel('objectives-remove')}</option>
+                  <option value="objectives-list">{builtinOptionLabel('objectives-list')}</option>
+                  <option value="players-set">{builtinOptionLabel('players-set')}</option>
+                  <option value="players-add">{builtinOptionLabel('players-add')}</option>
+                  <option value="players-remove">{builtinOptionLabel('players-remove')}</option>
                 </select>
               </div>
               {scoreboard.action.startsWith('objectives') ? (
@@ -891,8 +941,8 @@ export function LegacyToolsForm() {
                 <div className="grid-2" style={{ marginTop: 8 }}>
                   <div className="field">
                     <label className="field-label" htmlFor="legacy-exec-block">方块</label>
-                    <input id="legacy-exec-block" className="input" list="legacy-block-options" value={execute.block}
-                      onChange={(event) => setExecute({ ...execute, block: event.target.value })} />
+                    <LocalizedIdInput id="legacy-exec-block" label="检测方块" options={localizedBlocks} value={execute.block}
+                      onChange={(block) => setExecute({ ...execute, block })} />
                   </div>
                   <div className="field">
                     <label className="field-label" htmlFor="legacy-exec-data">数据值</label>
@@ -911,9 +961,9 @@ export function LegacyToolsForm() {
                   <label className="field-label" htmlFor="legacy-adv-action">动作</label>
                   <select id="legacy-adv-action" className="select" value={advancement.action}
                     onChange={(event) => setAdvancement({ ...advancement, action: event.target.value as typeof advancement.action })}>
-                    <option value="grant">grant</option>
-                    <option value="revoke">revoke</option>
-                    <option value="test">test</option>
+                    <option value="grant">{builtinOptionLabel('grant')}</option>
+                    <option value="revoke">{builtinOptionLabel('revoke')}</option>
+                    <option value="test">{builtinOptionLabel('test')}</option>
                   </select>
                 </div>
                 <div className="field">
@@ -925,10 +975,10 @@ export function LegacyToolsForm() {
                   <label className="field-label" htmlFor="legacy-adv-mode">范围</label>
                   <select id="legacy-adv-mode" className="select" value={advancement.mode}
                     onChange={(event) => setAdvancement({ ...advancement, mode: event.target.value as typeof advancement.mode })}>
-                    <option value="only">only</option>
-                    <option value="until">until</option>
-                    <option value="from">from</option>
-                    <option value="through">through</option>
+                    <option value="only">{builtinOptionLabel('only')}</option>
+                    <option value="until">{builtinOptionLabel('until')}</option>
+                    <option value="from">{builtinOptionLabel('from')}</option>
+                    <option value="through">{builtinOptionLabel('through')}</option>
                   </select>
                 </div>
               </div>
@@ -950,8 +1000,8 @@ export function LegacyToolsForm() {
                 </div>
                 <div className="field">
                   <label className="field-label" htmlFor="legacy-clear-item">物品</label>
-                  <input id="legacy-clear-item" className="input" list="legacy-item-options" value={clear.item}
-                    onChange={(event) => setClear({ ...clear, item: event.target.value })} />
+                  <LocalizedIdInput id="legacy-clear-item" label="物品" options={localizedItems} value={clear.item}
+                    onChange={(item) => setClear({ ...clear, item })} />
                 </div>
                 <div className="field">
                   <label className="field-label" htmlFor="legacy-clear-data">数据值</label>
@@ -980,12 +1030,12 @@ export function LegacyToolsForm() {
                 <label className="field-label" htmlFor="legacy-wb-action">动作</label>
                 <select id="legacy-wb-action" className="select" value={worldborder.action}
                   onChange={(event) => setWorldborder({ ...worldborder, action: event.target.value as typeof worldborder.action })}>
-                  <option value="set">set</option>
-                  <option value="center">center</option>
-                  <option value="damage">damage</option>
-                  <option value="warning">warning</option>
-                  <option value="get">get</option>
-                  <option value="add">add</option>
+                  <option value="set">{builtinOptionLabel('set')}</option>
+                  <option value="center">{builtinOptionLabel('center')}</option>
+                  <option value="damage">{builtinOptionLabel('damage')}</option>
+                  <option value="warning">{builtinOptionLabel('warning')}</option>
+                  <option value="get">{builtinOptionLabel('get')}</option>
+                  <option value="add">{builtinOptionLabel('add')}</option>
                 </select>
               </div>
               <div className="grid-3" style={{ marginTop: 12 }}>
@@ -1074,12 +1124,12 @@ export function LegacyToolsForm() {
                   <label className="field-label" htmlFor="legacy-title-action">动作</label>
                   <select id="legacy-title-action" className="select" value={title.action}
                     onChange={(event) => setTitle({ ...title, action: event.target.value as typeof title.action })}>
-                    <option value="title">title</option>
-                    <option value="subtitle">subtitle</option>
-                    <option value="actionbar">actionbar</option>
-                    <option value="clear">clear</option>
-                    <option value="reset">reset</option>
-                    <option value="times">times</option>
+                    <option value="title">{builtinOptionLabel('title')}</option>
+                    <option value="subtitle">{builtinOptionLabel('subtitle')}</option>
+                    <option value="actionbar">{builtinOptionLabel('actionbar')}</option>
+                    <option value="clear">{builtinOptionLabel('clear')}</option>
+                    <option value="reset">{builtinOptionLabel('reset')}</option>
+                    <option value="times">{builtinOptionLabel('times')}</option>
                   </select>
                 </div>
               </div>
@@ -1145,8 +1195,8 @@ export function LegacyToolsForm() {
             <>
               <div className="field">
                 <label className="field-label" htmlFor="legacy-summon-entity">实体</label>
-                <input id="legacy-summon-entity" className="input" value={summon.entity}
-                  onChange={(event) => setSummon({ ...summon, entity: event.target.value })} />
+                <LocalizedIdInput id="legacy-summon-entity" label="实体" options={registryOptions('entities', pack?.registries.entity_type ?? [])} value={summon.entity}
+                  onChange={(entity) => setSummon({ ...summon, entity })} />
               </div>
               <div className="grid-3" style={{ marginTop: 12 }}>
                 {(['x', 'y', 'z'] as const).map((axis) => (
@@ -1224,8 +1274,8 @@ export function LegacyToolsForm() {
                   <label className="field-label" htmlFor="legacy-effect-action">动作</label>
                   <select id="legacy-effect-action" className="select" value={effect.action}
                     onChange={(event) => setEffect({ ...effect, action: event.target.value as 'give' | 'clear' })}>
-                    <option value="give">give</option>
-                    <option value="clear">clear</option>
+                    <option value="give">{builtinOptionLabel('give')}</option>
+                    <option value="clear">{builtinOptionLabel('clear')}</option>
                   </select>
                 </div>
                 <div className="field">
@@ -1239,8 +1289,8 @@ export function LegacyToolsForm() {
                   <div className="grid-3" style={{ marginTop: 12 }}>
                     <div className="field">
                       <label className="field-label" htmlFor="legacy-effect-name">效果</label>
-                      <input id="legacy-effect-name" className="input" value={effect.effect}
-                        onChange={(event) => setEffect({ ...effect, effect: event.target.value })} />
+                      <LocalizedIdInput id="legacy-effect-name" label="效果" options={registryOptions('effects', pack?.registries.mob_effect ?? [])} value={effect.effect}
+                        onChange={(value) => setEffect({ ...effect, effect: value })} />
                     </div>
                     <div className="field">
                       <label className="field-label" htmlFor="legacy-effect-seconds">秒数</label>
@@ -1272,8 +1322,8 @@ export function LegacyToolsForm() {
               </div>
               <div className="field">
                 <label className="field-label" htmlFor="legacy-enchant-name">附魔</label>
-                <input id="legacy-enchant-name" className="input" value={enchant.enchantment}
-                  onChange={(event) => setEnchant({ ...enchant, enchantment: event.target.value })} />
+                <LocalizedIdInput id="legacy-enchant-name" label="附魔" options={registryOptions('enchantments', pack?.registries.enchantment ?? [])} value={enchant.enchantment}
+                  onChange={(enchantment) => setEnchant({ ...enchant, enchantment })} />
               </div>
               <div className="field">
                 <label className="field-label" htmlFor="legacy-enchant-level">等级</label>
@@ -1290,8 +1340,8 @@ export function LegacyToolsForm() {
                   <label className="field-label" htmlFor="legacy-sound-action">动作</label>
                   <select id="legacy-sound-action" className="select" value={sound.action}
                     onChange={(event) => setSound({ ...sound, action: event.target.value as 'play' | 'stop' })}>
-                    <option value="play">playsound</option>
-                    <option value="stop">stopsound</option>
+                    <option value="play">播放声音（playsound）</option>
+                    <option value="stop">停止声音（stopsound）</option>
                   </select>
                 </div>
                 <div className="field">
@@ -1338,8 +1388,8 @@ export function LegacyToolsForm() {
                   <label className="field-label" htmlFor="legacy-tp-command">命令</label>
                   <select id="legacy-tp-command" className="select" value={teleport.command}
                     onChange={(event) => setTeleport({ ...teleport, command: event.target.value as 'tp' | 'teleport' })}>
-                    <option value="tp">tp</option>
-                    <option value="teleport">teleport</option>
+                    <option value="tp">{builtinOptionLabel('tp')}</option>
+                    <option value="teleport">{builtinOptionLabel('teleport')}</option>
                   </select>
                 </div>
                 <div className="field">
@@ -1383,15 +1433,15 @@ export function LegacyToolsForm() {
                   <label className="field-label" htmlFor="legacy-admin-action">动作</label>
                   <select id="legacy-admin-action" className="select" value={admin.action}
                     onChange={(event) => setAdmin({ ...admin, action: event.target.value as typeof admin.action })}>
-                    <option value="ban">ban</option>
-                    <option value="ban-ip">ban-ip</option>
-                    <option value="banlist">banlist</option>
-                    <option value="pardon">pardon</option>
-                    <option value="pardon-ip">pardon-ip</option>
-                    <option value="whitelist">whitelist</option>
-                    <option value="op">op</option>
-                    <option value="deop">deop</option>
-                    <option value="kick">kick</option>
+                    <option value="ban">{builtinOptionLabel('ban')}</option>
+                    <option value="ban-ip">{builtinOptionLabel('ban-ip')}</option>
+                    <option value="banlist">{builtinOptionLabel('banlist')}</option>
+                    <option value="pardon">{builtinOptionLabel('pardon')}</option>
+                    <option value="pardon-ip">{builtinOptionLabel('pardon-ip')}</option>
+                    <option value="whitelist">{builtinOptionLabel('whitelist')}</option>
+                    <option value="op">{builtinOptionLabel('op')}</option>
+                    <option value="deop">{builtinOptionLabel('deop')}</option>
+                    <option value="kick">{builtinOptionLabel('kick')}</option>
                   </select>
                 </div>
                 <div className="field">
@@ -1405,8 +1455,8 @@ export function LegacyToolsForm() {
                   <label className="field-label" htmlFor="legacy-admin-list">列表</label>
                   <select id="legacy-admin-list" className="select" value={admin.listType}
                     onChange={(event) => setAdmin({ ...admin, listType: event.target.value as 'players' | 'ips' })}>
-                    <option value="players">players</option>
-                    <option value="ips">ips</option>
+                    <option value="players">{builtinOptionLabel('players')}</option>
+                    <option value="ips">{builtinOptionLabel('ips')}</option>
                   </select>
                 </div>
               ) : null}
@@ -1415,9 +1465,9 @@ export function LegacyToolsForm() {
                   <label className="field-label" htmlFor="legacy-admin-whitelist">白名单动作</label>
                   <select id="legacy-admin-whitelist" className="select" value={admin.whitelistAction}
                     onChange={(event) => setAdmin({ ...admin, whitelistAction: event.target.value as typeof admin.whitelistAction })}>
-                    <option value="add">add</option>
-                    <option value="remove">remove</option>
-                    <option value="list">list</option>
+                    <option value="add">{builtinOptionLabel('add')}</option>
+                    <option value="remove">{builtinOptionLabel('remove')}</option>
+                    <option value="list">{builtinOptionLabel('list')}</option>
                   </select>
                 </div>
               ) : null}
@@ -1437,9 +1487,9 @@ export function LegacyToolsForm() {
                 <label className="field-label" htmlFor="legacy-world-action">类型</label>
                 <select id="legacy-world-action" className="select" value={world.action}
                   onChange={(event) => setWorld({ ...world, action: event.target.value as typeof world.action })}>
-                  <option value="time">time</option>
-                  <option value="weather">weather</option>
-                  <option value="difficulty">difficulty</option>
+                  <option value="time">{builtinOptionLabel('time')}</option>
+                  <option value="weather">{builtinOptionLabel('weather')}</option>
+                  <option value="difficulty">{builtinOptionLabel('difficulty')}</option>
                 </select>
               </div>
               {world.action === 'time' ? (
@@ -1448,9 +1498,9 @@ export function LegacyToolsForm() {
                     <label className="field-label" htmlFor="legacy-world-time-action">时间动作</label>
                     <select id="legacy-world-time-action" className="select" value={world.timeAction}
                       onChange={(event) => setWorld({ ...world, timeAction: event.target.value as typeof world.timeAction })}>
-                      <option value="set">set</option>
-                      <option value="add">add</option>
-                      <option value="query">query</option>
+                      <option value="set">{builtinOptionLabel('set')}</option>
+                      <option value="add">{builtinOptionLabel('add')}</option>
+                      <option value="query">{builtinOptionLabel('query')}</option>
                     </select>
                   </div>
                   <div className="field">
@@ -1463,9 +1513,9 @@ export function LegacyToolsForm() {
                       <label className="field-label" htmlFor="legacy-world-time-query">查询类型</label>
                       <select id="legacy-world-time-query" className="select" value={world.timeQuery}
                         onChange={(event) => setWorld({ ...world, timeQuery: event.target.value as typeof world.timeQuery })}>
-                        <option value="daytime">daytime</option>
-                        <option value="gametime">gametime</option>
-                        <option value="day">day</option>
+                        <option value="daytime">{builtinOptionLabel('daytime')}</option>
+                        <option value="gametime">{builtinOptionLabel('gametime')}</option>
+                        <option value="day">当前天数（day）</option>
                       </select>
                     </div>
                   ) : null}
@@ -1477,9 +1527,9 @@ export function LegacyToolsForm() {
                     <label className="field-label" htmlFor="legacy-world-weather">天气</label>
                     <select id="legacy-world-weather" className="select" value={world.weather}
                       onChange={(event) => setWorld({ ...world, weather: event.target.value as typeof world.weather })}>
-                      <option value="clear">clear</option>
-                      <option value="rain">rain</option>
-                      <option value="thunder">thunder</option>
+                      <option value="clear">晴天（clear）</option>
+                      <option value="rain">{builtinOptionLabel('rain')}</option>
+                      <option value="thunder">{builtinOptionLabel('thunder')}</option>
                     </select>
                   </div>
                   <div className="field">
@@ -1494,10 +1544,10 @@ export function LegacyToolsForm() {
                   <label className="field-label" htmlFor="legacy-world-difficulty">难度</label>
                   <select id="legacy-world-difficulty" className="select" value={world.difficulty}
                     onChange={(event) => setWorld({ ...world, difficulty: event.target.value as typeof world.difficulty })}>
-                    <option value="peaceful">peaceful</option>
-                    <option value="easy">easy</option>
-                    <option value="normal">normal</option>
-                    <option value="hard">hard</option>
+                    <option value="peaceful">{builtinOptionLabel('peaceful')}</option>
+                    <option value="easy">{builtinOptionLabel('easy')}</option>
+                    <option value="normal">{builtinOptionLabel('normal')}</option>
+                    <option value="hard">{builtinOptionLabel('hard')}</option>
                   </select>
                 </div>
               ) : null}
@@ -1510,18 +1560,18 @@ export function LegacyToolsForm() {
                 <label className="field-label" htmlFor="legacy-simple-action">命令</label>
                 <select id="legacy-simple-action" className="select" value={simple.action}
                   onChange={(event) => setSimple({ ...simple, action: event.target.value as typeof simple.action })}>
-                  <option value="help">help</option>
-                  <option value="list">list</option>
-                  <option value="seed">seed</option>
-                  <option value="reload">reload</option>
-                  <option value="save-all">save-all</option>
-                  <option value="save-off">save-off</option>
-                  <option value="save-on">save-on</option>
-                  <option value="stop">stop</option>
-                  <option value="toggledownfall">toggledownfall</option>
-                  <option value="me">me</option>
-                  <option value="say">say</option>
-                  <option value="tell">tell</option>
+                  <option value="help">{builtinOptionLabel('help')}</option>
+                  <option value="list">{builtinOptionLabel('list')}</option>
+                  <option value="seed">{builtinOptionLabel('seed')}</option>
+                  <option value="reload">{builtinOptionLabel('reload')}</option>
+                  <option value="save-all">{builtinOptionLabel('save-all')}</option>
+                  <option value="save-off">{builtinOptionLabel('save-off')}</option>
+                  <option value="save-on">{builtinOptionLabel('save-on')}</option>
+                  <option value="stop">{builtinOptionLabel('stop')}</option>
+                  <option value="toggledownfall">{builtinOptionLabel('toggledownfall')}</option>
+                  <option value="me">{builtinOptionLabel('me')}</option>
+                  <option value="say">{builtinOptionLabel('say')}</option>
+                  <option value="tell">{builtinOptionLabel('tell')}</option>
                 </select>
               </div>
               {simple.action === 'help' ? (
@@ -1554,18 +1604,18 @@ export function LegacyToolsForm() {
                 <label className="field-label" htmlFor="legacy-gm-action">命令</label>
                 <select id="legacy-gm-action" className="select" value={gamemode.action}
                   onChange={(event) => setGamemode({ ...gamemode, action: event.target.value as typeof gamemode.action })}>
-                  <option value="gamemode">gamemode</option>
-                  <option value="defaultgamemode">defaultgamemode</option>
+                  <option value="gamemode">{builtinOptionLabel('gamemode')}</option>
+                  <option value="defaultgamemode">{builtinOptionLabel('defaultgamemode')}</option>
                 </select>
               </div>
               <div className="field">
                 <label className="field-label" htmlFor="legacy-gm-mode">模式</label>
                 <select id="legacy-gm-mode" className="select" value={gamemode.mode}
                   onChange={(event) => setGamemode({ ...gamemode, mode: event.target.value as typeof gamemode.mode })}>
-                  <option value="survival">survival</option>
-                  <option value="creative">creative</option>
-                  <option value="adventure">adventure</option>
-                  <option value="spectator">spectator</option>
+                  <option value="survival">{builtinOptionLabel('survival')}</option>
+                  <option value="creative">{builtinOptionLabel('creative')}</option>
+                  <option value="adventure">{builtinOptionLabel('adventure')}</option>
+                  <option value="spectator">{builtinOptionLabel('spectator')}</option>
                 </select>
               </div>
               {gamemode.action === 'gamemode' ? (
@@ -1587,9 +1637,9 @@ export function LegacyToolsForm() {
                     const action = event.target.value as typeof block.action
                     setBlock({ ...block, action, mode: action === 'clone' ? 'normal' : 'replace' })
                   }}>
-                  <option value="setblock">setblock</option>
-                  <option value="fill">fill</option>
-                  <option value="clone">clone</option>
+                  <option value="setblock">{builtinOptionLabel('setblock')}</option>
+                  <option value="fill">{builtinOptionLabel('fill')}</option>
+                  <option value="clone">{builtinOptionLabel('clone')}</option>
                 </select>
               </div>
               <div className="grid-3" style={{ marginTop: 12 }}>
@@ -1605,8 +1655,8 @@ export function LegacyToolsForm() {
                 <div className="grid-2" style={{ marginTop: 12 }}>
                   <div className="field">
                     <label className="field-label" htmlFor="legacy-block-name">方块</label>
-                    <input id="legacy-block-name" className="input" value={block.block}
-                      onChange={(event) => setBlock({ ...block, block: event.target.value })} />
+                    <LocalizedIdInput id="legacy-block-name" label="方块" options={localizedBlocks} value={block.block}
+                      onChange={(value) => setBlock({ ...block, block: value })} />
                   </div>
                   <div className="field">
                     <label className="field-label" htmlFor="legacy-block-data">数据值</label>
@@ -1627,9 +1677,9 @@ export function LegacyToolsForm() {
                     <label className="field-label" htmlFor="legacy-block-mask">掩码</label>
                     <select id="legacy-block-mask" className="select" value={block.mask}
                       onChange={(event) => setBlock({ ...block, mask: event.target.value })}>
-                      <option value="replace">replace</option>
-                      <option value="masked">masked</option>
-                      <option value="filtered">filtered</option>
+                      <option value="replace">{builtinOptionLabel('replace')}</option>
+                      <option value="masked">{builtinOptionLabel('masked')}</option>
+                      <option value="filtered">{builtinOptionLabel('filtered')}</option>
                     </select>
                   </div>
                 </div>
@@ -1642,7 +1692,7 @@ export function LegacyToolsForm() {
                     ? ['normal', 'force', 'move']
                     : ['replace', 'destroy', 'keep']
                   ).map((mode) => (
-                    <option key={mode} value={mode}>{mode}</option>
+                    <option key={mode} value={mode}>{builtinOptionLabel(mode)}</option>
                   ))}
                 </select>
               </div>
@@ -1655,15 +1705,15 @@ export function LegacyToolsForm() {
                 <label className="field-label" htmlFor="legacy-misc-action">命令</label>
                 <select id="legacy-misc-action" className="select" value={misc.action}
                   onChange={(event) => setMisc({ ...misc, action: event.target.value as typeof misc.action })}>
-                  <option value="function">function</option>
-                  <option value="recipe-give">recipe give</option>
-                  <option value="recipe-take">recipe take</option>
-                  <option value="locate">locate</option>
-                  <option value="spawnpoint">spawnpoint</option>
-                  <option value="setworldspawn">setworldspawn</option>
-                  <option value="kill">kill</option>
-                  <option value="debug-start">debug start</option>
-                  <option value="debug-stop">debug stop</option>
+                  <option value="function">{builtinOptionLabel('function')}</option>
+                  <option value="recipe-give">{builtinOptionLabel('recipe-give')}</option>
+                  <option value="recipe-take">{builtinOptionLabel('recipe-take')}</option>
+                  <option value="locate">{builtinOptionLabel('locate')}</option>
+                  <option value="spawnpoint">{builtinOptionLabel('spawnpoint')}</option>
+                  <option value="setworldspawn">{builtinOptionLabel('setworldspawn')}</option>
+                  <option value="kill">{builtinOptionLabel('kill')}</option>
+                  <option value="debug-start">{builtinOptionLabel('debug-start')}</option>
+                  <option value="debug-stop">{builtinOptionLabel('debug-stop')}</option>
                 </select>
               </div>
               {['function', 'locate', 'recipe-give', 'recipe-take'].includes(misc.action) ? (

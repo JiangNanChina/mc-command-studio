@@ -18,6 +18,7 @@ import {
   type CommandNodeData
 } from '@mcstudio/core'
 import { useAppStore, selectGenericNode } from '../store'
+import { argumentName, commandName, literalName } from '../lib/commandLabels'
 
 function ArgumentRow({
   name,
@@ -34,7 +35,8 @@ function ArgumentRow({
   return (
     <div className="field">
       <div className="field-label">
-        {name}
+        {argumentName(name)}
+        <code className="muted">{name}</code>
         <span className="badge">{info.label}</span>
         <span className="hint">{info.hint}</span>
       </div>
@@ -120,7 +122,7 @@ export function GenericBuilder() {
       <div className="page-head">
         <div>
           <div className="crumb">
-            命令库 / 通用构建器 / {root}
+            命令库 / 通用构建器 / {commandName(root)}
           </div>
           <div className="hero">
             <div className="hero-icon">
@@ -128,12 +130,12 @@ export function GenericBuilder() {
             </div>
             <div>
               <h1 className="hero-title">
-                {meta?.name ?? root}
+                {commandName(root)}
                 <span className="hero-id">{root}</span>
               </h1>
               <p className="hero-sub">
                 {meta?.description ??
-                  '该命令还没有中文说明，按官方命令树逐层选择字面量与参数即可拼出完整命令。'}
+                  '按步骤选择操作并填写参数，右侧实时生成当前游戏版本的命令。'}
               </p>
             </div>
           </div>
@@ -165,7 +167,7 @@ export function GenericBuilder() {
         <div className="card-body">
           <div className="row wrap" style={{ gap: 6 }}>
             <button type="button" className="chip" onClick={() => state.truncateGeneric(0)}>
-              {root}
+              {commandName(root)}<code className="muted">{root}</code>
             </button>
             {draft.steps.map((step, index) => (
               <span key={`${step.name}-${index}`} className="row" style={{ gap: 6 }}>
@@ -176,7 +178,8 @@ export function GenericBuilder() {
                   title="回到这一步"
                   onClick={() => state.truncateGeneric(index + 1)}
                 >
-                  {step.name}
+                  {step.value !== undefined ? argumentName(step.name) : literalName(step.name)}
+                  <code className="muted">{step.name}</code>
                   {step.value !== undefined ? (
                     <span style={{ color: 'var(--accent)', fontFamily: 'var(--mono)' }}>= {step.value}</span>
                   ) : null}
@@ -189,7 +192,7 @@ export function GenericBuilder() {
 
           {literals.length > 0 ? (
             <>
-              <div className="section-label">选择字面量子命令</div>
+              <div className="section-label">选择下一步操作</div>
               <div className="row wrap">
                 {literals.map((child) => (
                   <button
@@ -199,7 +202,7 @@ export function GenericBuilder() {
                     onClick={() => state.pushGenericStep({ name: child.name })}
                   >
                     <CornerDownRight size={14} />
-                    {child.name}
+                    {literalName(child.name)}<code className="muted">{child.name}</code>
                   </button>
                 ))}
               </div>

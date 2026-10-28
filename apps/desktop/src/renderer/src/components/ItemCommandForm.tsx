@@ -13,6 +13,8 @@ import { McIcon } from './McIcon'
 import { PositionInput } from './PositionInput'
 import { SelectorField } from './SelectorField'
 import { useAppStore } from '../store'
+import { itemSlotName, namedOptions } from '../lib/localizedOptions'
+import { LocalizedIdInput } from './LocalizedIdInput'
 
 const meta = COMMAND_MAP.get('item')
 
@@ -99,21 +101,15 @@ export function ItemCommandForm() {
             <label className="field-label" htmlFor="item-slot">
               槽位
             </label>
-            <input
+            <LocalizedIdInput
               id="item-slot"
-              className="input"
-              list="item-slot-suggestions"
               value={options.slot}
-              spellCheck={false}
-              onChange={(event) => state.updateItemCommand({ slot: event.target.value })}
+              label="槽位"
+              options={namedOptions(ITEM_SLOTS, itemSlotName)}
+              onChange={(slot) => state.updateItemCommand({ slot })}
             />
-            <datalist id="item-slot-suggestions">
-              {ITEM_SLOTS.map((slot) => (
-                <option key={slot} value={slot} />
-              ))}
-            </datalist>
             <div className="hint">
-              例如 weapon.mainhand、armor.head、hotbar.0、container.0。
+              选择主手、装备栏或容器槽位；也可以输入自定义槽位 ID。
             </div>
           </div>
         </div>

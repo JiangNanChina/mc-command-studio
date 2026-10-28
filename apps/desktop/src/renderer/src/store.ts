@@ -156,7 +156,7 @@ import {
   type VersionPack,
   type XpOptions
 } from '@mcstudio/core'
-import type { CommandCategory } from '@mcstudio/content'
+import type { SidebarCategory } from '@mcstudio/content'
 import type {
   AppInfo,
   PackSummary,
@@ -192,6 +192,9 @@ import {
   newClauseId
 } from './store/defaults'
 import { normalizeProjectPayload } from './store/normalize'
+import { COMMAND_TEMPLATES } from './lib/templateCatalog'
+import { createTemplateDraft, type TemplateDraft } from './lib/templateDraft'
+import { templateDraftKey } from './lib/templateState'
 
 export type {
   AutomationOptions,
@@ -213,6 +216,7 @@ export interface AppStore {
   pack: VersionPack | null
   activePackId: string
   quickDrafts: ProjectPayload['quickDrafts']
+  templateDrafts: ProjectPayload['templateDrafts']
   settings: UserSettings
   update: UpdateState
   activeCommandId: string | null
@@ -261,7 +265,7 @@ export interface AppStore {
   commandBlock: CommandBlockOptions
   outputMode: OutputMode
   search: string
-  category: CommandCategory | '全部'
+  category: SidebarCategory | '全部'
   projectName: string
   projectPath: string | null
   dirty: boolean
@@ -279,6 +283,9 @@ export interface AppStore {
   boot: () => Promise<void>
   loadPack: (id: string) => Promise<boolean>
   selectCommand: (id: string | null) => void
+  openTemplate: (id: string) => void
+  updateTemplateDraft: (patch: Partial<TemplateDraft>) => void
+  resetTemplateDraft: () => void
   setQuickValue: (commandId: string, key: string, value: string) => void
   setTarget: (target: Selector) => void
   setItemId: (id: string) => void
@@ -366,7 +373,7 @@ export interface AppStore {
   setOutputMode: (mode: OutputMode) => void
   setCommandBlock: (patch: Partial<CommandBlockOptions>) => void
   setSearch: (value: string) => void
-  setCategory: (value: CommandCategory | '全部') => void
+  setCategory: (value: SidebarCategory | '全部') => void
   setTheme: (theme: 'dark' | 'light') => Promise<void>
   updateSettings: (patch: Partial<UserSettings>) => Promise<void>
   setUpdate: (state: UpdateState) => void
@@ -470,6 +477,7 @@ export const useAppStore = create<AppStore>()(
     pack: null,
     activePackId: '26.3',
     quickDrafts: {},
+    templateDrafts: {},
     documentRevision: 0,
     projectSession: 0,
     projectCreatedAt: new Date().toISOString(),
@@ -612,6 +620,38 @@ export const useAppStore = create<AppStore>()(
         state.activeCommandId = id
         if (id) state.generic = { root: id, steps: [] }
       })
+    },
+
+    openTemplate: (id) => {
+      const pack = get().pack
+      if (!pack || !COMMAND_TEMPLATES.some((template) => template.id === id)) return
+      const key = templateDraftKey(pack.manifest.id, id)
+      set((state) => {
+        if (!Object.hasOwn(state.templateDrafts, key)) state.templateDrafts[key] = createTemplateDraft(id, pack)
+        state.activeCommandId = `template:${id}`
+        state.outputMode = 'command'
+      })
+    },
+
+    updateTemplateDraft: (patch) => {
+      const { pack, activeCommandId } = get()
+      if (!pack || !activeCommandId?.startsWith('template:')) return
+      const id = activeCommandId.slice('template:'.length)
+      if (!COMMAND_TEMPLATES.some((template) => template.id === id)) return
+      const key = templateDraftKey(pack.manifest.id, id)
+      set((state) => {
+        const draft = state.templateDrafts[key] ?? createTemplateDraft(id, pack)
+        state.templateDrafts[key] = { ...draft, ...patch, templateId: id }
+      })
+    },
+
+    resetTemplateDraft: () => {
+      const { pack, activeCommandId } = get()
+      if (!pack || !activeCommandId?.startsWith('template:')) return
+      const id = activeCommandId.slice('template:'.length)
+      if (!COMMAND_TEMPLATES.some((template) => template.id === id)) return
+      const key = templateDraftKey(pack.manifest.id, id)
+      set((state) => { state.templateDrafts[key] = createTemplateDraft(id, pack) })
     },
 
     setQuickValue: (commandId, key, value) => {

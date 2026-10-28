@@ -8,6 +8,8 @@ import {
 } from '@mcstudio/core'
 import { Modal } from './Modal'
 import { useAppStore } from '../store'
+import { registryOptions } from '../lib/localizedOptions'
+import { LocalizedIdInput } from './LocalizedIdInput'
 
 interface SelectorDialogProps {
   value?: Selector
@@ -111,19 +113,14 @@ export function SelectorDialog({ value, onApply, onClose }: SelectorDialogProps 
           <label className="field-label" htmlFor="selector-type">
             实体类型
           </label>
-          <input
+          <LocalizedIdInput
             id="selector-type"
-            className="input"
-            list="selector-entity-types"
             placeholder="minecraft:player"
             value={draft.type ?? ''}
-            onChange={(event) => patch({ type: event.target.value })}
+            label="实体类型"
+            options={registryOptions('entities', entities)}
+            onChange={(type) => patch({ type })}
           />
-          <datalist id="selector-entity-types">
-            {entities.map((id) => (
-              <option key={id} value={id} />
-            ))}
-          </datalist>
         </div>
       </div>
 

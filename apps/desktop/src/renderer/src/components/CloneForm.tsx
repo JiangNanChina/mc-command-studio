@@ -12,15 +12,15 @@ import { useAppStore } from '../store'
 const meta = COMMAND_MAP.get('clone')
 
 const MODES: { value: CloneMode; label: string }[] = [
-  { value: 'replace', label: 'replace（覆盖目标区域）' },
-  { value: 'masked', label: 'masked（只复制非空气）' },
-  { value: 'filtered', label: 'filtered（只复制过滤方块）' }
+  { value: 'replace', label: '覆盖目标区域（replace）' },
+  { value: 'masked', label: '只复制非空气（masked）' },
+  { value: 'filtered', label: '只复制匹配方块（filtered）' }
 ]
 
 const MOVES: { value: CloneMove; label: string }[] = [
-  { value: 'normal', label: 'normal（保留源区域）' },
-  { value: 'force', label: 'force（强制覆盖）' },
-  { value: 'move', label: 'move（复制后清空源区域）' }
+  { value: 'normal', label: '保留源区域（normal）' },
+  { value: 'force', label: '强制复制（force）' },
+  { value: 'move', label: '复制后清空源区域（move）' }
 ]
 
 export function CloneForm() {

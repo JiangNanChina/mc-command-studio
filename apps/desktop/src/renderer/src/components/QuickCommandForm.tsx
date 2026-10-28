@@ -2,6 +2,8 @@ import { TerminalSquare } from 'lucide-react'
 import { COMMAND_MAP } from '@mcstudio/content'
 import { useAppStore } from '../store'
 import { QUICK_SCHEMAS, buildQuickCommand, getQuickValues, getQuickFieldOptions } from '../lib/quickCommands'
+import { builtinOptionLabel } from '../lib/localizedOptions'
+import { commandName } from '../lib/commandLabels'
 
 export { isQuickCommand, isNbtQuickSafe } from '../lib/quickCommands'
 
@@ -18,17 +20,17 @@ export function QuickCommandForm({ id }: { id: string }) {
     <div className="content">
       <div className="page-head">
         <div>
-          <div className="crumb">命令库 / {meta?.category ?? '命令'} / {id}</div>
+          <div className="crumb">命令库 / {meta?.category ?? '通用命令'} / {commandName(id)}</div>
           <div className="hero">
             <div className="hero-icon">
               <TerminalSquare size={21} />
             </div>
             <div>
               <h1 className="hero-title">
-                {meta?.name ?? id}
+                {commandName(id)}
                 <span className="hero-id">{id}</span>
               </h1>
-              <p className="hero-sub">{meta?.description ?? '快捷命令表单。'}</p>
+          <p className="hero-sub">{meta?.description ?? '填写中文参数并逐步配置选项，命令原文会实时生成。'}</p>
             </div>
           </div>
         </div>
@@ -58,11 +60,11 @@ export function QuickCommandForm({ id }: { id: string }) {
                     }
                   >
                     {!getQuickFieldOptions(field, values, pack).includes(values[field.key]) ? (
-                      <option value={values[field.key]} disabled>{values[field.key] || '无可用选项'}（当前版本不支持）</option>
+                      <option value={values[field.key]} disabled>{builtinOptionLabel(values[field.key]) || '无可用选项'}（当前版本不支持）</option>
                     ) : null}
                     {getQuickFieldOptions(field, values, pack).map((option) => (
                       <option key={option} value={option}>
-                        {option}
+                        {builtinOptionLabel(option)}
                       </option>
                     ))}
                   </select>

@@ -4,6 +4,23 @@ export type CommandCategory = '常用' | '实体' | '世界' | '玩家' | '数�
 
 export const CATEGORY_ORDER: CommandCategory[] = ['常用', '实体', '世界', '玩家', '数据', '系统']
 
+export type TemplateCategory =
+  | 'JSON 相关'
+  | '特殊 NBT 物品/方块'
+  | '复合物品/方块'
+  | '特殊 NBT 实体'
+  | '复合实体'
+
+export type SidebarCategory = CommandCategory | TemplateCategory
+
+export const TEMPLATE_CATEGORY_ORDER: TemplateCategory[] = [
+  'JSON 相关',
+  '特殊 NBT 物品/方块',
+  '复合物品/方块',
+  '特殊 NBT 实体',
+  '复合实体'
+]
+
 export interface CommandMeta {
   id: string
   name: string
@@ -120,5 +137,12 @@ export const ITEM_COMPONENTS: ComponentMeta[] = [
   { kind: 'enchantment_glint_override', name: '附魔光效', description: '强制打开或关闭附魔光效。', example: 'enchantment_glint_override=true' },
   { kind: 'custom_model_data', name: '自定义模型数据', description: '供资源包判断模型/贴图用的数据，直接填写 SNBT。', example: 'custom_model_data={strings:["my_pack:model"]}' },
   { kind: 'custom_data', name: '自定义数据', description: '写入物品的 custom_data 复合标签，供数据包/模组读取。', example: 'custom_data={my_pack:{level:3}}' },
+  { kind: 'item_tags', name: '物品标签', description: '为物品添加可供命令筛选的自定义标签，每行填写一个。', example: 'custom_data={Tags:["mcstudio:reward"]}' },
+  { kind: 'attribute_modifiers', name: '属性修饰器', description: '设置物品在特定装备槽位应用的攻击、护甲、速度等属性。', example: 'attribute_modifiers=[{id:"mcstudio:power",type:"minecraft:attack_damage",amount:4.0,operation:"add_value",slot:"mainhand"}]' },
+  { kind: 'potion_contents', name: '药水效果', description: '选择基础药水、颜色和自定义状态效果。', example: 'potion_contents={potion:"minecraft:healing"}' },
+  { kind: 'can_break', name: '可破坏方块', description: '限制冒险模式下该物品可破坏的方块。', example: 'can_break=[{blocks:"minecraft:stone"}]' },
+  { kind: 'can_place_on', name: '可放置方块', description: '限制冒险模式下该物品可放置到哪些方块上。', example: 'can_place_on=[{blocks:"minecraft:dirt"}]' },
+  { kind: 'entity_data', name: '实体数据', description: '为刷怪蛋等物品填写生成实体的 NBT。', example: 'entity_data={id:"minecraft:zombie"}' },
+  { kind: 'block_entity_data', name: '刷怪笼设置', description: '选择生成生物，并设置刷怪延迟、数量与范围。', example: 'block_entity_data={id:"minecraft:mob_spawner",SpawnData:{entity:{id:"minecraft:zombie"}}}' },
   { kind: 'raw', name: '自定义组件（raw）', description: '直接写入任意组件 id=SNBT，用于尚未收录的组件。', example: 'tooltip_display={hidden_components:["minecraft:enchantments"]}' }
 ]

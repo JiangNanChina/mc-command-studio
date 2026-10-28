@@ -41,25 +41,29 @@ export function serializePosition(position: Position, diagnostics?: Diagnostic[]
 export function isBalancedCompound(value: string): boolean {
   const trimmed = value.trim()
   if (!trimmed.startsWith('{') || !trimmed.endsWith('}')) return false
-  let depth = 0
+  const closers: string[] = []
   let quoted = false
   let quoteChar = ''
   for (let i = 0; i < trimmed.length; i += 1) {
     const char = trimmed[i]
     if (quoted) {
-      if (char === '\\') i += 1
+      if (char === '\\') {
+        if (i + 1 >= trimmed.length) return false
+        i += 1
+      }
       else if (char === quoteChar) quoted = false
       continue
     }
     if (char === '"' || char === "'") {
       quoted = true
       quoteChar = char
-    } else if (char === '{' || char === '[') {
-      depth += 1
+    } else if (char === '{') {
+      closers.push('}')
+    } else if (char === '[') {
+      closers.push(']')
     } else if (char === '}' || char === ']') {
-      depth -= 1
-      if (depth < 0) return false
+      if (closers.pop() !== char) return false
     }
   }
-  return depth === 0
+  return !quoted && closers.length === 0
 }

@@ -153,4 +153,200 @@ describe('item stack', () => {
     expect(hasErrors(invalidOld.diagnostics)).toBe(true)
     expect(invalidOld.text).toContain('custom_model_data={strings:["model"]}')
   })
+
+  it.each(['1.20.5', '1.21.1', '1.21.4'])(
+    'serializes structured item components with the compatible codec in %s', (version) => {
+      const result = serializeItemStack({
+        id: 'potion',
+        components: [
+          {
+            kind: 'potion_contents',
+            potion: 'strong_healing',
+            customColor: 16711680,
+            effects: [{
+              id: 'speed', duration: 1200, amplifier: 1,
+              ambient: false, showParticles: true, showIcon: false
+            }]
+          },
+          { kind: 'can_break', blocks: ['#mineable/pickaxe', 'stone'] },
+          { kind: 'can_place_on', blocks: ['oak_planks'] },
+          { kind: 'entity_data', raw: '{id:"minecraft:allay",Health:20.0f}' },
+          {
+            kind: 'block_entity_data', entity: 'zombie', delay: 20,
+            minSpawnDelay: 100, maxSpawnDelay: 800, spawnCount: 4,
+            maxNearbyEntities: 6, requiredPlayerRange: 16, spawnRange: 4
+          }
+        ]
+      }, version)
+
+      expect(result.text).toBe(
+        'minecraft:potion[potion_contents={potion:"minecraft:strong_healing",custom_color:16711680,custom_effects:[{id:"minecraft:speed",duration:1200,amplifier:1,ambient:0b,show_particles:1b,show_icon:0b}]},can_break={predicates:[{blocks:"#minecraft:mineable/pickaxe"},{blocks:"minecraft:stone"}],show_in_tooltip:true},can_place_on={predicates:[{blocks:"minecraft:oak_planks"}],show_in_tooltip:true},entity_data={id:"minecraft:allay",Health:20.0f},block_entity_data={id:"minecraft:mob_spawner",Delay:20s,MinSpawnDelay:100s,MaxSpawnDelay:800s,SpawnCount:4s,MaxNearbyEntities:6s,RequiredPlayerRange:16s,SpawnRange:4s,SpawnData:{entity:{id:"minecraft:zombie"}}}]'
+      )
+      expect(result.diagnostics).toEqual([])
+    }
+  )
+
+  it.each([
+    ['1.20.5', 'attack_damage', 'minecraft:generic.attack_damage', 'legacy'],
+    ['1.21.1', 'attack_damage', 'minecraft:generic.attack_damage', 'wrapped'],
+    ['1.21.2', 'generic.attack_damage', 'minecraft:attack_damage', 'wrapped'],
+    ['1.21.4', 'generic.attack_damage', 'minecraft:attack_damage', 'wrapped'],
+    ['1.21.5', 'generic.attack_damage', 'minecraft:attack_damage', 'list']
+  ] as const)('uses the %s attribute modifier codec and ID format', (version, inputType, outputType, format) => {
+    const options = {
+      id: 'stick',
+      components: [{
+        kind: 'attribute_modifiers' as const,
+        entries: [{ id: 'example:power', type: inputType, amount: 2, operation: 'add_value' as const, slot: 'mainhand' }]
+      }]
+    }
+    const result = serializeItemStack(options, version)
+    expect(result.diagnostics).toEqual([])
+    if (format === 'legacy') {
+      expect(result.text).toMatch(new RegExp(`attribute_modifiers=\\{modifiers:\\[\\{type:"${outputType}",amount:2\\.0,name:"example:power",operation:"add_value",slot:"mainhand",uuid:\\[I;-?\\d+,-?\\d+,-?\\d+,-?\\d+\\]\\}\\],show_in_tooltip:true\\}`))
+      expect(serializeItemStack(options, version).text).toBe(result.text)
+    } else {
+      const modifier = `{id:"example:power",type:"${outputType}",amount:2.0,operation:"add_value",slot:"mainhand"}`
+      const serialized = format === 'list' ? `[${modifier}]` : `{modifiers:[${modifier}],show_in_tooltip:true}`
+      expect(result.text).toBe(`minecraft:stick[attribute_modifiers=${serialized}]`)
+    }
+  })
+
+  it.each([
+    'burning_time',
+    'explosion_knockback_resistance',
+    'movement_efficiency',
+    'oxygen_bonus',
+    'water_movement_efficiency'
+  ])('restores the generic attribute alias for %s in 1.21.1', (attribute) => {
+    const result = serializeItemStack({
+      id: 'stick',
+      components: [{
+        kind: 'attribute_modifiers',
+        entries: [{
+          id: `example:${attribute}`,
+          type: attribute,
+          amount: 1,
+          operation: 'add_value',
+          slot: 'mainhand'
+        }]
+      }]
+    }, '1.21.1')
+
+    expect(result.diagnostics).toEqual([])
+    expect(result.text).toContain(`type:"minecraft:generic.${attribute}"`)
+  })
+
+  it('uses direct block predicate lists from 1.21.5', () => {
+    const result = serializeItemStack({
+      id: 'stick',
+      components: [
+        { kind: 'can_break', blocks: ['stone'] },
+        { kind: 'can_place_on', blocks: ['dirt', '#logs'] }
+      ]
+    }, '1.21.5')
+    expect(result.text).toBe(
+      'minecraft:stick[can_break=[{blocks:"minecraft:stone"}],can_place_on=[{blocks:"minecraft:dirt"},{blocks:"#minecraft:logs"}]]'
+    )
+    expect(result.diagnostics).toEqual([])
+  })
+
+  it('rejects repeated modifier IDs', () => {
+    const result = serializeItemStack({
+      id: 'stick',
+      components: [{
+        kind: 'attribute_modifiers',
+        entries: [
+          { id: 'example:power', type: 'attack_damage', amount: 2, operation: 'add_value', slot: 'mainhand' },
+          { id: 'example:power', type: 'attack_speed', amount: 1, operation: 'add_value', slot: 'mainhand' }
+        ]
+      }]
+    })
+    expect(result.diagnostics.some((item) => item.code === 'item.attribute_modifiers.duplicate')).toBe(true)
+    expect(result.text).toContain('type:"minecraft:attack_damage"')
+    expect(result.text).not.toContain('type:"minecraft:attack_speed"')
+  })
+
+  it('serializes item tags through custom_data and rejects invalid tags', () => {
+    const valid = serializeItemStack({
+      id: 'stick',
+      components: [{ kind: 'item_tags', tags: [' quest:item ', 'rare'] }]
+    })
+    expect(valid.text).toBe('minecraft:stick[custom_data={Tags:["quest:item","rare"]}]')
+    expect(valid.diagnostics).toEqual([])
+
+    const invalid = serializeItemStack({
+      id: 'stick',
+      components: [{ kind: 'item_tags', tags: [' ', 'duplicate', ' duplicate ', 'bad\nvalue'] }]
+    })
+    expect(hasErrors(invalid.diagnostics)).toBe(true)
+    expect(invalid.text).toBe('minecraft:stick[custom_data={Tags:["duplicate"]}]')
+
+    const empty = serializeItemStack({
+      id: 'stick',
+      components: [{ kind: 'item_tags', tags: [] }]
+    })
+    expect(empty.text).toBe('minecraft:stick')
+    expect(empty.diagnostics.some((item) => item.code === 'item.item_tags.empty')).toBe(true)
+  })
+
+  it('does not emit item_tags and custom_data as duplicate components', () => {
+    const result = serializeItemStack({
+      id: 'stick',
+      components: [
+        { kind: 'item_tags', tags: ['one'] },
+        { kind: 'custom_data', raw: '{other:1b}' }
+      ]
+    })
+    expect(result.text).toBe('minecraft:stick[custom_data={Tags:["one"]}]')
+    expect(result.diagnostics.some((item) => item.code === 'item.component.duplicate')).toBe(true)
+  })
+
+  it('rejects invalid structured component values instead of emitting malformed SNBT', () => {
+    const result = serializeItemStack({
+      id: 'stick',
+      components: [
+        {
+          kind: 'attribute_modifiers',
+          entries: [{ id: 'bad id', type: 'generic.attack_damage', amount: Number.NaN, operation: 'multiply', slot: 'invalid' } as never]
+        },
+        {
+          kind: 'potion_contents', potion: '', customColor: 0x1000000,
+          effects: [{ id: 'speed', duration: -1, amplifier: 256, ambient: false, showParticles: true, showIcon: true }]
+        },
+        { kind: 'can_break', blocks: ['bad id'] },
+        { kind: 'entity_data', raw: '{broken' },
+        {
+          kind: 'block_entity_data', entity: 'zombie', delay: 0,
+          minSpawnDelay: 900, maxSpawnDelay: 100, spawnCount: 0,
+          maxNearbyEntities: 6, requiredPlayerRange: 16, spawnRange: 4
+        }
+      ]
+    })
+
+    expect(hasErrors(result.diagnostics)).toBe(true)
+    expect(result.text).not.toContain('attribute_modifiers=')
+    expect(result.text).not.toContain('potion_contents=')
+    expect(result.text).not.toContain('can_break=')
+    expect(result.text).not.toContain('entity_data=')
+    expect(result.text).not.toContain('block_entity_data=')
+  })
+
+  it.each(['{foo:[1}}', '{foo:{bar:1]}'])('rejects mismatched SNBT delimiters in entity data: %s', (raw) => {
+    const result = serializeItemStack({
+      id: 'zombie_spawn_egg',
+      components: [{ kind: 'entity_data', raw }]
+    })
+
+    expect(hasErrors(result.diagnostics)).toBe(true)
+    expect(result.text).not.toContain('entity_data=')
+  })
+
+  it('keeps new components unsupported by the pre-component item engine', () => {
+    const result = serializeItemStack({
+      id: 'stick',
+      components: [{ kind: 'can_break', blocks: ['stone'] }]
+    }, '1.20.4')
+    expect(result.diagnostics.some((item) => item.code === 'item.components.version')).toBe(true)
+  })
 })
