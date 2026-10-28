@@ -203,7 +203,7 @@ export function LocalizedIdInput({
         aria-expanded={open} aria-controls={open ? listboxId : undefined}
         aria-activedescendant={open && activeOption ? `${listboxId}-${activeIndex}` : undefined}
         autoComplete="off" autoCorrect="off" spellCheck={false} disabled={disabled}
-        placeholder={placeholder} value={draft} data-value={value} title={value ? `${displayValue} · ${value}` : label}
+        placeholder={placeholder} value={dirty ? draft : displayValue} data-value={value} title={value ? `${displayValue} · ${value}` : label}
         onFocus={(event) => { openList(); event.currentTarget.select() }}
         onClick={() => { if (!open) openList() }}
         onChange={(event) => {
