@@ -13,6 +13,7 @@ import { createHash } from 'node:crypto'
 import { mkdir, readFile, readdir, rename, stat, writeFile } from 'node:fs/promises'
 import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { finalizePackMetadata, verifyPack } from './lib/pack-files.mjs'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const ROOT = resolve(__dirname, '../..')
@@ -115,6 +116,7 @@ async function main() {
   const manifestPath = join(packDir, 'manifest.json')
 
   if (!args.force && (await exists(manifestPath))) {
+    await verifyPack(manifestPath)
     console.log(`✓ 数据包 ${args.version} 已存在，跳过（使用 --force 重建）`)
     return
   }
@@ -130,11 +132,12 @@ async function main() {
     fetchJson(`${base}/${FILES.blocks}`, 'blocks')
   ])
 
-  // 1.20.4 及更早版本没有 item_components 数据，使用空表并标记为 NBT 引擎。
+  // Older versions have no components report. Modern download errors must fail the build.
   let itemComponents
-  try {
+  const engine = versionAtLeast(args.version, '1.20.5') ? 'components' : 'nbt'
+  if (engine === 'components') {
     itemComponents = await fetchJson(`${base}/${FILES.itemComponents}`, 'item_components')
-  } catch {
+  } else {
     const empty = Buffer.from('{}')
     itemComponents = {
       json: {},
@@ -151,8 +154,6 @@ async function main() {
   if (!versionEntry) {
     throw new Error(`versions 数据里找不到版本 ${args.version}`)
   }
-
-  const engine = versionAtLeast(args.version, '1.20.5') ? 'components' : 'nbt'
 
   const stats = countTree(commands.json)
   const items = registries.json.item?.length ?? 0
@@ -211,6 +212,7 @@ async function main() {
   }
 
   await writeJsonAtomic(manifestPath, manifest)
+  await finalizePackMetadata(manifestPath)
   await updateIndex(args.version, manifest)
 
   console.log(`✓ ${args.version} 数据包完成`)

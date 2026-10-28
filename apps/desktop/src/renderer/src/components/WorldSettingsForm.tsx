@@ -1,3 +1,4 @@
+import { useShallow } from 'zustand/react/shallow'
 import { useEffect } from 'react'
 import { MapPin, MapPinned, ToggleLeft } from 'lucide-react'
 import type { ForceloadAction } from '@mcstudio/core'
@@ -20,7 +21,17 @@ const FORCELOAD_ACTIONS: { value: ForceloadAction; label: string }[] = [
 ]
 
 export function WorldSettingsForm() {
-  const state = useAppStore()
+  const state = useAppStore(useShallow((state) => ({
+    activeCommandId: state.activeCommandId,
+    spawnpoint: state.spawnpoint,
+    worldSpawn: state.worldSpawn,
+    forceload: state.forceload,
+    pack: state.pack,
+    updateSpawnpoint: state.updateSpawnpoint,
+    updateWorldSpawn: state.updateWorldSpawn,
+    selectCommand: state.selectCommand,
+    updateForceload: state.updateForceload
+  })))
   const active =
     state.activeCommandId === 'setworldspawn' || state.activeCommandId === 'forceload'
       ? state.activeCommandId

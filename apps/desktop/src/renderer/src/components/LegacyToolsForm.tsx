@@ -1,3 +1,4 @@
+import { useShallow } from 'zustand/react/shallow'
 import { useMemo, useState } from 'react'
 import { Copy, Wrench } from 'lucide-react'
 import {
@@ -117,7 +118,10 @@ const TABS: { id: LegacyTab; label: string }[] = [
 ]
 
 export function LegacyToolsForm() {
-  const state = useAppStore()
+  const state = useAppStore(useShallow((state) => ({
+    pack: state.pack,
+    showToast: state.showToast
+  })))
   const [tab, setTab] = useState<LegacyTab>('testfor')
   const [testfor, setTestfor] = useState(createDefaultTestfor)
   const [blockdata, setBlockdata] = useState(createDefaultBlockdata)

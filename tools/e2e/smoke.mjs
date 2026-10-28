@@ -8,6 +8,7 @@ import { existsSync, readFileSync } from 'node:fs'
 import { mkdir, rm } from 'node:fs/promises'
 import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { verifyPackagedAssets } from './packaged-assets.mjs'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const ROOT = resolve(__dirname, '../..')
@@ -51,18 +52,20 @@ async function main() {
     MCSTUDIO_USER_DATA: USER_DATA,
     MCSTUDIO_TEST_SAVE_DIR: DATAPACK_DIR
   }
+  if (process.env.MCSTUDIO_E2E_EXE) delete env.MCSTUDIO_PACKS_DIR
   delete env.ELECTRON_RUN_AS_NODE
+  const sandboxArgs = process.env.MCSTUDIO_E2E_NO_SANDBOX === '1' ? ['--no-sandbox'] : []
 
   app = await electron.launch(
     process.env.MCSTUDIO_E2E_EXE
       ? {
           executablePath: resolve(ROOT, process.env.MCSTUDIO_E2E_EXE),
-          args: [],
+          args: sandboxArgs,
           env,
           timeout: 60_000
         }
       : {
-          args: ['.'],
+          args: [...sandboxArgs, '.'],
           cwd: APP_DIR,
           env,
           timeout: 60_000
@@ -77,6 +80,10 @@ async function main() {
 
   await page.waitForSelector('.sidebar', { timeout: 30_000 })
   await page.waitForSelector('.command-item', { timeout: 30_000 })
+
+  if (process.env.MCSTUDIO_E2E_EXE) {
+    await verifyPackagedAssets(app, page)
+  }
 
   const bootError = await page.locator('.empty h2', { hasText: '数据包加载失败' }).count()
   if (bootError > 0) {
@@ -1541,6 +1548,7 @@ main()
   })
   .finally(async () => {
     if (app) {
+      await app.evaluate(({ app: electronApp }) => electronApp.exit(0)).catch(() => undefined)
       await app.close().catch(() => undefined)
     }
   })

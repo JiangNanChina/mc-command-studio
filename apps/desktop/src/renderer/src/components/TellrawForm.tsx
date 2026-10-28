@@ -1,3 +1,4 @@
+import { useShallow } from 'zustand/react/shallow'
 import { MessageSquareText, Users } from 'lucide-react'
 import { COMMAND_MAP } from '@mcstudio/content'
 import { TextPreview, TextSegmentsEditor } from './TextSegmentsEditor'
@@ -7,7 +8,10 @@ import { useAppStore } from '../store'
 const meta = COMMAND_MAP.get('tellraw')
 
 export function TellrawForm() {
-  const state = useAppStore()
+  const state = useAppStore(useShallow((state) => ({
+    tellraw: state.tellraw,
+    updateTellraw: state.updateTellraw
+  })))
   const tellraw = state.tellraw
 
   return (

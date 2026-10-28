@@ -45,3 +45,9 @@ jobs:
 
       - name: Build renderer/main/preload
         run: pnpm build
+
+      - name: Verify bundled runtime dependencies
+        run: pnpm check:runtime
+
+      - name: Persistence and version workflow regression
+        run: node tools/e2e/persistence-smoke.mjs

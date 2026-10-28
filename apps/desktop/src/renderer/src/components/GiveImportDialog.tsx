@@ -1,3 +1,4 @@
+import { useShallow } from 'zustand/react/shallow'
 import { useState } from 'react'
 import { ClipboardPaste, FileSearch } from 'lucide-react'
 import { parseGiveCommand, type ParseGiveResult } from '@mcstudio/core'
@@ -8,7 +9,10 @@ const SAMPLE =
   '/give @s minecraft:diamond_sword[custom_name={text:"Excalibur",color:"gold",italic:false},lore=[{text:"A legendary blade.",color:"gray",italic:false}],enchantments={sharpness:5,unbreaking:3}] 1'
 
 export function GiveImportDialog({ onClose }: { onClose: () => void }) {
-  const state = useAppStore()
+  const state = useAppStore(useShallow((state) => ({
+    applyGiveImport: state.applyGiveImport,
+    showToast: state.showToast
+  })))
   const [text, setText] = useState('')
   const [result, setResult] = useState<ParseGiveResult | null>(null)
 

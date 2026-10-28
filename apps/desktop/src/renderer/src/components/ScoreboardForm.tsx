@@ -1,3 +1,4 @@
+import { useShallow } from 'zustand/react/shallow'
 import { useEffect } from 'react'
 import { BarChart3, ListOrdered, Target, Trophy, Users } from 'lucide-react'
 import {
@@ -34,7 +35,11 @@ const PLAYER_ACTIONS: ScoreboardAction[] = [
 ]
 
 export function ScoreboardForm() {
-  const state = useAppStore()
+  const state = useAppStore(useShallow((state) => ({
+    scoreboard: state.scoreboard,
+    pack: state.pack,
+    updateScoreboard: state.updateScoreboard
+  })))
   const scoreboard = state.scoreboard
   const modifyBase = ['scoreboard', 'objectives', 'modify', 'objective'] as const
   const supportsAutoUpdate = hasCommandPath(

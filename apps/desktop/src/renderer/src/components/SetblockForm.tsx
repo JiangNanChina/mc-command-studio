@@ -1,3 +1,4 @@
+import { useShallow } from 'zustand/react/shallow'
 import { useEffect, useMemo, useState } from 'react'
 import { Boxes, Braces, MapPin, Settings2 } from 'lucide-react'
 import { COMMAND_MAP } from '@mcstudio/content'
@@ -18,7 +19,16 @@ const MODES: { value: SetblockMode; label: string; hint: string }[] = [
 ]
 
 export function SetblockForm() {
-  const state = useAppStore()
+  const state = useAppStore(useShallow((state) => ({
+    setblock: state.setblock,
+    pack: state.pack,
+    updateSetblock: state.updateSetblock,
+    selectBlock: state.selectBlock,
+    updateSetblockPosition: state.updateSetblockPosition,
+    setBlockState: state.setBlockState,
+    setBlockNbt: state.setBlockNbt,
+    setBlockMode: state.setBlockMode
+  })))
   const options = state.setblock
   const [pickerOpen, setPickerOpen] = useState(false)
   const supportsStrict = hasLiteral(state.pack, 'setblock', 'strict')

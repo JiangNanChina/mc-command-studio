@@ -1,3 +1,4 @@
+import { useShallow } from 'zustand/react/shallow'
 import { ArrowUpFromLine, CircleDot } from 'lucide-react'
 import { type RideAction } from '@mcstudio/core'
 import { COMMAND_MAP } from '@mcstudio/content'
@@ -7,7 +8,10 @@ import { useAppStore } from '../store'
 const meta = COMMAND_MAP.get('ride')
 
 export function RideForm() {
-  const state = useAppStore()
+  const state = useAppStore(useShallow((state) => ({
+    ride: state.ride,
+    updateRide: state.updateRide
+  })))
   const options = state.ride
 
   return (

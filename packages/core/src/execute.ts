@@ -151,7 +151,8 @@ export function buildExecuteCommand(options: ExecuteOptions): BuildResult {
     parts.push('run', run)
   }
 
-  const text = parts.join(' ').replace(/\s+/g, ' ').trim()
+  // Clause serializers trim their boundaries; quoted values and run text are opaque.
+  const text = parts.join(' ').trim()
   if (text.length > 32500) {
     diagnostics.push(error('execute.length', '命令超过 32,500 字符上限', 'command'))
   }

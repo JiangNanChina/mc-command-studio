@@ -1,3 +1,4 @@
+import { useShallow } from 'zustand/react/shallow'
 import { CloudSun, Clock3, Globe2, Shield, Skull } from 'lucide-react'
 import {
   DIFFICULTIES,
@@ -23,7 +24,14 @@ const DIFFICULTY_DESC: Record<string, string> = {
 }
 
 export function WorldControlForm() {
-  const state = useAppStore()
+  const state = useAppStore(useShallow((state) => ({
+    activeCommandId: state.activeCommandId,
+    world: state.world,
+    selectCommand: state.selectCommand,
+    updateTime: state.updateTime,
+    updateWeather: state.updateWeather,
+    updateDifficulty: state.updateDifficulty
+  })))
   const active =
     state.activeCommandId === 'weather' || state.activeCommandId === 'difficulty'
       ? state.activeCommandId

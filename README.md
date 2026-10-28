@@ -12,8 +12,10 @@
 
 ![give 表单](docs/assets/give-form.png)
 
-## 功能（0.6.1）
+## 功能（0.6.2）
 
+- **保存与恢复**：快捷表单草稿随项目保存、恢复和撤销；关闭、重启与安装更新前可选择保存、放弃或取消。
+- **版本兼容**：按目标版本生成物品文本、附魔与模型数据组件，修复旧版 NBT give 语法及命令内部空白丢失。
 - **品牌图标**：命令方块主题的应用图标、安装包图标与界面 Logo。
 - **更新公告**：只展示当前版本更新，历史版本跳转 GitHub Releases；不再显示已知问题。
 - **数据包工作区**：侧栏“工具”独立打开，多函数管理、load/tick 标签、文件预览与 zip 导出；与命令编辑彻底分开。
@@ -83,7 +85,7 @@
 ```bash
 pnpm install
 pnpm setup:electron     # Electron 45 不再自动下载运行时
-pnpm data:build         # 生成 packs/26.3（约 2.2 MB）
+pnpm data:build         # 按版本目录验证已有数据包，缺失的现代版本才下载
 pnpm dev                # 开发模式
 pnpm typecheck
 pnpm test
@@ -92,8 +94,8 @@ pnpm build:win          # 安装包 + 便携版 + latest.yml
 
 产物在 `release/`：
 
-- `MC-Command-Studio-Setup-0.6.1.exe`
-- `MC-Command-Studio-0.6.1-portable.exe`
+- `MC-Command-Studio-Setup-0.6.2.exe`
+- `MC-Command-Studio-0.6.2-portable.exe`
 - `latest.yml`、`.blockmap`
 
 如果 `pnpm install` 后没有 Electron 二进制，运行 `pnpm setup:electron`；国内网络可设置：
@@ -117,8 +119,10 @@ pnpm data:verify
 ## 测试
 
 ```bash
-pnpm test        # 277 个核心逻辑用例
-pnpm e2e         # Playwright 启动 Electron，覆盖 give/导入/summon/setblock/命令方块
+pnpm test        # 核心、状态、存储和退出流程回归
+pnpm e2e         # Playwright 启动 Electron，覆盖指令生成与导出
+pnpm test:e2e:persistence # 自动保存、快捷草稿、跨版本输出和退出保护
+pnpm test:pipeline # 数据包损坏、哈希、计数和别名回归
 ```
 
 `pnpm e2e` 需要先 `pnpm build`，并且需要可用的 Windows 桌面会话。截图输出到 `artifacts/`。
@@ -153,7 +157,7 @@ packages/content/    命令中文名、分类、示例、组件元数据
 tools/pipeline/      数据包构建/校验
 tools/release/       版本、Electron 安装、本地更新源
 docs/                产品、架构、数据、命令模型、UI、版本、路线、发布
-packs/               生成的数据包（不入库）
+packs/               随仓库维护的 45 个基础包、9 个别名及索引
 release/             打包产物（不入库）
 ```
 
@@ -182,4 +186,5 @@ release/             打包产物（不入库）
 - [全版本路线](docs/06-version-matrix.md)
 - [路线图与风险](docs/07-roadmap-risks.md)
 - [发布与自动更新](docs/08-release-update.md)
+- [P1/P2 可靠性与验证改造](docs/19-reliability-hardening.md)
 - [中文名称与图标资源](docs/09-visual-assets.md)

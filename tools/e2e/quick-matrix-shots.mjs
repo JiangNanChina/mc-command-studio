@@ -82,5 +82,6 @@ for (const [version, form] of CASES) {
   console.log(`✓ ${version}/${form}`)
 }
 
+await app.evaluate(({ app: electronApp }) => electronApp.exit(0)).catch(() => undefined)
 await app.close()
 console.log(`✓ 10 个版本表单截图完成：${OUT}`)

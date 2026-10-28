@@ -92,5 +92,6 @@ for (const [version, form, expected] of CASES) {
   console.log(`✓ ${version} ${form}`)
 }
 
+await app.evaluate(({ app: electronApp }) => electronApp.exit(0)).catch(() => undefined)
 await app.close()
 console.log(`✓ 版本特定快捷表单 UI 冒烟通过（${CASES.length} 个用例）`)

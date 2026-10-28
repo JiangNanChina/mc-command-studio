@@ -1,3 +1,4 @@
+import { useShallow } from 'zustand/react/shallow'
 import { useState } from 'react'
 import {
   ArrowLeft,
@@ -68,7 +69,14 @@ function ArgumentRow({
 }
 
 export function GenericBuilder() {
-  const state = useAppStore()
+  const state = useAppStore(useShallow((state) => ({
+    generic: state.generic,
+    pack: state.pack,
+    resetGeneric: state.resetGeneric,
+    popGenericStep: state.popGenericStep,
+    truncateGeneric: state.truncateGeneric,
+    pushGenericStep: state.pushGenericStep
+  })))
   const draft = state.generic
   const node = selectGenericNode(state.pack, draft)
   const root = draft.root

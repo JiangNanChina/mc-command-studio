@@ -1,3 +1,4 @@
+import { useShallow } from 'zustand/react/shallow'
 import { ArrowRight, FolderOpen, Sparkles, Terminal, Wand2 } from 'lucide-react'
 import { COMMANDS } from '@mcstudio/content'
 import icon from '../assets/icon.png'
@@ -6,7 +7,14 @@ import { useAppStore } from '../store'
 const QUICK_IDS = ['give', 'summon', 'setblock', 'execute', 'effect', 'tellraw']
 
 export function Welcome() {
-  const state = useAppStore()
+  const state = useAppStore(useShallow((state) => ({
+    settings: state.settings,
+    pack: state.pack,
+    selectCommand: state.selectCommand,
+    openProjectPath: state.openProjectPath,
+    openProject: state.openProject,
+    setDialog: state.setDialog
+  })))
   const quick = COMMANDS.filter((command) => QUICK_IDS.includes(command.id))
   const recent = state.settings.recentProjects.slice(0, 5)
 

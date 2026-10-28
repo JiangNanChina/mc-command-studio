@@ -92,7 +92,7 @@ export function buildNbtGiveCommand(options: NbtGiveOptions): BuildResult {
 
   const nbt = parts.length > 0 ? `{${parts.join(',')}}` : ''
   return {
-    text: `give ${target.text} ${item} ${count?.value ?? 1}${nbt ? ` ${nbt}` : ''}`,
+    text: `give ${target.text} ${item}${nbt} ${count?.value ?? 1}`,
     diagnostics
   }
 }

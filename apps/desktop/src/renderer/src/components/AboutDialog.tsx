@@ -1,3 +1,4 @@
+import { useShallow } from 'zustand/react/shallow'
 import { Code2, ExternalLink, ShieldCheck, Sparkles } from 'lucide-react'
 import { getApi } from '../lib/api'
 import icon from '../assets/icon.png'
@@ -8,7 +9,11 @@ export const RELEASES_URL = 'https://github.com/JiangNanChina/mc-command-studio/
 export const PROJECT_URL = 'https://github.com/JiangNanChina/mc-command-studio'
 
 export function AboutDialog() {
-  const state = useAppStore()
+  const state = useAppStore(useShallow((state) => ({
+    appInfo: state.appInfo,
+    setDialog: state.setDialog,
+    pack: state.pack
+  })))
   const info = state.appInfo
 
   return (

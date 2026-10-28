@@ -1,3 +1,4 @@
+import { useShallow } from 'zustand/react/shallow'
 import { Dices, Hash } from 'lucide-react'
 import { type RandomMode } from '@mcstudio/core'
 import { COMMAND_MAP } from '@mcstudio/content'
@@ -6,7 +7,10 @@ import { useAppStore } from '../store'
 const meta = COMMAND_MAP.get('random')
 
 export function RandomForm() {
-  const state = useAppStore()
+  const state = useAppStore(useShallow((state) => ({
+    random: state.random,
+    updateRandom: state.updateRandom
+  })))
   const options = state.random
 
   return (

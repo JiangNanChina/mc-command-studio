@@ -1,4 +1,5 @@
 import { lazy, Suspense, useEffect } from 'react'
+import { useShallow } from 'zustand/react/shallow'
 import { AlertTriangle, Database, FolderOpen, Info, RefreshCw } from 'lucide-react'
 import { getApi } from './lib/api'
 import { getCurrentOutput } from './lib/commandOutput'
@@ -67,6 +68,7 @@ import { AnnouncementDialog } from './components/AnnouncementDialog'
 import { AutosaveBanner } from './components/AutosaveBanner'
 import { Toast } from './components/Toast'
 import { QuickCommandForm, isQuickCommand, isNbtQuickSafe } from './components/QuickCommandForm'
+import { useCloseGuard } from './components/CloseProjectDialog'
 
 function LoadingScreen() {
   return (
@@ -81,7 +83,13 @@ function LoadingScreen() {
 }
 
 function ErrorPanel() {
-  const state = useAppStore()
+  const state = useAppStore(useShallow((store) => ({
+    appInfo: store.appInfo,
+    bootError: store.bootError,
+    activePackId: store.activePackId,
+    loadPack: store.loadPack,
+    showToast: store.showToast
+  })))
   const appInfo = state.appInfo
 
   return (
@@ -132,57 +140,20 @@ function ErrorPanel() {
 }
 
 export default function App() {
-  const state = useAppStore()
-  const bootError = state.bootError
-  const booted = state.booted
-  const pack = state.pack
-  const dirty = state.dirty
-  const give = state.give
-  const nbtGive = state.nbtGive
-  const gamemode = state.gamemode
-  const damage = state.damage
-  const rotate = state.rotate
-  const spreadplayers = state.spreadplayers
-  const ride = state.ride
-  const random = state.random
-  const tick = state.tick
-  const social = state.social
-  const summon = state.summon
-  const setblock = state.setblock
-  const execute = state.execute
-  const teleport = state.teleport
-  const effect = state.effect
-  const fill = state.fill
-  const clone = state.clone
-  const chain = state.chain
-  const enchant = state.enchant
-  const xp = state.xp
-  const tellraw = state.tellraw
-  const title = state.title
-  const sound = state.sound
-  const bossbar = state.bossbar
-  const scoreboard = state.scoreboard
-  const particle = state.particle
-  const world = state.world
-  const tag = state.tag
-  const clear = state.clear
-  const gamerule = state.gamerule
-  const worldborder = state.worldborder
-  const team = state.team
-  const spawnpoint = state.spawnpoint
-  const worldSpawn = state.worldSpawn
-  const forceload = state.forceload
-  const attribute = state.attribute
-  const automation = state.automation
-  const itemCommand = state.itemCommand
-  const dataCommand = state.dataCommand
-  const loot = state.loot
-  const generic = state.generic
-  const commandBlock = state.commandBlock
-  const outputMode = state.outputMode
-  const activeCommandId = state.activeCommandId
-  const projectName = state.projectName
-  const toast = state.toast
+  const state = useAppStore(useShallow((store) => ({
+    bootError: store.bootError,
+    booted: store.booted,
+    pack: store.pack,
+    dirty: store.dirty,
+    documentRevision: store.documentRevision,
+    activeCommandId: store.activeCommandId,
+    projectName: store.projectName,
+    toast: store.toast,
+    dialogs: store.dialogs,
+    announcementOpen: store.announcementOpen
+  })))
+  const { bootError, booted, pack, dirty, documentRevision, activeCommandId, projectName, toast } = state
+  const closeGuard = useCloseGuard()
   const treeOnly = pack?.manifest.engine !== 'components'
   const legacyEngine = pack?.manifest.engine === 'legacy'
 
@@ -280,53 +251,7 @@ export default function App() {
       if (mod && event.key === 'Enter') {
         event.preventDefault()
         const store = useAppStore.getState()
-        const output = getCurrentOutput(
-          store.pack,
-          store.activeCommandId,
-          store.give,
-          store.nbtGive,
-          store.gamemode,
-          store.damage,
-          store.rotate,
-          store.spreadplayers,
-          store.ride,
-          store.random,
-          store.tick,
-          store.social,
-          store.summon,
-          store.setblock,
-          store.execute,
-          store.teleport,
-          store.effect,
-          store.fill,
-          store.clone,
-          store.chain,
-          store.enchant,
-          store.xp,
-          store.tellraw,
-          store.title,
-          store.sound,
-          store.bossbar,
-          store.scoreboard,
-          store.particle,
-          store.world,
-          store.tag,
-          store.clear,
-          store.gamerule,
-          store.worldborder,
-          store.team,
-          store.spawnpoint,
-          store.worldSpawn,
-          store.forceload,
-          store.attribute,
-          store.automation,
-          store.itemCommand,
-          store.dataCommand,
-          store.loot,
-          store.generic,
-          store.outputMode,
-          store.commandBlock
-        )
+        const output = getCurrentOutput(store)
         if (!output.text) return
         void getApi()
           .clipboard.write(output.text)
@@ -346,12 +271,12 @@ export default function App() {
   }, [])
 
   useEffect(() => {
-    if (!dirty) return
+    if (!dirty || closeGuard.closing) return
     const timer = setTimeout(() => {
-      void useAppStore.getState().autosave()
+      void useAppStore.getState().autosave().catch(() => undefined)
     }, 4000)
     return () => clearTimeout(timer)
-  }, [dirty, give, nbtGive, gamemode, damage, rotate, spreadplayers, ride, random, tick, social, summon, setblock, execute, teleport, effect, fill, clone, chain, enchant, xp, tellraw, title, sound, bossbar, scoreboard, particle, world, tag, clear, gamerule, worldborder, team, spawnpoint, worldSpawn, forceload, attribute, automation, itemCommand, dataCommand, loot, generic, commandBlock, outputMode, activeCommandId, projectName])
+  }, [dirty, documentRevision, closeGuard.closing])
 
   useEffect(() => {
     if (!toast) return
@@ -367,7 +292,7 @@ export default function App() {
     document.querySelector('.main')?.scrollTo({ top: 0 })
   }, [activeCommandId])
 
-  if (!booted) return <LoadingScreen />
+  if (!booted) return <><LoadingScreen />{closeGuard.dialog}</>
 
   const showWelcome = !activeCommandId
 
@@ -529,6 +454,7 @@ export default function App() {
       {state.dialogs.selector ? <SelectorDialog /> : null}
       {state.dialogs.itemPicker ? <ItemPickerDialog /> : null}
       <Toast />
+      {closeGuard.dialog}
     </div>
   )
 }

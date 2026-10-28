@@ -1,5 +1,5 @@
 import { contextBridge, ipcRenderer } from 'electron'
-import type { McStudioApi, MenuAction, UpdateState, UserSettings } from '../shared/types'
+import type { BeforeCloseRequest, McStudioApi, MenuAction, UpdateState, UserSettings } from '../shared/types'
 
 const api: McStudioApi = {
   app: {
@@ -7,7 +7,17 @@ const api: McStudioApi = {
     openExternal: (url) => ipcRenderer.invoke('app:open-external', url),
     exportDiagnostics: () => ipcRenderer.invoke('app:export-diagnostics'),
     showItemInFolder: (path) => ipcRenderer.invoke('app:show-item', path),
-    relaunch: () => ipcRenderer.invoke('app:relaunch')
+    relaunch: () => ipcRenderer.invoke('app:relaunch'),
+    onBeforeClose: (callback) => {
+      const listener = (_event: Electron.IpcRendererEvent, request: BeforeCloseRequest): void => callback(request)
+      ipcRenderer.on('app:before-close', listener)
+      ipcRenderer.send('app:close-handler-ready', true)
+      return () => {
+        ipcRenderer.removeListener('app:before-close', listener)
+        ipcRenderer.send('app:close-handler-ready', false)
+      }
+    },
+    completeClose: (requestId, allow) => ipcRenderer.invoke('app:complete-close', { requestId, allow })
   },
   packs: {
     list: () => ipcRenderer.invoke('packs:list'),

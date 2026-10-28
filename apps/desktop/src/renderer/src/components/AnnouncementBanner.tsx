@@ -1,9 +1,15 @@
+import { useShallow } from 'zustand/react/shallow'
 import { Bell, Check } from 'lucide-react'
 import { getChangelogEntry, latestChangelog } from '@mcstudio/content'
 import { useAppStore } from '../store'
 
 export function AnnouncementBanner() {
-  const state = useAppStore()
+  const state = useAppStore(useShallow((state) => ({
+    appInfo: state.appInfo,
+    settings: state.settings,
+    markAnnouncementSeen: state.markAnnouncementSeen,
+    openAnnouncement: state.openAnnouncement
+  })))
   const version = state.appInfo?.version
   if (!version) return null
   if (state.settings.lastSeenVersion === version) return null

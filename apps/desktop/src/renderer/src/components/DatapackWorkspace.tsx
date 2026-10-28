@@ -1,3 +1,4 @@
+import { useShallow } from 'zustand/react/shallow'
 import { useMemo, useState } from 'react'
 import {
   FileArchive,
@@ -17,7 +18,22 @@ import { AdvancementEditor } from './AdvancementEditor'
 import { PredicateEditor } from './PredicateEditor'
 
 export function DatapackWorkspace() {
-  const state = useAppStore()
+  const state = useAppStore(useShallow((state) => ({
+    datapack: state.datapack,
+    pack: state.pack,
+    showToast: state.showToast,
+    updateDatapackMeta: state.updateDatapackMeta,
+    addDatapackFunction: state.addDatapackFunction,
+    selectDatapackFunction: state.selectDatapackFunction,
+    removeDatapackFunction: state.removeDatapackFunction,
+    updateDatapackFunction: state.updateDatapackFunction,
+    setDatapackLoadFunction: state.setDatapackLoadFunction,
+    setDatapackTickFunction: state.setDatapackTickFunction,
+    addDatapackDataFile: state.addDatapackDataFile,
+    selectDatapackDataFile: state.selectDatapackDataFile,
+    updateDatapackDataFile: state.updateDatapackDataFile,
+    removeDatapackDataFile: state.removeDatapackDataFile
+  })))
   const datapack = state.datapack
   const packFormat = state.pack?.manifest.packFormat ?? 121
   const [exporting, setExporting] = useState(false)

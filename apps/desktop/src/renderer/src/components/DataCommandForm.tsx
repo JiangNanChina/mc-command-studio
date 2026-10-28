@@ -1,3 +1,4 @@
+import { useShallow } from 'zustand/react/shallow'
 import { useEffect } from 'react'
 import { Braces, Database } from 'lucide-react'
 import {
@@ -43,7 +44,11 @@ const SOURCES: { value: DataSourceType; label: string }[] = [
 ]
 
 export function DataCommandForm() {
-  const state = useAppStore()
+  const state = useAppStore(useShallow((state) => ({
+    dataCommand: state.dataCommand,
+    pack: state.pack,
+    updateDataCommand: state.updateDataCommand
+  })))
   const options = state.dataCommand
   const actions = ACTIONS.filter((action) =>
     hasCommandPath(state.pack, 'data', action.value)

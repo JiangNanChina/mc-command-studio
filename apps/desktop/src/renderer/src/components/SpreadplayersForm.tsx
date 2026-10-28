@@ -1,3 +1,4 @@
+import { useShallow } from 'zustand/react/shallow'
 import { Shuffle, Users } from 'lucide-react'
 import { COMMAND_MAP } from '@mcstudio/content'
 import { SelectorField } from './SelectorField'
@@ -6,7 +7,10 @@ import { useAppStore } from '../store'
 const meta = COMMAND_MAP.get('spreadplayers')
 
 export function SpreadplayersForm() {
-  const state = useAppStore()
+  const state = useAppStore(useShallow((state) => ({
+    spreadplayers: state.spreadplayers,
+    updateSpreadplayers: state.updateSpreadplayers
+  })))
   const options = state.spreadplayers
 
   return (

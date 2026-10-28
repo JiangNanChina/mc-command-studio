@@ -24,6 +24,13 @@ export interface AppInfo {
 
 export type ThemeMode = 'dark' | 'light'
 
+export type CloseReason = 'close' | 'relaunch' | 'update'
+
+export interface BeforeCloseRequest {
+  requestId: number
+  reason: CloseReason
+}
+
 export interface RecentProject {
   name: string
   path: string
@@ -133,6 +140,8 @@ export interface McStudioApi {
     exportDiagnostics: () => Promise<string | null>
     showItemInFolder: (path: string) => Promise<void>
     relaunch: () => Promise<void>
+    onBeforeClose: (callback: (request: BeforeCloseRequest) => void) => () => void
+    completeClose: (requestId: number, allow: boolean) => Promise<void>
   }
   packs: {
     list: () => Promise<PackSummary[]>

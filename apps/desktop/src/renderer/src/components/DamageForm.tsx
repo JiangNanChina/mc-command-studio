@@ -1,3 +1,4 @@
+import { useShallow } from 'zustand/react/shallow'
 import { HeartPulse, Swords } from 'lucide-react'
 import { type DamageSource } from '@mcstudio/core'
 import { COMMAND_MAP } from '@mcstudio/content'
@@ -8,7 +9,11 @@ import { useAppStore } from '../store'
 const meta = COMMAND_MAP.get('damage')
 
 export function DamageForm() {
-  const state = useAppStore()
+  const state = useAppStore(useShallow((state) => ({
+    damage: state.damage,
+    pack: state.pack,
+    updateDamage: state.updateDamage
+  })))
   const options = state.damage
   const damageTypes = (state.pack?.registries.damage_type ?? []).map(
     (id) => `minecraft:${id}`

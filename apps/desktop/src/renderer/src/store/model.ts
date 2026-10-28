@@ -1,23 +1,14 @@
 // 项目数据模型：只包含类型与草稿结构，不依赖 store 运行时。
 import type {
-  BlockStateValue,
   BossbarOptions,
-  BuildResult,
-  ChainBlock,
   ChainOptions,
   CloneOptions,
   CommandBlockOptions,
-  CommandNodeData,
   EffectOptions,
   EnchantOptions,
-  ExecuteClause,
   ExecuteOptions,
   FillOptions,
-  GenericStep,
   GiveOptions,
-  ItemComponent,
-  Position,
-  Selector,
   ScoreboardOptions,
   ParticleOptions,
   WorldOptions,
@@ -45,17 +36,12 @@ import type {
   SocialOptions,
   DataOptions,
   LootOptions,
-  TimeOptions,
-  SetblockMode,
   SetblockOptions,
   SoundOptions,
   SummonOptions,
-  TeleportDestination,
   TeleportOptions,
   TellrawOptions,
-  TextSegment,
   TitleOptions,
-  VersionPack,
   XpOptions
 } from '@mcstudio/core'
 
@@ -98,6 +84,7 @@ export interface AutomationOptions {
 
 export interface ProjectPayload {
   activeCommandId: string | null
+  quickDrafts: Record<string, Record<string, string>>
   give: GiveOptions
   nbtGive: NbtGiveOptions
   gamemode: GamemodeOptions

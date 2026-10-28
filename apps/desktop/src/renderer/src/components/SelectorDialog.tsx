@@ -1,3 +1,4 @@
+import { useShallow } from 'zustand/react/shallow'
 import { useMemo, useState } from 'react'
 import { Crosshair, RotateCcw } from 'lucide-react'
 import {
@@ -15,7 +16,12 @@ interface SelectorDialogProps {
 }
 
 export function SelectorDialog({ value, onApply, onClose }: SelectorDialogProps = {}) {
-  const state = useAppStore()
+  const state = useAppStore(useShallow((state) => ({
+    give: state.give,
+    pack: state.pack,
+    setDialog: state.setDialog,
+    setTarget: state.setTarget
+  })))
   const [draft, setDraft] = useState<Selector>(() => structuredClone(value ?? state.give.target))
   const preview = serializeSelector(draft)
   const entities = useMemo(() => {

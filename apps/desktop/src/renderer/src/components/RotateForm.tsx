@@ -1,3 +1,4 @@
+import { useShallow } from 'zustand/react/shallow'
 import { Compass, RotateCw } from 'lucide-react'
 import { type FacingAnchor, type RotateMode } from '@mcstudio/core'
 import { COMMAND_MAP } from '@mcstudio/content'
@@ -8,7 +9,10 @@ import { useAppStore } from '../store'
 const meta = COMMAND_MAP.get('rotate')
 
 export function RotateForm() {
-  const state = useAppStore()
+  const state = useAppStore(useShallow((state) => ({
+    rotate: state.rotate,
+    updateRotate: state.updateRotate
+  })))
   const options = state.rotate
 
   return (

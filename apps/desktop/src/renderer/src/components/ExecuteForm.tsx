@@ -1,3 +1,4 @@
+import { useShallow } from 'zustand/react/shallow'
 import { useState, type ReactNode } from 'react'
 import {
   ArrowDown,
@@ -233,14 +234,14 @@ function ClauseEditor({
   onEditSelector,
   onEditConditionSelector
 }: ClauseEditorProps) {
-  const state = useAppStore()
+  const pack = useAppStore((state) => state.pack)
   const conditionTypes = (
     Object.keys(EXECUTE_CONDITION_LABELS) as ExecuteCondition['type'][]
   ).filter(
     (type) =>
       type === 'raw' ||
-      hasCommandPath(state.pack, 'execute', 'if', type) ||
-      hasCommandPath(state.pack, 'execute', 'unless', type)
+      hasCommandPath(pack, 'execute', 'if', type) ||
+      hasCommandPath(pack, 'execute', 'unless', type)
   )
 
   const positionFields = (
@@ -490,9 +491,9 @@ function ClauseEditor({
           </div>
         ) : null}
 
-        {state.pack && clause.kind === 'in' ? (
+        {pack && clause.kind === 'in' ? (
           <div className="hint" style={{ marginTop: 6 }}>
-            当前数据包可用维度：{state.pack.registries.dimension?.length ?? 0} 个
+            当前数据包可用维度：{pack.registries.dimension?.length ?? 0} 个
           </div>
         ) : null}
       </div>
@@ -501,7 +502,16 @@ function ClauseEditor({
 }
 
 export function ExecuteForm() {
-  const state = useAppStore()
+  const state = useAppStore(useShallow((state) => ({
+    pack: state.pack,
+    execute: state.execute,
+    updateExecuteClause: state.updateExecuteClause,
+    setExecuteClauses: state.setExecuteClauses,
+    setExecuteRun: state.setExecuteRun,
+    addExecuteClause: state.addExecuteClause,
+    moveExecuteClause: state.moveExecuteClause,
+    removeExecuteClause: state.removeExecuteClause
+  })))
   const execute = state.execute
   const clauseKinds = CLAUSE_KINDS.filter(
     (kind) => kind === 'raw' || hasCommandPath(state.pack, 'execute', kind)

@@ -1,3 +1,4 @@
+import { useShallow } from 'zustand/react/shallow'
 import { Compass, MapPin, Navigation, Users } from 'lucide-react'
 import { COMMAND_MAP } from '@mcstudio/content'
 import type { TeleportDestination } from '@mcstudio/core'
@@ -8,7 +9,10 @@ import { useAppStore } from '../store'
 const meta = COMMAND_MAP.get('tp')
 
 export function TeleportForm() {
-  const state = useAppStore()
+  const state = useAppStore(useShallow((state) => ({
+    teleport: state.teleport,
+    updateTeleport: state.updateTeleport
+  })))
   const tp = state.teleport
   const positionMode = tp.destination.mode === 'position'
 

@@ -1,3 +1,4 @@
+import { useShallow } from 'zustand/react/shallow'
 import { Scan, SquareDashed } from 'lucide-react'
 import { COMMAND_MAP } from '@mcstudio/content'
 import {
@@ -9,7 +10,10 @@ import { useAppStore } from '../store'
 const meta = COMMAND_MAP.get('worldborder')
 
 export function WorldborderForm() {
-  const state = useAppStore()
+  const state = useAppStore(useShallow((state) => ({
+    worldborder: state.worldborder,
+    updateWorldborder: state.updateWorldborder
+  })))
   const worldborder = state.worldborder
   const action = worldborder.action
   const isSize = action === 'set' || action === 'add'

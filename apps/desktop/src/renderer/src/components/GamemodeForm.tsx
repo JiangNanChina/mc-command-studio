@@ -1,3 +1,4 @@
+import { useShallow } from 'zustand/react/shallow'
 import { Gamepad2, Shield } from 'lucide-react'
 import { GAME_MODES, type GameMode } from '@mcstudio/core'
 import { COMMAND_MAP } from '@mcstudio/content'
@@ -7,7 +8,10 @@ import { useAppStore } from '../store'
 const meta = COMMAND_MAP.get('gamemode')
 
 export function GamemodeForm() {
-  const state = useAppStore()
+  const state = useAppStore(useShallow((state) => ({
+    gamemode: state.gamemode,
+    updateGamemode: state.updateGamemode
+  })))
   const options = state.gamemode
 
   return (

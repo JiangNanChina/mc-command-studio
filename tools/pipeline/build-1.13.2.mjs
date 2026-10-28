@@ -11,6 +11,7 @@
 import { createHash } from 'node:crypto'
 import { mkdir, readFile, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
+import { finalizePackMetadata } from './lib/pack-files.mjs'
 
 const args = process.argv.slice(2)
 const valueOf = (name, fallback) => {
@@ -155,6 +156,7 @@ const main = async () => {
     }
   }
   await writeFile(join(output, 'manifest.json'), `${JSON.stringify(manifest, null, 2)}\n`)
+  await finalizePackMetadata(join(output, 'manifest.json'))
 
   const indexPath = 'packs/index.json'
   const index = await readJson(indexPath)

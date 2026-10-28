@@ -41,7 +41,7 @@ packages/content/src/      命令中文名/分类/示例、组件元数据
 tools/pipeline/            数据包构建与校验
 tools/release/             版本校验、bump、Electron 安装、本地更新源
 tools/e2e/                 Playwright Electron 冒烟测试
-packs/                     构建产物（不入库，构建时复制进安装包）
+packs/                     版本库维护的数据快照（构建时复制进安装包）
 docs/                      本文档
 ```
 
@@ -135,3 +135,11 @@ pipeline 构建 pack
 - 输出编辑器只在文本变化时 dispatch 一次全文替换。
 - 自动保存 4 秒防抖，避免频繁写盘。
 - 实测冷启动到可交互约 2 秒（开发构建、Windows 本地）。
+
+## 9. P1/P2 可靠性改造
+
+项目与会话操作拆至 store/project.ts、store/session.ts；store/document.ts 提供统一持久化字段和历史过滤。文档变更通过 Immer patches 更新 revision、撤销与重做；界面状态不写入历史。自动保存依赖 revision，快捷草稿也属于项目文档。所有输出入口接收文档对象，使用当前目标版本能力生成语法。
+
+项目与设置采用按路径串行的临时文件原子替换；恢复文件将内容与时间戳一次提交。保存结果仅清除相同 session/revision 的 dirty。主进程退出、重启和安装更新均与 renderer 握手，用户可保存、放弃或取消，保存失败保留窗口。IPC 校验受信主 frame 与来源。
+
+数据包构建、验证、主进程加载共用 core schema，并验证实际统计与 fileHashes。变更范围、验证和历史迁移见 [19-reliability-hardening.md](19-reliability-hardening.md)。

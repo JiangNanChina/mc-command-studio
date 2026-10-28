@@ -1,3 +1,4 @@
+import { useShallow } from 'zustand/react/shallow'
 import { useDeferredValue, useMemo } from 'react'
 import { Search, X, Boxes, Link2, PackageOpen, TerminalSquare, Wrench } from 'lucide-react'
 import {
@@ -12,7 +13,17 @@ import { useAppStore } from '../store'
 const ALL: CommandCategory | '全部' = '全部'
 
 export function Sidebar() {
-  const state = useAppStore()
+  const state = useAppStore(useShallow((state) => ({
+    pack: state.pack,
+    search: state.search,
+    category: state.category,
+    setSearch: state.setSearch,
+    setCategory: state.setCategory,
+    activeCommandId: state.activeCommandId,
+    selectCommand: state.selectCommand,
+    openChain: state.openChain,
+    openDatapack: state.openDatapack
+  })))
   const pack = state.pack
 
   const roots = useMemo(() => (pack ? getRoots(pack.commands) : []), [pack])

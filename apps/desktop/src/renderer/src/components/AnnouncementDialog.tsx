@@ -1,3 +1,4 @@
+import { useShallow } from 'zustand/react/shallow'
 import {
   Bell,
   Calendar,
@@ -88,7 +89,10 @@ function EntryView({ entry }: { entry: ChangelogEntry }) {
 }
 
 export function AnnouncementDialog() {
-  const state = useAppStore()
+  const state = useAppStore(useShallow((state) => ({
+    appInfo: state.appInfo,
+    closeAnnouncement: state.closeAnnouncement
+  })))
   const current = state.appInfo?.version ?? latestChangelog().version
   const entry = getChangelogEntry(current) ?? latestChangelog()
 

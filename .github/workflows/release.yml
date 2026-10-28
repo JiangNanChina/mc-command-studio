@@ -36,6 +36,9 @@ jobs:
       - name: Build data pack
         run: pnpm data:build
 
+      - name: Verify data packs and version compatibility
+        run: pnpm data:verify
+
       - name: Typecheck
         run: pnpm typecheck
 
@@ -48,10 +51,18 @@ jobs:
           CSC_KEY_PASSWORD: ${{ secrets.CSC_KEY_PASSWORD }}
         run: pnpm build:win
 
+      - name: Verify bundled runtime dependencies
+        run: pnpm check:runtime
+
       - name: Packaged Electron smoke
         env:
           MCSTUDIO_E2E_EXE: release/win-unpacked/MC Command Studio.exe
         run: node tools/e2e/smoke.mjs
+
+      - name: Packaged persistence and version workflow regression
+        env:
+          MCSTUDIO_E2E_EXE: release/win-unpacked/MC Command Studio.exe
+        run: node tools/e2e/persistence-smoke.mjs
 
       - name: Verify tag and artifacts
         run: node tools/release/verify-version.mjs "${{ github.ref_name }}"

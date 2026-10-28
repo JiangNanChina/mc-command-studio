@@ -35,6 +35,7 @@ async function main() {
     await page.screenshot({ path: join(ROOT, 'artifacts/portable.png') })
     console.log('✓ 便携版模式验收通过：自动更新已禁用并提示手动下载')
   } finally {
+    await app.evaluate(({ app: electronApp }) => electronApp.exit(0)).catch(() => undefined)
     await app.close().catch(() => undefined)
   }
 }

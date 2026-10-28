@@ -23,6 +23,8 @@ import type {
 } from '../shared/types'
 import { buildDatapackFiles } from '../shared/datapack'
 import { listPacks, loadPack, packsDir } from './packs'
+import { completeClose, requestShutdown, setCloseHandlerReady } from './lifecycle'
+import { handleTrusted, isTrustedSender } from './trustedIpc'
 import {
   addRecentProject,
   clearAutosave,
@@ -168,26 +170,37 @@ async function exportDiagnostics(): Promise<string | null> {
 }
 
 export function registerIpc(): void {
-  ipcMain.handle('app:info', () => appInfo())
-  ipcMain.handle('app:open-external', async (_event, url: unknown) => {
+  handleTrusted('app:info', () => appInfo())
+  handleTrusted('app:open-external', async (_event, url: unknown) => {
     const parsed = z.string().url().max(2048).safeParse(url)
     if (!parsed.success) throw new Error('链接不合法')
     if (!/^https?:\/\//i.test(parsed.data)) throw new Error('只允许打开 http/https 链接')
     await shell.openExternal(parsed.data)
   })
-  ipcMain.handle('app:export-diagnostics', () => exportDiagnostics())
-  ipcMain.handle('app:show-item', async (_event, path: unknown) => {
+  handleTrusted('app:export-diagnostics', () => exportDiagnostics())
+  handleTrusted('app:show-item', async (_event, path: unknown) => {
     const parsed = pathSchema.safeParse(path)
     if (!parsed.success) return
     shell.showItemInFolder(parsed.data)
   })
-  ipcMain.handle('app:relaunch', () => {
-    app.relaunch()
-    app.exit(0)
+  handleTrusted('app:relaunch', () => {
+    requestShutdown('relaunch', () => {
+      app.relaunch()
+      app.quit()
+    })
+  })
+  ipcMain.on('app:close-handler-ready', (event, ready: unknown) => {
+    if (!isTrustedSender(event) || typeof ready !== 'boolean') return
+    setCloseHandlerReady(event.sender, ready)
+  })
+  handleTrusted('app:complete-close', async (event, payload: unknown) => {
+    const result = z.object({ requestId: z.number().int().positive(), allow: z.boolean() }).safeParse(payload)
+    if (!result.success || event.senderFrame !== event.sender.mainFrame) return
+    await completeClose(event.sender, result.data.requestId, result.data.allow)
   })
 
-  ipcMain.handle('packs:list', (): Promise<PackSummary[]> => listPacks())
-  ipcMain.handle('packs:load', (_event, id: unknown): Promise<LoadPackResult> => {
+  handleTrusted('packs:list', (): Promise<PackSummary[]> => listPacks())
+  handleTrusted('packs:load', (_event, id: unknown): Promise<LoadPackResult> => {
     const parsed = z.string().min(1).max(64).safeParse(id)
     if (!parsed.success) {
       return Promise.resolve({ ok: false, error: '数据包 ID 不合法' })
@@ -195,8 +208,8 @@ export function registerIpc(): void {
     return loadPack(parsed.data)
   })
 
-  ipcMain.handle('settings:get', () => readSettings())
-  ipcMain.handle('settings:update', async (_event, patch: unknown): Promise<UserSettings> => {
+  handleTrusted('settings:get', () => readSettings())
+  handleTrusted('settings:update', async (_event, patch: unknown): Promise<UserSettings> => {
     const parsed = settingsPatchSchema.safeParse(patch)
     if (!parsed.success) throw new Error('设置格式不正确')
     const next = await updateSettings(parsed.data)
@@ -204,7 +217,7 @@ export function registerIpc(): void {
     return next
   })
 
-  ipcMain.handle('project:open', async (): Promise<OpenProjectResult | null> => {
+  handleTrusted('project:open', async (): Promise<OpenProjectResult | null> => {
     const opts = {
       title: '打开项目',
       properties: ['openFile' as const],
@@ -221,7 +234,7 @@ export function registerIpc(): void {
     return { path, name: project.name, content: project.content }
   })
 
-  ipcMain.handle('project:open-path', async (_event, path: unknown): Promise<OpenProjectResult | null> => {
+  handleTrusted('project:open-path', async (_event, path: unknown): Promise<OpenProjectResult | null> => {
     const parsed = pathSchema.safeParse(path)
     if (!parsed.success) throw new Error('路径不合法')
     const project = await readProjectFile(parsed.data)
@@ -229,7 +242,7 @@ export function registerIpc(): void {
     return { path: parsed.data, name: project.name, content: project.content }
   })
 
-  ipcMain.handle('project:save', async (_event, payload: unknown): Promise<SaveProjectResult> => {
+  handleTrusted('project:save', async (_event, payload: unknown): Promise<SaveProjectResult> => {
     const parsed = saveSchema.safeParse(payload)
     if (!parsed.success) throw new Error('项目内容无效或超过大小限制')
     let path = parsed.data.path ?? null
@@ -254,13 +267,13 @@ export function registerIpc(): void {
       if (result.canceled || !result.filePath) return null
       path = result.filePath
     }
-    await writeProjectFile(path, parsed.data.content)
+    path = await writeProjectFile(path, parsed.data.content)
     const name = projectNameFromPath(path)
     await addRecentProject(path, name)
     return { path, name }
   })
 
-  ipcMain.handle('project:save-as', async (_event, payload: unknown): Promise<SaveProjectResult> => {
+  handleTrusted('project:save-as', async (_event, payload: unknown): Promise<SaveProjectResult> => {
     const parsed = saveSchema.safeParse(payload)
     if (!parsed.success) throw new Error('项目内容无效或超过大小限制')
     const fallbackName = (parsed.data.suggestedName?.trim() || '未命名项目').replace(
@@ -277,31 +290,31 @@ export function registerIpc(): void {
       ? await dialog.showSaveDialog(window, opts)
       : await dialog.showSaveDialog(opts)
     if (result.canceled || !result.filePath) return null
-    await writeProjectFile(result.filePath, parsed.data.content)
-    const name = projectNameFromPath(result.filePath)
-    await addRecentProject(result.filePath, name)
-    return { path: result.filePath, name }
+    const path = await writeProjectFile(result.filePath, parsed.data.content)
+    const name = projectNameFromPath(path)
+    await addRecentProject(path, name)
+    return { path, name }
   })
 
-  ipcMain.handle('project:autosave', async (_event, content: unknown): Promise<void> => {
+  handleTrusted('project:autosave', async (_event, content: unknown): Promise<void> => {
     const parsed = contentSchema.safeParse(content)
-    if (!parsed.success) return
+    if (!parsed.success) throw new Error('自动保存内容无效或超过大小限制')
     await writeAutosave(parsed.data)
   })
 
-  ipcMain.handle('project:get-autosave', async (): Promise<AutosaveResult | null> => {
+  handleTrusted('project:get-autosave', async (): Promise<AutosaveResult | null> => {
     return readAutosave()
   })
 
-  ipcMain.handle('project:clear-autosave', () => clearAutosave())
+  handleTrusted('project:clear-autosave', () => clearAutosave())
 
-  ipcMain.handle('clipboard:write', (_event, text: unknown) => {
+  handleTrusted('clipboard:write', (_event, text: unknown) => {
     const parsed = z.string().max(100_000).safeParse(text)
     if (!parsed.success) throw new Error('复制内容无效')
     clipboard.writeText(parsed.data)
   })
 
-  ipcMain.handle('datapack:export', async (_event, payload: unknown): Promise<DatapackExportResult | null> => {
+  handleTrusted('datapack:export', async (_event, payload: unknown): Promise<DatapackExportResult | null> => {
     const parsed = datapackSchema.safeParse(payload)
     if (!parsed.success) throw new Error('数据包参数不正确')
     const { files, functionIds } = buildDatapackFiles(parsed.data)
@@ -342,16 +355,16 @@ export function registerIpc(): void {
     }
   })
 
-  ipcMain.handle('updater:get-state', (): UpdateState => getUpdateState())
-  ipcMain.handle('updater:check', (_event, manual: unknown) => {
+  handleTrusted('updater:get-state', (): UpdateState => getUpdateState())
+  handleTrusted('updater:check', (_event, manual: unknown) => {
     return checkForUpdates(Boolean(manual))
   })
-  ipcMain.handle('updater:download', () => downloadUpdate())
-  ipcMain.handle('updater:install', () => installUpdate())
-  ipcMain.handle('updater:skip', async (_event, version: unknown) => {
+  handleTrusted('updater:download', () => downloadUpdate())
+  handleTrusted('updater:install', () => installUpdate())
+  handleTrusted('updater:skip', async (_event, version: unknown) => {
     const parsed = z.string().min(1).max(64).safeParse(version)
     if (!parsed.success) throw new Error('版本号不合法')
     return skipVersion(parsed.data)
   })
-  ipcMain.handle('updater:clear-skip', () => clearSkippedVersion())
+  handleTrusted('updater:clear-skip', () => clearSkippedVersion())
 }

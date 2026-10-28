@@ -1,3 +1,4 @@
+import { useShallow } from 'zustand/react/shallow'
 import { useEffect, useMemo, useState } from 'react'
 import { Settings2, ShieldCheck } from 'lucide-react'
 import { COMMAND_MAP } from '@mcstudio/content'
@@ -9,7 +10,11 @@ const meta = COMMAND_MAP.get('gamerule')
 const allRules = rulesJson as GameruleRule[]
 
 export function GameruleForm() {
-  const state = useAppStore()
+  const state = useAppStore(useShallow((state) => ({
+    gamerule: state.gamerule,
+    pack: state.pack,
+    updateGamerule: state.updateGamerule
+  })))
   const gamerule = state.gamerule
   const [pickerOpen, setPickerOpen] = useState(false)
   const rules = useMemo(() => {

@@ -4,8 +4,9 @@
   "gameVersion": "1.21",
   "dataVersion": 3953,
   "packFormat": 48,
+  "engine": "components",
   "type": "release",
-  "generatedAt": "2026-10-27T13:47:58.412Z",
+  "generatedAt": "2026-10-26T17:45:52.091Z",
   "sources": [
     {
       "name": "alias",
@@ -19,6 +20,12 @@
     "blocks": "blocks.json",
     "itemComponents": "item-components.json"
   },
+  "fileHashes": {
+    "commands": "4cd7e82c202df03be71eab9760351060a3245df0889005d79a935725ca81a884",
+    "registries": "e2b1d4d13681186b23e47975158f184901562c5a52923f5873b4a4472dff6b34",
+    "blocks": "fdfbbedc575b89b0116f33daf3ad69afa4698ff38770692433bf639317a6fcf0",
+    "itemComponents": "29ab202a034b656a9b0ddc5782961773fac3dbb31dc0174f79b86ff5a7de92d1"
+  },
   "counts": {
     "roots": 83,
     "literals": 816,
@@ -28,6 +35,5 @@
     "enchantments": 42,
     "entities": 130
   },
-  "engine": "components",
   "aliasOf": "1.21.1"
 }

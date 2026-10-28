@@ -34,4 +34,33 @@ describe('give command', () => {
     })
     expect(result.diagnostics.some((item) => item.code === 'give.target')).toBe(true)
   })
+
+  it('preserves whitespace inside names, selectors and raw data', () => {
+    const result = buildGiveCommand({
+      target: { base: '@a', name: 'A  B' },
+      item: {
+        id: 'diamond_sword',
+        components: [
+          { kind: 'custom_name', text: 'A  B', italic: false },
+          { kind: 'custom_data', raw: '{note:"C  D"}' }
+        ]
+      },
+      count: 1
+    })
+    expect(result.text).toContain('@a[name="A  B"]')
+    expect(result.text).toContain('text:"A  B"')
+    expect(result.text).toContain('note:"C  D"')
+    expect(result.diagnostics).toEqual([])
+  })
+
+  it('passes the target version to item serialization', () => {
+    const options = createDefaultGiveOptions()
+    options.item.components = [{ kind: 'enchantments', entries: [{ id: 'sharpness', level: 5 }] }]
+    expect(buildGiveCommand(options, '1.21.1').text).toBe(
+      'give @s minecraft:diamond_sword[enchantments={levels:{sharpness:5}}]'
+    )
+    expect(buildGiveCommand(options, '1.21.5').text).toBe(
+      'give @s minecraft:diamond_sword[enchantments={sharpness:5}]'
+    )
+  })
 })

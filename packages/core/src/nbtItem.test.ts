@@ -23,6 +23,8 @@ describe('nbt give', () => {
     expect(result.text).toContain('Lore:[')
     expect(result.text).toContain('Enchantments:[{id:"minecraft:sharpness",lvl:5}')
     expect(result.text).toContain('Unbreakable:1b')
+    expect(result.text).toMatch(/^give @s minecraft:diamond_sword\{display:/)
+    expect(result.text).toMatch(/Unbreakable:1b\} 1$/)
   })
 
   it('validates item, count, lore and enchantments', () => {

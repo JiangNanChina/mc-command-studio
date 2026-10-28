@@ -1,3 +1,4 @@
+import { useShallow } from 'zustand/react/shallow'
 import {
   Database,
   FileText,
@@ -34,7 +35,20 @@ function updateStatusText(status: string, version?: string, percent?: number): s
 }
 
 export function SettingsDialog() {
-  const state = useAppStore()
+  const state = useAppStore(useShallow((state) => ({
+    settings: state.settings,
+    appInfo: state.appInfo,
+    update: state.update,
+    showToast: state.showToast,
+    setDialog: state.setDialog,
+    setTheme: state.setTheme,
+    updateSettings: state.updateSettings,
+    checkForUpdates: state.checkForUpdates,
+    installUpdate: state.installUpdate,
+    openAnnouncement: state.openAnnouncement,
+    pack: state.pack,
+    openProjectPath: state.openProjectPath
+  })))
   const settings = state.settings
   const appInfo = state.appInfo
   const update = state.update

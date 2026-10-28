@@ -1,3 +1,4 @@
+import { useShallow } from 'zustand/react/shallow'
 import { useMemo, useState } from 'react'
 import { Clock, FlaskConical, Sparkles, Users } from 'lucide-react'
 import { COMMAND_MAP } from '@mcstudio/content'
@@ -18,7 +19,11 @@ const QUICK_EFFECTS = [
 ]
 
 export function EffectForm() {
-  const state = useAppStore()
+  const state = useAppStore(useShallow((state) => ({
+    effect: state.effect,
+    pack: state.pack,
+    updateEffect: state.updateEffect
+  })))
   const effect = state.effect
   const [pickerOpen, setPickerOpen] = useState(false)
   const effects = useMemo(() => {

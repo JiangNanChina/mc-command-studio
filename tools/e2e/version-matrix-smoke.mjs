@@ -71,5 +71,6 @@ for (const [version, roots] of CASES) {
   console.log(`✓ ${version} ${roots}`)
 }
 
+await app.evaluate(({ app: electronApp }) => electronApp.exit(0)).catch(() => undefined)
 await app.close()
 console.log(`✓ 版本矩阵冒烟通过（${CASES.length} 个版本）`)

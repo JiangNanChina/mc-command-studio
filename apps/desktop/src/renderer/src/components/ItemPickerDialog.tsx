@@ -1,3 +1,4 @@
+import { useShallow } from 'zustand/react/shallow'
 import { useMemo, useState } from 'react'
 import { Package, Search } from 'lucide-react'
 import { getApi } from '../lib/api'
@@ -15,7 +16,13 @@ interface ItemPickerDialogProps {
 }
 
 export function ItemPickerDialog({ onSelect, currentId, onClose }: ItemPickerDialogProps = {}) {
-  const state = useAppStore()
+  const state = useAppStore(useShallow((state) => ({
+    pack: state.pack,
+    setDialog: state.setDialog,
+    setItemId: state.setItemId,
+    give: state.give,
+    showToast: state.showToast
+  })))
   const [query, setQuery] = useState('')
   const [manual, setManual] = useState('')
   const allItems = state.pack?.registries.item ?? []

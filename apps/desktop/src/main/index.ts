@@ -14,6 +14,8 @@ import { registerIpc } from './ipc'
 import { buildMenu } from './menu'
 import { readSettings, logsPath } from './storage'
 import { initUpdater } from './updater'
+import { registerCloseWindow } from './lifecycle'
+import { isTrustedRendererUrl } from './trustedIpc'
 
 if (process.env.MCSTUDIO_USER_DATA) {
   const dir = resolve(process.env.MCSTUDIO_USER_DATA)
@@ -71,6 +73,7 @@ function registerAppProtocol(): void {
   protocol.handle('app', async (request) => {
     try {
       const url = new URL(request.url)
+      if (url.hostname !== 'bundle') return new Response('Forbidden', { status: 403 })
       let pathname = decodeURIComponent(url.pathname)
       if (!pathname || pathname === '/') pathname = '/index.html'
       const filePath = normalize(join(rendererRoot, pathname))
@@ -116,6 +119,8 @@ function createWindow(): BrowserWindow {
     }
   })
 
+  registerCloseWindow(window)
+
   window.once('ready-to-show', () => {
     window.show()
   })
@@ -128,9 +133,7 @@ function createWindow(): BrowserWindow {
   })
 
   window.webContents.on('will-navigate', (event, url) => {
-    const devUrl = process.env.ELECTRON_RENDERER_URL
-    if (devUrl && url.startsWith(devUrl)) return
-    if (url.startsWith('app://')) return
+    if (isTrustedRendererUrl(url)) return
     event.preventDefault()
     if (/^https?:\/\//i.test(url)) void shell.openExternal(url)
   })
@@ -142,7 +145,7 @@ function createWindow(): BrowserWindow {
     }
   })
 
-  const devUrl = process.env.ELECTRON_RENDERER_URL
+  const devUrl = !app.isPackaged && process.env.ELECTRON_RENDERER_URL
   if (devUrl) {
     void window.loadURL(devUrl)
   } else {

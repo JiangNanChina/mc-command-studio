@@ -1,51 +1,7 @@
-import {
-  buildCommandBlockSetblock,
-  hasErrors,
-  type BuildResult,
-  type BossbarOptions,
-  type ChainOptions,
-  type CloneOptions,
-  type CommandBlockOptions,
-  type Diagnostic,
-  type EffectOptions,
-  type EnchantOptions,
-  type ExecuteOptions,
-  type FillOptions,
-  type GiveOptions,
-  type NbtGiveOptions,
-  type GamemodeOptions,
-  type DamageOptions,
-  type RotateOptions,
-  type SpreadplayersOptions,
-  type RideOptions,
-  type RandomOptions,
-  type TickOptions,
-  type SocialOptions,
-  type SetblockOptions,
-  type ScoreboardOptions,
-  type ParticleOptions,
-  type WorldOptions,
-  type TagOptions,
-  type ClearOptions,
-  type GameruleOptions,
-  type WorldborderOptions,
-  type TeamOptions,
-  type SpawnpointOptions,
-  type WorldSpawnOptions,
-  type ForceloadOptions,
-  type AttributeOptions,
-  type ItemOptions,
-  type DataOptions,
-  type LootOptions,
-  type SoundOptions,
-  type SummonOptions,
-  type TeleportOptions,
-  type TellrawOptions,
-  type TitleOptions,
-  type VersionPack,
-  type XpOptions
-} from '@mcstudio/core'
-import type { AutomationOptions } from '../store'
+import { buildCommandBlockSetblock, error, hasErrors, type BuildResult, type Diagnostic, type VersionPack } from '@mcstudio/core'
+import type { ProjectPayload } from '../store/model'
+import { buildQuickCommand, isNbtQuickSafe, isQuickCommand } from './quickCommands'
+import { supportsLegacyForm } from './packCompat'
 import {
   selectNbtGiveOutput,
   selectGamemodeOutput,
@@ -91,10 +47,13 @@ import {
   selectTellrawOutput,
   selectTeleportOutput,
   selectTitleOutput,
-  selectXpOutput,
-  type GenericDraft,
-  type OutputMode
-} from '../store'
+  selectXpOutput
+} from '../store/selectors'
+
+
+export interface CommandOutputState extends ProjectPayload {
+  pack: VersionPack | null
+}
 
 export interface CurrentOutput {
   command: BuildResult
@@ -103,56 +62,30 @@ export interface CurrentOutput {
   hasErrors: boolean
 }
 
-export function getCommandOutput(
-  pack: VersionPack | null,
-  activeCommandId: string | null,
-  give: GiveOptions,
-  nbtGive: NbtGiveOptions,
-  gamemode: GamemodeOptions,
-  damage: DamageOptions,
-  rotate: RotateOptions,
-  spreadplayers: SpreadplayersOptions,
-  ride: RideOptions,
-  random: RandomOptions,
-  tick: TickOptions,
-  social: SocialOptions,
-  summon: SummonOptions,
-  setblock: SetblockOptions,
-  execute: ExecuteOptions,
-  teleport: TeleportOptions,
-  effect: EffectOptions,
-  fill: FillOptions,
-  clone: CloneOptions,
-  chain: ChainOptions,
-  enchant: EnchantOptions,
-  xp: XpOptions,
-  tellraw: TellrawOptions,
-  title: TitleOptions,
-  sound: SoundOptions,
-  bossbar: BossbarOptions,
-  scoreboard: ScoreboardOptions,
-  particle: ParticleOptions,
-  world: WorldOptions,
-  tag: TagOptions,
-  clear: ClearOptions,
-  gamerule: GameruleOptions,
-  worldborder: WorldborderOptions,
-  team: TeamOptions,
-  spawnpoint: SpawnpointOptions,
-  worldSpawn: WorldSpawnOptions,
-  forceload: ForceloadOptions,
-  attribute: AttributeOptions,
-  automation: AutomationOptions,
-  itemCommand: ItemOptions,
-  dataCommand: DataOptions,
-  loot: LootOptions,
-  generic: GenericDraft
-): BuildResult {
-  if (!activeCommandId) return { text: '', diagnostics: [] }
+function usesNbtQuickForm(state: CommandOutputState): boolean {
+  return state.pack?.manifest.engine !== 'components' &&
+    state.pack?.manifest.engine !== 'legacy' && isNbtQuickSafe(state.activeCommandId)
+}
+
+function usesGenericForm(state: CommandOutputState): boolean {
+  if (state.activeCommandId === 'chain') return false
+  return state.pack?.manifest.engine !== 'components' &&
+    (state.pack?.manifest.engine === 'legacy' || !supportsLegacyForm(state.activeCommandId ?? ''))
+}
+
+/** 所有预览、状态栏与复制入口使用相同的文档和版本路由。 */
+export function getCommandOutput(state: CommandOutputState): BuildResult {
+  const { pack, activeCommandId, give, nbtGive, gamemode, damage, rotate, spreadplayers, ride, random, tick, social, summon, setblock, execute, teleport, effect, fill, clone, chain, enchant, xp, tellraw, title, sound, bossbar, scoreboard, particle, world, tag, clear, gamerule, worldborder, team, spawnpoint, worldSpawn, forceload, attribute, automation, itemCommand, dataCommand, loot, generic } = state
+  if (!activeCommandId || ['datapack', 'ooc', 'legacy-tools'].includes(activeCommandId)) return { text: '', diagnostics: [] }
+  if (activeCommandId !== 'chain' && !pack?.commands.children?.[activeCommandId]) {
+    return { text: '', diagnostics: [error('command.unsupported', '当前版本不支持此命令', 'command')] }
+  }
+  if (usesNbtQuickForm(state)) return buildQuickCommand(pack, activeCommandId, state.quickDrafts[activeCommandId])
+  if (usesGenericForm(state)) return selectGenericOutput(pack, { ...generic, root: generic.root ?? activeCommandId })
   if (activeCommandId === 'give') {
     return pack?.manifest.engine === 'nbt'
       ? selectNbtGiveOutput(nbtGive)
-      : selectGiveOutput(give)
+      : selectGiveOutput(give, pack?.manifest.gameVersion)
   }
   if (activeCommandId === 'gamemode') return selectGamemodeOutput(gamemode)
   if (activeCommandId === 'damage') return selectDamageOutput(damage)
@@ -218,117 +151,49 @@ export function getCommandOutput(
   if (activeCommandId === 'playsound' || activeCommandId === 'stopsound') {
     return selectSoundOutput(sound)
   }
+  if (isQuickCommand(activeCommandId)) return buildQuickCommand(pack, activeCommandId, state.quickDrafts[activeCommandId])
   if (!pack) return { text: '', diagnostics: [] }
   return selectGenericOutput(pack, { ...generic, root: generic.root ?? activeCommandId })
 }
 
-export function getCurrentOutput(
-  pack: VersionPack | null,
-  activeCommandId: string | null,
-  give: GiveOptions,
-  nbtGive: NbtGiveOptions,
-  gamemode: GamemodeOptions,
-  damage: DamageOptions,
-  rotate: RotateOptions,
-  spreadplayers: SpreadplayersOptions,
-  ride: RideOptions,
-  random: RandomOptions,
-  tick: TickOptions,
-  social: SocialOptions,
-  summon: SummonOptions,
-  setblock: SetblockOptions,
-  execute: ExecuteOptions,
-  teleport: TeleportOptions,
-  effect: EffectOptions,
-  fill: FillOptions,
-  clone: CloneOptions,
-  chain: ChainOptions,
-  enchant: EnchantOptions,
-  xp: XpOptions,
-  tellraw: TellrawOptions,
-  title: TitleOptions,
-  sound: SoundOptions,
-  bossbar: BossbarOptions,
-  scoreboard: ScoreboardOptions,
-  particle: ParticleOptions,
-  world: WorldOptions,
-  tag: TagOptions,
-  clear: ClearOptions,
-  gamerule: GameruleOptions,
-  worldborder: WorldborderOptions,
-  team: TeamOptions,
-  spawnpoint: SpawnpointOptions,
-  worldSpawn: WorldSpawnOptions,
-  forceload: ForceloadOptions,
-  attribute: AttributeOptions,
-  automation: AutomationOptions,
-  itemCommand: ItemOptions,
-  dataCommand: DataOptions,
-  loot: LootOptions,
-  generic: GenericDraft,
-  outputMode: OutputMode,
-  commandBlock: CommandBlockOptions
-): CurrentOutput {
-  const command = getCommandOutput(
-    pack,
-    activeCommandId,
-    give,
-    nbtGive,
-    gamemode,
-    damage,
-    rotate,
-    spreadplayers,
-    ride,
-    random,
-    tick,
-    social,
-    summon,
-    setblock,
-    execute,
-    teleport,
-    effect,
-    fill,
-    clone,
-    chain,
-    enchant,
-    xp,
-    tellraw,
-    title,
-    sound,
-    bossbar,
-    scoreboard,
-    particle,
-    world,
-    tag,
-    clear,
-    gamerule,
-    worldborder,
-    team,
-    spawnpoint,
-    worldSpawn,
-    forceload,
-    attribute,
-    automation,
-    itemCommand,
-    dataCommand,
-    loot,
-    generic
-  )
-  if (outputMode === 'command') {
-    return {
-      command,
-      text: command.text,
-      diagnostics: command.diagnostics,
-      hasErrors: hasErrors(command.diagnostics)
-    }
+export function getCurrentOutput(state: CommandOutputState): CurrentOutput {
+  const command = getCommandOutput(state)
+  if (state.outputMode === 'command') {
+    return { command, text: command.text, diagnostics: command.diagnostics, hasErrors: hasErrors(command.diagnostics) }
   }
-
-  const commandBlockResult = buildCommandBlockSetblock(command.text, commandBlock)
+  const commandBlockResult = buildCommandBlockSetblock(command.text, state.commandBlock)
   const diagnostics = [...command.diagnostics, ...commandBlockResult.diagnostics]
-  return {
-    command,
-    text: commandBlockResult.text,
-    diagnostics,
-    hasErrors: hasErrors(diagnostics)
+  return { command, text: commandBlockResult.text, diagnostics, hasErrors: hasErrors(diagnostics) }
+}
+
+const DRAFT_KEYS: Partial<Record<string, keyof ProjectPayload>> = {
+  tp: 'teleport', playsound: 'sound', stopsound: 'sound', time: 'world', weather: 'world', difficulty: 'world',
+  setworldspawn: 'worldSpawn', advancement: 'automation', function: 'automation', schedule: 'automation',
+  item: 'itemCommand', data: 'dataCommand', say: 'social', msg: 'social', kill: 'social', list: 'social',
+  seed: 'social', me: 'social', kick: 'social', op: 'social', deop: 'social'
+}
+
+const QUICK_WITH_SPECIALIZED_FORM = new Set(['kill', 'kick', 'op', 'deop', 'say', 'me', 'msg', 'list', 'seed'])
+
+/** 只在当前命令的草稿或输出设置改变时重新构建，界面事件不触发整套输出计算。 */
+export function createCurrentOutputSelector(): (state: CommandOutputState) => CurrentOutput {
+  let previousInputs: unknown[] = []
+  let previousOutput: CurrentOutput | undefined
+  return (state) => {
+    const id = state.activeCommandId ?? ''
+    let draft: unknown
+    if (usesNbtQuickForm(state)) draft = state.quickDrafts[id]
+    else if (usesGenericForm(state)) draft = state.generic
+    else if (isQuickCommand(id) && !QUICK_WITH_SPECIALIZED_FORM.has(id)) draft = state.quickDrafts[id]
+    else if (id === 'give') draft = state.pack?.manifest.engine === 'nbt' ? state.nbtGive : state.give
+    else if (Object.hasOwn(DRAFT_KEYS, id)) draft = state[DRAFT_KEYS[id]!]
+    else if (Object.hasOwn(state, id)) draft = state[id as keyof ProjectPayload]
+    else if (isQuickCommand(id)) draft = state.quickDrafts[id]
+    else draft = state.generic
+    const inputs = [state.pack, id, draft, state.outputMode, state.commandBlock]
+    if (previousOutput && inputs.every((value, index) => Object.is(value, previousInputs[index]))) return previousOutput
+    previousInputs = inputs
+    previousOutput = getCurrentOutput(state)
+    return previousOutput
   }
 }

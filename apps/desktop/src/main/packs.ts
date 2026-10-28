@@ -1,12 +1,15 @@
 import { app } from 'electron'
+import { createHash } from 'node:crypto'
 import { readdir, readFile, stat } from 'node:fs/promises'
-import { join, resolve } from 'node:path'
-import type {
-  BlockStates,
-  CommandTree,
-  ItemComponentDefaults,
-  PackManifest,
-  Registries
+import { basename, join, resolve } from 'node:path'
+import {
+  PACK_FILE_KEYS,
+  assertPackCounts,
+  assertPackFileHashes,
+  createVersionPack,
+  parsePackIndex,
+  parsePackManifest,
+  type PackFileKey
 } from '@mcstudio/core'
 import type { LoadPackResult, PackSummary } from '../shared/types'
 
@@ -21,18 +24,26 @@ export function packsDir(): string {
 }
 
 function isSafeId(id: string): boolean {
-  return /^[0-9A-Za-z._-]+$/.test(id)
+  return /^[0-9A-Za-z._-]+$/.test(id) && id !== '.' && id !== '..'
 }
 
-async function readJson<T>(path: string): Promise<T> {
-  return JSON.parse(await readFile(path, 'utf8')) as T
+async function readJson(path: string): Promise<unknown> {
+  const content = await readFile(path, 'utf8')
+  try {
+    return JSON.parse(content)
+  } catch (error) {
+    throw new Error(`${basename(path)}: JSON 格式错误：${(error as Error).message}`)
+  }
 }
 
 export async function listPacks(): Promise<PackSummary[]> {
   const dir = packsDir()
-  const index = await readJson<{ packs?: PackSummary[] }>(join(dir, 'index.json')).catch(() => null)
-  if (index?.packs?.length) {
-    return index.packs
+  const index = await readJson(join(dir, 'index.json')).catch((error: NodeJS.ErrnoException) => {
+    if (error.code === 'ENOENT') return null
+    throw error
+  })
+  if (index) {
+    return parsePackIndex(index).packs
   }
 
   // 索引缺失时扫描目录，便于手动放入数据包
@@ -41,15 +52,17 @@ export async function listPacks(): Promise<PackSummary[]> {
   for (const entry of entries) {
     if (!entry.isDirectory()) continue
     const manifestPath = join(dir, entry.name, 'manifest.json')
-    const manifest = await readJson<PackManifest>(manifestPath).catch(() => null)
+    const manifest = await readJson(manifestPath).then(parsePackManifest).catch(() => null)
     if (!manifest) continue
     packs.push({
       id: manifest.id,
       gameVersion: manifest.gameVersion,
       dataVersion: manifest.dataVersion,
       packFormat: manifest.packFormat,
+      engine: manifest.engine,
       type: manifest.type,
-      builtAt: manifest.generatedAt
+      builtAt: manifest.generatedAt,
+      ...(manifest.aliasOf ? { aliasOf: manifest.aliasOf } : {})
     })
   }
   return packs
@@ -73,43 +86,41 @@ export async function loadPack(id: string): Promise<LoadPackResult> {
   }
 
   try {
-    const manifest = await readJson<PackManifest>(manifestPath)
+    const manifest = parsePackManifest(await readJson(manifestPath))
+    if (manifest.id !== id) throw new Error('manifest.json: id 与目录名不一致')
     let sourceDir = dir
+    let sourceManifest = manifest
     if (manifest.aliasOf) {
-      if (!isSafeId(manifest.aliasOf)) {
-        throw new Error(`别名目标不合法：${manifest.aliasOf}`)
-      }
+      if (manifest.aliasOf === id) throw new Error('manifest.json: 别名不能指向自身')
       sourceDir = join(packsDir(), manifest.aliasOf)
-      const baseManifest = await readJson<PackManifest>(join(sourceDir, 'manifest.json'))
-      if (baseManifest.aliasOf) throw new Error('数据包别名不能指向另一个别名')
+      sourceManifest = parsePackManifest(await readJson(join(sourceDir, 'manifest.json')))
+      if (sourceManifest.id !== manifest.aliasOf) throw new Error('manifest.json: 别名目标 ID 不一致')
+      if (sourceManifest.aliasOf) throw new Error('manifest.json: 别名不能指向另一个别名')
+      if (sourceManifest.engine !== manifest.engine) throw new Error('manifest.json: 别名引擎与基础包不一致')
     }
-    const [commands, registries, blocks, itemComponents] = await Promise.all([
-      readJson<CommandTree>(join(sourceDir, 'commands.json')),
-      readJson<Registries>(join(sourceDir, 'registries.json')),
-      readJson<BlockStates>(join(sourceDir, 'blocks.json')),
-      readJson<ItemComponentDefaults>(join(sourceDir, 'item-components.json'))
-    ])
-    if (!commands?.children) throw new Error('commands.json 缺少根节点')
-    if (!registries || typeof registries !== 'object') throw new Error('registries.json 格式不正确')
-    if (!blocks || typeof blocks !== 'object') throw new Error('blocks.json 格式不正确')
-    if (!itemComponents || typeof itemComponents !== 'object') {
-      throw new Error('item-components.json 格式不正确')
-    }
-    return {
-      ok: true,
-      pack: {
-        manifest,
-        commands,
-        registries,
-        blocks: blocks as BlockStates,
-        itemComponents
+    const payload = {} as Record<PackFileKey, unknown>
+    const hashes: Record<string, string> = {}
+    await Promise.all(PACK_FILE_KEYS.map(async (key) => {
+      const file = sourceManifest.files[key]
+      const buffer = await readFile(join(sourceDir, file))
+      hashes[key] = createHash('sha256').update(buffer).digest('hex')
+      try {
+        payload[key] = JSON.parse(buffer.toString('utf8'))
+      } catch (error) {
+        throw new Error(`${file}: JSON 格式错误：${(error as Error).message}`)
       }
-    }
+    }))
+    assertPackFileHashes(sourceManifest, hashes)
+    assertPackFileHashes(manifest, hashes, manifest.aliasOf ? sourceManifest : undefined)
+    const pack = createVersionPack({ manifest, ...payload })
+    assertPackCounts(pack)
+    if (manifest.aliasOf) assertPackCounts({ ...pack, manifest: sourceManifest })
+    return { ok: true, pack }
   } catch (error) {
     return {
       ok: false,
       error: `数据包 ${id} 读取失败：${(error as Error).message}`,
-      hint: '可尝试删除 packs 目录后重新运行 pnpm data:build。',
+      hint: '请重新构建损坏的数据包；开发环境的历史数据包可显式运行 node tools/pipeline/migrate-pack-metadata.mjs。',
       packDir: dir
     }
   }

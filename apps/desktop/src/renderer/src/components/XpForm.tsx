@@ -1,3 +1,4 @@
+import { useShallow } from 'zustand/react/shallow'
 import { Coins, TrendingUp, Users } from 'lucide-react'
 import { COMMAND_MAP } from '@mcstudio/content'
 import type { XpAction, XpUnit } from '@mcstudio/core'
@@ -7,7 +8,10 @@ import { useAppStore } from '../store'
 const meta = COMMAND_MAP.get('xp')
 
 export function XpForm() {
-  const state = useAppStore()
+  const state = useAppStore(useShallow((state) => ({
+    xp: state.xp,
+    updateXp: state.updateXp
+  })))
   const xp = state.xp
   const query = xp.action === 'query'
 

@@ -1,3 +1,4 @@
+import { useShallow } from 'zustand/react/shallow'
 import { Gift, Sparkles } from 'lucide-react'
 import { type LootAction } from '@mcstudio/core'
 import { COMMAND_MAP } from '@mcstudio/content'
@@ -25,7 +26,12 @@ const COMMON_LOOT_TABLES = [
 ]
 
 export function LootForm() {
-  const state = useAppStore()
+  const state = useAppStore(useShallow((state) => ({
+    loot: state.loot,
+    pack: state.pack,
+    datapack: state.datapack,
+    updateLoot: state.updateLoot
+  })))
   const loot = state.loot
   const nbtEngine = state.pack?.manifest.engine === 'nbt'
   const dataLootTables = state.datapack.dataFiles

@@ -1,3 +1,4 @@
+import { useShallow } from 'zustand/react/shallow'
 import { Clock, MonitorPlay, Users } from 'lucide-react'
 import { COMMAND_MAP } from '@mcstudio/content'
 import type { TitleAction } from '@mcstudio/core'
@@ -14,7 +15,10 @@ const ACTIONS: { value: TitleAction; label: string }[] = [
 ]
 
 export function TitleForm() {
-  const state = useAppStore()
+  const state = useAppStore(useShallow((state) => ({
+    title: state.title,
+    updateTitle: state.updateTitle
+  })))
   const title = state.title
 
   return (

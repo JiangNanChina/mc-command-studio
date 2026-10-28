@@ -1,3 +1,4 @@
+import { useShallow } from 'zustand/react/shallow'
 import { useState } from 'react'
 import {
   Bell,
@@ -19,7 +20,27 @@ import { TemplateDialog } from './TemplateDialog'
 import { VersionSelect } from './VersionSelect'
 
 export function Header() {
-  const state = useAppStore()
+  const state = useAppStore(useShallow((state) => ({
+    booted: state.booted,
+    appInfo: state.appInfo,
+    settings: state.settings,
+    projectName: state.projectName,
+    setProjectName: state.setProjectName,
+    dirty: state.dirty,
+    pack: state.pack,
+    newProject: state.newProject,
+    openProject: state.openProject,
+    canUndo: state.historyPast.length > 0,
+    undo: state.undo,
+    canRedo: state.historyFuture.length > 0,
+    redo: state.redo,
+    saveProject: state.saveProject,
+    openAnnouncement: state.openAnnouncement,
+    setTheme: state.setTheme,
+    checkForUpdates: state.checkForUpdates,
+    updateStatus: state.update.status,
+    setDialog: state.setDialog
+  })))
   const loading = !state.booted
   const [templatesOpen, setTemplatesOpen] = useState(false)
   const announcementUnread = Boolean(
@@ -79,7 +100,7 @@ export function Header() {
           className="icon-btn"
           title="撤销 (Ctrl+Z)"
           aria-label="撤销"
-          disabled={state.historyPast.length === 0}
+          disabled={!state.canUndo}
           onClick={() => state.undo()}
         >
           <Undo2 size={17} />
@@ -89,7 +110,7 @@ export function Header() {
           className="icon-btn"
           title="重做 (Ctrl+Shift+Z / Ctrl+Y)"
           aria-label="重做"
-          disabled={state.historyFuture.length === 0}
+          disabled={!state.canRedo}
           onClick={() => state.redo()}
         >
           <Redo2 size={17} />
@@ -122,7 +143,7 @@ export function Header() {
           title="检查更新"
           onClick={() => state.checkForUpdates(true)}
         >
-          {state.update.status === 'checking' ? <RotateCcw size={17} className="spin" /> : <Sparkles size={17} />}
+          {state.updateStatus === 'checking' ? <RotateCcw size={17} className="spin" /> : <Sparkles size={17} />}
         </button>
         <button
           type="button"

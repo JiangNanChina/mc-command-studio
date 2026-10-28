@@ -1,3 +1,4 @@
+import { useShallow } from 'zustand/react/shallow'
 import { useEffect, useState } from 'react'
 import { Boxes, Layers, Maximize2 } from 'lucide-react'
 import { COMMAND_MAP } from '@mcstudio/content'
@@ -23,7 +24,11 @@ const MODES: { value: FillMode; label: string }[] = [
 const QUICK_BLOCKS = ['minecraft:stone', 'minecraft:oak_planks', 'minecraft:glass', 'minecraft:dirt', 'minecraft:air']
 
 export function FillForm() {
-  const state = useAppStore()
+  const state = useAppStore(useShallow((state) => ({
+    fill: state.fill,
+    pack: state.pack,
+    updateFill: state.updateFill
+  })))
   const fill = state.fill
   const [pickerOpen, setPickerOpen] = useState(false)
   const supportsStrict = hasLiteral(state.pack, 'fill', 'strict')

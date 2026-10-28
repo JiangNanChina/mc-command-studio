@@ -6,7 +6,7 @@
   "packFormat": 4,
   "engine": "nbt",
   "type": "release",
-  "generatedAt": "2026-10-27T13:47:58.389Z",
+  "generatedAt": "2026-10-27T04:13:14.736Z",
   "sources": [
     {
       "name": "alias",
@@ -19,6 +19,12 @@
     "registries": "registries.json",
     "blocks": "blocks.json",
     "itemComponents": "item-components.json"
+  },
+  "fileHashes": {
+    "commands": "24a1fa47ad421b9b47b88572fe0cd446e46c3e8c2f5e8e1073321b6e162be623",
+    "registries": "1dbeb395cd8b97f26ae30cd1f7750cee2ecdf9adfb14d2826be95a296e705f0f",
+    "blocks": "c1400e921c674b3095f89203ff3fc45dbd771361d73bf9a495172abcd0f0b1ac",
+    "itemComponents": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356"
   },
   "counts": {
     "roots": 67,

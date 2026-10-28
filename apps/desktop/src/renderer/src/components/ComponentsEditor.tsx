@@ -2,6 +2,7 @@ import { Plus, Trash2, X } from 'lucide-react'
 import {
   RARITIES,
   TEXT_COLORS,
+  getVersionCapabilities,
   itemComponentLabel,
   type EnchantmentEntry,
   type ItemComponent,
@@ -30,6 +31,7 @@ const COLOR_LABELS: Record<string, string> = {
 interface ComponentsEditorProps {
   components: ItemComponent[]
   enchantments: string[]
+  gameVersion?: string
   onReplace: (index: number, component: ItemComponent) => void
   onRemove: (index: number) => void
 }
@@ -55,8 +57,9 @@ function ColorSelect({
   )
 }
 
-export function ComponentsEditor({ components, enchantments, onReplace, onRemove }: ComponentsEditorProps) {
+export function ComponentsEditor({ components, enchantments, gameVersion, onReplace, onRemove }: ComponentsEditorProps) {
   const enchantmentOptions = enchantments.map((id) => (id.includes(':') ? id : `minecraft:${id}`))
+  const integerModelData = getVersionCapabilities(gameVersion).customModelData === 'integer'
 
   return (
     <div>
@@ -487,16 +490,20 @@ export function ComponentsEditor({ components, enchantments, onReplace, onRemove
             <div className="component-body">
               <div className="field">
                 <label className="field-label" htmlFor="custom-model-data">
-                  SNBT 值
+                  {integerModelData ? '整数模型编号' : 'SNBT 值'}
                 </label>
                 <textarea
                   id="custom-model-data"
                   className="textarea"
-                  placeholder='例如 {strings:["my_pack:model"]}'
+                  placeholder={integerModelData ? '例如 123' : '例如 {strings:["my_pack:model"]}'}
                   value={component.raw}
                   onChange={(event) => onReplace(index, { ...component, raw: event.target.value })}
                 />
-                <div className="hint">直接写入 custom_model_data= 后面的内容，不做额外包装。</div>
+                <div className="hint">
+                  {integerModelData
+                    ? '当前版本使用整数模型编号，例如 123。'
+                    : '当前版本使用复合值，例如 {strings:["my_pack:model"]}。'}
+                </div>
               </div>
             </div>
           </div>

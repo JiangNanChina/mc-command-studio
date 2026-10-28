@@ -166,6 +166,10 @@ import type {
 import { DEFAULT_SETTINGS } from '../../shared/types'
 import { create } from 'zustand'
 import { immer } from 'zustand/middleware/immer'
+import { applyPatches, enablePatches, produceWithPatches, type Draft } from 'immer'
+import { documentPatches, type HistoryEntry } from './store/document'
+import { createProjectSlice } from './store/project'
+import { createSessionSlice } from './store/session'
 import { getApi } from './lib/api'
 import { applyPresetBundle, loadPresetBundle } from './lib/customPresets'
 import type {
@@ -201,14 +205,14 @@ export type {
   Toast
 } from './store/model'
 
-interface AppStore {
+export interface AppStore {
   booted: boolean
   bootError: string | null
   appInfo: AppInfo | null
   packs: PackSummary[]
   pack: VersionPack | null
   activePackId: string
-  quickCommand: string
+  quickDrafts: ProjectPayload['quickDrafts']
   settings: UserSettings
   update: UpdateState
   activeCommandId: string | null
@@ -264,15 +268,18 @@ interface AppStore {
   autosaveAvailable: boolean
   lastAutosaveAt: string | null
   announcementOpen: boolean
-  historyPast: string[]
-  historyFuture: string[]
+  documentRevision: number
+  projectSession: number
+  projectCreatedAt: string
+  historyPast: HistoryEntry[]
+  historyFuture: HistoryEntry[]
   dialogs: Record<DialogName, boolean>
   toast: Toast | null
 
   boot: () => Promise<void>
-  loadPack: (id: string) => Promise<void>
+  loadPack: (id: string) => Promise<boolean>
   selectCommand: (id: string | null) => void
-  setQuickCommand: (text: string) => void
+  setQuickValue: (commandId: string, key: string, value: string) => void
   setTarget: (target: Selector) => void
   setItemId: (id: string) => void
   setCount: (count: number) => void
@@ -370,11 +377,12 @@ interface AppStore {
   newProject: () => void
   setProjectName: (name: string) => void
   serializeProject: () => string
-  applyProjectContent: (content: string, path: string | null, fallbackName: string) => Promise<void>
+  applyProjectContent: (content: string, path: string | null, fallbackName: string, preserveAutosave?: boolean) => Promise<boolean>
   saveProject: (saveAs?: boolean) => Promise<boolean>
   openProject: () => Promise<void>
   openProjectPath: (path: string) => Promise<void>
   autosave: () => Promise<void>
+  flushPersistence: () => Promise<void>
   restoreAutosave: () => Promise<void>
   dismissAutosave: () => Promise<void>
   showToast: (message: string, kind?: Toast['kind']) => void
@@ -390,6 +398,8 @@ interface AppStore {
 
 let booting = false
 
+enablePatches()
+
 function applyTheme(theme: 'dark' | 'light'): void {
   document.documentElement.dataset.theme = theme
 }
@@ -398,73 +408,59 @@ function messageOf(error: unknown): string {
   return error instanceof Error ? error.message : String(error)
 }
 
-function documentSnapshot(state: AppStore): string {
-  return JSON.stringify({
-    projectName: state.projectName,
-    give: state.give,
-    nbtGive: state.nbtGive,
-    gamemode: state.gamemode,
-    damage: state.damage,
-    rotate: state.rotate,
-    spreadplayers: state.spreadplayers,
-    ride: state.ride,
-    random: state.random,
-    tick: state.tick,
-    social: state.social,
-    summon: state.summon,
-    setblock: state.setblock,
-    execute: state.execute,
-    teleport: state.teleport,
-    effect: state.effect,
-    fill: state.fill,
-    clone: state.clone,
-    chain: state.chain,
-    enchant: state.enchant,
-    xp: state.xp,
-    tellraw: state.tellraw,
-    title: state.title,
-    sound: state.sound,
-    bossbar: state.bossbar,
-    scoreboard: state.scoreboard,
-    particle: state.particle,
-    world: state.world,
-    tag: state.tag,
-    clear: state.clear,
-    gamerule: state.gamerule,
-    worldborder: state.worldborder,
-    team: state.team,
-    spawnpoint: state.spawnpoint,
-    worldSpawn: state.worldSpawn,
-    forceload: state.forceload,
-    attribute: state.attribute,
-    automation: state.automation,
-    itemCommand: state.itemCommand,
-    dataCommand: state.dataCommand,
-    loot: state.loot,
-    datapack: state.datapack,
-    generic: state.generic,
-    commandBlock: state.commandBlock
-  })
-}
-
 export const useAppStore = create<AppStore>()(
   immer((setRaw, get) => {
     let restoring = false
+    let replacing = false
     let lastPushAt = 0
+    let lastHistoryField = ''
+    let packRequest = 0
+    let persistenceTail: Promise<unknown> = Promise.resolve()
 
-    const set = ((updater: any, replace?: boolean) => {
-      const before = documentSnapshot(get())
-      ;(setRaw as any)(updater, replace)
-      const after = documentSnapshot(get())
-      if (!restoring && before !== after && Date.now() - lastPushAt > 500) {
-        setRaw((state) => {
-          state.historyPast.push(before)
-          if (state.historyPast.length > 100) state.historyPast.shift()
-          state.historyFuture = []
-        })
-        lastPushAt = Date.now()
+    const enqueuePersistence = <T,>(operation: () => Promise<T>): Promise<T> => {
+      const result = persistenceTail.then(operation, operation)
+      persistenceTail = result.catch(() => undefined)
+      return result
+    }
+
+    type StateUpdate = Partial<AppStore> | ((state: Draft<AppStore>) => void)
+    const set = (updater: StateUpdate): void => {
+      const before = get()
+      const [next, patches, inverse] = produceWithPatches(before, (draft) => {
+        if (typeof updater === 'function') updater(draft)
+        else Object.assign(draft, updater)
+      })
+      const changes = documentPatches(patches)
+      const versionChanged = before.activePackId !== next.activePackId
+      if (!changes.length && !versionChanged) {
+        setRaw(next, true)
+        return
       }
-    }) as typeof setRaw
+      const now = Date.now()
+      const field = changes.length ? String(changes[0].path[0]) : ''
+      const canGroup = now - lastPushAt < 500 && field === lastHistoryField
+      setRaw((state) => {
+        Object.assign(state, next)
+        state.documentRevision = before.documentRevision + 1
+        if (!replacing && (changes.length > 0 || before.booted)) state.dirty = true
+        if (!restoring && !replacing && changes.length) {
+          const entry: HistoryEntry = { patches: changes, inversePatches: documentPatches(inverse) }
+          const previous = state.historyPast.at(-1)
+          if (canGroup && previous) {
+            previous.patches.push(...entry.patches)
+            previous.inversePatches.unshift(...entry.inversePatches)
+          } else {
+            state.historyPast.push(entry)
+            if (state.historyPast.length > 100) state.historyPast.shift()
+          }
+          state.historyFuture = []
+        }
+      })
+      if (!restoring && !replacing && changes.length) {
+        lastPushAt = now
+        lastHistoryField = field
+      }
+    }
 
     return {
     booted: false,
@@ -473,7 +469,10 @@ export const useAppStore = create<AppStore>()(
     packs: [],
     pack: null,
     activePackId: '26.3',
-    quickCommand: '',
+    quickDrafts: {},
+    documentRevision: 0,
+    projectSession: 0,
+    projectCreatedAt: new Date().toISOString(),
     settings: { ...DEFAULT_SETTINGS },
     update: { status: 'idle' },
     activeCommandId: null,
@@ -557,7 +556,9 @@ export const useAppStore = create<AppStore>()(
         })
 
         const preferred = settings.lastPackId ?? packs[0]?.id ?? '26.3'
-        await get().loadPack(preferred)
+        if (!(await get().loadPack(preferred))) {
+          throw new Error(get().bootError ?? '无法加载版本数据包')
+        }
 
         const autosave = await api.project.getAutosave()
         if (autosave) {
@@ -582,47 +583,41 @@ export const useAppStore = create<AppStore>()(
     },
 
     loadPack: async (id) => {
+      const request = ++packRequest
       try {
         const api = getApi()
         const result = await api.packs.load(id)
-        if (!result.ok) {
-          set((state) => {
-            state.bootError = result.error
-            if (result.hint) state.bootError += `\n${result.hint}`
-          })
-          return
+        if (request !== packRequest) return false
+        if (!result.ok) throw new Error([result.error, result.hint].filter(Boolean).join('\n'))
+        set({ pack: result.pack, activePackId: id, bootError: null })
+        try {
+          const settings = await api.settings.update({ lastPackId: id })
+          if (request === packRequest) set({ settings })
+        } catch (error) {
+          if (request === packRequest) get().showToast(`版本已切换，但偏好保存失败：${messageOf(error)}`, 'error')
         }
-        set({
-          pack: result.pack,
-          activePackId: id,
-          bootError: null
-        })
-        const settings = await api.settings.update({ lastPackId: id })
-        set((state) => {
-          state.settings = settings
-        })
+        return request === packRequest
       } catch (error) {
-        set((state) => {
-          state.bootError = `加载数据包失败：${messageOf(error)}`
-        })
+        if (request === packRequest) {
+          const message = `加载数据包失败：${messageOf(error)}`
+          set({ bootError: message })
+          if (get().booted) get().showToast(message, 'error')
+        }
+        return false
       }
     },
 
     selectCommand: (id) => {
       set((state) => {
-        if (id !== state.activeCommandId) state.quickCommand = ''
         state.activeCommandId = id
-        if (id) {
-          state.generic = { root: id, steps: [] }
-        }
-        state.dirty = true
+        if (id) state.generic = { root: id, steps: [] }
       })
     },
 
-    setQuickCommand: (text) => {
+    setQuickValue: (commandId, key, value) => {
       set((state) => {
-        state.quickCommand = text
-        state.dirty = true
+        const values = state.quickDrafts[commandId] ?? (state.quickDrafts[commandId] = {})
+        values[key] = value
       })
     },
 
@@ -1285,378 +1280,15 @@ export const useAppStore = create<AppStore>()(
       })
     },
 
-    setSearch: (value) => {
-      set((state) => {
-        state.search = value
-      })
-    },
+    ...createSessionSlice(set, get),
 
-    setCategory: (value) => {
-      set((state) => {
-        state.category = value
-      })
-    },
-
-    setTheme: async (theme) => {
-      applyTheme(theme)
-      set((state) => {
-        state.settings.theme = theme
-      })
-      try {
-        const next = await getApi().settings.update({ theme })
-        set((state) => {
-          state.settings = next
-        })
-      } catch (error) {
-        get().showToast(`主题保存失败：${messageOf(error)}`, 'error')
-      }
-    },
-
-    updateSettings: async (patch) => {
-      try {
-        const next = await getApi().settings.update(patch)
-        set((state) => {
-          state.settings = next
-        })
-        if (patch.theme) applyTheme(patch.theme)
-      } catch (error) {
-        get().showToast(`设置保存失败：${messageOf(error)}`, 'error')
-      }
-    },
-
-    setUpdate: (update) => {
-      set((state) => {
-        state.update = update
-      })
-    },
-
-    checkForUpdates: async (manual = true) => {
-      try {
-        const update = await getApi().updater.check(manual)
-        set((state) => {
-          state.update = update
-        })
-      } catch (error) {
-        get().showToast(`检查更新失败：${messageOf(error)}`, 'error')
-      }
-    },
-
-    downloadUpdate: async () => {
-      try {
-        const update = await getApi().updater.download()
-        set((state) => {
-          state.update = update
-        })
-      } catch (error) {
-        get().showToast(`下载更新失败：${messageOf(error)}`, 'error')
-      }
-    },
-
-    installUpdate: async () => {
-      try {
-        await getApi().updater.install()
-      } catch (error) {
-        get().showToast(`安装更新失败：${messageOf(error)}`, 'error')
-      }
-    },
-
-    skipUpdate: async (version) => {
-      try {
-        const update = await getApi().updater.skip(version)
-        set((state) => {
-          state.update = update
-        })
-        get().showToast(`已跳过 ${version}，可在设置中重新检查`, 'info')
-      } catch (error) {
-        get().showToast(`操作失败：${messageOf(error)}`, 'error')
-      }
-    },
-
-    newProject: () => {
-      set((state) => {
-        state.activeCommandId = null
-        state.give = createDefaultGiveOptions()
-        state.nbtGive = createDefaultNbtGiveOptions()
-        state.gamemode = createDefaultGamemodeOptions()
-        state.damage = createDefaultDamageOptions()
-        state.rotate = createDefaultRotateOptions()
-        state.spreadplayers = createDefaultSpreadplayersOptions()
-        state.ride = createDefaultRideOptions()
-        state.random = createDefaultRandomOptions()
-        state.tick = createDefaultTickOptions()
-        state.social = createDefaultSocialOptions()
-        state.summon = createDefaultSummonOptions()
-        state.setblock = createDefaultSetblockOptions()
-        state.execute = createDefaultExecuteOptions()
-        state.teleport = createDefaultTeleportOptions()
-        state.effect = createDefaultEffectOptions()
-        state.fill = createDefaultFillOptions()
-        state.clone = createDefaultCloneOptions()
-        state.chain = createDefaultChainOptions()
-        state.enchant = createDefaultEnchantOptions()
-        state.xp = createDefaultXpOptions()
-        state.tellraw = createDefaultTellrawOptions()
-        state.title = createDefaultTitleOptions()
-        state.sound = createDefaultSoundOptions()
-        state.bossbar = createDefaultBossbarOptions()
-        state.scoreboard = createDefaultScoreboardOptions()
-        state.particle = createDefaultParticleOptions()
-        state.world = createDefaultWorldOptions()
-        state.tag = createDefaultTagOptions()
-        state.clear = createDefaultClearOptions()
-        state.gamerule = createDefaultGameruleOptions()
-        state.worldborder = createDefaultWorldborderOptions()
-        state.team = createDefaultTeamOptions()
-        state.spawnpoint = createDefaultSpawnpointOptions()
-        state.worldSpawn = createDefaultWorldSpawnOptions()
-        state.forceload = createDefaultForceloadOptions()
-        state.attribute = createDefaultAttributeOptions()
-        state.automation = {
-          advancement: createDefaultAdvancementOptions(),
-          function: createDefaultFunctionOptions(),
-          schedule: createDefaultScheduleOptions()
-        }
-        state.itemCommand = createDefaultItemOptions()
-        state.dataCommand = createDefaultDataOptions()
-        state.loot = createDefaultLootOptions()
-        state.datapack = defaultDatapackDraft()
-        state.generic = emptyGeneric()
-        state.commandBlock = createDefaultCommandBlockOptions()
-        state.outputMode = 'command'
-        state.projectName = '未命名项目'
-        state.projectPath = null
-        state.dirty = false
-        state.autosaveAvailable = false
-      })
-      get().clearHistory()
-      void getApi().project.clearAutosave()
-      get().showToast('已新建项目', 'info')
-    },
-
-    setProjectName: (name) => {
-      set((state) => {
-        state.projectName = name.trim() || '未命名项目'
-        state.dirty = true
-      })
-    },
-
-    serializeProject: () => {
-      const state = get()
-      const payload: ProjectPayload = {
-        activeCommandId: state.activeCommandId,
-        give: state.give,
-        nbtGive: state.nbtGive,
-        gamemode: state.gamemode,
-        damage: state.damage,
-        rotate: state.rotate,
-        spreadplayers: state.spreadplayers,
-        ride: state.ride,
-        random: state.random,
-        tick: state.tick,
-        social: state.social,
-        summon: state.summon,
-        setblock: state.setblock,
-        execute: state.execute,
-        teleport: state.teleport,
-        effect: state.effect,
-        fill: state.fill,
-        clone: state.clone,
-        chain: state.chain,
-        enchant: state.enchant,
-        xp: state.xp,
-        tellraw: state.tellraw,
-        title: state.title,
-        sound: state.sound,
-        bossbar: state.bossbar,
-        scoreboard: state.scoreboard,
-        particle: state.particle,
-        world: state.world,
-        tag: state.tag,
-        clear: state.clear,
-        gamerule: state.gamerule,
-        worldborder: state.worldborder,
-        team: state.team,
-        spawnpoint: state.spawnpoint,
-        worldSpawn: state.worldSpawn,
-        forceload: state.forceload,
-        attribute: state.attribute,
-        automation: state.automation,
-        itemCommand: state.itemCommand,
-        dataCommand: state.dataCommand,
-        loot: state.loot,
-        datapack: state.datapack,
-        generic: state.generic,
-        commandBlock: state.commandBlock,
-        outputMode: state.outputMode
-      }
-      const file = createProjectFile(
-        state.projectName,
-        state.activePackId,
-        payload,
-        loadPresetBundle()
-      )
-      return `${JSON.stringify(file, null, 2)}\n`
-    },
-
-    applyProjectContent: async (content, path, fallbackName) => {
-      const parsed = parseProjectFile(JSON.parse(content))
-      if (!parsed.ok || !parsed.project) {
-        throw new Error(parsed.error ?? '项目文件无法解析')
-      }
-      const project = parsed.project
-      if (project.packId && project.packId !== get().activePackId) {
-        await get().loadPack(project.packId)
-      }
-      const payload = normalizeProjectPayload(project.data)
-      applyPresetBundle(project.presets)
-      set((state) => {
-        state.activeCommandId = payload.activeCommandId
-        state.give = payload.give
-        state.nbtGive = payload.nbtGive
-        state.gamemode = payload.gamemode
-        state.damage = payload.damage
-        state.rotate = payload.rotate
-        state.spreadplayers = payload.spreadplayers
-        state.ride = payload.ride
-        state.random = payload.random
-        state.tick = payload.tick
-        state.social = payload.social
-        state.summon = payload.summon
-        state.setblock = payload.setblock
-        state.execute = payload.execute
-        state.teleport = payload.teleport
-        state.effect = payload.effect
-        state.fill = payload.fill
-        state.clone = payload.clone
-        state.chain = payload.chain
-        state.enchant = payload.enchant
-        state.xp = payload.xp
-        state.tellraw = payload.tellraw
-        state.title = payload.title
-        state.sound = payload.sound
-        state.bossbar = payload.bossbar
-        state.scoreboard = payload.scoreboard
-        state.particle = payload.particle
-        state.world = payload.world
-        state.tag = payload.tag
-        state.clear = payload.clear
-        state.gamerule = payload.gamerule
-        state.worldborder = payload.worldborder
-        state.team = payload.team
-        state.spawnpoint = payload.spawnpoint
-        state.worldSpawn = payload.worldSpawn
-        state.forceload = payload.forceload
-        state.attribute = payload.attribute
-        state.automation = payload.automation
-        state.itemCommand = payload.itemCommand
-        state.dataCommand = payload.dataCommand
-        state.loot = payload.loot
-        state.datapack = payload.datapack
-        state.generic = payload.generic
-        state.commandBlock = payload.commandBlock
-        state.outputMode = payload.outputMode
-        state.projectName = project.name || fallbackName
-        state.projectPath = path
-        state.dirty = false
-        state.autosaveAvailable = false
-      })
-      get().clearHistory()
-      await getApi().project.clearAutosave()
-      const presetCount = Object.values(project.presets ?? {}).reduce<number>(
-        (total, value) => total + (Array.isArray(value) ? value.length : 0),
-        0
-      )
-      get().showToast(
-        presetCount > 0
-          ? `项目已打开，已恢复 ${presetCount} 条自定义预设`
-          : '项目已打开（未包含自定义预设）',
-        'success'
-      )
-    },
-
-    saveProject: async (saveAs = false) => {
-      try {
-        const api = getApi()
-        const content = get().serializeProject()
-        const result =
-          saveAs || !get().projectPath
-            ? await api.project.saveAs(content, get().projectName)
-            : await api.project.save(content, get().projectPath)
-        if (!result) return false
-        set((state) => {
-          state.projectPath = result.path
-          state.projectName = result.name
-          state.dirty = false
-          state.autosaveAvailable = false
-        })
-        await api.project.clearAutosave()
-        get().showToast(`已保存：${result.name}`, 'success')
-        return true
-      } catch (error) {
-        get().showToast(`保存失败：${messageOf(error)}`, 'error')
-        return false
-      }
-    },
-
-    openProject: async () => {
-      try {
-        const result = await getApi().project.open()
-        if (!result) return
-        await get().applyProjectContent(result.content, result.path, result.name)
-      } catch (error) {
-        get().showToast(`打开失败：${messageOf(error)}`, 'error')
-      }
-    },
-
-    openProjectPath: async (path) => {
-      try {
-        const result = await getApi().project.openPath(path)
-        if (!result) return
-        await get().applyProjectContent(result.content, result.path, result.name)
-      } catch (error) {
-        get().showToast(`打开失败：${messageOf(error)}`, 'error')
-      }
-    },
-
-    autosave: async () => {
-      if (!get().dirty) return
-      try {
-        await getApi().project.autosave(get().serializeProject())
-        set((state) => {
-          state.lastAutosaveAt = new Date().toISOString()
-        })
-      } catch {
-        // 自动保存失败不打扰用户，下次编辑再试
-      }
-    },
-
-    restoreAutosave: async () => {
-      try {
-        const autosave = await getApi().project.getAutosave()
-        if (!autosave) {
-          set((state) => {
-            state.autosaveAvailable = false
-          })
-          return
-        }
-        await get().applyProjectContent(autosave.content, null, '自动恢复的项目')
-        set((state) => {
-          state.dirty = true
-          state.autosaveAvailable = false
-        })
-        get().showToast('已恢复自动保存的内容，请另存为新项目', 'success')
-      } catch (error) {
-        get().showToast(`恢复失败：${messageOf(error)}`, 'error')
-      }
-    },
-
-    dismissAutosave: async () => {
-      await getApi().project.clearAutosave()
-      set((state) => {
-        state.autosaveAvailable = false
-      })
-    },
-
+    ...createProjectSlice({
+      set, get, enqueuePersistence,
+      waitForPersistence: () => persistenceTail,
+      setReplacing: (value) => { replacing = value },
+      nextPackRequest: () => ++packRequest,
+      isCurrentPackRequest: (request) => request === packRequest
+    }),
     showToast: (message, kind = 'info') => {
       set((state) => {
         state.toast = { id: Date.now(), message, kind }
@@ -1696,42 +1328,40 @@ export const useAppStore = create<AppStore>()(
 
     undo: () => {
       const state = get()
-      const previous = state.historyPast[state.historyPast.length - 1]
+      const previous = state.historyPast.at(-1)
       if (!previous) return
-      const current = documentSnapshot(state)
       restoring = true
-      set((draft) => {
-        Object.assign(draft, JSON.parse(previous))
-        draft.historyPast.pop()
-        draft.historyFuture.push(current)
-        draft.dirty = true
-      })
-      restoring = false
+      try {
+        set({
+          ...applyPatches(state, previous.inversePatches),
+          historyPast: state.historyPast.slice(0, -1),
+          historyFuture: [...state.historyFuture, previous],
+          dirty: true
+        })
+      } finally { restoring = false }
       lastPushAt = 0
     },
 
     redo: () => {
       const state = get()
-      const next = state.historyFuture[state.historyFuture.length - 1]
+      const next = state.historyFuture.at(-1)
       if (!next) return
-      const current = documentSnapshot(state)
       restoring = true
-      set((draft) => {
-        Object.assign(draft, JSON.parse(next))
-        draft.historyFuture.pop()
-        draft.historyPast.push(current)
-        draft.dirty = true
-      })
-      restoring = false
+      try {
+        set({
+          ...applyPatches(state, next.patches),
+          historyPast: [...state.historyPast, next],
+          historyFuture: state.historyFuture.slice(0, -1),
+          dirty: true
+        })
+      } finally { restoring = false }
       lastPushAt = 0
     },
 
     clearHistory: () => {
-      set((state) => {
-        state.historyPast = []
-        state.historyFuture = []
-      })
+      set({ historyPast: [], historyFuture: [] })
       lastPushAt = 0
+      lastHistoryField = ''
     }
   }
   })

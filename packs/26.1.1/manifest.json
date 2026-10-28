@@ -6,7 +6,7 @@
   "packFormat": 101,
   "engine": "components",
   "type": "release",
-  "generatedAt": "2026-10-27T13:47:58.419Z",
+  "generatedAt": "2026-10-27T10:29:06.964Z",
   "sources": [
     {
       "name": "alias",
@@ -19,6 +19,12 @@
     "registries": "registries.json",
     "blocks": "blocks.json",
     "itemComponents": "item-components.json"
+  },
+  "fileHashes": {
+    "commands": "7e08ad792e73c187ce66ce20f8c05c505cde4f1d47046248304384080c3c2f82",
+    "registries": "34cb17845634fe4e721db2819f8b2065c4108a4c60c890649ccbd2317530e3cd",
+    "blocks": "e1e4479da29e4a6679e230a94f73b3e61beb1926f7967c23172dc376f812a48f",
+    "itemComponents": "e3c25b8d0fb564b6d80cb111babc095be60b2f844500d91878bdd260dcfede0f"
   },
   "counts": {
     "roots": 91,

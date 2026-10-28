@@ -1,3 +1,4 @@
+import { useShallow } from 'zustand/react/shallow'
 import { useEffect, useState } from 'react'
 import { Activity, Gauge } from 'lucide-react'
 import {
@@ -24,7 +25,11 @@ const ACTIONS: { value: AttributeAction; label: string }[] = [
 ]
 
 export function AttributeForm() {
-  const state = useAppStore()
+  const state = useAppStore(useShallow((state) => ({
+    attribute: state.attribute,
+    pack: state.pack,
+    updateAttribute: state.updateAttribute
+  })))
   const attribute = state.attribute
   const [pickerOpen, setPickerOpen] = useState(false)
   const legacy = isLegacyNbtPack(state.pack)

@@ -1,3 +1,4 @@
+import { useShallow } from 'zustand/react/shallow'
 import { Clock, Pause, Play } from 'lucide-react'
 import { type TickAction } from '@mcstudio/core'
 import { COMMAND_MAP } from '@mcstudio/content'
@@ -16,7 +17,10 @@ const ACTIONS: { value: TickAction; label: string }[] = [
 ]
 
 export function TickForm() {
-  const state = useAppStore()
+  const state = useAppStore(useShallow((state) => ({
+    tick: state.tick,
+    updateTick: state.updateTick
+  })))
   const options = state.tick
 
   return (

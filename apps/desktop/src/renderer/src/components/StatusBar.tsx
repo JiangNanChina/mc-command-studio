@@ -1,5 +1,6 @@
 import { CircleAlert, CircleCheck, Clock3, Database, Terminal } from 'lucide-react'
-import { getCurrentOutput } from '../lib/commandOutput'
+import { createCurrentOutputSelector } from '../lib/commandOutput'
+import { useShallow } from 'zustand/react/shallow'
 import { useAppStore } from '../store'
 
 function updateText(status: string, version?: string): string {
@@ -23,55 +24,18 @@ function updateText(status: string, version?: string): string {
   }
 }
 
+const selectOutput = createCurrentOutputSelector()
+
 export function StatusBar() {
-  const state = useAppStore()
-  const output = getCurrentOutput(
-    state.pack,
-    state.activeCommandId,
-    state.give,
-    state.nbtGive,
-    state.gamemode,
-    state.damage,
-    state.rotate,
-    state.spreadplayers,
-    state.ride,
-    state.random,
-    state.tick,
-    state.social,
-    state.summon,
-    state.setblock,
-    state.execute,
-    state.teleport,
-    state.effect,
-    state.fill,
-    state.clone,
-    state.chain,
-    state.enchant,
-    state.xp,
-    state.tellraw,
-    state.title,
-    state.sound,
-    state.bossbar,
-    state.scoreboard,
-    state.particle,
-    state.world,
-    state.tag,
-    state.clear,
-    state.gamerule,
-    state.worldborder,
-    state.team,
-    state.spawnpoint,
-    state.worldSpawn,
-    state.forceload,
-    state.attribute,
-    state.automation,
-    state.itemCommand,
-    state.dataCommand,
-    state.loot,
-    state.generic,
-    state.outputMode,
-    state.commandBlock
-  )
+  const state = useAppStore(useShallow((state) => ({
+    pack: state.pack,
+    lastAutosaveAt: state.lastAutosaveAt,
+    updateStatus: state.update.status,
+    updateVersion: state.update.version,
+    dirty: state.dirty,
+    appInfo: state.appInfo
+  })))
+  const output = useAppStore(selectOutput)
   const errors = output.diagnostics.filter((item) => item.severity === 'error').length
   const warnings = output.diagnostics.filter((item) => item.severity === 'warn').length
   const saved = state.lastAutosaveAt
@@ -110,7 +74,7 @@ export function StatusBar() {
         </span>
       ) : null}
       <span className="status-spacer" />
-      <span className="status-item">{updateText(state.update.status, state.update.version)}</span>
+      <span className="status-item">{updateText(state.updateStatus, state.updateVersion)}</span>
       <span className="status-item">
         <span className={`dot${state.dirty ? ' warn' : ''}`} />
         {state.dirty ? '未保存' : '已保存'}

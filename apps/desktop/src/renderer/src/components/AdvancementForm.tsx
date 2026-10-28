@@ -1,3 +1,4 @@
+import { useShallow } from 'zustand/react/shallow'
 import { Award, Trophy } from 'lucide-react'
 import { type AdvancementAction, type AdvancementMode } from '@mcstudio/core'
 import { COMMAND_MAP } from '@mcstudio/content'
@@ -26,7 +27,10 @@ const COMMON_ADVANCEMENTS = [
 ]
 
 export function AdvancementForm() {
-  const state = useAppStore()
+  const state = useAppStore(useShallow((state) => ({
+    automation: state.automation,
+    updateAdvancement: state.updateAdvancement
+  })))
   const advancement = state.automation.advancement
   const mode = MODES.find((item) => item.value === advancement.mode) ?? MODES[0]
 

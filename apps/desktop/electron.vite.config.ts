@@ -4,7 +4,13 @@ import react from '@vitejs/plugin-react'
 
 export default defineConfig({
   main: {
-    plugins: [externalizeDepsPlugin()],
+    // Bundle pure JS runtime dependencies as well as workspace TS sources.
+    // This avoids depending on installer collectors understanding pnpm's store
+    // layout; Electron and Node builtins remain external.
+    plugins: [externalizeDepsPlugin({ exclude: [
+      '@mcstudio/core', '@mcstudio/content', 'electron-log',
+      'electron-updater', 'jszip', 'zod'
+    ] })],
     build: {
       rollupOptions: {
         input: resolve(__dirname, 'src/main/index.ts')

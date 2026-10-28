@@ -1,3 +1,4 @@
+import { useShallow } from 'zustand/react/shallow'
 import { useMemo, useState } from 'react'
 import { Braces, Crosshair, Ghost, MapPin } from 'lucide-react'
 import { COMMAND_MAP } from '@mcstudio/content'
@@ -17,7 +18,12 @@ const QUICK_ENTITIES = [
 const meta = COMMAND_MAP.get('summon')
 
 export function SummonForm() {
-  const state = useAppStore()
+  const state = useAppStore(useShallow((state) => ({
+    summon: state.summon,
+    pack: state.pack,
+    updateSummon: state.updateSummon,
+    updateSummonPosition: state.updateSummonPosition
+  })))
   const summon = state.summon
   const [pickerOpen, setPickerOpen] = useState(false)
   const entities = useMemo(() => {

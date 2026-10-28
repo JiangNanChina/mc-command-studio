@@ -9,7 +9,7 @@ const app = await readFile(
   'utf8'
 )
 const quick = await readFile(
-  join(ROOT, 'apps/desktop/src/renderer/src/components/QuickCommandForm.tsx'),
+  join(ROOT, 'apps/desktop/src/renderer/src/lib/quickCommands.ts'),
   'utf8'
 )
 const commands = JSON.parse(

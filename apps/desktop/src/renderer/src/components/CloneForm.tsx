@@ -1,3 +1,4 @@
+import { useShallow } from 'zustand/react/shallow'
 import { useState } from 'react'
 import { Copy, Layers, Move3d } from 'lucide-react'
 import { COMMAND_MAP } from '@mcstudio/content'
@@ -23,7 +24,10 @@ const MOVES: { value: CloneMove; label: string }[] = [
 ]
 
 export function CloneForm() {
-  const state = useAppStore()
+  const state = useAppStore(useShallow((state) => ({
+    clone: state.clone,
+    updateClone: state.updateClone
+  })))
   const clone = state.clone
   const [pickerOpen, setPickerOpen] = useState(false)
 

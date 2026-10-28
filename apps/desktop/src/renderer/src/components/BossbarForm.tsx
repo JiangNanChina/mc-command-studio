@@ -1,3 +1,4 @@
+import { useShallow } from 'zustand/react/shallow'
 import { Gauge, Monitor, Plus, Trash2, Users } from 'lucide-react'
 import { COMMAND_MAP } from '@mcstudio/content'
 import {
@@ -13,7 +14,10 @@ import { useAppStore } from '../store'
 const meta = COMMAND_MAP.get('bossbar')
 
 export function BossbarForm() {
-  const state = useAppStore()
+  const state = useAppStore(useShallow((state) => ({
+    bossbar: state.bossbar,
+    updateBossbar: state.updateBossbar
+  })))
   const bossbar = state.bossbar
   const max = Math.max(1, Number(bossbar.max) || 1)
   const value = Math.max(0, Math.min(max, Number(bossbar.value) || 0))

@@ -6,6 +6,7 @@
 import { createHash } from 'node:crypto'
 import { copyFile, mkdir, readFile, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
+import { finalizePackMetadata } from './lib/pack-files.mjs'
 
 const ROOTS = [
   'advancement',
@@ -133,6 +134,7 @@ const manifest = {
   }
 }
 await writeFile(join(output, 'manifest.json'), `${JSON.stringify(manifest, null, 2)}\n`)
+await finalizePackMetadata(join(output, 'manifest.json'))
 
 const indexPath = 'packs/index.json'
 const index = JSON.parse(await readFile(indexPath, 'utf8'))

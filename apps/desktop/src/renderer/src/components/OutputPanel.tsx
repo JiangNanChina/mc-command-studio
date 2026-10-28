@@ -17,7 +17,8 @@ import {
   type Diagnostic
 } from '@mcstudio/core'
 import { getApi } from '../lib/api'
-import { getCurrentOutput } from '../lib/commandOutput'
+import { createCurrentOutputSelector } from '../lib/commandOutput'
+import { useShallow } from 'zustand/react/shallow'
 import { useAppStore } from '../store'
 
 const outputTheme = EditorView.theme(
@@ -174,57 +175,18 @@ function CommandBlockFields() {
   )
 }
 
+const selectOutput = createCurrentOutputSelector()
+
 export function OutputPanel() {
-  const state = useAppStore()
-  const output = state.quickCommand
-    ? { text: state.quickCommand, diagnostics: [], hasErrors: false }
-    : getCurrentOutput(
-    state.pack,
-    state.activeCommandId,
-    state.give,
-    state.nbtGive,
-    state.gamemode,
-    state.damage,
-    state.rotate,
-    state.spreadplayers,
-    state.ride,
-    state.random,
-    state.tick,
-    state.social,
-    state.summon,
-    state.setblock,
-    state.execute,
-    state.teleport,
-    state.effect,
-    state.fill,
-    state.clone,
-    state.chain,
-    state.enchant,
-    state.xp,
-    state.tellraw,
-    state.title,
-    state.sound,
-    state.bossbar,
-    state.scoreboard,
-    state.particle,
-    state.world,
-    state.tag,
-    state.clear,
-    state.gamerule,
-    state.worldborder,
-    state.team,
-    state.spawnpoint,
-    state.worldSpawn,
-    state.forceload,
-    state.attribute,
-    state.automation,
-    state.itemCommand,
-    state.dataCommand,
-    state.loot,
-    state.generic,
-    state.outputMode,
-    state.commandBlock
-  )
+  const state = useAppStore(useShallow((state) => ({
+    activeCommandId: state.activeCommandId,
+    pack: state.pack,
+    outputMode: state.outputMode,
+    title: state.title,
+    showToast: state.showToast,
+    setOutputMode: state.setOutputMode
+  })))
+  const output = useAppStore(selectOutput)
   const commandMode = state.outputMode === 'command'
   const chainMode = state.activeCommandId === 'chain'
   const multiLineMode =

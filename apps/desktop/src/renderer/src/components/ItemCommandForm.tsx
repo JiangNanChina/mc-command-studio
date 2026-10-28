@@ -1,3 +1,4 @@
+import { useShallow } from 'zustand/react/shallow'
 import { useState } from 'react'
 import { Package, Wrench } from 'lucide-react'
 import {
@@ -16,7 +17,11 @@ import { useAppStore } from '../store'
 const meta = COMMAND_MAP.get('item')
 
 export function ItemCommandForm() {
-  const state = useAppStore()
+  const state = useAppStore(useShallow((state) => ({
+    itemCommand: state.itemCommand,
+    pack: state.pack,
+    updateItemCommand: state.updateItemCommand
+  })))
   const options = state.itemCommand
   const [itemOpen, setItemOpen] = useState(false)
   const nbtEngine = state.pack?.manifest.engine === 'nbt'

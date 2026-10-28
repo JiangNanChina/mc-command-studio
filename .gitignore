@@ -7,10 +7,8 @@ dist/
 .DS_Store
 Thumbs.db
 
-# 数据包由 tools/pipeline 生成，不提交
-packs/*
-!packs/README.md
-!packs/.gitkeep
+# Version data snapshots are tracked; ignore interrupted build files only
+packs/**/*.tmp
 
 # 本地更新源 / 测试产物
 .cache/
@@ -23,6 +21,6 @@ test-results/
 .env
 .env.local
 
-# ������ʱĿ¼
+# Temporary test directories
 *.tmpdir/
 /release-test/

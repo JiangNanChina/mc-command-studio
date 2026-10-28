@@ -128,18 +128,30 @@ function topLevelLastIndex(input: string, target: ':'): number {
 function parseTextLine(value: string): TextLine | null {
   const trimmed = value.trim()
   if (trimmed.startsWith('"') || trimmed.startsWith("'")) {
-    return { text: unquote(trimmed), color: '', italic: false }
+    const decoded = unquote(trimmed)
+    // Before 1.21.5, item text components contain JSON encoded inside an SNBT string.
+    if (decoded.startsWith('{')) return parseTextLine(decoded)
+    if (decoded.startsWith('[')) return null
+    return { text: decoded, color: '', italic: false }
   }
   if (!trimmed.startsWith('{') || !trimmed.endsWith('}')) return null
-  const inner = trimmed.slice(1, -1)
-  const textMatch = inner.match(/(?:^|,)\s*text\s*:\s*("(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*')/)
-  if (!textMatch) return null
-  const colorMatch = inner.match(/(?:^|,)\s*color\s*:\s*("(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*')/)
-  const italicMatch = inner.match(/(?:^|,)\s*italic\s*:\s*(true|false)/)
+  const fields = new Map<string, string>()
+  for (const field of splitTopLevel(trimmed.slice(1, -1), ',')) {
+    const separator = topLevelIndex(field, ':')
+    if (separator < 0) return null
+    const key = unquote(field.slice(0, separator))
+    // Preserve complex text components as raw instead of dropping styles or children.
+    if (!['text', 'color', 'italic'].includes(key) || fields.has(key)) return null
+    fields.set(key, field.slice(separator + 1).trim())
+  }
+  const text = fields.get('text')
+  if (!text || !/^("(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*')$/s.test(text)) return null
+  const italic = fields.get('italic')
+  if (italic !== undefined && !['true', 'false', '1b', '0b'].includes(italic)) return null
   return {
-    text: unquote(textMatch[1]),
-    color: colorMatch ? (unquote(colorMatch[1]) as TextLine['color']) : '',
-    italic: italicMatch ? italicMatch[1] === 'true' : false
+    text: unquote(text),
+    color: (unquote(fields.get('color') ?? '') as TextLine['color']),
+    italic: italic === 'true' || italic === '1b'
   }
 }
 
@@ -162,8 +174,14 @@ function parseEnchantments(value: string): EnchantmentEntry[] | null {
   if (!trimmed.startsWith('{') || !trimmed.endsWith('}')) return null
   const inner = trimmed.slice(1, -1).trim()
   if (!inner) return []
+  const parts = splitTopLevel(inner, ',')
+  const wrapper = topLevelIndex(parts[0], ':')
+  if (wrapper >= 0 && unquote(parts[0].slice(0, wrapper)) === 'levels') {
+    // A show_in_tooltip override cannot be represented by the simple form.
+    return parts.length === 1 ? parseEnchantments(parts[0].slice(wrapper + 1)) : null
+  }
   const entries: EnchantmentEntry[] = []
-  for (const part of splitTopLevel(inner, ',')) {
+  for (const part of parts) {
     const index = topLevelLastIndex(part, ':')
     if (index < 0) return null
     const id = unquote(part.slice(0, index).trim())

@@ -86,4 +86,13 @@ describe('execute', () => {
     expect(result.diagnostics.some((item) => item.code === 'execute.rotated')).toBe(true)
     expect(result.diagnostics.some((item) => item.code === 'execute.run')).toBe(true)
   })
+
+  it('preserves quoted and greedy text in run commands and raw clauses', () => {
+    const result = buildExecuteCommand({
+      clauses: [clause('1', { kind: 'raw', text: 'if entity @e[name="A  B"]' })],
+      run: '/tellraw @a {"text":"C  D"}'
+    })
+    expect(result.text).toBe('execute if entity @e[name="A  B"] run tellraw @a {"text":"C  D"}')
+    expect(buildExecuteCommand({ clauses: [], run: 'say A  B' }).text).toBe('execute run say A  B')
+  })
 })

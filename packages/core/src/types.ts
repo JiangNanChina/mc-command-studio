@@ -46,6 +46,8 @@ export interface PackManifest {
   generatedAt: string
   sources: PackSource[]
   files: Record<string, string>
+  /** SHA-256 of generated files, separate from downloaded source hashes. */
+  fileHashes?: Record<string, string>
   counts: PackCounts
   aliasOf?: string
 }

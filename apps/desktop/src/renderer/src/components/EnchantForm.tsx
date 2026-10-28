@@ -1,3 +1,4 @@
+import { useShallow } from 'zustand/react/shallow'
 import { useMemo, useState } from 'react'
 import { Sparkles, Star, Wand2 } from 'lucide-react'
 import { COMMAND_MAP } from '@mcstudio/content'
@@ -19,7 +20,11 @@ const QUICK_ENCHANTS = [
 ]
 
 export function EnchantForm() {
-  const state = useAppStore()
+  const state = useAppStore(useShallow((state) => ({
+    enchant: state.enchant,
+    pack: state.pack,
+    updateEnchant: state.updateEnchant
+  })))
   const enchant = state.enchant
   const [pickerOpen, setPickerOpen] = useState(false)
   const enchantments = useMemo(() => {

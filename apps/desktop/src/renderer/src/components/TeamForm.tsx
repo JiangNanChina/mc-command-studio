@@ -1,3 +1,4 @@
+import { useShallow } from 'zustand/react/shallow'
 import { Flag, Shield, Users } from 'lucide-react'
 import { COMMAND_MAP } from '@mcstudio/content'
 import {
@@ -25,7 +26,10 @@ const ACTIONS: { value: TeamAction; label: string }[] = [
 ]
 
 export function TeamForm() {
-  const state = useAppStore()
+  const state = useAppStore(useShallow((state) => ({
+    team: state.team,
+    updateTeam: state.updateTeam
+  })))
   const team = state.team
   const color = TEAM_COLORS.find((item) => item.value === team.color) ?? TEAM_COLORS[0]
   const showOptions = team.action === 'create' || team.action === 'modify'

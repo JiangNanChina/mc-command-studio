@@ -1,3 +1,4 @@
+import { useShallow } from 'zustand/react/shallow'
 import { CalendarClock, Clock3 } from 'lucide-react'
 import { type ScheduleAction, type ScheduleMode } from '@mcstudio/core'
 import { COMMAND_MAP } from '@mcstudio/content'
@@ -6,7 +7,11 @@ import { useAppStore } from '../store'
 const meta = COMMAND_MAP.get('schedule')
 
 export function ScheduleForm() {
-  const state = useAppStore()
+  const state = useAppStore(useShallow((state) => ({
+    automation: state.automation,
+    datapack: state.datapack,
+    updateSchedule: state.updateSchedule
+  })))
   const schedule = state.automation.schedule
   const dataFunctions = state.datapack.functions.map(
     (item) => `${state.datapack.namespace}:${item.name}`

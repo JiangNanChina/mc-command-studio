@@ -1,3 +1,4 @@
+import { useShallow } from 'zustand/react/shallow'
 import { useState } from 'react'
 import { PackageX, Trash2 } from 'lucide-react'
 import { COMMAND_MAP } from '@mcstudio/content'
@@ -10,7 +11,10 @@ import { useAppStore } from '../store'
 const meta = COMMAND_MAP.get('clear')
 
 export function ClearForm() {
-  const state = useAppStore()
+  const state = useAppStore(useShallow((state) => ({
+    clear: state.clear,
+    updateClear: state.updateClear
+  })))
   const clear = state.clear
   const [itemOpen, setItemOpen] = useState(false)
 

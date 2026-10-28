@@ -1,3 +1,4 @@
+import { useShallow } from 'zustand/react/shallow'
 import { useMemo, useState } from 'react'
 import { Boxes, Search } from 'lucide-react'
 import { getApi } from '../lib/api'
@@ -15,7 +16,12 @@ interface BlockPickerDialogProps {
 }
 
 export function BlockPickerDialog({ currentId, onSelect, onClose }: BlockPickerDialogProps) {
-  const state = useAppStore()
+  const state = useAppStore(useShallow((state) => ({
+    pack: state.pack,
+    setblock: state.setblock,
+    selectBlock: state.selectBlock,
+    showToast: state.showToast
+  })))
   const [query, setQuery] = useState('')
   const [manual, setManual] = useState('')
   const allBlocks = state.pack?.registries.block ?? []

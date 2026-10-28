@@ -1,3 +1,4 @@
+import { useShallow } from 'zustand/react/shallow'
 import { Tag, Tags } from 'lucide-react'
 import { COMMAND_MAP } from '@mcstudio/content'
 import type { TagAction } from '@mcstudio/core'
@@ -7,7 +8,10 @@ import { useAppStore } from '../store'
 const meta = COMMAND_MAP.get('tag')
 
 export function TagForm() {
-  const state = useAppStore()
+  const state = useAppStore(useShallow((state) => ({
+    tag: state.tag,
+    updateTag: state.updateTag
+  })))
   const tag = state.tag
 
   return (

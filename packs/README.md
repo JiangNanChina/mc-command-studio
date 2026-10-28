@@ -1,37 +1,14 @@
 # packs
 
-版本数据包由 `tools/pipeline/build-pack.mjs` 生成，不提交到 Git。
+此目录随版本库维护 45 个基础数据包、9 个版本别名和 index.json，确保干净检出和离线打包使用同一份数据。
 
-```bash
-pnpm data:build
-pnpm data:verify
-```
+- `pnpm data:build`：按 index.json 验证已有包；缺失的现代版本才下载构建；最后更新别名。缓存命中也校验内容，不会重建哈希基线。
+- `pnpm data:verify`：验证 schema、实际统计、输出文件 SHA-256、别名、版本目录和图标资源。
+- `pnpm data:migrate`：显式迁移可信的历史数据包，补齐首次输出哈希，规范化 1.20.5/1.20.6 组件数组；已有哈希不匹配时拒绝覆盖。
+- `pnpm data:build --force`：重新下载现代版本。1.12/1.13 保留已提交的历史报告转换结果，完整重建需对应转换脚本的官方报告输入。
 
-当前构建十一个版本：
+manifest.sources[].sha256 记录下载来源原始字节；manifest.fileHashes 记录最终四个 JSON 文件字节。两者用途不同，加载和验证均比较后者。别名与基础包共享文件及哈希，不能嵌套指向其他别名。
 
-- `26.3`：主版本，所有可视化表单按此语法生成。
-- `1.21.1`：组件引擎，命令树完整；主要表单已按 1.21.1 差异适配。
-- `1.20.4`：NBT 引擎，命令树 + 37+ 兼容表单、旧版 particle/attribute。
-- `1.20.3`：NBT 引擎，命令树 + 兼容表单。
-- `1.19.4`：NBT 引擎，命令树 + 兼容表单（无 tick/random/rotate 等新命令）。
-- `1.18.2`：NBT 引擎，旧版目录与命令树。
-- `1.16.5`：NBT 引擎，旧版目录与命令树。
-- `1.15.2`：NBT 引擎，旧版目录与命令树。
-- `1.14.4`：NBT 引擎，旧版目录与命令树。
-- `1.13.2`：官方 server reports + client lang 转换；NBT 引擎、旧版目录。
-- `1.12.2`：Legacy 引擎、静态命令表、OOC 生成器。
+打包时复制到 resources/packs。开发时可用 MCSTUDIO_PACKS_DIR 覆盖目录；打包冒烟测试直接验证安装包内的资源。
 
-> 1.13.2 由 `tools/pipeline/build-1.13.2.mjs` 生成，1.12.2 由 `build-1.12.2.mjs` 生成；产物已提交，CI 不重复下载 server/client jar。
-
-生成内容：
-
-- `commands.json`：官方命令树
-- `registries.json`：物品/方块/实体/附魔等注册表
-- `blocks.json`：方块状态
-- `item-components.json`：物品默认组件
-- `manifest.json`：版本、来源哈希、统计
-- `index.json`：数据包索引
-
-打包时 electron-builder 会把整个 `packs/` 复制到安装目录的 `resources/packs`。开发时也可以用环境变量 `MCSTUDIO_PACKS_DIR` 指向别的目录。
-
-数据不包含游戏 jar、材质或语言文件。
+数据包不包含游戏 JAR。早期 1.12.2 注册表和方块表沿用 1.13.2 作为选择器资源，不能当成精确的 1.12 注册表。

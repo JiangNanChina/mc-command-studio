@@ -1,3 +1,4 @@
+import { useShallow } from 'zustand/react/shallow'
 import {
   ArrowDown,
   ArrowUp,
@@ -27,7 +28,15 @@ const DIRECTIONS: { value: BlockFacing; label: string }[] = [
 ]
 
 export function ChainBuilder() {
-  const state = useAppStore()
+  const state = useAppStore(useShallow((state) => ({
+    chain: state.chain,
+    showToast: state.showToast,
+    updateChain: state.updateChain,
+    addChainBlock: state.addChainBlock,
+    updateChainBlock: state.updateChainBlock,
+    moveChainBlock: state.moveChainBlock,
+    removeChainBlock: state.removeChainBlock
+  })))
   const chain = state.chain
   const output = buildChainCommands(chain)
 

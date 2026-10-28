@@ -1,3 +1,4 @@
+import { useShallow } from 'zustand/react/shallow'
 import { useEffect, useMemo, useState } from 'react'
 import {
   Eye,
@@ -36,7 +37,11 @@ const OPTION_MODES: { value: ParticleOptionMode; label: string }[] = [
 ]
 
 export function ParticleForm() {
-  const state = useAppStore()
+  const state = useAppStore(useShallow((state) => ({
+    particle: state.particle,
+    pack: state.pack,
+    updateParticle: state.updateParticle
+  })))
   const particle = state.particle
   const [pickerOpen, setPickerOpen] = useState(false)
   const [blockOpen, setBlockOpen] = useState(false)

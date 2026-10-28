@@ -4,6 +4,7 @@ import { autoUpdater, type UpdateInfo } from 'electron-updater'
 import type { UpdateState, UserSettings } from '../shared/types'
 import { readSettings, updateSettings } from './storage'
 import { isNewerVersion } from './version'
+import { requestShutdown } from './lifecycle'
 
 let state: UpdateState = { status: 'idle' }
 let mainWindow: BrowserWindow | null = null
@@ -253,7 +254,7 @@ export function installUpdate(): void {
   if (!app.isPackaged) return
   if (state.status !== 'downloaded') return
   // 静默安装，避免更新时弹出 NSIS 向导阻塞无人值守的升级。
-  autoUpdater.quitAndInstall(true, true)
+  requestShutdown('update', () => autoUpdater.quitAndInstall(true, true))
 }
 
 export async function skipVersion(version: string): Promise<UpdateState> {

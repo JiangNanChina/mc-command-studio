@@ -45,6 +45,7 @@ const failed = result.filter((row) => !row.ok)
 for (const row of result) {
   console.log(`${row.ok ? '✓' : '✗'} ${row.id} ${row.actual}/${row.expected}`)
 }
+await app.evaluate(({ app: electronApp }) => electronApp.exit(0)).catch(() => undefined)
 await app.close()
 if (failed.length > 0) {
   throw new Error(`${failed.length} 个版本根命令数不一致`)

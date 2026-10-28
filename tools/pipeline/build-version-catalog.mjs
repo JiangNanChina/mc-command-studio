@@ -6,6 +6,7 @@
 import { mkdir, readFile, writeFile } from 'node:fs/promises'
 import { existsSync } from 'node:fs'
 import { join, resolve } from 'node:path'
+import { verifyPack } from './lib/pack-files.mjs'
 
 const ROOT = resolve('.')
 const PACKS = join(ROOT, 'packs')
@@ -109,10 +110,13 @@ for (const id of releaseIds) {
     continue
   }
   const meta = VERSIONS.find((entry) => entry.id === id) ?? META_FALLBACK[id] ?? {}
-  const baseManifest = JSON.parse(await readFile(baseManifestPath, 'utf8'))
+  const baseManifest = (await verifyPack(baseManifestPath)).manifest
   const isReal = id === base
   let manifest = baseManifest
   if (!isReal) {
+    const existing = await readFile(join(PACKS, id, 'manifest.json'), 'utf8').then(JSON.parse).catch(() => null)
+    // A cached alias is subject to the same integrity gate as a cached base pack.
+    if (existing?.fileHashes) await verifyPack(join(PACKS, id, 'manifest.json'))
     manifest = {
       ...baseManifest,
       id,
@@ -120,7 +124,7 @@ for (const id of releaseIds) {
       dataVersion: meta.data_version ?? baseManifest.dataVersion,
       packFormat: meta.data_pack_version ?? baseManifest.packFormat,
       type: 'release',
-      generatedAt: new Date().toISOString(),
+      generatedAt: baseManifest.generatedAt,
       aliasOf: base,
       sources: [
         {
@@ -131,7 +135,9 @@ for (const id of releaseIds) {
       ]
     }
     await mkdir(join(PACKS, id), { recursive: true })
-    await writeFile(join(PACKS, id, 'manifest.json'), `${JSON.stringify(manifest, null, 2)}\n`)
+    const content = `${JSON.stringify(manifest, null, 2)}\n`
+    const path = join(PACKS, id, 'manifest.json')
+    if (await readFile(path, 'utf8').catch(() => null) !== content) await writeFile(path, content)
   }
   packs.push({
     id,
@@ -145,9 +151,9 @@ for (const id of releaseIds) {
   })
 }
 
-await writeFile(
-  join(PACKS, 'index.json'),
-  `${JSON.stringify({ schemaVersion: 1, updatedAt: new Date().toISOString(), packs })}\n`
-)
+const indexPath = join(PACKS, 'index.json')
+const updatedAt = packs.map((pack) => pack.builtAt).sort().at(-1) ?? '1970-01-01T00:00:00.000Z'
+const indexContent = `${JSON.stringify({ schemaVersion: 1, updatedAt, packs })}\n`
+if (await readFile(indexPath, 'utf8').catch(() => null) !== indexContent) await writeFile(indexPath, indexContent)
 console.log(`✓ 版本目录 ${packs.length} 个（基础包 ${packs.filter((p) => !p.aliasOf).length}，别名 ${packs.filter((p) => p.aliasOf).length}）`)
 console.log(packs.map((p) => p.gameVersion).join(' '))

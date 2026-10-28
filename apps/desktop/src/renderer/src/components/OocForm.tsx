@@ -1,3 +1,4 @@
+import { useShallow } from 'zustand/react/shallow'
 import { useMemo, useRef, useState } from 'react'
 import { Copy, TerminalSquare } from 'lucide-react'
 import {
@@ -39,7 +40,10 @@ const LAYOUT_PRESETS = [
 ]
 
 export function OocForm() {
-  const state = useAppStore()
+  const state = useAppStore(useShallow((state) => ({
+    pack: state.pack,
+    showToast: state.showToast
+  })))
   const [options, setOptions] = useState(createDefaultOocOptions)
   const version = state.pack?.manifest.gameVersion
   const result = useMemo(

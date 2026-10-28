@@ -1,10 +1,15 @@
+import { useShallow } from 'zustand/react/shallow'
 import { List, MessageSquare, Skull, Sprout } from 'lucide-react'
 import { COMMAND_MAP } from '@mcstudio/content'
 import { SelectorField } from './SelectorField'
 import { useAppStore } from '../store'
 
 export function SocialForm() {
-  const state = useAppStore()
+  const state = useAppStore(useShallow((state) => ({
+    social: state.social,
+    activeCommandId: state.activeCommandId,
+    updateSocial: state.updateSocial
+  })))
   const options = state.social
   const id = state.activeCommandId ?? 'say'
   const meta = COMMAND_MAP.get(id)

@@ -59,5 +59,6 @@ for (const [tab, expected] of CASES) {
   console.log(`✓ ${tab}`)
 }
 
+await app.evaluate(({ app: electronApp }) => electronApp.exit(0)).catch(() => undefined)
 await app.close()
 console.log('✓ 1.12.2 分组表单冒烟通过')

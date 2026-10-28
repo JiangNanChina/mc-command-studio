@@ -1,3 +1,4 @@
+import { useShallow } from 'zustand/react/shallow'
 import { Braces, Code2 } from 'lucide-react'
 import { COMMAND_MAP } from '@mcstudio/content'
 import { useAppStore } from '../store'
@@ -5,7 +6,11 @@ import { useAppStore } from '../store'
 const meta = COMMAND_MAP.get('function')
 
 export function FunctionForm() {
-  const state = useAppStore()
+  const state = useAppStore(useShallow((state) => ({
+    automation: state.automation,
+    datapack: state.datapack,
+    updateFunction: state.updateFunction
+  })))
   const fn = state.automation.function
   const dataFunctions = state.datapack.functions.map(
     (item) => `${state.datapack.namespace}:${item.name}`

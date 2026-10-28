@@ -1,3 +1,4 @@
+import { useShallow } from 'zustand/react/shallow'
 import { useState } from 'react'
 import { Package, Plus, Sparkles, Trash2 } from 'lucide-react'
 import { COMMAND_MAP } from '@mcstudio/content'
@@ -59,7 +60,11 @@ const NBT_PRESETS: { label: string; patch: Partial<ReturnType<typeof createDefau
 ]
 
 export function NbtGiveForm() {
-  const state = useAppStore()
+  const state = useAppStore(useShallow((state) => ({
+    nbtGive: state.nbtGive,
+    pack: state.pack,
+    updateNbtGive: state.updateNbtGive
+  })))
   const options = state.nbtGive
   const [itemOpen, setItemOpen] = useState(false)
   const enchantIds = (state.pack?.registries.enchantment ?? []).map(

@@ -3,6 +3,7 @@ import { containsControlCharacters, resourceId, snbtKey, snbtString } from './es
 import { isBalancedCompound } from './position'
 import { serializeSelector, warnIfEntityTarget, type Selector } from './selector'
 import type { BuildResult, Diagnostic } from './types'
+import { getVersionCapabilities } from './versionCapabilities'
 
 export const RARITIES = ['common', 'uncommon', 'rare', 'epic'] as const
 export type Rarity = (typeof RARITIES)[number]
@@ -73,16 +74,26 @@ function isColor(value: string | undefined): boolean {
 }
 
 /** 文本组件的 SNBT 形式：{text:"…",color:"gold",italic:false} */
-export function serializeTextComponent(line: TextLine, diagnostics?: Diagnostic[]): string {
+export function serializeTextComponent(
+  line: TextLine,
+  diagnostics?: Diagnostic[],
+  gameVersion?: string
+): string {
   const parts: string[] = [`text:${snbtString(line.text)}`]
+  const json: Record<string, string | boolean> = { text: line.text }
   if (line.color) {
     if (!isColor(line.color)) {
       diagnostics?.push(error('item.color', `颜色 ${line.color} 不是有效颜色`, 'color'))
     } else {
       parts.push(`color:${snbtString(line.color)}`)
+      json.color = line.color
     }
   }
   parts.push(`italic:${line.italic ? 'true' : 'false'}`)
+  json.italic = line.italic
+  if (getVersionCapabilities(gameVersion).textComponents === 'json-string') {
+    return snbtString(JSON.stringify(json))
+  }
   return `{${parts.join(',')}}`
 }
 
@@ -112,8 +123,12 @@ function serializeEnchantmentMap(entries: EnchantmentEntry[], diagnostics: Diagn
 }
 
 /** 序列化一个物品（含组件），不校验物品是否存在于当前版本注册表。 */
-export function serializeItemStack(item: ItemStack): BuildResult {
+export function serializeItemStack(item: ItemStack, gameVersion?: string): BuildResult {
   const diagnostics: Diagnostic[] = []
+  const capabilities = getVersionCapabilities(gameVersion)
+  if (!capabilities.itemComponents && item.components.length > 0) {
+    diagnostics.push(error('item.components.version', '该版本使用物品 NBT，请使用 NBT 物品编辑器', 'components'))
+  }
   const rawId = item.id.trim()
   if (!rawId) {
     diagnostics.push(error('item.id', '物品 ID 不能为空', 'item'))
@@ -149,7 +164,8 @@ export function serializeItemStack(item: ItemStack): BuildResult {
         }
         const text = serializeTextComponent(
           { text: component.text, color: component.color, italic: component.italic },
-          diagnostics
+          diagnostics,
+          gameVersion
         )
         parts.push(`${component.kind}=${text}`)
         break
@@ -161,7 +177,7 @@ export function serializeItemStack(item: ItemStack): BuildResult {
         }
         const lines = component.lines
           .filter((line) => line.text.trim().length > 0)
-          .map((line) => serializeTextComponent(line, diagnostics))
+          .map((line) => serializeTextComponent(line, diagnostics, gameVersion))
         parts.push(`lore=[${lines.join(',')}]`)
         break
       }
@@ -170,7 +186,8 @@ export function serializeItemStack(item: ItemStack): BuildResult {
           diagnostics.push(warn('item.enchantments.empty', '附魔列表为空，已忽略', 'enchantments'))
           continue
         }
-        parts.push(`enchantments=${serializeEnchantmentMap(component.entries, diagnostics)}`)
+        const levels = serializeEnchantmentMap(component.entries, diagnostics)
+        parts.push(`enchantments=${capabilities.enchantments === 'levels' ? `{levels:${levels}}` : levels}`)
         break
       }
       case 'unbreakable': {
@@ -250,6 +267,14 @@ export function serializeItemStack(item: ItemStack): BuildResult {
           )
           continue
         }
+        if (capabilities.customModelData === 'integer') {
+          const value = Number(raw)
+          if (!/^-?\d+$/.test(raw) || !Number.isSafeInteger(value) || value < -2147483648 || value > 2147483647) {
+            diagnostics.push(error('item.custom_model_data', '1.21.4 以前的自定义模型数据必须是 32 位整数', 'custom_model_data'))
+          }
+        } else if (!isBalancedCompound(raw)) {
+          diagnostics.push(error('item.custom_model_data', '此版本的自定义模型数据必须是 {floats:[…],flags:[…],strings:[…],colors:[…]} 复合标签', 'custom_model_data'))
+        }
         parts.push(`custom_model_data=${raw}`)
         break
       }
@@ -273,13 +298,13 @@ export function createDefaultGiveOptions(): GiveOptions {
 }
 
 /** 生成完整的 /give 命令。 */
-export function buildGiveCommand(options: GiveOptions): BuildResult {
+export function buildGiveCommand(options: GiveOptions, gameVersion?: string): BuildResult {
   const diagnostics: Diagnostic[] = []
   const selector = serializeSelector(options.target)
   diagnostics.push(...selector.diagnostics)
   warnIfEntityTarget(options.target, diagnostics)
 
-  const item = serializeItemStack(options.item)
+  const item = serializeItemStack(options.item, gameVersion)
   diagnostics.push(...item.diagnostics)
 
   if (!Number.isInteger(options.count) || options.count < 1) {
@@ -289,7 +314,7 @@ export function buildGiveCommand(options: GiveOptions): BuildResult {
   }
 
   const countText = options.count !== 1 ? ` ${options.count}` : ''
-  const text = `give ${selector.text} ${item.text}${countText}`.replace(/\s+/g, ' ').trim()
+  const text = `give ${selector.text} ${item.text}${countText}`
 
   if (text.length > 32500) {
     diagnostics.push(error('give.length', '命令超过命令方块 32,500 字符上限', 'command'))

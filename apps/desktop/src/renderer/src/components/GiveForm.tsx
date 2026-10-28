@@ -1,3 +1,4 @@
+import { useShallow } from 'zustand/react/shallow'
 import { useState } from 'react'
 import { Gift, Package, Plus, Crosshair, Hash, Layers, ClipboardPaste } from 'lucide-react'
 import { COMMAND_MAP, ITEM_COMPONENTS } from '@mcstudio/content'
@@ -11,7 +12,17 @@ import { useAppStore } from '../store'
 const meta = COMMAND_MAP.get('give')
 
 export function GiveForm() {
-  const state = useAppStore()
+  const state = useAppStore(useShallow((state) => ({
+    give: state.give,
+    pack: state.pack,
+    setDialog: state.setDialog,
+    setTarget: state.setTarget,
+    setCount: state.setCount,
+    replaceComponent: state.replaceComponent,
+    removeComponent: state.removeComponent,
+    addComponent: state.addComponent,
+    showToast: state.showToast
+  })))
   const [importOpen, setImportOpen] = useState(false)
   const selectorPreview = serializeSelector(state.give.target)
   const itemComponents = state.give.item.components
@@ -160,6 +171,7 @@ export function GiveForm() {
           <ComponentsEditor
             components={itemComponents}
             enchantments={enchantments}
+            gameVersion={state.pack?.manifest.gameVersion}
             onReplace={(index, component) => state.replaceComponent(index, component)}
             onRemove={(index) => state.removeComponent(index)}
           />

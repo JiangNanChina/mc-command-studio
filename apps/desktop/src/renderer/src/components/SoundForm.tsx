@@ -1,3 +1,4 @@
+import { useShallow } from 'zustand/react/shallow'
 import { useEffect, useMemo, useState } from 'react'
 import { MapPin, Play, Square, Volume2, VolumeX } from 'lucide-react'
 import { COMMAND_MAP } from '@mcstudio/content'
@@ -12,7 +13,12 @@ import { useAppStore } from '../store'
 const meta = COMMAND_MAP.get('playsound')
 
 export function SoundForm() {
-  const state = useAppStore()
+  const state = useAppStore(useShallow((state) => ({
+    sound: state.sound,
+    pack: state.pack,
+    activeCommandId: state.activeCommandId,
+    updateSound: state.updateSound
+  })))
   const sound = state.sound
   const [pickerOpen, setPickerOpen] = useState(false)
   const sounds = useMemo(() => {

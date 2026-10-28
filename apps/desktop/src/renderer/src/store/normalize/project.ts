@@ -4,6 +4,7 @@ import {
 } from '@mcstudio/core'
 import { emptyGeneric } from '../defaults'
 import type { ProjectPayload } from '../model'
+import { normalizeQuickDrafts } from '../../lib/quickCommands'
 import {
   normalizeGive,
   normalizeNbtGive,
@@ -52,6 +53,7 @@ export function normalizeProjectPayload(input: unknown): ProjectPayload {
   const data = (input ?? {}) as Partial<ProjectPayload>
   return {
     activeCommandId: typeof data.activeCommandId === 'string' ? data.activeCommandId : null,
+    quickDrafts: normalizeQuickDrafts(data.quickDrafts),
     give: normalizeGive(data.give),
     nbtGive: normalizeNbtGive(data.nbtGive),
     gamemode: normalizeGamemode(data.gamemode),

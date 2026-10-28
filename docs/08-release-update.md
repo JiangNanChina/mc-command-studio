@@ -72,7 +72,9 @@ publish:
 ```
 
 本仓库已完成配置，并已发布：
-[MC 指令工坊 v0.6.0](https://github.com/JiangNanChina/mc-command-studio/releases/tag/v0.6.0)（最新）、
+[MC 指令工坊 v0.6.2](https://github.com/JiangNanChina/mc-command-studio/releases/tag/v0.6.2)（最新）、
+[v0.6.1](https://github.com/JiangNanChina/mc-command-studio/releases/tag/v0.6.1)、
+[v0.6.0](https://github.com/JiangNanChina/mc-command-studio/releases/tag/v0.6.0)、
 [v0.1.64](https://github.com/JiangNanChina/mc-command-studio/releases/tag/v0.1.64)、
 [v0.1.63](https://github.com/JiangNanChina/mc-command-studio/releases/tag/v0.1.63)、
 [v0.1.62](https://github.com/JiangNanChina/mc-command-studio/releases/tag/v0.1.62)、
