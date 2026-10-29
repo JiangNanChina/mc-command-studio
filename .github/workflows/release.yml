@@ -98,7 +98,7 @@ jobs:
           $match = [regex]::Match($md, $pattern)
           if (-not $match.Success) { throw "CHANGELOG.md 中找不到 $version 的条目" }
           $notes = $match.Groups[1].Value.Trim()
-          $footer = "`n`n安装：MC-Command-Studio-Setup-$version.exe（安装版，支持自动更新）/ MC-Command-Studio-$version-portable.exe（便携版，请手动下载）`n`n校验：发布资产 checksums.txt（SHA-256）`n`n国内镜像：https://mcstudio-cn.oss-cn-chengdu.aliyuncs.com/mc-command-studio/updates/"
+          $footer = "`n`n安装：MC-Command-Studio-Setup-$version.exe（安装版，支持自动更新）/ MC-Command-Studio-$version-portable.exe（便携版，请手动下载）`n`n校验：发布资产 checksums.txt（SHA-256）"
           Set-Content -Path release-notes.md -Value ($notes + $footer) -Encoding utf8
           Write-Host "release notes: $($notes.Length) chars"
 
