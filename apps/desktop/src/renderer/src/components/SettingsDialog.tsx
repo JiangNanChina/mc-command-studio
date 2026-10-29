@@ -10,6 +10,7 @@ import {
   Settings
 } from 'lucide-react'
 import { getApi } from '../lib/api'
+import { UPDATE_SOURCE_LABELS } from '../../../shared/types'
 import { Modal } from './Modal'
 import { useAppStore } from '../store'
 
@@ -164,6 +165,7 @@ export function SettingsDialog() {
             </div>
             <div className="settings-meta" style={{ marginTop: 4 }}>
               {appInfo?.updateFeed}
+              {update.source ? ` · 本次：${UPDATE_SOURCE_LABELS[update.source]}` : ''}
             </div>
           </div>
           <div className="row">

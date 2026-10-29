@@ -22,6 +22,43 @@ const REPO = 'https://github.com/JiangNanChina/mc-command-studio'
  */
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: '0.7.1',
+    date: '2026-10-29',
+    title: '国内更新镜像',
+    highlights: [
+      '软件仍处于测试阶段，部分功能属于半成品（尚未完成），可能存在错误或体验不完善。',
+      '安装版检查更新时优先走国内镜像，失败自动回退 GitHub Releases。',
+      '设置页可以看到当前更新源链路，以及本次实际使用的源。'
+    ],
+    sections: [
+      {
+        type: 'added',
+        items: [
+          '正式版默认优先使用阿里云 OSS 国内镜像检查更新，镜像不可用时自动回退 GitHub Releases。',
+          '新增镜像同步工作流：Release 发布后自动上传安装包、blockmap、latest.yml 与 checksums。',
+          '新增 pnpm mirror:check，一键校验镜像版本一致性、缓存头与 Range 支持。'
+        ]
+      },
+      {
+        type: 'improved',
+        items: [
+          '镜像落后于 GitHub 时仍能检测到新版本，不会因为镜像未同步而收不到更新。',
+          '镜像首次检查失败后，本次运行内不再重试，避免每次检查都卡到超时。',
+          '设置页显示更新源链路与本次实际使用的源。'
+        ]
+      },
+      {
+        type: 'known',
+        items: [
+          '软件仍处于测试阶段，部分功能属于半成品；尚未在实际 Minecraft 游戏 / 服务器中逐项执行命令，请先在测试世界验证。',
+          '高级模板、复杂组件及部分特殊实体 / 方块字段仍需编辑 JSON / SNBT 或组件文本，尚未全部可视化。',
+          '国内镜像需要先配置 OSS Bucket 与仓库 Secrets，未配置时会自动回退 GitHub。'
+        ]
+      }
+    ],
+    releaseUrl: REPO + '/releases/tag/v0.7.1'
+  },
+  {
     version: '0.7.0',
     date: '2026-10-29',
     title: '中文优先界面与物品方案',

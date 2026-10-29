@@ -55,7 +55,7 @@
 - `autoInstallOnAppQuit = true`：退出时也可安装。
 - `allowDowngrade = false`。
 - 稳定渠道 `latest.yml`；测试渠道 `beta.yml` + `allowPrerelease=true`。
-- `MCSTUDIO_UPDATE_URL` 可将更新源覆盖为 `generic` 静态地址（本地测试/国内镜像）。
+- 正式版默认**国内镜像优先、GitHub 兜底**：`MCSTUDIO_UPDATE_MIRROR` 换镜像地址（填 `off` 关闭），`MCSTUDIO_UPDATE_URL` 强制单一源。详见 [21-cn-mirror-oss.md](21-cn-mirror-oss.md)。
 
 ## 3. 更新源
 
@@ -71,7 +71,7 @@ publish:
     releaseType: draft
 ```
 
-本仓库已完成配置。当前版本为 [MC 指令工坊 v0.7.0](https://github.com/JiangNanChina/mc-command-studio/releases/tag/v0.7.0)，本次更新包括中文优先界面、物品分区设置、方案管理与独立模板分类。**软件仍处于测试阶段，部分功能属于半成品，正式发布渠道不代表所有功能已经完成。** 具体范围见 [更新日志](../CHANGELOG.md)。
+本仓库已完成配置。当前版本为 [MC 指令工坊 v0.7.1](https://github.com/JiangNanChina/mc-command-studio/releases/tag/v0.7.1)，本次更新包括国内更新镜像与自动回退。**软件仍处于测试阶段，部分功能属于半成品，正式发布渠道不代表所有功能已经完成。** 具体范围见 [更新日志](../CHANGELOG.md)。
 
 历史版本：
 [v0.6.2](https://github.com/JiangNanChina/mc-command-studio/releases/tag/v0.6.2)、
@@ -154,16 +154,25 @@ pnpm configure:github <你的GitHub用户名> mc-command-studio
 
 ### 3.2 国内镜像
 
-准备一个静态目录，结构与 GitHub Release 相同：
+静态目录结构与 GitHub Release 相同，托管在阿里云 OSS：
 
 ```
-https://your-cdn.example.com/mc-command-studio/updates/
+https://mcstudio-cn.oss-cn-chengdu.aliyuncs.com/mc-command-studio/updates/
   latest.yml
-  MC-Command-Studio-Setup-0.1.1.exe
-  MC-Command-Studio-Setup-0.1.1.exe.blockmap
+  MC-Command-Studio-Setup-0.7.0.exe
+  MC-Command-Studio-Setup-0.7.0.exe.blockmap
 ```
 
-构建时设置 `MCSTUDIO_UPDATE_URL`，或发布一个“国内镜像版”安装包。镜像与 GitHub 必须同步 `latest.yml`，否则会出现版本检测不一致。
+客户端行为（已实现）：
+
+- 安装版每次检查先问镜像，失败或镜像无更新时再问 GitHub，取"比当前版本更新"的那个；
+- 镜像落后于 GitHub 时仍能收到更新，不会因为镜像没同步而卡住；
+- 本地测试版（版本号含 `-test`）只用打包内置的 `app-update.yml`；
+- `MCSTUDIO_UPDATE_URL` 强制单一源，不做回退。
+
+发布流程：Release 转为 published 后，`mirror.yml` 自动把安装包、blockmap、`latest.yml` 同步到 OSS；先传文件、最后传 `latest.yml`。
+
+成本、开通步骤、Secrets 与运维注意事项见 [21-cn-mirror-oss.md](21-cn-mirror-oss.md)。
 
 ### 3.3 数据包与软件更新解耦
 

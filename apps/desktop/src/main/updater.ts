@@ -5,6 +5,15 @@ import type { UpdateState, UserSettings } from '../shared/types'
 import { readSettings, updateSettings } from './storage'
 import { isNewerVersion } from './version'
 import { requestShutdown } from './lifecycle'
+import {
+  GITHUB_OWNER,
+  GITHUB_REPO,
+  decideFeedResult,
+  describeUpdateFeeds,
+  resolveUpdateFeeds,
+  type FeedAttempt,
+  type UpdateFeed
+} from './updateFeeds'
 
 let state: UpdateState = { status: 'idle' }
 let mainWindow: BrowserWindow | null = null
@@ -13,6 +22,10 @@ let manualCheck = false
 let checkTimer: NodeJS.Timeout | null = null
 let intervalTimer: NodeJS.Timeout | null = null
 let currentSettings: UserSettings | null = null
+/** 轮询多个更新源时屏蔽事件回调，避免状态在源之间来回跳。 */
+let probing = false
+/** 镜像一旦失败（含域名被黑洞），本次运行内不再重试，避免每 6 小时都卡到超时。 */
+let mirrorDown = false
 
 function currentChannel(): 'stable' | 'beta' | 'test' {
   if (app.getVersion().includes('-test')) return 'test'
@@ -24,6 +37,10 @@ function releaseNotes(info: UpdateInfo): string {
   if (!notes) return ''
   if (typeof notes === 'string') return notes
   return notes.map((entry) => `${entry.version}\n${entry.note}`).join('\n\n')
+}
+
+function errorMessage(error: unknown): string {
+  return error instanceof Error ? error.message : String(error)
 }
 
 function emit(): void {
@@ -40,9 +57,39 @@ function setState(next: UpdateState): void {
   emit()
 }
 
+/** 当前生效的更新源顺序：国内镜像优先，GitHub 兜底。 */
+function updateFeeds(): UpdateFeed[] {
+  return resolveUpdateFeeds({
+    version: app.getVersion(),
+    overrideUrl: process.env.MCSTUDIO_UPDATE_URL,
+    mirrorUrl: process.env.MCSTUDIO_UPDATE_MIRROR
+  })
+}
+
 export function updateFeedDescription(): string {
-  if (app.getVersion().includes('-test')) return '本地测试源（app-update.yml）'
-  return process.env.MCSTUDIO_UPDATE_URL ?? 'GitHub Releases（app-update.yml）'
+  return describeUpdateFeeds(updateFeeds())
+}
+
+function applyFeed(feed: UpdateFeed): void {
+  if (feed.kind === 'bundled') {
+    // 使用打包进 app-update.yml 的源（本地测试版）
+    return
+  }
+  if (feed.kind === 'github') {
+    autoUpdater.setFeedURL({
+      provider: 'github',
+      owner: GITHUB_OWNER,
+      repo: GITHUB_REPO
+    })
+    return
+  }
+  if (!feed.url) return
+  autoUpdater.setFeedURL({
+    provider: 'generic',
+    url: feed.url,
+    // OSS 只支持单段 Range，多段请求会让差异更新失败后退回全量下载。
+    useMultipleRangeRequest: false
+  })
 }
 
 export function initUpdater(window: BrowserWindow, settings: UserSettings): void {
@@ -69,59 +116,6 @@ export function initUpdater(window: BrowserWindow, settings: UserSettings): void
     return
   }
 
-  if (process.env.MCSTUDIO_UPDATE_URL) {
-    autoUpdater.setFeedURL({
-      provider: 'generic',
-      url: process.env.MCSTUDIO_UPDATE_URL
-    })
-  }
-
-  autoUpdater.on('checking-for-update', () => {
-    setState({ ...state, status: 'checking', manual: manualCheck, error: undefined })
-  })
-
-  autoUpdater.on('update-available', (info) => {
-    // GitHub 的 latest 可能落后于本地新版本，禁止把旧版本当更新。
-    if (!isNewerVersion(info.version, app.getVersion())) {
-      setState({
-        status: 'idle',
-        version: info.version,
-        channel: currentChannel()
-      })
-      return
-    }
-    if (!manualCheck && currentSettings?.skippedVersion === info.version) {
-      setState({
-        status: 'idle',
-        version: info.version,
-        skipped: true,
-        channel: currentChannel()
-      })
-      return
-    }
-    setState({
-      status: 'available',
-      version: info.version,
-      notes: releaseNotes(info),
-      manual: manualCheck,
-      channel: currentChannel(),
-      error: undefined
-    })
-  })
-
-  autoUpdater.on('update-not-available', () => {
-    setState({
-      status: 'not-available',
-      manual: manualCheck,
-      channel: currentChannel()
-    })
-    setTimeout(() => {
-      if (state.status === 'not-available') {
-        setState({ status: 'idle', channel: currentChannel() })
-      }
-    }, 5000)
-  })
-
   autoUpdater.on('download-progress', (progress) => {
     setState({
       ...state,
@@ -142,6 +136,8 @@ export function initUpdater(window: BrowserWindow, settings: UserSettings): void
   })
 
   autoUpdater.on('error', (error) => {
+    // 检查阶段由 checkForUpdates 汇总各源错误，这里只处理下载/安装阶段的异常。
+    if (probing) return
     log.error('updater error', error)
     setState({
       ...state,
@@ -199,6 +195,32 @@ export function getUpdateState(): UpdateState {
   return state
 }
 
+function scheduleIdleReset(): void {
+  setTimeout(() => {
+    if (state.status === 'not-available') {
+      setState({ status: 'idle', channel: currentChannel() })
+    }
+  }, 5000)
+}
+
+async function probeFeed(feed: UpdateFeed): Promise<FeedAttempt & { info?: UpdateInfo }> {
+  applyFeed(feed)
+  const result = await autoUpdater.checkForUpdates()
+  if (!result) {
+    return { feed, ok: false, error: '更新器未就绪' }
+  }
+  const info = result.updateInfo
+  // electron-updater 在设置 channel 时会打开 allowDowngrade，
+  // 这里统一改成"只认比当前版本更新的版本"，镜像落后时才能继续问下一个源。
+  return {
+    feed,
+    ok: true,
+    isUpdateAvailable: result.isUpdateAvailable && isNewerVersion(info.version, app.getVersion()),
+    version: info.version,
+    info
+  }
+}
+
 export async function checkForUpdates(manual = false): Promise<UpdateState> {
   if (process.env.PORTABLE_EXECUTABLE_DIR) {
     state = { status: 'disabled', error: '便携版不支持自动更新，请手动下载新版' }
@@ -224,15 +246,75 @@ export async function checkForUpdates(manual = false): Promise<UpdateState> {
     channel: currentChannel()
   })
 
+  const feeds = updateFeeds()
+  const attempts: Array<FeedAttempt & { info?: UpdateInfo }> = []
+
+  probing = true
   try {
-    await autoUpdater.checkForUpdates()
-  } catch (error) {
+    for (const feed of feeds) {
+      if (feed.kind === 'mirror' && mirrorDown) {
+        log.info('国内镜像本次运行已失败，直接使用 GitHub')
+        attempts.push({ feed, ok: false, error: '本次运行内已跳过（此前连接失败）' })
+        continue
+      }
+      try {
+        const attempt = await probeFeed(feed)
+        attempts.push(attempt)
+        if (attempt.isUpdateAvailable) break
+      } catch (error) {
+        const message = errorMessage(error)
+        if (feed.kind === 'mirror') mirrorDown = true
+        log.warn(`更新源 ${feed.label} 检查失败：${message}`)
+        attempts.push({ feed, ok: false, error: message })
+      }
+    }
+  } finally {
+    probing = false
+  }
+
+  const decision = decideFeedResult(attempts)
+  const chosen = decision.chosen
+
+  if (!chosen) {
     setState({
       status: 'error',
-      error: (error as Error).message,
-      manual
+      error: `检查更新失败：${decision.errors.join('；') || '没有可用的更新源'}`,
+      manual,
+      channel: currentChannel()
     })
+    return state
   }
+
+  // 让后续 downloadUpdate 复用选中的那个源
+  try {
+    applyFeed(chosen.feed)
+  } catch (error) {
+    log.warn(`切换更新源 ${chosen.feed.label} 失败：${errorMessage(error)}`)
+  }
+
+  const version = chosen.version
+  const source = chosen.feed.kind
+
+  if (!version || !isNewerVersion(version, app.getVersion())) {
+    setState({ status: 'not-available', manual, channel: currentChannel(), source })
+    scheduleIdleReset()
+    return state
+  }
+
+  if (!manual && currentSettings?.skippedVersion === version) {
+    setState({ status: 'idle', version, skipped: true, channel: currentChannel(), source })
+    return state
+  }
+
+  const probed = attempts.find((attempt) => attempt.feed.kind === chosen.feed.kind)
+  setState({
+    status: 'available',
+    version,
+    notes: probed?.info ? releaseNotes(probed.info) : '',
+    manual,
+    channel: currentChannel(),
+    source
+  })
   return state
 }
 
@@ -267,6 +349,6 @@ export async function skipVersion(version: string): Promise<UpdateState> {
 
 export async function clearSkippedVersion(): Promise<void> {
   const settings = await readSettings()
-  currentSettings = { ...settings, skippedVersion: null }
   await updateSettings({ skippedVersion: null })
+  currentSettings = { ...settings, skippedVersion: null }
 }

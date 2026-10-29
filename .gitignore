@@ -24,3 +24,6 @@ test-results/
 # Temporary test directories
 *.tmpdir/
 /release-test/
+
+# 发布脚本的构建临时目录（esbuild / electron-builder）
+/.tmp/

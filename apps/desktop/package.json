@@ -1,6 +1,6 @@
 {
   "name": "@mcstudio/desktop",
-  "version": "0.7.0",
+  "version": "0.7.1",
   "private": true,
   "description": "MC 指令工坊中文命令编辑器（测试阶段，部分功能尚未完成）",
   "main": "out/main/index.js",

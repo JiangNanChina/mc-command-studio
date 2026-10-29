@@ -109,6 +109,16 @@ export type UpdateStatus =
   | 'downloaded'
   | 'error'
 
+/** 更新源：打包内置、显式覆盖、国内镜像、GitHub。 */
+export type UpdateSource = 'bundled' | 'override' | 'mirror' | 'github'
+
+export const UPDATE_SOURCE_LABELS: Record<UpdateSource, string> = {
+  bundled: '打包内置源',
+  override: '自定义源',
+  mirror: '国内镜像',
+  github: 'GitHub'
+}
+
 export interface UpdateState {
   status: UpdateStatus
   version?: string
@@ -118,6 +128,8 @@ export interface UpdateState {
   manual?: boolean
   skipped?: boolean
   channel?: 'stable' | 'beta' | 'test'
+  /** 本次检查实际采用的更新源 */
+  source?: UpdateSource
 }
 
 export type MenuAction =

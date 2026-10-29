@@ -1,6 +1,6 @@
 {
   "name": "mc-command-studio",
-  "version": "0.7.0",
+  "version": "0.7.1",
   "private": true,
   "description": "MC 指令工坊 - 中文优先的 Windows Minecraft Java 命令编辑器（测试阶段，部分功能尚未完成）",
   "packageManager": "pnpm@11.28.5",
@@ -23,6 +23,9 @@
     "release:patch": "node tools/release/bump.mjs patch",
     "release:minor": "node tools/release/bump.mjs minor",
     "update:serve": "node tools/release/mock-update-server.mjs",
+    "mirror:check": "node tools/release/check-mirror.mjs",
+    "oss:setup": "node tools/release/setup-oss.mjs",
+    "release:oss": "node tools/release/release-oss.mjs",
     "e2e": "node tools/e2e/smoke.mjs",
     "e2e:update": "node tools/e2e/update-test.mjs",
     "test:e2e:matrix": "node tools/e2e/version-matrix-smoke.mjs",

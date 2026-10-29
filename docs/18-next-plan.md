@@ -69,8 +69,8 @@
 ## P2：发布基础设施
 
 - [ ] 代码签名
-- [ ] 国内镜像
-- [ ] 便携版自动更新或明确提示
+- [ ] 国内镜像：客户端双源、`mirror.yml` 同步、`pnpm release:oss` 一键发布均已实现（见 [21-cn-mirror-oss.md](21-cn-mirror-oss.md)）；桶 `mcstudio-cn`（成都）已就绪，待上传文件 + 写 Secrets
+- [x] 便携版更新提示（`updater.ts` 已提示手动下载）
 - [ ] 更新失败回滚提示
 
 ## 下一版建议

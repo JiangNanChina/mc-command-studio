@@ -12,14 +12,14 @@
 
 ![give 表单](docs/assets/give-form.png)
 
-## 本次更新（0.7.0）
+## 本次更新（0.7.1）
 
-- **中文主显示**：属性、附魔、药水、刷怪笼、实体、槽位、伤害、游戏规则等优先显示中文，英文 ID 作为次级信息保留；可按中文或 ID 搜索，选择后仍生成原始游戏 ID。
-- **给予物品分区设置**：基础、属性、附魔、进阶、特殊物品五个分区，覆盖数量、损耗耐久、名称、描述、标签、属性修饰器、药水效果和刷怪笼参数等常用字段。
-- **物品方案复用**：保存和载入当前配置；独立管理弹窗支持重命名、删除与 JSON 导入 / 导出。
-- **五类专用模板**：JSON 相关、特殊 NBT 物品 / 方块、复合物品 / 方块、特殊 NBT 实体、复合实体，共 51 个入口，按模板和版本保留独立草稿。专有数据仍通过文本编辑，并非所有字段都已可视化。
-- **旧版界面调整**：1.12.2 工具沿用主界面深色风格，按用途分组并提供中文说明和图标；基础命令集中展示，修正同行输入框与窄窗口布局。
-- **版本兼容修复**：1.13–1.15 保留旧版 camelCase 属性名，现代版本继续使用对应资源 ID；保留自定义 ID、原始命令与 JSON / NBT 编辑能力。
+- **国内更新镜像**：安装版检查更新时优先走阿里云 OSS 镜像，失败自动回退 GitHub Releases，国内网络不再依赖 GitHub 连通性。
+- **镜像未同步也不掉队**：镜像版本落后时仍会向 GitHub 再问一次，取真正比当前版本新的那个。
+- **一键体检**：`pnpm mirror:check` 校验镜像版本一致性、`Cache-Control` 与 Range 支持。
+- **设置页可见**：显示“更新源：国内镜像 → GitHub”，以及本次实际使用的源。
+
+> 0.7.0 的中文优先界面、物品分区与 51 个模板改动见 [CHANGELOG.md](CHANGELOG.md)。
 
 ## 主要功能
 
@@ -159,7 +159,7 @@ git push origin main --tags
 - GitHub Actions `Release` 会构建并创建 draft Release，上传安装包、便携版、`latest.yml`、blockmap、checksums。
 - 人工检查 draft 后发布，客户端即可自动更新。
 - 便携版通过 `PORTABLE_EXECUTABLE_DIR` 识别，不会请求更新源，只提示手动下载。
-- 国内可配置 `generic` 镜像（`MCSTUDIO_UPDATE_URL`），详见 [docs/08-release-update.md](docs/08-release-update.md)。
+- 国内网络默认走阿里云 OSS 镜像，失败自动回退 GitHub Releases；详见 [docs/21-cn-mirror-oss.md](docs/21-cn-mirror-oss.md)。
 
 ## 目录
 
@@ -202,4 +202,5 @@ release/             打包产物（不入库）
 - [发布与自动更新](docs/08-release-update.md)
 - [P1/P2 可靠性与验证改造](docs/19-reliability-hardening.md)
 - [中文优先改造与本地验收记录](docs/20-chinese-first-preview.md)
+- [国内镜像（阿里云 OSS）：成本与操作步骤](docs/21-cn-mirror-oss.md)
 - [中文名称与图标资源](docs/09-visual-assets.md)
