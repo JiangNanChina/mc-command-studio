@@ -95,4 +95,13 @@ jobs:
             throw "latest.yml 版本与 tag 不一致（期望 $expected）：`n$text"
           }
           Write-Host '最新版元数据校验通过'
-          ossutil ls @oss "$base/" | Select-Object -First 20
+
+          # 公共可读性 + 缓存头：走匿名 HTTP，不依赖 ListObjects（RAM 最小权限里可能没有）
+          $url = "https://$env:OSS_BUCKET.$env:OSS_ENDPOINT/$env:OSS_PREFIX/latest.yml"
+          $head = Invoke-WebRequest -Uri $url -Method Head
+          if ($head.StatusCode -ne 200) { throw "镜像公共读失败：HTTP $($head.StatusCode)" }
+          $cacheControl = [string]$head.Headers['Cache-Control']
+          if ($cacheControl -notmatch 'no-cache|max-age=0') {
+            throw "latest.yml 的 Cache-Control 是 '$cacheControl'，应为 no-cache"
+          }
+          Write-Host "公共可读 OK：$url（Cache-Control: $cacheControl）"
