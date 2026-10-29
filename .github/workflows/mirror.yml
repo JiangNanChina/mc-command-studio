@@ -55,8 +55,8 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           New-Item -ItemType Directory -Force dist | Out-Null
-          # 不带 --pattern：发布资产就是 exe / blockmap / latest.yml / checksums，全量拉取最稳
-          gh release download $env:TAG --dir dist --clobber
+          # 没有 checkout，必须显式指定仓库，否则 gh 会报 "not a git repository"
+          gh release download $env:TAG --repo $env:GITHUB_REPOSITORY --dir dist --clobber
           Get-ChildItem dist | Select-Object Name, Length | Format-Table -AutoSize
 
       - name: Install ossutil
