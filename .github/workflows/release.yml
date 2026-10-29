@@ -89,11 +89,24 @@ jobs:
             Set-Content release/checksums.txt -Encoding utf8
           Get-Content release/checksums.txt
 
+      - name: Extract release notes from CHANGELOG
+        shell: pwsh
+        run: |
+          $version = (Get-Content package.json -Raw -Encoding utf8 | ConvertFrom-Json).version
+          $md = Get-Content CHANGELOG.md -Raw -Encoding utf8
+          $pattern = "(?ms)^## \[$([regex]::Escape($version))\][^\r\n]*\r?\n(.*?)(?=^## \[|\z)"
+          $match = [regex]::Match($md, $pattern)
+          if (-not $match.Success) { throw "CHANGELOG.md 中找不到 $version 的条目" }
+          $notes = $match.Groups[1].Value.Trim()
+          $footer = "`n`n安装：MC-Command-Studio-Setup-$version.exe（安装版，支持自动更新）/ MC-Command-Studio-$version-portable.exe（便携版，请手动下载）`n`n校验：发布资产 checksums.txt（SHA-256）`n`n国内镜像：https://mcstudio-cn.oss-cn-chengdu.aliyuncs.com/mc-command-studio/updates/"
+          Set-Content -Path release-notes.md -Value ($notes + $footer) -Encoding utf8
+          Write-Host "release notes: $($notes.Length) chars"
+
       - name: Create draft release with update metadata
         uses: softprops/action-gh-release@v2
         with:
           draft: true
-          generate_release_notes: true
+          body_path: release-notes.md
           files: |
             release/MC-Command-Studio-Setup-*.exe
             release/MC-Command-Studio-*-portable.exe

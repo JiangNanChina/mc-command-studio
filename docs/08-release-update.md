@@ -190,7 +190,10 @@ https://mcstudio-cn.oss-cn-chengdu.aliyuncs.com/mc-command-studio/updates/
 5. `pnpm build:win`（electron-builder）。
 6. `node tools/release/verify-version.mjs "$tag"` 校验版本、产物、`CHANGELOG.md` 与内置更新公告的当前版本。
 7. 生成 `checksums.txt`。
-8. 创建 **draft** Release，上传安装包、便携版、`latest.yml`、blockmap、checksums。
+8. 从 `CHANGELOG.md` 提取当前版本段落，加上安装/校验/镜像信息，写入 `release-notes.md`。
+9. 创建 **draft** Release（`body_path` 用上面的发布说明），上传安装包、便携版、`latest.yml`、blockmap、checksums。
+
+> 不用 `generate_release_notes: true`：本仓库直接往 `main` 提交、没有 PR，GitHub 自动生成的说明只有一行 compare 链接。
 
 人工检查后发布 draft，自动更新才会对用户生效。
 
